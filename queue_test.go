@@ -11,7 +11,7 @@
 package collections_test
 
 import (
-	col "github.com/craterdog/go-collection-framework/collections"
+	col "github.com/craterdog/go-collection-framework"
 	ass "github.com/stretchr/testify/assert"
 	syn "sync"
 	tes "testing"

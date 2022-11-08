@@ -15,9 +15,8 @@ repository.
 The Go best practices suggest that we keep package names short so that they are
 easy to use in our code. The problem is that the import section can be rather
 cryptic. Instead, we use longer descriptive package names and assign each to a
-short three character variable (usually the first three letters of the package
-name). This makes package references in the code terse while making the import
-section informative. Here is an example:
+short three character variable. This makes package references in the code terse
+while making the import section informative. Here is an example:
 ```go
 package elements
 
@@ -41,14 +40,71 @@ sole purpose is to represent the structure and give full access to its
 attributes. An example of a structural type is the following:
 
 ```go
-type Association[T any] struct {
-	Name string
-	Value T
+type Association[K any, V any] struct {
+	Key K
+	Value V
 }
 ```
 
+Note that an encapsulated type may be chosen over a pure structured type even if
+read-update access to all attributes is allowed.
+
+#### Constrained Types
+The constrained type approach allows constraints to be enforced on specific
+attributes. For example, the actual implementation of the `Association` type is
+something more like this:
+
+```go
+// ASSOCIATION INTERFACE
+
+// This interface defines the methods supported by all association-like types.
+// An association associates a key with an setable value.
+type AssociationLike[K Key, V Value] interface {
+	GetKey() K
+	GetValue() V
+	SetValue(value V)
+}
+
+// ASSOCIATION IMPLEMENTATION
+
+// This constructor creates a new association with the specified key and value.
+func Association[K Key, V Value](key K, value V) AssociationLike[K, V] {
+	return &association[K, V]{key, value}
+}
+
+// This type defines the structure and methods associated with a key-value
+// pair. This type is parameterized as follows:
+//   - K is any type of key.
+//   - V is any type of value.
+//
+// This structure is used by the catalog type to maintain its associations.
+type association[K Key, V Value] struct {
+	key   K
+	value V
+}
+
+// This method returns the key for this association.
+func (v *association[K, V]) GetKey() K {
+	return v.key
+}
+
+// This method returns the value for this association.
+func (v *association[K, V]) GetValue() V {
+	return v.value
+}
+
+// This method sets the value of this association to a new value.
+func (v *association[K, V]) SetValue(value V) {
+	v.value = value
+}
+```
+
+Notice that the interface defining the Association type has a "Like" suffix on
+it turning a noun phrase into an adjective phrase. This approach is used for all
+types that implement one or more interfaces.
+
 #### Encapsulated Types
-A type that encapsulates information should restrict all access to the
+A type that fully encapsulates information should restrict all access to the
 information via its methods. Since encapsulated types have methods, it is
 important to isolate the implementation of the type from other code that
 depends on its interface. This can be done by making the type and its attributes
@@ -61,41 +117,41 @@ and return it **via an interface**. For example:
 
 // This interface consolidates all the interfaces supported by list-like
 // collections.
-type ListLike[T any] interface {
-	Sequential[T]
-	Indexed[T]
+type ListLike[V Value] interface {
+	Sequential[V]
+	Indexed[V]
 	...
 }
 
 // This constructor creates a new empty list and returns it via an interface.
-func List[T any]() ListLike[T] {
-	items := make([]T, 0, 4)
-	return &list[T]{items}
+func List[V Value]() ListLike[V] {
+	items := make([]V, 0, 4)
+	return &list[V]{items}
 }
 
 // LIST IMPLEMENTATION
 
 // This type defines the structure and methods associated with a list of items.
-type list[T any] struct {
-	items   []T
+type list[V Value] struct {
+	items   []V
 }
 
 // SEQUENTIAL INTERFACE
 
 // This method determines whether or not this list is empty.
-func (v *list[T]) IsEmpty() bool {
+func (v *list[V]) IsEmpty() bool {
 	return len(v.items) == 0
 }
 
 // This method returns the number of items contained in this list.
-func (v *list[T]) GetSize() int {
+func (v *list[V]) GetSize() int {
 	return len(v.items)
 }
 
 // This method returns all the items in this list as an array (slice).
-func (v *list[T]) AsArray() []T {
+func (v *list[V]) AsArray() []V {
 	length := len(v.items)
-	result := make([]T, length)
+	result := make([]V, length)
 	copy(result, v.items)
 	return result
 }
@@ -106,40 +162,6 @@ func (v *list[T]) AsArray() []T {
 ```
 
 For coding conventions associated with interfaces see [Interfaces](#Interfaces).
-
-Note that an encapsulated type may be chosen over a structured type even if
-read-update access to all attributes is allowed. The encapsulated type approach
-allows constraints to be enforced on specific attributes. For example:
-```go
-// THROW CLAUSE IMPLEMENTATION
-
-// This constructor creates a new throw clause.
-func ThrowClause(exception any) abs.ThrowClauseLike {
-	var v = &throwClause{}
-	// Perform argument validation.
-	v.SetException(exception)
-	return v
-}
-
-// This type defines the structure and methods associated with an throw
-// clause.
-type throwClause struct {
-	exception any
-}
-
-// This method returns the exception expression for this throw clause.
-func (v *throwClause) GetException() any {
-	return v.exception
-}
-
-// This method sets the exception expression for this throw clause.
-func (v *throwClause) SetException(exception any) {
-	if exception == nil {
-		panic("A throw clause requires an exception.")
-	}
-	v.exception = exception
-}
-```
 
 #### Extended Primitive Types
 The Go primitive types (`int`, `string`, `[]byte`, etc.) can be extended to
@@ -153,7 +175,7 @@ This can be done in a similar manner to encapsulated types as follows:
 
 // This constructor creates a new angle from the specified value and normalizes
 // the value to be in the allowed range for angles [0..2π).
-func Angle(v float64) AngleLike {
+func Angle(v float64) Angle {
 	twoPi := 2.0 * math.Pi
 	if v < -twoPi || v >= twoPi {
 		// Normalize the angle to the range [-2π..2π).
@@ -163,26 +185,26 @@ func Angle(v float64) AngleLike {
 		// Normalize the angle to the range [0..2π).
 		v = v + twoPi
 	}
-	return AngleLike(v)
+	return Angle(v)
 }
 
 // This type defines the methods associated with angle elements. It extends the
 // native Go `float64` type and represents a radian based angle in the range
 // [0..2π).
-type AngleLike float64
+type Angle float64
 
 // This method implements the standard Go Stringer interface.
-func (v AngleLike) String() string {
+func (v Angle) String() string {
 	return v.AsString()
 }
 
 // This method returns a string value for this angle.
-func (v AngleLike) AsString() string {
+func (v Angle) AsString() string {
 	return "~" + strconv.FormatFloat(float64(v), 'G', -1, 64)
 }
 
 // This method returns a real value for this angle.
-func (v AngleLike) AsReal() float64 {
+func (v Angle) AsReal() float64 {
 	return float64(v)
 }
 

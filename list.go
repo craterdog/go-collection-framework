@@ -145,6 +145,22 @@ func (v *list[V]) ContainsAll(values Sequential[V]) bool {
 	return true
 }
 
+// UPDATABLE INTERFACE
+
+// This method sets the value in this list that is associated with the specified
+// index to be the specified value.
+func (v *list[V]) SetValue(index int, value V) {
+	index = v.normalizedIndex(index)
+	v.values[index] = value
+}
+
+// This method sets the values in this list starting with the specified index
+// to the specified values.
+func (v *list[V]) SetValues(index int, values Sequential[V]) {
+	index = v.normalizedIndex(index)
+	copy(v.values[index:], values.AsArray())
+}
+
 // MALLEABLE INTERFACE
 
 // This method appends the specified value to the end of this list.
@@ -166,20 +182,6 @@ func (v *list[V]) AddValues(values Sequential[V]) {
 	v.resize(length)
 
 	// Append the new values.
-	copy(v.values[index:], values.AsArray())
-}
-
-// This method sets the value in this list that is associated with the specified
-// index to be the specified value.
-func (v *list[V]) SetValue(index int, value V) {
-	index = v.normalizedIndex(index)
-	v.values[index] = value
-}
-
-// This method sets the values in this list starting with the specified index
-// to the specified values.
-func (v *list[V]) SetValues(index int, values Sequential[V]) {
-	index = v.normalizedIndex(index)
 	copy(v.values[index:], values.AsArray())
 }
 

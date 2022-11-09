@@ -80,7 +80,7 @@ type Malleable[V Value] interface {
 	RemoveAll()
 	ShuffleValues()
 	SortValues()
-	SortValuesWithRanker(ranker RankingFunction)
+	SortValuesWithRanker(rank RankingFunction)
 	ReverseValues()
 }
 
@@ -97,7 +97,7 @@ type Associative[K Key, V Value] interface {
 	RemoveValues(keys Sequential[K]) Sequential[V]
 	RemoveAll()
 	SortAssociations()
-	SortAssociationsWithRanker(ranker RankingFunction)
+	SortAssociationsWithRanker(rank RankingFunction)
 	ReverseAssociations()
 }
 

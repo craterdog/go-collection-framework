@@ -83,7 +83,7 @@ func (v *set[V]) ContainsAll(values Sequential[V]) bool {
 
 // FLEXIBLE INTERFACE
 
-// This method sets the ranker function for this set.
+// This method sets the ranking function for this set.
 func (v *set[V]) SetRanker(rank RankingFunction) {
 	if rank == nil {
 		rank = RankValues

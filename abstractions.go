@@ -10,7 +10,7 @@
 
 package collections
 
-// SEQUENTIAL INTERFACES
+// INDIVIDUAL INTERFACES
 
 type Key any
 
@@ -84,6 +84,14 @@ type Malleable[V Value] interface {
 	ReverseValues()
 }
 
+// This interface defines the methods supported by all binding associations.
+// It binds a readonly key with an setable value.
+type Binding[K Key, V Value] interface {
+	GetKey() K
+	GetValue() V
+	SetValue(value V)
+}
+
 // This interface defines the methods supported by all associative sequences
 // whose values consist of key-value pair associations.
 type Associative[K Key, V Value] interface {
@@ -122,7 +130,61 @@ type LIFO[V Value] interface {
 	RemoveAll()
 }
 
-// COLLECTION INTERFACES
+// This interface defines the methods supported by all ratcheted agents that
+// are capable of moving forward and backward over the values in a sequence. It
+// is used to implement the GoF Iterator Pattern:
+//   - https://en.wikipedia.org/wiki/Iterator_pattern
+//
+// A ratcheted agent locks into the slots that reside between each value in the
+// sequence:
+//
+//	    [value 1] . [value 2] . [value 3] ... [value N]
+//	  ^           ^           ^                         ^
+//	slot 0      slot 1      slot 2                    slot N
+//
+// It moves from slot to slot and has access to the values (if they exist) on
+// each side of the slot.
+type Ratcheted[V Value] interface {
+	GetSlot() int
+	ToSlot(slot int)
+	ToStart()
+	ToEnd()
+	HasPrevious() bool
+	GetPrevious() V
+	HasNext() bool
+	GetNext() V
+}
+
+// This interface defines the methods supported by all collator-like agent
+// types that can compare and rank two values.
+type CollatorLike interface {
+	CompareValues(first Value, second Value) bool
+	RankValues(first Value, second Value) int
+}
+
+// This type defines the function signature for any function that can determine
+// whether or not two specified values are equal to each other.
+type ComparisonFunction func(first Value, second Value) bool
+
+// This type defines the function signature for any function that can determine
+// the relative ordering of two specified values. The result must be one of
+// the following:
+//   - -1: The first value is less than the second value.
+//   - 0: The first value is equal to the second value.
+//   - 1: The first value is more than the second value.
+type RankingFunction func(first Value, second Value) int
+
+// This interface defines the methods supported by all sorter-like agents that
+// can sort an array of values using a ranking function.
+type SorterLike[V Value] interface {
+	SortArray(array []V)
+}
+
+// This type defines the function signature for any function that can sort an
+// array of values using a ranking function.
+type Sort[V Value] func(array []V, rank RankingFunction)
+
+// CONSOLIDATED INTERFACES
 
 // This interface consolidates all the interfaces supported by array-like
 // sequences.
@@ -134,11 +196,9 @@ type ArrayLike[V Value] interface {
 }
 
 // This interface defines the methods supported by all association-like types.
-// An association associates a key with an setable value.
+// An association binds a key with a value.
 type AssociationLike[K Key, V Value] interface {
-	GetKey() K
-	GetValue() V
-	SetValue(value V)
+	Binding[K, V]
 }
 
 // This interface consolidates all the interfaces supported by catalog-like
@@ -181,58 +241,7 @@ type StackLike[V Value] interface {
 	LIFO[V]
 }
 
-// AGENT INTERFACES
-
-// This interface defines the methods supported by all iterator-like agents that
-// are capable of moving forward and backward over the values in a sequence. It
-// is used to implement the GoF Iterator Pattern:
-//   - https://en.wikipedia.org/wiki/Iterator_pattern
-//
-// An iterator locks into the slots that reside between each value in the
-// sequence:
-//
-//	    [value 1] . [value 2] . [value 3] ... [value N]
-//	  ^           ^           ^                         ^
-//	slot 0      slot 1      slot 2                    slot N
-//
-// It moves from slot to slot and has access to the values (if they exist) on
-// each side of the slot.
+// This interface defines the methods supported by all iterator-like types.
 type IteratorLike[V Value] interface {
-	GetSlot() int
-	ToSlot(slot int)
-	ToStart()
-	ToEnd()
-	HasPrevious() bool
-	GetPrevious() V
-	HasNext() bool
-	GetNext() V
+	Ratcheted[V]
 }
-
-// This interface defines the methods supported by all collator-like agent
-// types that can compare and rank two values.
-type CollatorLike interface {
-	CompareValues(first Value, second Value) bool
-	RankValues(first Value, second Value) int
-}
-
-// This type defines the function signature for any function that can determine
-// whether or not two specified values are equal to each other.
-type ComparisonFunction func(first Value, second Value) bool
-
-// This type defines the function signature for any function that can determine
-// the relative ordering of two specified values. The result must be one of
-// the following:
-//   - -1: The first value is less than the second value.
-//   - 0: The first value is equal to the second value.
-//   - 1: The first value is more than the second value.
-type RankingFunction func(first Value, second Value) int
-
-// This interface defines the methods supported by all sorter-like agents that
-// can sort an array of values using a ranking function.
-type SorterLike[V Value] interface {
-	SortArray(array []V)
-}
-
-// This type defines the function signature for any function that can sort an
-// array of values using a ranking function.
-type Sort[V Value] func(array []V, rank RankingFunction)

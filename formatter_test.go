@@ -199,6 +199,7 @@ func TestFormatterWithQueueOfAny(t *tes.T) {
 func TestFormatterWithAssociationOfAnyToAny(t *tes.T) {
 	association := col.Association[any, any]("foo", 5)
 	s := col.FormatValue(association)
+	ass.Equal(t, s, fmt.Sprintf("%s", association))
 	fmt.Println("\nAssociation of Any to Any: " + s)
 }
 

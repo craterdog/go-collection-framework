@@ -17,6 +17,49 @@ func Association[K Key, V Value](key K, value V) AssociationLike[K, V] {
 	return &association[K, V]{key, value}
 }
 
+// This type defines the structure and methods associated with a key-value
+// pair. This type is parameterized as follows:
+//   - K is a primitive type of key.
+//   - V is any type of entity.
+//
+// This structure is used by the catalog type to maintain its associations.
+type association[K Key, V Value] struct {
+	key   K
+	value V
+}
+
+// STRINGER INTERFACE
+
+func (v *association[K, V]) String() string {
+	return FormatValue(v)
+}
+
+// BINDING INTERFACE
+
+// This method returns the key for this association.
+func (v *association[K, V]) GetKey() K {
+	return v.key
+}
+
+// This method returns the value for this association.
+func (v *association[K, V]) GetValue() V {
+	return v.value
+}
+
+// This method sets the value of this association to a new value.
+func (v *association[K, V]) SetValue(value V) {
+	v.value = value
+}
+
+// CATALOG IMPLEMENTATION
+
+// This constructor creates a new empty catalog.
+func Catalog[K Key, V Value]() CatalogLike[K, V] {
+	var keys = map[Key]AssociationLike[K, V]{}
+	var associations = List[AssociationLike[K, V]]()
+	return &catalog[K, V]{associations, associations, keys}
+}
+
 // This function returns a new catalog containing all of the associations
 // that are in the specified catalogs in the order that they appear in each
 // catalog.
@@ -41,41 +84,6 @@ func Extract[K Key, V Value](catalog CatalogLike[K, V], keys Sequential[K]) Cata
 	}
 	return result
 }
-
-// This type defines the structure and methods associated with a key-value
-// pair. This type is parameterized as follows:
-//   - K is a primitive type of key.
-//   - V is any type of entity.
-//
-// This structure is used by the catalog type to maintain its associations.
-type association[K Key, V Value] struct {
-	key   K
-	value V
-}
-
-// This method returns the key for this association.
-func (v *association[K, V]) GetKey() K {
-	return v.key
-}
-
-// This method returns the value for this association.
-func (v *association[K, V]) GetValue() V {
-	return v.value
-}
-
-// This method sets the value of this association to a new value.
-func (v *association[K, V]) SetValue(value V) {
-	v.value = value
-}
-
-// This constructor creates a new empty catalog.
-func Catalog[K Key, V Value]() CatalogLike[K, V] {
-	var keys = map[Key]AssociationLike[K, V]{}
-	var associations = List[AssociationLike[K, V]]()
-	return &catalog[K, V]{associations, associations, keys}
-}
-
-// CATALOG IMPLEMENTATION
 
 // This type defines the structure and methods associated with a catalog of
 // key-value pair associations. This type is parameterized as follows:

@@ -88,6 +88,12 @@ type catalog[K Key, V Value] struct {
 	keys         map[Key]AssociationLike[K, V]
 }
 
+// STRINGER INTERFACE
+
+func (v *catalog[K, V]) String() string {
+	return FormatValue(v)
+}
+
 // ASSOCIATIVE INTERFACE
 
 // This method appends the specified association to the end of this catalog.

@@ -41,6 +41,12 @@ type stack[V Value] struct {
 	capacity int
 }
 
+// STRINGER INTERFACE
+
+func (v *stack[V]) String() string {
+	return FormatValue(v)
+}
+
 // LIFO INTERFACE
 
 // This method retrieves the capacity of this stack.

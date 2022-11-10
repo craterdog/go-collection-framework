@@ -85,6 +85,12 @@ type set[V Value] struct {
 	rank   RankingFunction
 }
 
+// STRINGER INTERFACE
+
+func (v *set[V]) String() string {
+	return FormatValue(v)
+}
+
 // SEARCHABLE INTERFACE
 
 // This method determines whether or not this set contains the specified value.

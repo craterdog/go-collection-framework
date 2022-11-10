@@ -54,6 +54,12 @@ type list[V Value] struct {
 	compare ComparisonFunction
 }
 
+// STRINGER INTERFACE
+
+func (v *list[V]) String() string {
+	return FormatValue(v)
+}
+
 // SEQUENTIAL INTERFACE
 
 // This method determines whether or not this list is empty.

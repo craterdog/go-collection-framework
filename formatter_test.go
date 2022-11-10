@@ -139,6 +139,7 @@ func TestFormatterWithEmptyList(t *tes.T) {
 func TestFormatterWithListOfAny(t *tes.T) {
 	list := col.ListFromArray[any]([]any{v1, v2, v3, v4, v5, v6, v7, v8})
 	s := col.FormatValue(list)
+	ass.Equal(t, s, fmt.Sprintf("%s", list))
 	ass.Equal(t, "(list)", s[len(s)-6:])
 	fmt.Println("\nList of Any: " + s)
 }
@@ -152,6 +153,7 @@ func TestFormatterWithListOfBoolean(t *tes.T) {
 func TestFormatterWithSetOfAny(t *tes.T) {
 	set := col.SetFromArray[any]([]any{v1, v2, v3, v4, v5, v6, v7, v8})
 	s := col.FormatValue(set)
+	ass.Equal(t, s, fmt.Sprintf("%s", set))
 	ass.Equal(t, "(set)", s[len(s)-5:])
 	fmt.Println("\nSet of Any: " + s)
 }
@@ -174,6 +176,7 @@ func TestFormatterWithStackOfAny(t *tes.T) {
 	stack.AddValue(v6)
 	stack.AddValue(v7)
 	s := col.FormatValue(stack)
+	ass.Equal(t, s, fmt.Sprintf("%s", stack))
 	ass.Equal(t, "(stack)", s[len(s)-7:])
 	fmt.Println("\nStack: " + s)
 }
@@ -188,6 +191,7 @@ func TestFormatterWithQueueOfAny(t *tes.T) {
 	queue.AddValue(v6)
 	queue.AddValue(v7)
 	s := col.FormatValue(queue)
+	ass.Equal(t, s, fmt.Sprintf("%s", queue))
 	ass.Equal(t, "(queue)", s[len(s)-7:])
 	fmt.Println("\nQueue: " + s)
 }
@@ -221,6 +225,7 @@ func TestFormatterWithCatalogOfAnyToAny(t *tes.T) {
 	catalog.SetValue(k6, v6)
 	catalog.SetValue(k7, v7)
 	s := col.FormatValue(catalog)
+	ass.Equal(t, s, fmt.Sprintf("%s", catalog))
 	ass.Equal(t, "(catalog)", s[len(s)-9:])
 	fmt.Println("\nCatalog: " + s)
 }

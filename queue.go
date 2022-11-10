@@ -201,6 +201,12 @@ type queue[V Value] struct {
 	mutex     syn.Mutex
 }
 
+// STRINGER INTERFACE
+
+func (v *queue[V]) String() string {
+	return FormatValue(v)
+}
+
 // SEQUENTIAL INTERFACE
 
 // This method determines whether or not this queue is empty.

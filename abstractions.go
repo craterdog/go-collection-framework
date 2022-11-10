@@ -155,9 +155,9 @@ type Ratcheted[V Value] interface {
 	GetNext() V
 }
 
-// This interface defines the methods supported by all collator-like agent
+// This interface defines the methods supported by all discerning agent
 // types that can compare and rank two values.
-type CollatorLike interface {
+type Discerning interface {
 	CompareValues(first Value, second Value) bool
 	RankValues(first Value, second Value) int
 }
@@ -174,9 +174,10 @@ type ComparisonFunction func(first Value, second Value) bool
 //   - 1: The first value is more than the second value.
 type RankingFunction func(first Value, second Value) int
 
-// This interface defines the methods supported by all sorter-like agents that
-// can sort an array of values using a ranking function.
-type SorterLike[V Value] interface {
+// This interface defines the methods supported by all systematic agents that
+// can shuffle or sort an array of values using a ranking function.
+type Systematic[V Value] interface {
+	ShuffleArray(array []V)
 	SortArray(array []V)
 }
 
@@ -244,4 +245,14 @@ type StackLike[V Value] interface {
 // This interface defines the methods supported by all iterator-like types.
 type IteratorLike[V Value] interface {
 	Ratcheted[V]
+}
+
+// This interface defines the methods supported by all collator-like types.
+type CollatorLike interface {
+	Discerning
+}
+
+// This interface defines the methods supported by all sorter-like types.
+type SorterLike[V Value] interface {
+	Systematic[V]
 }

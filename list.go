@@ -11,9 +11,7 @@
 package collections
 
 import (
-	ran "crypto/rand"
 	fmt "fmt"
-	big "math/big"
 )
 
 // LIST IMPLEMENTATION
@@ -38,7 +36,7 @@ func ListFromArray[V Value](array []V) ListLike[V] {
 }
 
 // This function returns the concatenation of the two specified lists.
-func Concatenate[V any](first, second ListLike[V]) ListLike[V] {
+func Concatenate[V Value](first, second ListLike[V]) ListLike[V] {
 	var result = List[V]()
 	result.AddValues(first)
 	result.AddValues(second)
@@ -255,22 +253,7 @@ func (v *list[V]) RemoveAll() {
 
 // This method pseudo-randomly shuffles the values in this list.
 func (v *list[V]) ShuffleValues() {
-	var array = v.values
-	var size = len(array)
-	for i := 0; i < size; i++ {
-		var r = randomIndex(size)
-		array[i], array[r] = array[r], array[i]
-	}
-}
-
-// This function generates a cryptographically secure random index in the
-// range [0..size).
-func randomIndex(size int) int {
-	var random, err = ran.Int(ran.Reader, big.NewInt(int64(size)))
-	if err != nil {
-		panic(err)
-	}
-	return int(random.Int64())
+	ShuffleArray[V](v.values)
 }
 
 // This method sorts the values in this list using the canonical rank function.

@@ -41,7 +41,7 @@ func QueueWithCapacity[V Value](capacity int) QueueLike[V] {
 // added automatically to ALL of the output queues. This pattern is useful when
 // a set of DIFFERENT operations needs to occur for every value and each
 // operation can be done in parallel.
-func Fork[V any](wg *syn.WaitGroup, input FIFO[V], size int) Sequential[FIFO[V]] {
+func Fork[V Value](wg *syn.WaitGroup, input FIFO[V], size int) Sequential[FIFO[V]] {
 	// Validate the arguments.
 	if size < 1 {
 		panic("The fan out size for a queue must be greater than zero.")
@@ -95,7 +95,7 @@ func Fork[V any](wg *syn.WaitGroup, input FIFO[V], size int) Sequential[FIFO[V]]
 // a SINGLE operation needs to occur for each value and the operation can be done
 // on the values in parallel. The results can then be consolidated later on using
 // the Join() function.
-func Split[V any](wg *syn.WaitGroup, input FIFO[V], size int) Sequential[FIFO[V]] {
+func Split[V Value](wg *syn.WaitGroup, input FIFO[V], size int) Sequential[FIFO[V]] {
 	// Validate the arguments.
 	if size < 1 {
 		panic("The size of the split must be greater than zero.")
@@ -147,7 +147,7 @@ func Split[V any](wg *syn.WaitGroup, input FIFO[V], size int) Sequential[FIFO[V]
 // removed from each input queue will automatically be added to the output
 // queue. This pattern is useful when the results of the processing with a
 // Split() function need to be consolicated into a single queue.
-func Join[V any](wg *syn.WaitGroup, inputs Sequential[FIFO[V]]) FIFO[V] {
+func Join[V Value](wg *syn.WaitGroup, inputs Sequential[FIFO[V]]) FIFO[V] {
 	// Validate the arguments.
 	if inputs == nil || inputs.IsEmpty() {
 		panic("The number of input queues for a join must be greater than zero.")

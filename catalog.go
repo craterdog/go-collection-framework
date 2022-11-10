@@ -20,7 +20,7 @@ func Association[K Key, V Value](key K, value V) AssociationLike[K, V] {
 // This function returns a new catalog containing all of the associations
 // that are in the specified catalogs in the order that they appear in each
 // catalog.
-func Merge[K any, V any](first, second CatalogLike[K, V]) CatalogLike[K, V] {
+func Merge[K Key, V Value](first, second CatalogLike[K, V]) CatalogLike[K, V] {
 	var result = Catalog[K, V]()
 	result.AddAssociations(first)
 	result.AddAssociations(second)
@@ -31,7 +31,7 @@ func Merge[K any, V any](first, second CatalogLike[K, V]) CatalogLike[K, V] {
 // that are in the specified catalog that have the specified keys. The
 // associations in the resulting catalog will be in the same order as the
 // specified keys.
-func Extract[K any, V any](catalog CatalogLike[K, V], keys Sequential[K]) CatalogLike[K, V] {
+func Extract[K Key, V Value](catalog CatalogLike[K, V], keys Sequential[K]) CatalogLike[K, V] {
 	var result = Catalog[K, V]()
 	var iterator = Iterator(keys)
 	for iterator.HasNext() {

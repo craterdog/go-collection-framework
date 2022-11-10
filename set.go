@@ -31,12 +31,12 @@ func SetFromArray[V Value](array []V) SetLike[V] {
 }
 
 // This function returns the logical inverse of the specified set.
-func Not[V any](set SetLike[V]) SetLike[V] {
+func Not[V Value](set SetLike[V]) SetLike[V] {
 	panic("Not(set) is meaningless, use Sans(fullSet, set) instead.")
 }
 
 // This function returns the logical conjunction of the specified sets.
-func And[V any](first, second SetLike[V]) SetLike[V] {
+func And[V Value](first, second SetLike[V]) SetLike[V] {
 	var result = Set[V]()
 	var iterator = Iterator[V](first)
 	for iterator.HasNext() {
@@ -50,7 +50,7 @@ func And[V any](first, second SetLike[V]) SetLike[V] {
 
 // This function returns the logical material non-implication of the
 // specified sets.
-func Sans[V any](first, second SetLike[V]) SetLike[V] {
+func Sans[V Value](first, second SetLike[V]) SetLike[V] {
 	var result = Set[V]()
 	result.AddValues(first)
 	result.RemoveValues(second)
@@ -58,7 +58,7 @@ func Sans[V any](first, second SetLike[V]) SetLike[V] {
 }
 
 // This function returns the logical disjunction of the specified sets.
-func Or[V any](first, second SetLike[V]) SetLike[V] {
+func Or[V Value](first, second SetLike[V]) SetLike[V] {
 	var result = Set[V]()
 	result.AddValues(first)
 	result.AddValues(second)
@@ -67,7 +67,7 @@ func Or[V any](first, second SetLike[V]) SetLike[V] {
 
 // This function returns the logical exclusive disjunction of the
 // specified sets.
-func Xor[V any](first, second SetLike[V]) SetLike[V] {
+func Xor[V Value](first, second SetLike[V]) SetLike[V] {
 	var result = Or(Sans(first, second), Sans(second, first))
 	return result
 }

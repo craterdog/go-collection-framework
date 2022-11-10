@@ -10,7 +10,18 @@
 
 package collections
 
+import (
+	ran "crypto/rand"
+	big "math/big"
+)
+
 // SORTER INTERFACE
+
+// This function randomly shuffles the values specified array.
+func ShuffleArray[V Value](array []V) {
+	var v = Sorter[V](nil)
+	v.ShuffleArray(array)
+}
 
 // This function sorts the specified array of values using the specified ranking
 // function.
@@ -32,7 +43,12 @@ type sorter[V Value] struct {
 	rank RankingFunction
 }
 
-// This method sorts an array of values and returns the sorted array.
+// This method randomly shuffles the values in an array in place.
+func (v *sorter[V]) ShuffleArray(array []V) {
+	v.shuffleArray(array)
+}
+
+// This method sorts the values in an array in place.
 func (v *sorter[V]) SortArray(array []V) {
 	v.sortArray(array)
 }
@@ -120,3 +136,23 @@ func (v *sorter[V]) mergeArrays(left []V, right []V, merged []V) {
 		mergedIndex++
 	}
 }
+
+// This method pseudo-randomly shuffles the values in this array.
+func (v *sorter[V]) shuffleArray(array []V) {
+	var size = len(array)
+	for i := 0; i < size; i++ {
+		var r = randomIndex(size)
+		array[i], array[r] = array[r], array[i]
+	}
+}
+
+// This function generates a cryptographically secure random index in the
+// range [0..size).
+func randomIndex(size int) int {
+	var random, err = ran.Int(ran.Reader, big.NewInt(int64(size)))
+	if err != nil {
+		panic(err)
+	}
+	return int(random.Int64())
+}
+

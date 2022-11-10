@@ -8,6 +8,24 @@
  * Initiative. (See http://opensource.org/licenses/MIT)                        *
  *******************************************************************************/
 
+/*
+This collections package defines a set of simple, pragmatic interfaces for
+collections of sequential values. It also provides efficient and compact
+implementations of the following collection types based on those interfaces:
+  - list
+  - set (an ordered list)
+  - catalog (an ordered map)
+  - stack
+  - queue (gorouting aware)
+
+Additional implementations of these collection types can be defined and used
+seemlessly since the interface definitions only depend on other interfaces and
+native types; and the type implementations only depend on interfaces, not on
+each other. For a full description of this package see the wiki documentation
+at the github repository maintaining this package:
+
+	https://github.com/craterdog/go-collection-framework/wiki
+*/
 package collections
 
 // INDIVIDUAL INTERFACES
@@ -155,8 +173,18 @@ type Ratcheted[V Value] interface {
 	GetNext() V
 }
 
-// This interface defines the methods supported by all discerning agent
-// types that can compare and rank two values.
+// This interface defines the methods supported by all canonical agents that can
+// format any value in a standard way.
+type Canonical interface {
+	GetIndentation() int
+	FormatValue(value Value)
+	AppendString(s string)
+	AppendNewline()
+	GetResult() string
+}
+
+// This interface defines the methods supported by all discerning agent types
+// that can compare and rank two values.
 type Discerning interface {
 	CompareValues(first Value, second Value) bool
 	RankValues(first Value, second Value) int
@@ -245,6 +273,11 @@ type StackLike[V Value] interface {
 // This interface defines the methods supported by all iterator-like types.
 type IteratorLike[V Value] interface {
 	Ratcheted[V]
+}
+
+// This interface defines the methods supported by all sorter-like types.
+type FormatterLike interface {
+	Canonical
 }
 
 // This interface defines the methods supported by all collator-like types.

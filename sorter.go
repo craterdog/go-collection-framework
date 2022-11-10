@@ -155,4 +155,3 @@ func randomIndex(size int) int {
 	}
 	return int(random.Int64())
 }
-

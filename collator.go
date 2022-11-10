@@ -44,7 +44,7 @@ func Collator() CollatorLike {
 // references in a clean and efficient way.
 const maximumRecursion int = 100
 
-// This type defines the structure and methods for a natural formatting agent.
+// This type defines the structure and methods for a natural collator agent.
 type collator struct {
 	depth int
 }

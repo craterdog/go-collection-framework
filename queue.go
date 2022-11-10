@@ -35,6 +35,156 @@ func QueueWithCapacity[V Value](capacity int) QueueLike[V] {
 	return &queue[V]{available: available, values: values}
 }
 
+// This function connects the output of the specified input queue with a
+// number of new output queues specified by the size parameter and returns an
+// array of the new output queues. Each value added to the input queue will be
+// added automatically to ALL of the output queues. This pattern is useful when
+// a set of DIFFERENT operations needs to occur for every value and each
+// operation can be done in parallel.
+func Fork[V any](wg *syn.WaitGroup, input FIFO[V], size int) Sequential[FIFO[V]] {
+	// Validate the arguments.
+	if size < 1 {
+		panic("The fan out size for a queue must be greater than zero.")
+	}
+
+	// Create the new output queues.
+	var capacity = input.GetCapacity()
+	var outputs = List[FIFO[V]]()
+	for i := 0; i < size; i++ {
+		outputs.AddValue(FIFO[V](QueueWithCapacity[V](capacity)))
+	}
+
+	// Connect up the input queue to the output queues in a separate goroutine.
+	wg.Add(1)
+	go func() {
+		// Make sure the wait group is decremented on termination.
+		defer wg.Done()
+
+		// Write each value read from the input queue to each output queue.
+		var iterator = Iterator[FIFO[V]](outputs)
+		for {
+			// Read from the input queue.
+			var value, ok = input.RemoveHead() // Will block when empty.
+			if !ok {
+				break // The input queue has been closed.
+			}
+
+			// Write to all output queues.
+			iterator.ToStart()
+			for iterator.HasNext() {
+				var output = iterator.GetNext()
+				output.AddValue(value) // Will block when full.
+			}
+		}
+
+		// Close all output queues.
+		iterator.ToStart()
+		for iterator.HasNext() {
+			var output = iterator.GetNext()
+			output.CloseQueue()
+		}
+	}()
+
+	return outputs
+}
+
+// This function connects the output of the specified input queue with
+// the number of output queues specified by the size parameter and returns an
+// array of the new output queues. Each value added to the input queue will be
+// added automatically to ONE of the output queues. This pattern is useful when
+// a SINGLE operation needs to occur for each value and the operation can be done
+// on the values in parallel. The results can then be consolidated later on using
+// the Join() function.
+func Split[V any](wg *syn.WaitGroup, input FIFO[V], size int) Sequential[FIFO[V]] {
+	// Validate the arguments.
+	if size < 1 {
+		panic("The size of the split must be greater than zero.")
+	}
+
+	// Create the new output queues.
+	var capacity = input.GetCapacity()
+	var outputs = List[FIFO[V]]()
+	for i := 0; i < size; i++ {
+		outputs.AddValue(FIFO[V](QueueWithCapacity[V](capacity)))
+	}
+
+	// Connect up the input queue to the output queues.
+	wg.Add(1)
+	go func() {
+		// Make sure the wait group is decremented on termination.
+		defer wg.Done()
+
+		// Take turns reading from the input queue and writing to each output queue.
+		var iterator = Iterator[FIFO[V]](outputs)
+		for {
+			// Read from the input queue.
+			var value, ok = input.RemoveHead() // Will block when empty.
+			if !ok {
+				break // The input queue has been closed.
+			}
+
+			// Write to the next output queue.
+			var output = iterator.GetNext()
+			output.AddValue(value) // Will block when full.
+			if !iterator.HasNext() {
+				iterator.ToStart()
+			}
+		}
+
+		// Close all output queues.
+		iterator.ToStart()
+		for iterator.HasNext() {
+			var output = iterator.GetNext()
+			output.CloseQueue()
+		}
+	}()
+
+	return outputs
+}
+
+// This function connects the outputs of the specified array of input
+// queues with a new output queue returns the new output queue. Each value
+// removed from each input queue will automatically be added to the output
+// queue. This pattern is useful when the results of the processing with a
+// Split() function need to be consolicated into a single queue.
+func Join[V any](wg *syn.WaitGroup, inputs Sequential[FIFO[V]]) FIFO[V] {
+	// Validate the arguments.
+	if inputs == nil || inputs.IsEmpty() {
+		panic("The number of input queues for a join must be greater than zero.")
+	}
+
+	// Create the new output queue.
+	var iterator = Iterator(inputs)
+	var capacity = iterator.GetNext().GetCapacity()
+	var output = QueueWithCapacity[V](capacity)
+
+	// Connect up the input queues to the output queue.
+	wg.Add(1)
+	go func() {
+		// Make sure the wait group is decremented on termination.
+		defer wg.Done()
+
+		// Take turns reading from each input queue and writing to the output queue.
+		iterator.ToStart()
+		for {
+			var input = iterator.GetNext()
+			var value, ok = input.RemoveHead() // Will block when empty.
+			if !ok {
+				break // The input queue has been closed.
+			}
+			output.AddValue(value) // Will block when full.
+			if !iterator.HasNext() {
+				iterator.ToStart()
+			}
+		}
+
+		// Close the output queue.
+		output.CloseQueue()
+	}()
+
+	return output
+}
+
 // This type defines the structure and methods associated with a queue of values.
 // A queue implements first-in-first-out semantics. It is generally used by
 // multiple goroutines at the same time and therefore enforces synchronized
@@ -127,170 +277,4 @@ func (v *queue[V]) CloseQueue() {
 	v.mutex.Lock()
 	close(v.available) // No more values can be placed on the queue.
 	v.mutex.Unlock()
-}
-
-// QUEUES LIBRARY
-
-// This constructor creates a new queues library for the specified generic
-// value type.
-func Queues[V Value]() *queues[V] {
-	return &queues[V]{}
-}
-
-// This type defines the library functions that operate on queues. Since
-// queues have a parameterized value type this library type is also
-// parameterized as follows:
-//   - V is any type of value.
-type queues[V Value] struct{}
-
-// ROUTEABLE INTERFACE
-
-// This library function connects the output of the specified input queue with a
-// number of new output queues specified by the size parameter and returns an
-// array of the new output queues. Each value added to the input queue will be
-// added automatically to ALL of the output queues. This pattern is useful when
-// a set of DIFFERENT operations needs to occur for every value and each
-// operation can be done in parallel.
-func (l *queues[V]) Fork(wg *syn.WaitGroup, input FIFO[V], size int) Sequential[FIFO[V]] {
-	// Validate the arguments.
-	if size < 1 {
-		panic("The fan out size for a queue must be greater than zero.")
-	}
-
-	// Create the new output queues.
-	var capacity = input.GetCapacity()
-	var outputs = List[FIFO[V]]()
-	for i := 0; i < size; i++ {
-		outputs.AddValue(FIFO[V](QueueWithCapacity[V](capacity)))
-	}
-
-	// Connect up the input queue to the output queues in a separate goroutine.
-	wg.Add(1)
-	go func() {
-		// Make sure the wait group is decremented on termination.
-		defer wg.Done()
-
-		// Write each value read from the input queue to each output queue.
-		var iterator = Iterator[FIFO[V]](outputs)
-		for {
-			// Read from the input queue.
-			var value, ok = input.RemoveHead() // Will block when empty.
-			if !ok {
-				break // The input queue has been closed.
-			}
-
-			// Write to all output queues.
-			iterator.ToStart()
-			for iterator.HasNext() {
-				var output = iterator.GetNext()
-				output.AddValue(value) // Will block when full.
-			}
-		}
-
-		// Close all output queues.
-		iterator.ToStart()
-		for iterator.HasNext() {
-			var output = iterator.GetNext()
-			output.CloseQueue()
-		}
-	}()
-
-	return outputs
-}
-
-// This library function connects the output of the specified input queue with
-// the number of output queues specified by the size parameter and returns an
-// array of the new output queues. Each value added to the input queue will be
-// added automatically to ONE of the output queues. This pattern is useful when
-// a SINGLE operation needs to occur for each value and the operation can be done
-// on the values in parallel. The results can then be consolidated later on using
-// the Join() function.
-func (l *queues[V]) Split(wg *syn.WaitGroup, input FIFO[V], size int) Sequential[FIFO[V]] {
-	// Validate the arguments.
-	if size < 1 {
-		panic("The size of the split must be greater than zero.")
-	}
-
-	// Create the new output queues.
-	var capacity = input.GetCapacity()
-	var outputs = List[FIFO[V]]()
-	for i := 0; i < size; i++ {
-		outputs.AddValue(FIFO[V](QueueWithCapacity[V](capacity)))
-	}
-
-	// Connect up the input queue to the output queues.
-	wg.Add(1)
-	go func() {
-		// Make sure the wait group is decremented on termination.
-		defer wg.Done()
-
-		// Take turns reading from the input queue and writing to each output queue.
-		var iterator = Iterator[FIFO[V]](outputs)
-		for {
-			// Read from the input queue.
-			var value, ok = input.RemoveHead() // Will block when empty.
-			if !ok {
-				break // The input queue has been closed.
-			}
-
-			// Write to the next output queue.
-			var output = iterator.GetNext()
-			output.AddValue(value) // Will block when full.
-			if !iterator.HasNext() {
-				iterator.ToStart()
-			}
-		}
-
-		// Close all output queues.
-		iterator.ToStart()
-		for iterator.HasNext() {
-			var output = iterator.GetNext()
-			output.CloseQueue()
-		}
-	}()
-
-	return outputs
-}
-
-// This library function connects the outputs of the specified array of input
-// queues with a new output queue returns the new output queue. Each value
-// removed from each input queue will automatically be added to the output
-// queue. This pattern is useful when the results of the processing with a
-// Split() function need to be consolicated into a single queue.
-func (l *queues[V]) Join(wg *syn.WaitGroup, inputs Sequential[FIFO[V]]) FIFO[V] {
-	// Validate the arguments.
-	if inputs == nil || inputs.IsEmpty() {
-		panic("The number of input queues for a join must be greater than zero.")
-	}
-
-	// Create the new output queue.
-	var iterator = Iterator(inputs)
-	var capacity = iterator.GetNext().GetCapacity()
-	var output = QueueWithCapacity[V](capacity)
-
-	// Connect up the input queues to the output queue.
-	wg.Add(1)
-	go func() {
-		// Make sure the wait group is decremented on termination.
-		defer wg.Done()
-
-		// Take turns reading from each input queue and writing to the output queue.
-		iterator.ToStart()
-		for {
-			var input = iterator.GetNext()
-			var value, ok = input.RemoveHead() // Will block when empty.
-			if !ok {
-				break // The input queue has been closed.
-			}
-			output.AddValue(value) // Will block when full.
-			if !iterator.HasNext() {
-				iterator.ToStart()
-			}
-		}
-
-		// Close the output queue.
-		output.CloseQueue()
-	}()
-
-	return output
 }

@@ -69,7 +69,6 @@ func TestCatalogsWithStringsAndIntegers(t *tes.T) {
 }
 
 func TestCatalogsWithMerge(t *tes.T) {
-	var catalogs = col.Catalogs[string, int]()
 	var association1 = col.Association[string, int]("foo", 1)
 	var association2 = col.Association[string, int]("bar", 2)
 	var association3 = col.Association[string, int]("baz", 3)
@@ -79,7 +78,7 @@ func TestCatalogsWithMerge(t *tes.T) {
 	var catalog2 = col.Catalog[string, int]()
 	catalog2.AddAssociation(association2)
 	catalog2.AddAssociation(association3)
-	var catalog3 = catalogs.Merge(catalog1, catalog2)
+	var catalog3 = col.Merge(catalog1, catalog2)
 	var catalog4 = col.Catalog[string, int]()
 	catalog4.AddAssociation(association1)
 	catalog4.AddAssociation(association2)
@@ -88,8 +87,7 @@ func TestCatalogsWithMerge(t *tes.T) {
 }
 
 func TestCatalogsWithExtract(t *tes.T) {
-	var keys = col.ListFromArray([]string{"foo", "baz"})
-	var catalogs = col.Catalogs[string, int]()
+	var keys col.Sequential[string] = col.ListFromArray([]string{"foo", "baz"})
 	var association1 = col.Association[string, int]("foo", 1)
 	var association2 = col.Association[string, int]("bar", 2)
 	var association3 = col.Association[string, int]("baz", 3)
@@ -97,7 +95,7 @@ func TestCatalogsWithExtract(t *tes.T) {
 	catalog1.AddAssociation(association1)
 	catalog1.AddAssociation(association2)
 	catalog1.AddAssociation(association3)
-	var catalog2 = catalogs.Extract(catalog1, keys)
+	var catalog2 = col.Extract(catalog1, keys)
 	var catalog3 = col.Catalog[string, int]()
 	catalog3.AddAssociation(association1)
 	catalog3.AddAssociation(association3)
@@ -105,12 +103,11 @@ func TestCatalogsWithExtract(t *tes.T) {
 }
 
 func TestCatalogsWithEmptyCatalogs(t *tes.T) {
-	var keys = col.List[int]()
-	var catalogs = col.Catalogs[int, string]()
+	var keys col.Sequential[int] = col.List[int]()
 	var catalog1 = col.Catalog[int, string]()
 	var catalog2 = col.Catalog[int, string]()
-	var catalog3 = catalogs.Merge(catalog1, catalog2)
-	var catalog4 = catalogs.Extract(catalog1, keys)
+	var catalog3 = col.Merge(catalog1, catalog2)
+	var catalog4 = col.Extract(catalog1, keys)
 	ass.True(t, col.CompareValues(catalog1, catalog2))
 	ass.True(t, col.CompareValues(catalog2, catalog3))
 	ass.True(t, col.CompareValues(catalog3, catalog4))

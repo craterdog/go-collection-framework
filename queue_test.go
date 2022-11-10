@@ -51,15 +51,13 @@ func TestQueueWithConcurrency(t *tes.T) {
 }
 
 func TestQueueWithFork(t *tes.T) {
-	var queues = col.Queues[int]()
-
 	// Create a wait group for synchronization.
 	var wg = new(syn.WaitGroup)
 	defer wg.Wait()
 
 	// Create a new queue with a fan out of two.
-	var input = col.QueueWithCapacity[int](3)
-	var outputs = queues.Fork(wg, input, 2)
+	var input col.FIFO[int] = col.QueueWithCapacity[int](3)
+	var outputs = col.Fork(wg, input, 2)
 
 	// Remove values from the output queues in the background.
 	var readOutput = func(output col.FIFO[int], name string) {
@@ -85,16 +83,14 @@ func TestQueueWithFork(t *tes.T) {
 }
 
 func TestQueueWithSplitAndJoin(t *tes.T) {
-	var queues = col.Queues[int]()
-
 	// Create a wait group for synchronization.
 	var wg = new(syn.WaitGroup)
 	defer wg.Wait()
 
 	// Create a new queue with a split of five outputs and a join back to one.
-	var input = col.QueueWithCapacity[int](3)
-	var split = queues.Split(wg, input, 5)
-	var output = queues.Join(wg, split)
+	var input col.FIFO[int] = col.QueueWithCapacity[int](3)
+	var split = col.Split(wg, input, 5)
+	var output = col.Join(wg, split)
 
 	// Remove values from the output queue in the background.
 	wg.Add(1)

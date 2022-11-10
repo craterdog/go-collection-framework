@@ -30,6 +30,48 @@ func SetFromArray[V Value](array []V) SetLike[V] {
 	return v
 }
 
+// This function returns the logical inverse of the specified set.
+func Not[V any](set SetLike[V]) SetLike[V] {
+	panic("Not(set) is meaningless, use Sans(fullSet, set) instead.")
+}
+
+// This function returns the logical conjunction of the specified sets.
+func And[V any](first, second SetLike[V]) SetLike[V] {
+	var result = Set[V]()
+	var iterator = Iterator[V](first)
+	for iterator.HasNext() {
+		var value = iterator.GetNext()
+		if second.ContainsValue(value) {
+			result.AddValue(value)
+		}
+	}
+	return result
+}
+
+// This function returns the logical material non-implication of the
+// specified sets.
+func Sans[V any](first, second SetLike[V]) SetLike[V] {
+	var result = Set[V]()
+	result.AddValues(first)
+	result.RemoveValues(second)
+	return result
+}
+
+// This function returns the logical disjunction of the specified sets.
+func Or[V any](first, second SetLike[V]) SetLike[V] {
+	var result = Set[V]()
+	result.AddValues(first)
+	result.AddValues(second)
+	return result
+}
+
+// This function returns the logical exclusive disjunction of the
+// specified sets.
+func Xor[V any](first, second SetLike[V]) SetLike[V] {
+	var result = Or(Sans(first, second), Sans(second, first))
+	return result
+}
+
 // This type defines the structure and methods associated with a set of values.
 // The set uses ORDINAL based indexing rather than ZERO based indexing (see
 // the description of what this means in the Sequential interface definition).
@@ -177,62 +219,4 @@ func (v *set[V]) search(value V) (index int, found bool) {
 	// would be inserted. Note that since the value was not found, the
 	// indexes are inverted: last < first (i.e. last = first - 1).
 	return last, false
-}
-
-// SETS LIBRARY
-
-// This constructor creates a new sets library for the specified generic
-// value type.
-func Sets[V Value]() *sets[V] {
-	return &sets[V]{}
-}
-
-// This type defines the library functions that operate on sets. Since
-// sets have a parameterized value type this library type is also
-// parameterized as follows:
-//   - V is any type of value.
-type sets[V Value] struct{}
-
-// LOGICAL INTERFACE
-
-// This library function returns the logical inverse of the specified set.
-func (l *sets[V]) Not(set SetLike[V]) SetLike[V] {
-	panic("Not(set) is meaningless, use Sans(fullSet, set) instead.")
-}
-
-// This library function returns the logical conjunction of the specified sets.
-func (l *sets[V]) And(first, second SetLike[V]) SetLike[V] {
-	var result = Set[V]()
-	var iterator = Iterator[V](first)
-	for iterator.HasNext() {
-		var value = iterator.GetNext()
-		if second.ContainsValue(value) {
-			result.AddValue(value)
-		}
-	}
-	return result
-}
-
-// This library function returns the logical material non-implication of the
-// specified sets.
-func (l *sets[V]) Sans(first, second SetLike[V]) SetLike[V] {
-	var result = Set[V]()
-	result.AddValues(first)
-	result.RemoveValues(second)
-	return result
-}
-
-// This library function returns the logical disjunction of the specified sets.
-func (l *sets[V]) Or(first, second SetLike[V]) SetLike[V] {
-	var result = Set[V]()
-	result.AddValues(first)
-	result.AddValues(second)
-	return result
-}
-
-// This library function returns the logical exclusive disjunction of the
-// specified sets.
-func (l *sets[V]) Xor(first, second SetLike[V]) SetLike[V] {
-	var result = l.Or(l.Sans(first, second), l.Sans(second, first))
-	return result
 }

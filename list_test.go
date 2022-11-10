@@ -134,7 +134,6 @@ func TestListsWithStrings(t *tes.T) {
 }
 
 func TestListsWithConcatenate(t *tes.T) {
-	var lists = col.Lists[int]()
 	var list1 = col.List[int]()
 	var onetwothree = col.ListFromArray([]int{1, 2, 3})
 	var fourfivesix = col.ListFromArray([]int{4, 5, 6})
@@ -142,17 +141,16 @@ func TestListsWithConcatenate(t *tes.T) {
 	list1.AddValues(onetwothree)
 	var list2 = col.List[int]()
 	list2.AddValues(fourfivesix)
-	var list3 = lists.Concatenate(list1, list2)
+	var list3 = col.Concatenate(list1, list2)
 	var list4 = col.List[int]()
 	list4.AddValues(onethrusix)
 	ass.True(t, col.CompareValues(list3, list4))
 }
 
 func TestListsWithEmptyLists(t *tes.T) {
-	var lists = col.Lists[int]()
 	var list1 = col.List[int]()
 	var list2 = col.List[int]()
-	var list3 = lists.Concatenate(list1, list2)
+	var list3 = col.Concatenate(list1, list2)
 	ass.True(t, col.CompareValues(list1, list2))
 	ass.True(t, col.CompareValues(list2, list3))
 	ass.True(t, col.CompareValues(list3, list1))

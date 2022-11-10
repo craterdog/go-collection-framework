@@ -37,6 +37,14 @@ func ListFromArray[V Value](array []V) ListLike[V] {
 	return v
 }
 
+// This function returns the concatenation of the two specified lists.
+func Concatenate[V any](first, second ListLike[V]) ListLike[V] {
+	var result = List[V]()
+	result.AddValues(first)
+	result.AddValues(second)
+	return result
+}
+
 // This type defines the structure and methods associated with a list of values.
 // Each value is associated with an implicit positive integer index. The list
 // uses ORDINAL based indexing rather than ZERO based indexing (see the
@@ -342,28 +350,4 @@ func (v *list[V]) normalizedIndex(index int) int {
 		// This should never happen so time to panic...
 		panic(fmt.Sprintf("Compiler problem, unexpected index value: %v", index))
 	}
-}
-
-// LISTS LIBRARY
-
-// This constructor creates a new lists library for the specified generic
-// value type.
-func Lists[V Value]() *lists[V] {
-	return &lists[V]{}
-}
-
-// This type defines the library functions that operate on lists. Since
-// lists have a parameterized value type this library type is also
-// parameterized as follows:
-//   - V is any type of value.
-type lists[V Value] struct{}
-
-// CHAINABLE INTERFACE
-
-// This library function returns the concatenation of the two specified lists.
-func (l *lists[V]) Concatenate(first, second ListLike[V]) ListLike[V] {
-	var result = List[V]()
-	result.AddValues(first)
-	result.AddValues(second)
-	return result
 }

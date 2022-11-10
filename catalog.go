@@ -17,6 +17,31 @@ func Association[K Key, V Value](key K, value V) AssociationLike[K, V] {
 	return &association[K, V]{key, value}
 }
 
+// This function returns a new catalog containing all of the associations
+// that are in the specified catalogs in the order that they appear in each
+// catalog.
+func Merge[K any, V any](first, second CatalogLike[K, V]) CatalogLike[K, V] {
+	var result = Catalog[K, V]()
+	result.AddAssociations(first)
+	result.AddAssociations(second)
+	return result
+}
+
+// This function returns a new catalog containing only the associations
+// that are in the specified catalog that have the specified keys. The
+// associations in the resulting catalog will be in the same order as the
+// specified keys.
+func Extract[K any, V any](catalog CatalogLike[K, V], keys Sequential[K]) CatalogLike[K, V] {
+	var result = Catalog[K, V]()
+	var iterator = Iterator(keys)
+	for iterator.HasNext() {
+		var key = iterator.GetNext()
+		var value = catalog.GetValue(key)
+		result.SetValue(key, value)
+	}
+	return result
+}
+
 // This type defines the structure and methods associated with a key-value
 // pair. This type is parameterized as follows:
 //   - K is a primitive type of key.
@@ -179,46 +204,4 @@ func (v *catalog[K, V]) SortAssociationsWithRanker(rank RankingFunction) {
 // This method reverses the order of all associations in this catalog.
 func (v *catalog[K, V]) ReverseAssociations() {
 	v.associations.ReverseValues()
-}
-
-// CATALOGS LIBRARY
-
-// This constructor creates a new catalogs library for the specified generic
-// key and value types.
-func Catalogs[K Key, V Value]() *catalogs[K, V] {
-	return &catalogs[K, V]{}
-}
-
-// This type defines the library functions that operate on catalogs. Since
-// catalogs have parameterized key and value types this library type is also
-// parameterized as follows:
-//   - K is a primitive type of key.
-//   - V is any type of entity.
-type catalogs[K Key, V Value] struct{}
-
-// BLENDABLE INTERFACE
-
-// This library function returns a new catalog containing all of the associations
-// that are in the specified catalogs in the order that they appear in each
-// catalog.
-func (l *catalogs[K, V]) Merge(first, second CatalogLike[K, V]) CatalogLike[K, V] {
-	var result = Catalog[K, V]()
-	result.AddAssociations(first)
-	result.AddAssociations(second)
-	return result
-}
-
-// This library function returns a new catalog containing only the associations
-// that are in the specified catalog that have the specified keys. The
-// associations in the resulting catalog will be in the same order as the
-// specified keys.
-func (l *catalogs[K, V]) Extract(catalog CatalogLike[K, V], keys Sequential[K]) CatalogLike[K, V] {
-	var result = Catalog[K, V]()
-	var iterator = Iterator(keys)
-	for iterator.HasNext() {
-		var key = iterator.GetNext()
-		var value = catalog.GetValue(key)
-		result.SetValue(key, value)
-	}
-	return result
 }

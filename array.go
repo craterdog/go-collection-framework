@@ -16,7 +16,7 @@ import (
 
 // ARRAY IMPLEMENTATION
 
-// This type defines the structure and methods associated with an array of
+// This type defines the structure and methods associated with a native array of
 // values. Each value is associated with an implicit positive integer index. The
 // array uses ORDINAL based indexing rather than ZERO based indexing (see the
 // description of what this means in the Sequential interface definition).

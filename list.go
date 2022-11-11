@@ -257,10 +257,7 @@ func (v *list[V]) RemoveAll() {
 	v.values = make([]V, 0, 4)
 }
 
-// This method pseudo-randomly shuffles the values in this list.
-func (v *list[V]) ShuffleValues() {
-	ShuffleArray[V](v.values)
-}
+// SORTABLE INTERFACE
 
 // This method sorts the values in this list using the canonical rank function.
 func (v *list[V]) SortValues() {
@@ -289,6 +286,11 @@ func (v *list[V]) ReverseValues() {
 		reversed[i] = v.values[length-i-1]
 	}
 	v.values = reversed
+}
+
+// This method pseudo-randomly shuffles the values in this list.
+func (v *list[V]) ShuffleValues() {
+	ShuffleArray[V](v.values)
 }
 
 // PRIVATE INTERFACE

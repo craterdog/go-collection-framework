@@ -96,10 +96,15 @@ type Malleable[V Value] interface {
 	RemoveValue(index int) V
 	RemoveValues(first int, last int) Sequential[V]
 	RemoveAll()
-	ShuffleValues()
+}
+
+// This interface defines the methods supported by all sequences whose values may
+// be sorted using various sorting algorithms.
+type Sortable[V Value] interface {
 	SortValues()
 	SortValuesWithRanker(rank RankingFunction)
 	ReverseValues()
+	ShuffleValues()
 }
 
 // This interface defines the methods supported by all binding associations.
@@ -113,8 +118,8 @@ type Binding[K Key, V Value] interface {
 // This interface defines the methods supported by all associative sequences
 // whose values consist of key-value pair associations.
 type Associative[K Key, V Value] interface {
-	AddAssociation(association AssociationLike[K, V])
-	AddAssociations(associations Sequential[AssociationLike[K, V]])
+	AddAssociation(association Binding[K, V])
+	AddAssociations(associations Sequential[Binding[K, V]])
 	GetKeys() Sequential[K]
 	GetValue(key K) V
 	GetValues(keys Sequential[K]) Sequential[V]
@@ -122,9 +127,6 @@ type Associative[K Key, V Value] interface {
 	RemoveValue(key K) V
 	RemoveValues(keys Sequential[K]) Sequential[V]
 	RemoveAll()
-	SortAssociations()
-	SortAssociationsWithRanker(rank RankingFunction)
-	ReverseAssociations()
 }
 
 // This interface defines the methods supported by all sequences whose values
@@ -215,13 +217,21 @@ type Sort[V Value] func(array []V, rank RankingFunction)
 
 // CONSOLIDATED INTERFACES
 
-// This interface consolidates all the interfaces supported by array-like
+// This interface consolidates all the interfaces supported by native array-like
 // sequences.
 type ArrayLike[V Value] interface {
 	Sequential[V]
 	Indexed[V]
 	Searchable[V]
 	Updatable[V]
+}
+
+// This interface consolidates all the interfaces supported by native map-like
+// sequences. Note, that the order of the key-value pairs on a native map is
+// random, even for two maps containing the same keys.
+type MapLike[K Key, V Value] interface {
+	Sequential[Binding[K, V]]
+	Associative[K, V]
 }
 
 // This interface defines the methods supported by all association-like types.
@@ -233,8 +243,9 @@ type AssociationLike[K Key, V Value] interface {
 // This interface consolidates all the interfaces supported by catalog-like
 // sequences.
 type CatalogLike[K Key, V Value] interface {
-	Sequential[AssociationLike[K, V]]
+	Sequential[Binding[K, V]]
 	Associative[K, V]
+	Sortable[Binding[K, V]]
 }
 
 // This interface consolidates all the interfaces supported by list-like
@@ -245,6 +256,7 @@ type ListLike[V Value] interface {
 	Searchable[V]
 	Updatable[V]
 	Malleable[V]
+	Sortable[V]
 }
 
 // This interface consolidates all of the interfaces supported by queue-like

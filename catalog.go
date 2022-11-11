@@ -55,8 +55,8 @@ func (v *association[K, V]) SetValue(value V) {
 
 // This constructor creates a new empty catalog.
 func Catalog[K Key, V Value]() CatalogLike[K, V] {
-	var keys = map[Key]AssociationLike[K, V]{}
-	var associations = List[AssociationLike[K, V]]()
+	var keys = map[Key]Binding[K, V]{}
+	var associations = List[Binding[K, V]]()
 	return &catalog[K, V]{associations, associations, keys}
 }
 
@@ -91,9 +91,9 @@ func Extract[K Key, V Value](catalog CatalogLike[K, V], keys Sequential[K]) Cata
 //   - V is any type of entity.
 type catalog[K Key, V Value] struct {
 	// Note: The delegated methods don't see the real collection type.
-	Sequential[AssociationLike[K, V]]
-	associations ListLike[AssociationLike[K, V]]
-	keys         map[Key]AssociationLike[K, V]
+	Sequential[Binding[K, V]]
+	associations ListLike[Binding[K, V]]
+	keys         map[Key]Binding[K, V]
 }
 
 // STRINGER INTERFACE
@@ -105,14 +105,14 @@ func (v *catalog[K, V]) String() string {
 // ASSOCIATIVE INTERFACE
 
 // This method appends the specified association to the end of this catalog.
-func (v *catalog[K, V]) AddAssociation(association AssociationLike[K, V]) {
+func (v *catalog[K, V]) AddAssociation(association Binding[K, V]) {
 	var key = association.GetKey()
 	var value = association.GetValue()
 	v.SetValue(key, value) // This copies the association.
 }
 
 // This method appends the specified associations to the end of this catalog.
-func (v *catalog[K, V]) AddAssociations(associations Sequential[AssociationLike[K, V]]) {
+func (v *catalog[K, V]) AddAssociations(associations Sequential[Binding[K, V]]) {
 	var iterator = Iterator(associations)
 	for iterator.HasNext() {
 		var association = iterator.GetNext()
@@ -123,7 +123,7 @@ func (v *catalog[K, V]) AddAssociations(associations Sequential[AssociationLike[
 // This method returns the keys for this catalog.
 func (v *catalog[K, V]) GetKeys() Sequential[K] {
 	var keys = List[K]()
-	var iterator = Iterator[AssociationLike[K, V]](v.associations)
+	var iterator = Iterator[Binding[K, V]](v.associations)
 	for iterator.HasNext() {
 		var association = iterator.GetNext()
 		keys.AddValue(association.GetKey())
@@ -199,23 +199,31 @@ func (v *catalog[K, V]) RemoveValues(keys Sequential[K]) Sequential[V] {
 
 // This method removes all associations from this catalog.
 func (v *catalog[K, V]) RemoveAll() {
-	v.keys = map[Key]AssociationLike[K, V]{}
+	v.keys = map[Key]Binding[K, V]{}
 	v.associations.RemoveAll()
 }
 
+// SORTABLE INTERFACE
+
 // This method sorts this catalog using the canonical rank function to compare
 // the keys.
-func (v *catalog[K, V]) SortAssociations() {
+func (v *catalog[K, V]) SortValues() {
 	v.associations.SortValues()
 }
 
 // This method sorts this catalog using the specified rank function to compare
 // the keys.
-func (v *catalog[K, V]) SortAssociationsWithRanker(rank RankingFunction) {
+func (v *catalog[K, V]) SortValuesWithRanker(rank RankingFunction) {
 	v.associations.SortValuesWithRanker(rank)
 }
 
 // This method reverses the order of all associations in this catalog.
-func (v *catalog[K, V]) ReverseAssociations() {
+func (v *catalog[K, V]) ReverseValues() {
 	v.associations.ReverseValues()
+}
+
+// This method pseudo-randomly shuffles the order of all associations in this
+// catalog.
+func (v *catalog[K, V]) ShuffleValues() {
+	v.associations.ShuffleValues()
 }

@@ -20,6 +20,13 @@ func Set[V Value]() SetLike[V] {
 	return &set[V]{values, values, values, rank}
 }
 
+// This constructor creates a new empty set that uses the specified rank
+// function.
+func SetWithRanker[V Value](rank RankingFunction) SetLike[V] {
+	var values = List[V]()
+	return &set[V]{values, values, values, rank}
+}
+
 // This constructor creates a new set from the specified array. The set uses the
 // natural rank function.
 func SetFromArray[V Value](array []V) SetLike[V] {
@@ -142,14 +149,6 @@ func (v *set[V]) ContainsAll(values Sequential[V]) bool {
 }
 
 // FLEXIBLE INTERFACE
-
-// This method sets the ranking function for this set.
-func (v *set[V]) SetRanker(rank RankingFunction) {
-	if rank == nil {
-		rank = RankValues
-	}
-	v.rank = rank
-}
 
 // This method adds the specified value to this set if it is not already a
 // member of the set.

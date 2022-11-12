@@ -142,18 +142,6 @@ func (v *catalog[K, V]) GetKeys() Sequential[K] {
 	return keys
 }
 
-// This method returns the value that is associated with the specified key in
-// this catalog.
-func (v *catalog[K, V]) GetValue(key K) V {
-	var value V // Set the return value to its zero value.
-	var association, exists = v.keys[key]
-	if exists {
-		// Extract the value.
-		value = association.GetValue()
-	}
-	return value
-}
-
 // This method returns the values associated with the specified keys for this
 // catalog. The values are returned in the same order as the keys in the
 // catalog.
@@ -165,6 +153,18 @@ func (v *catalog[K, V]) GetValues(keys Sequential[K]) Sequential[V] {
 		values.AddValue(v.GetValue(key))
 	}
 	return values
+}
+
+// This method returns the value that is associated with the specified key in
+// this catalog.
+func (v *catalog[K, V]) GetValue(key K) V {
+	var value V // Set the return value to its zero value.
+	var association, exists = v.keys[key]
+	if exists {
+		// Extract the value.
+		value = association.GetValue()
+	}
+	return value
 }
 
 // This method sets the value associated with the specified key to the

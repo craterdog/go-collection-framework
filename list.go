@@ -21,6 +21,14 @@ func List[V Value]() ListLike[V] {
 	return &list[V]{Array[V](values), values, compare}
 }
 
+// This constructor creates a new empty list that uses the specified compare
+// function.
+func ListWithComparer[V Value](compare ComparisonFunction) ListLike[V] {
+	var capacity = 4 // The minimum value.
+	var values = make([]V, 0, capacity)
+	return &list[V]{Array[V](values), values, compare}
+}
+
 // This constructor creates a new list from the specified array. The list uses
 // the natural compare function.
 func ListFromArray[V Value](array []V) ListLike[V] {
@@ -67,16 +75,6 @@ type list[V Value] struct {
 
 func (v *list[V]) String() string {
 	return FormatValue(v)
-}
-
-// INDEXED INTERFACE
-
-// This method sets the comparer function for this list.
-func (v *list[V]) SetComparer(compare ComparisonFunction) {
-	if compare == nil {
-		compare = CompareValues
-	}
-	v.compare = compare
 }
 
 // MALLEABLE INTERFACE

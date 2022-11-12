@@ -79,13 +79,6 @@ func (v Map[K, V]) GetKeys() Sequential[K] {
 	return keys
 }
 
-// This method returns the value that is associated with the specified key in
-// this map.
-func (v Map[K, V]) GetValue(key K) V {
-	var value = v[key]
-	return value
-}
-
 // This method returns the values associated with the specified keys for this
 // map. The values are returned in the same order as the keys in the map.
 func (v Map[K, V]) GetValues(keys Sequential[K]) Sequential[V] {
@@ -96,6 +89,13 @@ func (v Map[K, V]) GetValues(keys Sequential[K]) Sequential[V] {
 		values.AddValue(v.GetValue(key))
 	}
 	return values
+}
+
+// This method returns the value that is associated with the specified key in
+// this map.
+func (v Map[K, V]) GetValue(key K) V {
+	var value = v[key]
+	return value
 }
 
 // This method sets the value associated with the specified key to the

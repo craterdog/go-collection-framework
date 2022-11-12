@@ -53,11 +53,6 @@ func (v Array[V]) AsArray() []V {
 
 // INDEXED INTERFACE
 
-// This method sets the comparer function for this array.
-func (v Array[V]) SetComparer(compare ComparisonFunction) {
-	panic("The Array type must use the default comparer.")
-}
-
 // This method retrieves from this array the value that is associated with the
 // specified index.
 func (v Array[V]) GetValue(index int) V {

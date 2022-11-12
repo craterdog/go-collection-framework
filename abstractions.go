@@ -56,7 +56,6 @@ type Sequential[V Value] interface {
 // Notice that because the indices are ordinal based, the positive and negative
 // indices are symmetrical.
 type Indexed[V Value] interface {
-	SetComparer(compare ComparisonFunction)
 	GetValue(index int) V
 	GetValues(first int, last int) Sequential[V]
 	GetIndex(value V) int
@@ -81,7 +80,6 @@ type Updatable[V Value] interface {
 // This interface defines the methods supported by all sequences of values that
 // allow values to be added and removed.
 type Flexible[V Value] interface {
-	SetRanker(rank RankingFunction)
 	AddValue(value V)
 	AddValues(values Sequential[V])
 	RemoveValue(value V)
@@ -124,8 +122,8 @@ type Associative[K Key, V Value] interface {
 	AddAssociation(association Binding[K, V])
 	AddAssociations(associations Sequential[Binding[K, V]])
 	GetKeys() Sequential[K]
-	GetValue(key K) V
 	GetValues(keys Sequential[K]) Sequential[V]
+	GetValue(key K) V
 	SetValue(key K, value V)
 	RemoveValue(key K) V
 	RemoveValues(keys Sequential[K]) Sequential[V]

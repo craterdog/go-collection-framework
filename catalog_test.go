@@ -40,6 +40,17 @@ func TestCatalogsWithStringsAndIntegers(t *tes.T) {
 	ass.Equal(t, 1, catalog.GetSize())
 	catalog.AddAssociations(associations)
 	ass.Equal(t, 3, catalog.GetSize())
+	var catalog2 = col.CatalogFromSequence[string, int](catalog)
+	ass.True(t, col.CompareValues(catalog, catalog2))
+	var m = col.Map[string, int](map[string]int{
+		"foo": 1,
+		"bar": 2,
+		"baz": 3,
+	})
+	var catalog3 = col.CatalogFromSequence[string, int](m)
+	catalog2.SortValues()
+	catalog3.SortValues()
+	ass.True(t, col.CompareValues(catalog2, catalog3))
 	iterator = col.Iterator[col.Binding[string, int]](catalog)
 	ass.True(t, iterator.HasNext())
 	ass.False(t, iterator.HasPrevious())

@@ -52,6 +52,13 @@ func TestListsWithStrings(t *tes.T) {
 	ass.Equal(t, "foo", string(list.GetValue(1))) //       ["foo", "bar", "baz"]
 	ass.Equal(t, barbaz.AsArray(), list.GetValues(2, 3).AsArray())
 	ass.Equal(t, foo.AsArray(), list.GetValues(1, 1).AsArray())
+	var list2 = col.ListFromSequence[string](list)
+	ass.True(t, col.CompareValues(list, list2))
+	var array = col.Array[string]([]string{"foo", "bar", "baz"})
+	var list3 = col.ListFromSequence[string](array)
+	list2.SortValues()
+	list3.SortValues()
+	ass.True(t, col.CompareValues(list2, list3))
 	iterator = col.Iterator[string](list)               // ["foo", "bar", "baz"]
 	ass.True(t, iterator.HasNext())                     // ["foo", "bar", "baz"]
 	ass.False(t, iterator.HasPrevious())                // ["foo", "bar", "baz"]

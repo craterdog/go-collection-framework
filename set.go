@@ -12,7 +12,7 @@ package collections
 
 // SET IMPLEMENTATION
 
-// This constructor creates a new empty set that uses the canonical rank
+// This constructor creates a new empty set that uses the natural rank
 // function.
 func Set[V Value]() SetLike[V] {
 	var rank = RankValues
@@ -20,11 +20,23 @@ func Set[V Value]() SetLike[V] {
 	return &set[V]{values, values, values, rank}
 }
 
-// This constructor creates a new set from the specified array that uses the
-// canonical rank function.
+// This constructor creates a new set from the specified array. The set uses the
+// natural rank function.
 func SetFromArray[V Value](array []V) SetLike[V] {
 	var v = Set[V]()
 	for _, value := range array {
+		v.AddValue(value)
+	}
+	return v
+}
+
+// This constructor creates a new set from the specified sequence. The set uses
+// the natural rank function.
+func SetFromSequence[V Value](sequence Sequential[V]) SetLike[V] {
+	var v = Set[V]()
+	var iterator = Iterator(sequence)
+	for iterator.HasNext() {
+		var value = iterator.GetNext()
 		v.AddValue(value)
 	}
 	return v

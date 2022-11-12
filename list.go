@@ -12,7 +12,7 @@ package collections
 
 // LIST IMPLEMENTATION
 
-// This constructor creates a new empty list that uses the canonical compare
+// This constructor creates a new empty list that uses the natural compare
 // function.
 func List[V Value]() ListLike[V] {
 	var capacity = 4 // The minimum value.
@@ -21,11 +21,23 @@ func List[V Value]() ListLike[V] {
 	return &list[V]{Array[V](values), values, compare}
 }
 
-// This constructor creates a new list from the specified array that uses the
-// canonical compare function.
+// This constructor creates a new list from the specified array. The list uses
+// the natural compare function.
 func ListFromArray[V Value](array []V) ListLike[V] {
 	var v = List[V]()
 	for _, value := range array {
+		v.AddValue(value)
+	}
+	return v
+}
+
+// This constructor creates a new list from the specified sequence. The list
+// uses the natural compare function.
+func ListFromSequence[V Value](sequence Sequential[V]) ListLike[V] {
+	var v = List[V]()
+	var iterator = Iterator(sequence)
+	for iterator.HasNext() {
+		var value = iterator.GetNext()
 		v.AddValue(value)
 	}
 	return v
@@ -154,7 +166,7 @@ func (v *list[V]) RemoveAll() {
 
 // SORTABLE INTERFACE
 
-// This method sorts the values in this list using the canonical rank function.
+// This method sorts the values in this list using the natural rank function.
 func (v *list[V]) SortValues() {
 	v.SortValuesWithRanker(nil)
 }

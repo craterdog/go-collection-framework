@@ -45,6 +45,7 @@ func (v Map[K, V]) AsArray() []Binding[K, V] {
 	for key, value := range v {
 		var association = Association[K, V](key, value)
 		result[index] = association
+		index++
 	}
 	return result
 }

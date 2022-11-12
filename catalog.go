@@ -60,6 +60,17 @@ func Catalog[K Key, V Value]() CatalogLike[K, V] {
 	return &catalog[K, V]{associations, associations, keys}
 }
 
+// This constructor creates a new catalog from the specified sequence.
+func CatalogFromSequence[K Key, V Value](sequence Sequential[Binding[K, V]]) CatalogLike[K, V] {
+	var v = Catalog[K, V]()
+	var iterator = Iterator(sequence)
+	for iterator.HasNext() {
+		var association = iterator.GetNext()
+		v.AddAssociation(association)
+	}
+	return v
+}
+
 // This function returns a new catalog containing all of the associations
 // that are in the specified catalogs in the order that they appear in each
 // catalog.

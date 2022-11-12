@@ -16,7 +16,8 @@ The Go best practices suggest that we keep package names short so that they are
 easy to use in our code. The problem is that the import section can be rather
 cryptic. Instead, we use longer descriptive package names and assign each to a
 short three character variable. This makes package references in the code terse
-while making the import section informative. Here is an example:
+(and recognizable) while making the import section informative. Here is an
+example:
 ```go
 package elements
 
@@ -47,7 +48,8 @@ type Association[K any, V any] struct {
 ```
 
 Note that an encapsulated type may be chosen over a pure structured type even if
-read-update access to all attributes is allowed.
+read-update access to all attributes is allowed. This leads us to constrained
+types.
 
 #### Constrained Types
 The constrained type approach allows constraints to be enforced on specific
@@ -125,34 +127,34 @@ type ListLike[V Value] interface {
 
 // This constructor creates a new empty list and returns it via an interface.
 func List[V Value]() ListLike[V] {
-	items := make([]V, 0, 4)
-	return &list[V]{items}
+	values := make([]V, 0, 4)
+	return &list[V]{values}
 }
 
 // LIST IMPLEMENTATION
 
-// This type defines the structure and methods associated with a list of items.
+// This type defines the structure and methods associated with a list of values.
 type list[V Value] struct {
-	items   []V
+	values   []V
 }
 
 // SEQUENTIAL INTERFACE
 
 // This method determines whether or not this list is empty.
 func (v *list[V]) IsEmpty() bool {
-	return len(v.items) == 0
+	return len(v.values) == 0
 }
 
-// This method returns the number of items contained in this list.
+// This method returns the number of values contained in this list.
 func (v *list[V]) GetSize() int {
-	return len(v.items)
+	return len(v.values)
 }
 
-// This method returns all the items in this list as an array (slice).
+// This method returns all the values in this list as an array (slice).
 func (v *list[V]) AsArray() []V {
-	length := len(v.items)
+	length := len(v.values)
 	result := make([]V, length)
-	copy(result, v.items)
+	copy(result, v.values)
 	return result
 }
 
@@ -160,6 +162,12 @@ func (v *list[V]) AsArray() []V {
 ...
 
 ```
+
+Notice that everything in the implementation references interfaces rather than
+specific types. That means that the only place where a specific type must be
+referenced is when creating a new instance of that type. This approach makes it
+easy to swap in new implementations without changing the interfaces or
+implementation code.
 
 For coding conventions associated with interfaces see [Interfaces](#Interfaces).
 
@@ -171,43 +179,46 @@ implementation of the methods from the code that depends on the extended type.
 This can be done in a similar manner to encapsulated types as follows:
 
 ```go
-// ANGLE INTERFACE
+// ARRAY IMPLEMENTATION
 
-// This constructor creates a new angle from the specified value and normalizes
-// the value to be in the allowed range for angles [0..2π).
-func Angle(v float64) Angle {
-	twoPi := 2.0 * math.Pi
-	if v < -twoPi || v >= twoPi {
-		// Normalize the angle to the range [-2π..2π).
-		v = math.Remainder(v, twoPi)
-	}
-	if v < 0.0 {
-		// Normalize the angle to the range [0..2π).
-		v = v + twoPi
-	}
-	return Angle(v)
+// This type defines the structure and methods associated with a native array of
+// values. Each value is associated with an implicit positive integer index. The
+// array uses ORDINAL based indexing rather than ZERO based indexing (see the
+// description of what this means in the Sequential interface definition).
+// This type is parameterized as follows:
+//   - V is any type of value.
+type Array[V Value] []V
+
+// STRINGER INTERFACE
+
+// This method implements the Go Stringer interface using the canonical
+// formatter.
+func (v Array[V]) String() string {
+	return FormatValue(v)
 }
 
-// This type defines the methods associated with angle elements. It extends the
-// native Go `float64` type and represents a radian based angle in the range
-// [0..2π).
-type Angle float64
+// SEQUENTIAL INTERFACE
 
-// This method implements the standard Go Stringer interface.
-func (v Angle) String() string {
-	return v.AsString()
+// This method determines whether or not this array is empty.
+func (v Array[V]) IsEmpty() bool {
+	return len(v) == 0
 }
 
-// This method returns a string value for this angle.
-func (v Angle) AsString() string {
-	return "~" + strconv.FormatFloat(float64(v), 'G', -1, 64)
+// This method returns the number of values contained in this array.
+func (v Array[V]) GetSize() int {
+	return len(v)
 }
 
-// This method returns a real value for this angle.
-func (v Angle) AsReal() float64 {
-	return float64(v)
+// This method returns all the values in this array. The values retrieved are in
+// the same order as they are in the array.
+func (v Array[V]) AsArray() []V {
+	var length = len(v)
+	var result = make([]V, length)
+	copy(result, v)
+	return result
 }
 
+// INDEXED INTERFACE
 ...
 
 ```
@@ -235,67 +246,6 @@ type ComparisonFunction func(first any, second any) bool
 //   - 1: The first value is more than the second value.
 type RankingFunction func(first any, second any) int
 
-```
-
-#### Library Types
-Many languages have the concept of type(or class)-level functions that do not
-operate on a specific instance of the type. These functions are scoped to the
-type by prefixing each call to the function with the type name. The Go language
-scopes these types of functions to the package name.
-
-Often there are groups of related type specific functions that form a library
-that can be used to operate on instances of that type. For example, there may
-be a library of arithmetic functions that operate on integers. But if we want
-to have a similar library of those arithmetic functions that operates on real
-numbers we must name each arithmetic function differently to distinguish what
-type of number it operates on:
- * `AddIntegers(first, second int) int`
- * `AddReals(first, second float64) float64`
- * `AddVectors(first, second complex128) complex128`
-
-To provide a cleaner solution to this challenge, we introduce the concept of a
-type specific library. Each library is a _singleton_ object and the library
-functions are methods on the library object. This scopes each method to a
-specific library type and allows multiple libraries to support the same library
-methods without any name collisions. The above arithmetic functions would then
-be something like:
- * `Integers.Add(first, second int) int`
- * `Reals.Add(first, second float64) float64`
- * `Vectors.Add(first, second complex128) complex128`
-
-Libraries are named using the _plural_ form of the same noun phrase used for the
-specific type with which the library is associated. To provide a bit more
-detail, here is a simple example of a library for the binary type:
-
-```go
-// BINARY TYPE
-
-// This type defines the methods associated with a binary string that extends
-// the native Go array type and represents the string of bytes that make up
-// the binary string.
-type Binary []byte
-
-// BINARIES LIBRARY
-
-// This singleton creates a unique name space for the library functions for
-// binaries.
-var Binaries = &binaries{}
-
-// This type defines an empty structure and the group of methods bound to it
-// that define the library functions for binaries.
-type binaries struct {
-}
-
-// CHAINABLE INTERFACE
-
-// This library function returns the concatenation of the two specified binary
-// strings.
-func (l *binaries) Concatenate(first Binary, second Binary) Binary {
-	binary := make(Binary, len(first)+len(second))
-	copy(binary, first)
-	copy(binary[len(first):], second)
-	return binary
-}
 ```
 
 ### Methods
@@ -339,8 +289,8 @@ is reserved for types and variables. Therefore we prefix getter methods with
 "Get" followed by the attribute name. For example:
  * `GetSize() int`
  * `GetPath() string`
- * `GetIndex(item T) int`
- * `GetItems(first, last int) []T`
+ * `GetIndex(value T) int`
+ * `GetValues(first, last int) []T`
 
 #### Setter Methods
 A method that sets the value of one of the attributes of a structured type is a
@@ -348,7 +298,7 @@ setter method. Consistent with the getter methods each setter method is prefixed
 with "Set" followed by the attribute name. For example:
  * `SetPath(path string)`
  * `SetPassphrase(passphrase []rune)`
- * `SetItems(first, last int, items []T)`
+ * `SetValues(first, last int, values []T)`
 
 Note that just because a type has a getter method for an attribute doesn't mean
 that it necessarily should have a setter method for the same attribute. Some
@@ -374,29 +324,10 @@ should be implemented as a library function rather than a method. All action
 methods should be named with a verb phrase denoting the action being performed.
 Here are some examples of action methods:
 
- * `AddItem(item T)`
- * `ShuffleItems()`
+ * `AddValue(value T)`
+ * `ShuffleValues()`
  * `RemoveTop() T`
  * `EmitToken(token int)`
-
-#### Library Function Methods
-Since library functions are essentially methods on a library, they follow the
-same conventions listed above for all methods with one exception. Whereas the
-target of a normal method is a value of the type defining the method, the target
-of a library function is the library. Therefore, the naming of the target of a
-library function is always "l" for "library" instead of "v" for "value".
-
-Note that the only time the target of a library function is used within the
-library function itself is when the implementation of that function needs to
-call another function associated with that same library.
-
-Again the declaration of each library function has the same form:
-
-```go
-func (l *LibraryName) FunctionName(...) ... {
-	...
-}
-```
 
 ### Interfaces
 Since an interface describes only one aspect of a type or function library we
@@ -454,7 +385,7 @@ type Temporal interface {
 }
 
 // This interface defines the methods supported by all associative collections
-// whose items consist of key-value pair associations.
+// whose values consist of key-value pair associations.
 type Associative[K any, V any] interface {
 	AddAssociation(association AssociationLike[K, V])
 	AddAssociations(associations []AssociationLike[K, V])
@@ -470,32 +401,3 @@ type Associative[K any, V any] interface {
 	ReverseAssociations()
 }
 ```
-
-#### Library Interfaces
-An interface to a library allows multiple implementations of that library to be
-developed. For example, one implementation might be fast but not secure whereas
-another implementation would be slower but cryptographically secure. Since each
-library is actually a singleton object, a pointer to the desired library can be
-passed into a function that needs to call it without caring how it is
-implemented. Again, a library interface should not depend on non-native types
-(or other libraries) except via other interfaces.
-
-Here are a few examples of simple library interfaces:
-
-```go
-// This library interface defines the functions supported by all libraries that
-// can disect and combine associative collections.
-type Blendable[K any, V any] interface {
-	Merge(first, second Associative[K, V]) Associative[K, V]
-	Extract(catalog Associative[K, V], keys []K) Associative[K, V]
-}
-
-// This library interface defines the functions supported by all libraries that
-// can combine first-in-first-out (FIFO) style collections in interesting ways.
-type Routeable[T any] interface {
-	Fork(wg *sync.WaitGroup, input FIFO[T], size int) []FIFO[T]
-	Split(wg *sync.WaitGroup, input FIFO[T], size int) []FIFO[T]
-	Join(wg *sync.WaitGroup, inputs []FIFO[T]) FIFO[T]
-}
-```
-

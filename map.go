@@ -16,7 +16,7 @@ package collections
 // key-value pair associations. This type is parameterized as follows:
 //   - K is a primitive type of key.
 //   - V is any type of entity.
-type Map[K comparable, V Value] map[K] V
+type Map[K comparable, V Value] map[K]V
 
 // STRINGER INTERFACE
 

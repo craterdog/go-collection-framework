@@ -18,7 +18,7 @@ func List[V Value]() ListLike[V] {
 	var capacity = 4 // The minimum value.
 	var values = make([]V, 0, capacity)
 	var compare = CompareValues
-	return &list[V]{values, compare}
+	return &list[V]{Array[V](values), values, compare}
 }
 
 // This constructor creates a new list from the specified array that uses the
@@ -46,7 +46,8 @@ func Concatenate[V Value](first, second ListLike[V]) ListLike[V] {
 // This type is parameterized as follows:
 //   - V is any type of value.
 type list[V Value] struct {
-	Array[V]
+	ArrayLike[V]
+	values []V
 	compare ComparisonFunction
 }
 
@@ -71,35 +72,35 @@ func (v *list[V]) SetComparer(compare ComparisonFunction) {
 // This method appends the specified value to the end of this list.
 func (v *list[V]) AddValue(value V) {
 	// Add space for the new value.
-	var index = len(v.Array)
+	var index = len(v.values)
 	var length = index + 1
 	v.resize(length)
 
 	// Append the new value.
-	v.Array[index] = value
+	v.values[index] = value
 }
 
 // This method appends the specified values to the end of this list.
 func (v *list[V]) AddValues(values Sequential[V]) {
 	// Add space for the new values.
-	var index = len(v.Array)
+	var index = len(v.values)
 	var length = index + values.GetSize()
 	v.resize(length)
 
 	// Append the new values.
-	copy(v.Array[index:], values.AsArray())
+	copy(v.values[index:], values.AsArray())
 }
 
 // This method inserts the specified value into this list in the specified
 // slot between existing values.
 func (v *list[V]) InsertValue(slot int, value V) {
 	// Add space for the new value.
-	var length = len(v.Array) + 1
+	var length = len(v.values) + 1
 	v.resize(length)
 
 	// Insert the new value.
-	copy(v.Array[slot+1:], v.Array[slot:])
-	v.Array[slot] = value
+	copy(v.values[slot+1:], v.values[slot:])
+	v.values[slot] = value
 }
 
 // This method inserts the specified values into this list in the specified
@@ -107,24 +108,24 @@ func (v *list[V]) InsertValue(slot int, value V) {
 func (v *list[V]) InsertValues(slot int, values Sequential[V]) {
 	// Add space for the new values.
 	var size = values.GetSize()
-	var length = len(v.Array) + size
+	var length = len(v.values) + size
 	v.resize(length)
 
 	// Insert the new values.
-	copy(v.Array[slot+size:], v.Array[slot:])
-	copy(v.Array[slot:], values.AsArray())
+	copy(v.values[slot+size:], v.values[slot:])
+	copy(v.values[slot:], values.AsArray())
 }
 
 // This method removes the value at the specified index from this list. The
 // removed value is returned.
 func (v *list[V]) RemoveValue(index int) V {
 	// Remove the old value.
-	index = v.normalizedIndex(index)
-	var old = v.Array[index]
-	copy(v.Array[index:], v.Array[index+1:])
+	index = v.GoIndex(index)
+	var old = v.values[index]
+	copy(v.values[index:], v.values[index+1:])
 
 	// Remove extra space.
-	var length = len(v.Array) - 1
+	var length = len(v.values) - 1
 	v.resize(length)
 	return old
 }
@@ -133,13 +134,13 @@ func (v *list[V]) RemoveValue(index int) V {
 // The removed values are returned.
 func (v *list[V]) RemoveValues(first int, last int) Sequential[V] {
 	// Remove the specified values.
-	first = v.normalizedIndex(first)
-	last = v.normalizedIndex(last)
-	var result = ListFromArray[V](v.Array[first : last+1])
-	copy(v.Array[first:], v.Array[last+1:])
+	first = v.GoIndex(first)
+	last = v.GoIndex(last)
+	var result = ListFromArray(v.values[first : last+1])
+	copy(v.values[first:], v.values[last+1:])
 
 	// Remove the extra space.
-	var length = len(v.Array)
+	var length = len(v.values)
 	var size = last - first + 1
 	v.resize(length - size)
 	return result
@@ -147,7 +148,8 @@ func (v *list[V]) RemoveValues(first int, last int) Sequential[V] {
 
 // This method removes all values from this list.
 func (v *list[V]) RemoveAll() {
-	v.Array = make([]V, 0, 4)
+	v.values = make([]V, 0, 4)
+	v.ArrayLike = Array[V](v.values)
 }
 
 // SORTABLE INTERFACE
@@ -162,28 +164,29 @@ func (v *list[V]) SortValuesWithRanker(rank RankingFunction) {
 	if rank == nil {
 		rank = RankValues
 	}
-	if len(v.Array) > 1 {
-		SortArray[V](v.Array, rank)
+	if len(v.values) > 1 {
+		SortArray(v.values, rank)
 	}
 }
 
 // This method reverses the order of all values in this list.
 func (v *list[V]) ReverseValues() {
 	// Allocate a new array/slice.
-	var length = len(v.Array)
-	var capacity = cap(v.Array)
+	var length = len(v.values)
+	var capacity = cap(v.values)
 	var reversed = make([]V, length, capacity)
 
 	// Copy the values into the new array in reverse.
-	for i, _ := range v.Array {
-		reversed[i] = v.Array[length-i-1]
+	for i, _ := range v.values {
+		reversed[i] = v.values[length-i-1]
 	}
-	v.Array = reversed
+	v.values = reversed
+	v.ArrayLike = Array[V](v.values)
 }
 
 // This method pseudo-randomly shuffles the values in this list.
 func (v *list[V]) ShuffleValues() {
-	ShuffleArray[V](v.Array)
+	ShuffleArray(v.values)
 }
 
 // PRIVATE INTERFACE
@@ -192,18 +195,19 @@ func (v *list[V]) ShuffleValues() {
 // necessary to make it more efficient. Note: Any additional values that are
 // added to the length of the list are NOT zeroed out.
 func (v *list[V]) resize(length int) {
-	var capacity = cap(v.Array)
+	var capacity = cap(v.values)
 	for length > capacity {
 		capacity *= 2
 	}
 	for length < capacity/4 {
 		capacity /= 2
 	}
-	if capacity != cap(v.Array) {
+	if capacity != cap(v.values) {
 		// Adjust the capacity accordingly.
 		var values = make([]V, length, capacity)
-		copy(values, v.Array)
-		v.Array = values
+		copy(values, v.values)
+		v.values = values
 	}
-	v.Array = v.Array[:length] // A change the length of the slice.
+	v.values = v.values[:length] // A change the length of the slice.
+	v.ArrayLike = Array[V](v.values)
 }

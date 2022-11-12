@@ -60,6 +60,7 @@ type Indexed[V Value] interface {
 	GetValue(index int) V
 	GetValues(first int, last int) Sequential[V]
 	GetIndex(value V) int
+	GoIndex(index int) int
 }
 
 // This interface defines the methods supported by all searchable sequences of

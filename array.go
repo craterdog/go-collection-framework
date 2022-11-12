@@ -61,15 +61,15 @@ func (v Array[V]) SetComparer(compare ComparisonFunction) {
 // This method retrieves from this array the value that is associated with the
 // specified index.
 func (v Array[V]) GetValue(index int) V {
-	index = v.normalizedIndex(index)
+	index = v.GoIndex(index)
 	return v[index]
 }
 
 // This method retrieves from this array all values from the first index through
 // the last index (inclusive).
 func (v Array[V]) GetValues(first int, last int) Sequential[V] {
-	first = v.normalizedIndex(first)
-	last = v.normalizedIndex(last)
+	first = v.GoIndex(first)
+	last = v.GoIndex(last)
 	var result = Array[V](v[first : last+1])
 	return result
 }
@@ -85,6 +85,34 @@ func (v Array[V]) GetIndex(value V) int {
 	}
 	// The value was not found.
 	return 0
+}
+
+// This method normalizes an index to match the Go (zero based) indexing. The
+// following transformation is performed:
+//
+//	[-length..-1] and [1..length] => [0..length)
+//
+// Notice that the specified index cannot be zero since zero is not an ORDINAL.
+func (v Array[V]) GoIndex(index int) int {
+	var length = len(v)
+	switch {
+	case index < -length || index == 0 || index > length:
+		// The index is outside the bounds of the specified range.
+		panic(fmt.Sprintf(
+			"The specified index is outside the allowed ranges [-%v..-1] and [1..%v]: %v",
+			length,
+			length,
+			index))
+	case index < 0:
+		// Convert a negative index.
+		return index + length
+	case index > 0:
+		// Convert a positive index.
+		return index - 1
+	default:
+		// This should never happen so time to panic...
+		panic(fmt.Sprintf("Compiler problem, unexpected index value: %v", index))
+	}
 }
 
 // SEARCHABLE INTERFACE
@@ -129,41 +157,13 @@ func (v Array[V]) ContainsAll(values Sequential[V]) bool {
 // This method sets the value in this array that is associated with the specified
 // index to be the specified value.
 func (v Array[V]) SetValue(index int, value V) {
-	index = v.normalizedIndex(index)
+	index = v.GoIndex(index)
 	v[index] = value
 }
 
 // This method sets the values in this array starting with the specified index
 // to the specified values.
 func (v Array[V]) SetValues(index int, values Sequential[V]) {
-	index = v.normalizedIndex(index)
+	index = v.GoIndex(index)
 	copy(v[index:], values.AsArray())
-}
-
-// This method normalizes an index to match the Go (zero based) indexing. The
-// following transformation is performed:
-//
-//	[-length..-1] and [1..length] => [0..length)
-//
-// Notice that the specified index cannot be zero since zero is not an ORDINAL.
-func (v Array[V]) normalizedIndex(index int) int {
-	var length = len(v)
-	switch {
-	case index < -length || index == 0 || index > length:
-		// The index is outside the bounds of the specified range.
-		panic(fmt.Sprintf(
-			"The specified index is outside the allowed ranges [-%v..-1] and [1..%v]: %v",
-			length,
-			length,
-			index))
-	case index < 0:
-		// Convert a negative index.
-		return index + length
-	case index > 0:
-		// Convert a positive index.
-		return index - 1
-	default:
-		// This should never happen so time to panic...
-		panic(fmt.Sprintf("Compiler problem, unexpected index value: %v", index))
-	}
 }

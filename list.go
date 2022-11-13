@@ -181,17 +181,7 @@ func (v *list[V]) SortValuesWithRanker(rank RankingFunction) {
 
 // This method reverses the order of all values in this list.
 func (v *list[V]) ReverseValues() {
-	// Allocate a new array/slice.
-	var length = len(v.values)
-	var capacity = cap(v.values)
-	var reversed = make([]V, length, capacity)
-
-	// Copy the values into the new array in reverse.
-	for i, _ := range v.values {
-		reversed[i] = v.values[length-i-1]
-	}
-	v.values = reversed
-	v.ArrayLike = Array[V](v.values)
+	ReverseArray(v.values)
 }
 
 // This method pseudo-randomly shuffles the values in this list.

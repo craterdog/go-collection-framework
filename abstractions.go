@@ -208,6 +208,7 @@ type RankingFunction func(first Value, second Value) int
 // This interface defines the methods supported by all systematic agents that
 // can shuffle or sort an array of values using a ranking function.
 type Systematic[V Value] interface {
+	ReverseArray(array []V)
 	ShuffleArray(array []V)
 	SortArray(array []V)
 }

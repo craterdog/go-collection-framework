@@ -30,7 +30,7 @@ following:
  new code.
  1 Make the changes to the existing code and add any new code that is required.
  1 Make sure that all code changes and new code meet the
- [coding conventions](https://github.com/craterdog/go-collection-framework/CONVENTIONS)
+ [coding conventions](https://github.com/craterdog/go-collection-framework/CONVENTIONS.md)
    and that all unit tests pass.
  1 Create a [pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request) for your proposed
  changes.

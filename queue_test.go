@@ -28,7 +28,7 @@ func TestQueueWithConcurrency(t *tes.T) {
 	ass.True(t, queue.IsEmpty())
 	ass.Equal(t, 0, queue.GetSize())
 
-	// Add values to the queue in bulk.
+	// Add some values to the queue.
 	for i := 1; i < 10; i++ {
 		queue.AddValue(i)
 	}
@@ -38,16 +38,21 @@ func TestQueueWithConcurrency(t *tes.T) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		for i := 1; i < 101; i++ {
-			var value, _ = queue.RemoveHead()
-			ass.Equal(t, i, value)
+		var value int
+		var ok = true
+		for i := 1; ok; i++ {
+			value, ok = queue.RemoveHead()
+			if ok {
+				ass.Equal(t, i, value)
+			}
 		}
 	}()
 
-	// Add more values to the queue.
+	// Add some more values to the queue.
 	for i := 10; i < 101; i++ {
 		queue.AddValue(i)
 	}
+	queue.CloseQueue()
 }
 
 func TestQueueWithFork(t *tes.T) {
@@ -62,10 +67,13 @@ func TestQueueWithFork(t *tes.T) {
 	// Remove values from the output queues in the background.
 	var readOutput = func(output col.FIFO[int], name string) {
 		defer wg.Done()
-		var value, ok = output.RemoveHead()
+		var value int
+		var ok bool = true
 		for i := 1; ok; i++ {
-			ass.Equal(t, i, value)
 			value, ok = output.RemoveHead()
+			if ok {
+				ass.Equal(t, i, value)
+			}
 		}
 	}
 	wg.Add(2)
@@ -96,10 +104,13 @@ func TestQueueWithSplitAndJoin(t *tes.T) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		var value, ok = output.RemoveHead()
+		var value int
+		var ok bool = true
 		for i := 1; ok; i++ {
-			ass.Equal(t, i, value)
 			value, ok = output.RemoveHead()
+			if ok {
+				ass.Equal(t, i, value)
+			}
 		}
 	}()
 

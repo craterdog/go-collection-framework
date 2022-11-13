@@ -263,8 +263,10 @@ func (v *queue[V]) AddValues(values Sequential[V]) {
 
 // This method removes from this queue the value that is at the head of it. It
 // returns the removed value and a "comma ok" value as the result.
-func (v *queue[V]) RemoveHead() (head V, ok bool) {
-	// Default the return value to the zero value for type T.
+func (v *queue[V]) RemoveHead() (V, bool) {
+	// Default the return value to the zero value for type V.
+	var head V
+	var ok bool
 
 	// Remove the head value from the queue if one exists.
 	_, ok = <-v.available // Will block until an value is available.
@@ -275,7 +277,7 @@ func (v *queue[V]) RemoveHead() (head V, ok bool) {
 	}
 
 	// Return the results
-	return
+	return head, ok
 }
 
 // This method closes the queue so no more values can be placed on it.

@@ -1,3 +1,5 @@
+## Coding Conventions
+
 <img src="https://craterdog.com/images/CraterDog.png" width="50%">
 
 ### Naming Conventions

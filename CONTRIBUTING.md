@@ -13,9 +13,9 @@ with any of the following:
 Please follow the normal Github process for submitting
 [tickets](https://github.com/craterdog/go-collection-framework/issues)
 for this project. Include the following with each ticket:
- 1 Label it as a _bug_ or _enhancement_.
- 1 Provide a brief summary of the problem or suggestion.
- 1 Show example code that either demonstrates the problem or shows how the
+ 1. Label it as a _bug_ or _enhancement_.
+ 1. Provide a brief summary of the problem or suggestion.
+ 1. Show example code that either demonstrates the problem or shows how the
  proposed enhancement would work. If demonstrating the problem, include
  a link to the Go Playground demonstrating the code.
 

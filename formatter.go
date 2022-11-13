@@ -67,7 +67,7 @@ func (v *formatter) FormatValue(value Value) {
 
 // This method returns the canonically formatted string result.
 func (v *formatter) GetResult() string {
-	result := v.result.String()
+	var result = v.result.String()
 	v.result.Reset()
 	return result
 }
@@ -79,8 +79,8 @@ func (v *formatter) AppendString(s string) {
 
 // This method appends a properly indented newline to the result.
 func (v *formatter) AppendNewline() {
-	separator := "\n"
-	levels := v.depth + v.indentation
+	var separator = "\n"
+	var levels = v.depth + v.indentation
 	for level := 0; level < levels; level++ {
 		separator += "\t"
 	}
@@ -152,29 +152,29 @@ func (v *formatter) formatNil(r ref.Value) {
 // This private method appends the name of the specified boolean value to the
 // result.
 func (v *formatter) formatBoolean(r ref.Value) {
-	b := r.Bool()
+	var b = r.Bool()
 	v.AppendString(stc.FormatBool(b))
 }
 
 // This private method appends the base 10 string for the specified integer
 // value to the result.
 func (v *formatter) formatInteger(r ref.Value) {
-	i := r.Int()
+	var i = r.Int()
 	v.AppendString(stc.FormatInt(int64(i), 10))
 }
 
 // This private method appends the base 16 string for the specified unsigned
 // integer value to the result.
 func (v *formatter) formatUnsigned(r ref.Value) {
-	u := r.Uint()
+	var u = r.Uint()
 	v.AppendString("0x" + stc.FormatUint(uint64(u), 16))
 }
 
 // This private method appends the base 10 string for the specified floating
 // point value to the result using scientific notation if necessary.
 func (v *formatter) formatFloat(r ref.Value) {
-	flt := r.Float()
-	str := stc.FormatFloat(flt, 'G', -1, 64)
+	var flt = r.Float()
+	var str = stc.FormatFloat(flt, 'G', -1, 64)
 	if !sts.Contains(str, ".") && !sts.Contains(str, "E") {
 		str += ".0"
 	}
@@ -184,28 +184,28 @@ func (v *formatter) formatFloat(r ref.Value) {
 // This private method appends the base 10 string for the specified complex
 // number value to the result using scientific notation if necessary.
 func (v *formatter) formatComplex(r ref.Value) {
-	c := r.Complex()
+	var c = r.Complex()
 	v.AppendString(stc.FormatComplex(c, 'G', -1, 128))
 }
 
 // This private method appends the string for the specified rune value to the
 // result.
 func (v *formatter) formatRune(r ref.Value) {
-	rn := r.Int()
+	var rn = r.Int()
 	v.AppendString(stc.QuoteRune(int32(rn)))
 }
 
 // This private method appends the string for the specified string value to the
 // result.
 func (v *formatter) formatString(r ref.Value) {
-	str := r.String()
+	var str = r.String()
 	v.AppendString(stc.Quote(str))
 }
 
 // This private method appends the string for the specified array of values to
 // the result.
 func (v *formatter) formatArray(r ref.Value, typ string) {
-	size := r.Len()
+	var size = r.Len()
 	v.AppendString("[")
 	if size > 0 {
 		if v.depth+1 > maximumDepth {
@@ -213,10 +213,17 @@ func (v *formatter) formatArray(r ref.Value, typ string) {
 			v.AppendString("...")
 		} else {
 			for i := 0; i < size; i++ {
+				var value ref.Value
 				v.depth++
 				v.AppendNewline()
-				item := r.Index(i)
-				v.formatValue(item)
+				if typ == "stack" {
+					// Format values in reverse order.
+					value = r.Index(size - i - 1)
+				} else {
+					// Format values in actual order.
+					value = r.Index(i)
+				}
+				v.formatValue(value)
 				v.depth--
 			}
 			v.AppendNewline()
@@ -225,7 +232,7 @@ func (v *formatter) formatArray(r ref.Value, typ string) {
 		if typ == "catalog" {
 			v.AppendString(":") // The array of attributes is empty: [:]
 		} else {
-			v.AppendString(" ") // The array of items is empty: [ ]
+			v.AppendString(" ") // The array of values is empty: [ ]
 		}
 	}
 	v.AppendString("](" + typ + ")")
@@ -234,8 +241,8 @@ func (v *formatter) formatArray(r ref.Value, typ string) {
 // This private method appends the string for the specified map of key-value
 // pairs to the result.
 func (v *formatter) formatMap(r ref.Value) {
-	keys := r.MapKeys()
-	size := len(keys)
+	var keys = r.MapKeys()
+	var size = len(keys)
 	v.AppendString("[")
 	if size > 0 {
 		if v.depth+1 > maximumDepth {
@@ -245,8 +252,8 @@ func (v *formatter) formatMap(r ref.Value) {
 			for i := 0; i < size; i++ {
 				v.depth++
 				v.AppendNewline()
-				key := keys[i]
-				value := r.MapIndex(key)
+				var key = keys[i]
+				var value = r.MapIndex(key)
 				v.formatValue(key)
 				v.AppendString(": ")
 				v.formatValue(value)
@@ -263,25 +270,25 @@ func (v *formatter) formatMap(r ref.Value) {
 // This private method appends the string for the specified catalog of
 // key-value pairs to the result. It uses recursion to format each pair.
 func (v *formatter) formatAttribute(r ref.Value) {
-	key := r.MethodByName("GetKey").Call([]ref.Value{})[0]
+	var key = r.MethodByName("GetKey").Call([]ref.Value{})[0]
 	v.formatValue(key)
 	v.AppendString(": ")
-	value := r.MethodByName("GetValue").Call([]ref.Value{})[0]
+	var value = r.MethodByName("GetValue").Call([]ref.Value{})[0]
 	v.formatValue(value)
 }
 
 // This private method appends the string for the specified collection of
-// items to the result. It uses recursion to format each item.
+// values to the result. It uses recursion to format each value.
 func (v *formatter) formatCollection(r ref.Value) {
-	array := r.MethodByName("AsArray").Call([]ref.Value{})[0]
-	typ := extractType(r)
+	var array = r.MethodByName("AsArray").Call([]ref.Value{})[0]
+	var typ = extractType(r)
 	v.formatArray(array, typ)
 }
 
 // This private function extracts the type name string from the full reflected
 // type.
 func extractType(r ref.Value) string {
-	t := r.Type().String()
+	var t = r.Type().String()
 	switch {
 	case sts.HasPrefix(t, "[]"):
 		return "array"

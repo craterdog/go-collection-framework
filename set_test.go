@@ -47,11 +47,11 @@ func TestSetsWithStrings(t *tes.T) {
 	ass.Equal(t, "bar", string(set.GetValue(1)))                  // ["bar", "baz", "foo"]
 	ass.Equal(t, bazfoo.AsArray(), set.GetValues(2, 3).AsArray()) // ["bar", "baz", "foo"]
 	ass.Equal(t, bar.AsArray(), set.GetValues(1, 1).AsArray())    // ["bar", "baz", "foo"]
-	var set2 = col.SetFromSequence[string](set)
-	ass.True(t, col.CompareValues(set, set2))
-	var array = col.Array[string]([]string{"foo", "bar", "baz"})
-	var set3 = col.SetFromSequence[string](array)
-	ass.True(t, col.CompareValues(set2, set3))
+	var set2 = col.SetFromSequence[string](set)                   // ["bar", "baz", "foo"]
+	ass.True(t, col.CompareValues(set, set2))                     // ["bar", "baz", "foo"]
+	var array = col.Array[string]([]string{"foo", "bar", "baz"})  // ["bar", "baz", "foo"]
+	var set3 = col.SetFromSequence[string](array)                 // ["bar", "baz", "foo"]
+	ass.True(t, col.CompareValues(set2, set3))                    // ["bar", "baz", "foo"]
 	iterator = col.Iterator[string](set)                          // ["bar", "baz", "foo"]
 	ass.True(t, iterator.HasNext())                               // ["bar", "baz", "foo"]
 	ass.False(t, iterator.HasPrevious())                          // ["bar", "baz", "foo"]

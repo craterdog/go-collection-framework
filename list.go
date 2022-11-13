@@ -67,7 +67,7 @@ func Concatenate[V Value](first, second ListLike[V]) ListLike[V] {
 //   - V is any type of value.
 type list[V Value] struct {
 	ArrayLike[V]
-	values []V
+	values  []V
 	compare ComparisonFunction
 }
 

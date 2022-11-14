@@ -23,4 +23,4 @@ import (
 
 ### Contributing
 Project contributors are always welcome. Check out the contributing guidelines
-[here](https://github.com/craterdog/go-collection-framework/.github/CONTRIBUTING.md).
+[here](https://github.com/craterdog/go-collection-framework/blob/main/.github/CONTRIBUTING.md).

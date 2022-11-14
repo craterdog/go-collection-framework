@@ -1,6 +1,6 @@
-## Contributor Covenant Code of Conduct
-
 <img src="https://craterdog.com/images/CraterDog.png" width="50%">
+
+## Contributor Covenant Code of Conduct
 
 ### Our Pledge
 

@@ -1,6 +1,6 @@
-## Security Policy
-
 <img src="https://craterdog.com/images/CraterDog.png" width="50%">
+
+## Security Policy
 
 ### Supported Versions
 

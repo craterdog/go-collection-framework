@@ -69,7 +69,7 @@ func (v Array[V]) GetValues(first int, last int) Sequential[V] {
 	return result
 }
 
-// This method returns the index of the FIRST occurence of the specified value in
+// This method returns the index of the FIRST occurrence of the specified value in
 // this array, or zero if this array does not contain the value.
 func (v Array[V]) GetIndex(value V) int {
 	for index, candidate := range v {

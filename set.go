@@ -203,7 +203,7 @@ func (v *set[V]) RemoveAll() {
 //     before which it could be inserted in the underlying list.
 //   - found: A boolean stating whether or not the value was found.
 //
-// The algoritm performs a true O[log(n)] worst case search.
+// The algorithm performs a true O[log(n)] worst case search.
 func (v *set[V]) search(value V) (index int, found bool) {
 	// We use iteration instead of recursion for better performance.
 	//    start        first      middle       last          end

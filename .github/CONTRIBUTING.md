@@ -37,8 +37,14 @@ following:
  1. We will review the pull request and then merge the changes into the main branch.
 
 ### Project Related Discussions
-We have setup a [Reddit Community](https://www.reddit.com/r/GoCollections/) for
-discussions associated with this project. Please submit questions and comments
-to this community rather than submitting a formal ticket.
+Most project related discussions can happen in the Github
+[discussion area](https://github.com/craterdog/go-collection-framework/discussions)
+for this project.
+
+We have also setup a [Reddit Community](https://www.reddit.com/r/GoCollections/) for
+broader discussions related to this project.
+
+Please submit questions and comments to one of these two communities rather than
+submitting a formal ticket.
 
 And that's pretty much it. Thanks again for your participation!

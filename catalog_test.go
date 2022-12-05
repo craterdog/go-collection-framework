@@ -40,7 +40,7 @@ func TestCatalogsWithStringsAndIntegers(t *tes.T) {
 	ass.Equal(t, 1, catalog.GetSize())
 	catalog.AddAssociations(associations)
 	ass.Equal(t, 3, catalog.GetSize())
-	var catalog2 = col.CatalogFromSequence[string, int](catalog)
+	var catalog2 = col.CatalogFromArray[string, int](catalog.AsArray())
 	ass.True(t, col.CompareValues(catalog, catalog2))
 	var m = col.Map[string, int](map[string]int{
 		"foo": 1,

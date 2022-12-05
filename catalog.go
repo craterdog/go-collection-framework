@@ -30,6 +30,7 @@ type association[K Key, V Value] struct {
 
 // STRINGER INTERFACE
 
+// This method returns a canonical string for this association.
 func (v *association[K, V]) String() string {
 	return FormatValue(v)
 }
@@ -60,7 +61,18 @@ func Catalog[K Key, V Value]() CatalogLike[K, V] {
 	return &catalog[K, V]{associations, associations, keys}
 }
 
-// This constructor creates a new catalog from the specified sequence.
+// This constructor creates a new catalog from the specified array of
+// associations.
+func CatalogFromArray[K Key, V Value](array []Binding[K, V]) CatalogLike[K, V] {
+	var v = Catalog[K, V]()
+	for _, association := range array {
+		v.AddAssociation(association)
+	}
+	return v
+}
+
+// This constructor creates a new catalog from the specified sequence of
+// associations.
 func CatalogFromSequence[K Key, V Value](sequence Sequential[Binding[K, V]]) CatalogLike[K, V] {
 	var v = Catalog[K, V]()
 	var iterator = Iterator(sequence)

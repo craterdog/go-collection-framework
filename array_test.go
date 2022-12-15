@@ -16,7 +16,7 @@ import (
 	tes "testing"
 )
 
-func TestEmptyArrays(t *tes.T) {
+func TestEmptyArray(t *tes.T) {
 	var array = col.Array[string]([]string{})
 	ass.True(t, array.IsEmpty())
 	ass.Equal(t, 0, array.GetSize())
@@ -28,9 +28,29 @@ func TestEmptyArrays(t *tes.T) {
 	ass.False(t, iterator.HasPrevious())
 	iterator.ToStart()
 	iterator.ToEnd()
+	defer func() {
+		if e := recover(); e != nil {
+			ass.Equal(t, "Cannot index an empty array.", e)
+		} else {
+			ass.Fail(t, "Test should result in recovered panic.")
+		}
+	}()
+	array.GoIndex(0) // This should panic.
 }
 
-func TestArraysWithStrings(t *tes.T) {
+func TestArrayIndexOfZero(t *tes.T) {
+	var array = col.Array[int]([]int{1, 2, 3})
+	defer func() {
+		if e := recover(); e != nil {
+			ass.Equal(t, "Indices must be positive or negative ordinals, not zero.", e)
+		} else {
+			ass.Fail(t, "Test should result in recovered panic.")
+		}
+	}()
+	array.GoIndex(0) // This should panic.
+}
+
+func TestArrayWithStrings(t *tes.T) {
 	var array = col.Array[string]([]string{"foo", "bar", "baz"})
 	var foobar = col.Array[string]([]string{"foo", "bar"})
 	ass.False(t, array.IsEmpty())
@@ -49,4 +69,28 @@ func TestArraysWithStrings(t *tes.T) {
 	ass.Equal(t, []string{"foo", "bax", "baz"}, array.AsArray())
 	array.SetValues(2, foobar)
 	ass.Equal(t, []string{"foo", "foo", "bar"}, array.AsArray())
+	defer func() {
+		if e := recover(); e != nil {
+			ass.Equal(t, "The specified index is outside the allowed ranges [-3..-1] and [1..3]: 4", e)
+		} else {
+			ass.Fail(t, "Test should result in recovered panic.")
+		}
+	}()
+	array.GoIndex(4) // This should panic.
+}
+
+func TestArrayWithIntegers(t *tes.T) {
+	var array = col.Array[int]([]int{1, 2, 3})
+	for index, value := range array {
+		ass.Equal(t, index, array.GoIndex(value))
+		ass.Equal(t, index, array.GoIndex(value-4))
+	}
+	defer func() {
+		if e := recover(); e != nil {
+			ass.Equal(t, "The specified index is outside the allowed ranges [-3..-1] and [1..3]: -4", e)
+		} else {
+			ass.Fail(t, "Test should result in recovered panic.")
+		}
+	}()
+	array.GoIndex(-4) // This should panic.
 }

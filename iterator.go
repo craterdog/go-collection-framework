@@ -59,7 +59,7 @@ func (v *iterator[V]) ToEnd() {
 	v.slot = v.size
 }
 
-// This method determines whether or not there is an value before the current
+// This method determines whether or not there is a value before the current
 // slot.
 func (v *iterator[V]) HasPrevious() bool {
 	return v.slot > 0
@@ -75,7 +75,7 @@ func (v *iterator[V]) GetPrevious() V {
 	return result
 }
 
-// This method determines whether or not there is an value after the current
+// This method determines whether or not there is a value after the current
 // slot.
 func (v *iterator[V]) HasNext() bool {
 	return v.slot < v.size

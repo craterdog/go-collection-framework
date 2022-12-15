@@ -91,7 +91,13 @@ func (v Array[V]) GetIndex(value V) int {
 func (v Array[V]) GoIndex(index int) int {
 	var length = len(v)
 	switch {
-	case index < -length || index == 0 || index > length:
+	case length == 0:
+		// The array is empty.
+		panic("Cannot index an empty array.")
+	case index == 0:
+		// Zero is not an ordinal.
+		panic("Indices must be positive or negative ordinals, not zero.")
+	case index < -length || index > length:
 		// The index is outside the bounds of the specified range.
 		panic(fmt.Sprintf(
 			"The specified index is outside the allowed ranges [-%v..-1] and [1..%v]: %v",
@@ -105,8 +111,8 @@ func (v Array[V]) GoIndex(index int) int {
 		// Convert a positive index.
 		return index - 1
 	default:
-		// This should never happen so time to panic...
-		panic(fmt.Sprintf("Compiler problem, unexpected index value: %v", index))
+		// This should never happen so time to...
+		panic(fmt.Sprintf("Go compiler problem, unexpected index value: %v", index))
 	}
 }
 

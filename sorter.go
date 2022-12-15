@@ -91,7 +91,8 @@ func (v *sorter[V]) shuffleArray(array []V) {
 func randomIndex(size int) int {
 	var random, err = ran.Int(ran.Reader, big.NewInt(int64(size)))
 	if err != nil {
-		panic(err)
+		// There was an issue with the underlying OS so time to...
+		panic("Unable to generate a random index:\n" + err.Error())
 	}
 	return int(random.Int64())
 }

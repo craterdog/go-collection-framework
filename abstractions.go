@@ -109,7 +109,7 @@ type Sortable[V Value] interface {
 }
 
 // This interface defines the methods supported by all binding associations.
-// It binds a readonly key with an setable value.
+// It binds a readonly key with a setable value.
 type Binding[K Key, V Value] interface {
 	GetKey() K
 	GetValue() V

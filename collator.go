@@ -396,16 +396,22 @@ func (v *collator) rankMaps(first ref.Value, second ref.Value) int {
 
 	// Iterate through the smallest map.
 	for i := 0; i < firstSize; i++ {
+		v.depth++
+		if v.depth > maximumRecursion {
+			panic(fmt.Sprintf("The maximum recursion depth was exceeded: %v", maximumRecursion))
+		}
 		// Rank the two keys.
 		var firstKey = firstKeys[i]
 		var secondKey = secondKeys[i]
 		var keyRank = v.rankValues(firstKey, secondKey)
 		if keyRank < 0 {
 			// The key in the first map comes before its matching key.
+			v.depth--
 			return -1
 		}
 		if keyRank > 0 {
 			// The key in the first map comes after its matching key.
+			v.depth--
 			return 1
 		}
 
@@ -415,12 +421,15 @@ func (v *collator) rankMaps(first ref.Value, second ref.Value) int {
 		var valueRank = v.rankValues(firstValue, secondValue)
 		if valueRank < 0 {
 			// The value in the first map comes before its matching value.
+			v.depth--
 			return -1
 		}
 		if valueRank > 0 {
 			// The value in the first map comes after its matching value.
+			v.depth--
 			return 1
 		}
+		v.depth--
 	}
 
 	// The maps contain the same initial associations.

@@ -43,8 +43,8 @@ func QueueWithCapacity[V Value](capacity int) QueueLike[V] {
 // operation can be done in parallel.
 func Fork[V Value](wg *syn.WaitGroup, input FIFO[V], size int) Sequential[FIFO[V]] {
 	// Validate the arguments.
-	if size < 1 {
-		panic("The fan out size for a queue must be greater than zero.")
+	if size < 2 {
+		panic("The fan out size for a queue must be greater than one.")
 	}
 
 	// Create the new output queues.
@@ -97,8 +97,8 @@ func Fork[V Value](wg *syn.WaitGroup, input FIFO[V], size int) Sequential[FIFO[V
 // the Join() function.
 func Split[V Value](wg *syn.WaitGroup, input FIFO[V], size int) Sequential[FIFO[V]] {
 	// Validate the arguments.
-	if size < 1 {
-		panic("The size of the split must be greater than zero.")
+	if size < 2 {
+		panic("The size of the split must be greater than one.")
 	}
 
 	// Create the new output queues.
@@ -150,7 +150,7 @@ func Split[V Value](wg *syn.WaitGroup, input FIFO[V], size int) Sequential[FIFO[
 func Join[V Value](wg *syn.WaitGroup, inputs Sequential[FIFO[V]]) FIFO[V] {
 	// Validate the arguments.
 	if inputs == nil || inputs.IsEmpty() {
-		panic("The number of input queues for a join must be greater than zero.")
+		panic("The number of input queues for a join must be at least one.")
 	}
 
 	// Create the new output queue.

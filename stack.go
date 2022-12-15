@@ -10,6 +10,10 @@
 
 package collections
 
+import (
+	fmt "fmt"
+)
+
 // STACK IMPLEMENTATION
 
 // This constructor creates a new empty stack with the default capacity.
@@ -57,7 +61,11 @@ func (v *stack[V]) GetCapacity() int {
 // This method adds the specified value to the top of this stack.
 func (v *stack[V]) AddValue(value V) {
 	if v.values.GetSize() == v.capacity {
-		panic("Attempted to add an value onto a stack that has reached its capacity!")
+		panic(fmt.Sprintf(
+			"Attempted to add an value onto a stack that has reached its capacity: %v\nvalue: %v\nstack: %v\n",
+			v.capacity,
+			value,
+			v))
 	}
 	v.values.AddValue(value)
 }

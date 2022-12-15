@@ -90,6 +90,23 @@ func TestQueueWithFork(t *tes.T) {
 	input.CloseQueue()
 }
 
+func TestQueueWithInvalidFanOut(t *tes.T) {
+	// Create a wait group for synchronization.
+	var wg = new(syn.WaitGroup)
+	defer wg.Wait()
+
+	// Create a new queue with an invalid fan out.
+	var input col.FIFO[int] = col.QueueWithCapacity[int](3)
+	defer func() {
+		if e := recover(); e != nil {
+			ass.Equal(t, "The fan out size for a queue must be greater than one.", e)
+		} else {
+			ass.Fail(t, "Test should result in recovered panic.")
+		}
+	}()
+	col.Fork(wg, input, 1) // Should panic here.
+}
+
 func TestQueueWithSplitAndJoin(t *tes.T) {
 	// Create a wait group for synchronization.
 	var wg = new(syn.WaitGroup)
@@ -119,4 +136,39 @@ func TestQueueWithSplitAndJoin(t *tes.T) {
 		input.AddValue(i)
 	}
 	input.CloseQueue()
+}
+
+func TestQueueWithInvalidSplit(t *tes.T) {
+	// Create a wait group for synchronization.
+	var wg = new(syn.WaitGroup)
+	defer wg.Wait()
+
+	// Create a new queue with an invalid fan out.
+	var input col.FIFO[int] = col.QueueWithCapacity[int](3)
+	defer func() {
+		if e := recover(); e != nil {
+			ass.Equal(t, "The size of the split must be greater than one.", e)
+		} else {
+			ass.Fail(t, "Test should result in recovered panic.")
+		}
+	}()
+	col.Split(wg, input, 1) // Should panic here.
+}
+
+func TestQueueWithInvalidJoin(t *tes.T) {
+	// Create a wait group for synchronization.
+	var wg = new(syn.WaitGroup)
+	defer wg.Wait()
+
+	// Create a new queue with an invalid fan out.
+	var inputs col.Sequential[col.FIFO[int]] = col.List[col.FIFO[int]]()
+	defer func() {
+		if e := recover(); e != nil {
+			ass.Equal(t, "The number of input queues for a join must be at least one.", e)
+		} else {
+			ass.Fail(t, "Test should result in recovered panic.")
+		}
+	}()
+	col.Join(wg, inputs) // Should panic here.
+	defer wg.Done()
 }

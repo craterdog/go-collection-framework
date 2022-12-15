@@ -36,10 +36,10 @@ func QueueWithCapacity[V Value](capacity int) QueueLike[V] {
 }
 
 // This function connects the output of the specified input queue with a
-// number of new output queues specified by the size parameter and returns an
-// array of the new output queues. Each value added to the input queue will be
-// added automatically to ALL of the output queues. This pattern is useful when
-// a set of DIFFERENT operations needs to occur for every value and each
+// number of new output queues specified by the size parameter and returns a
+// sequence of the new output queues. Each value added to the input queue will
+// be added automatically to ALL of the output queues. This pattern is useful
+// when a set of DIFFERENT operations needs to occur for every value and each
 // operation can be done in parallel.
 func Fork[V Value](wg *syn.WaitGroup, input FIFO[V], size int) Sequential[FIFO[V]] {
 	// Validate the arguments.
@@ -88,13 +88,13 @@ func Fork[V Value](wg *syn.WaitGroup, input FIFO[V], size int) Sequential[FIFO[V
 	return outputs
 }
 
-// This function connects the output of the specified input queue with
-// the number of output queues specified by the size parameter and returns an
-// array of the new output queues. Each value added to the input queue will be
-// added automatically to ONE of the output queues. This pattern is useful when
-// a SINGLE operation needs to occur for each value and the operation can be done
-// on the values in parallel. The results can then be consolidated later on using
-// the Join() function.
+// This function connects the output of the specified input queue with the
+// number of output queues specified by the size parameter and returns a
+// sequence of the new output queues. Each value added to the input queue will
+// be added automatically to ONE of the output queues. This pattern is useful
+// when a SINGLE operation needs to occur for each value and the operation can
+// be done on the values in parallel. The results can then be consolidated later
+// on using the Join() function.
 func Split[V Value](wg *syn.WaitGroup, input FIFO[V], size int) Sequential[FIFO[V]] {
 	// Validate the arguments.
 	if size < 2 {
@@ -142,7 +142,7 @@ func Split[V Value](wg *syn.WaitGroup, input FIFO[V], size int) Sequential[FIFO[
 	return outputs
 }
 
-// This function connects the outputs of the specified array of input
+// This function connects the outputs of the specified sequence of input
 // queues with a new output queue returns the new output queue. Each value
 // removed from each input queue will automatically be added to the output
 // queue. This pattern is useful when the results of the processing with a

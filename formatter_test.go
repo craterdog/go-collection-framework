@@ -262,6 +262,8 @@ func TestFormatInvalidType(t *tes.T) {
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "Attempted to format:\n\tvalue: {}\n\ttype: struct {}\n\tkind: struct\n", e)
+		} else {
+			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
 	col.FormatValue(s) // This should panic.

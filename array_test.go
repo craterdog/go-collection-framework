@@ -31,6 +31,8 @@ func TestEmptyArray(t *tes.T) {
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "Cannot index an empty array.", e)
+		} else {
+			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
 	array.GoIndex(0) // This should panic.
@@ -41,6 +43,8 @@ func TestArrayIndexOfZero(t *tes.T) {
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "Indices must be positive or negative ordinals, not zero.", e)
+		} else {
+			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
 	array.GoIndex(0) // This should panic.
@@ -68,6 +72,8 @@ func TestArrayWithStrings(t *tes.T) {
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "The specified index is outside the allowed ranges [-3..-1] and [1..3]: 4", e)
+		} else {
+			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
 	array.GoIndex(4) // This should panic.
@@ -82,6 +88,8 @@ func TestArrayWithIntegers(t *tes.T) {
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "The specified index is outside the allowed ranges [-3..-1] and [1..3]: -4", e)
+		} else {
+			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
 	array.GoIndex(-4) // This should panic.

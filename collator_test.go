@@ -160,6 +160,8 @@ func TestCompareInvalidTypes(t *tes.T) {
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "Attempted to compare:\n\tfirst: {}\n\ttype: struct {}\n\tkind: struct\nand\n\tsecond: {}\n\ttype: struct {}\n\tkind: struct\n", e)
+		} else {
+			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
 	col.CompareValues(s, s) // This should panic.
@@ -171,6 +173,8 @@ func TestCompareRecursiveArrays(t *tes.T) {
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "The maximum recursion depth was exceeded: 100", e)
+		} else {
+			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
 	col.CompareValues(array, array) // This should panic.
@@ -182,6 +186,8 @@ func TestCompareRecursiveMaps(t *tes.T) {
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "The maximum recursion depth was exceeded: 100", e)
+		} else {
+			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
 	col.CompareValues(m, m) // This should panic.
@@ -375,6 +381,8 @@ func TestRankInvalidTypes(t *tes.T) {
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "Attempted to rank:\n\tfirst: {}\n\ttype: struct {}\n\tkind: struct\nand\n\tsecond: {}\n\ttype: struct {}\n\tkind: struct\n", e)
+		} else {
+			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
 	col.RankValues(s, s) // This should panic.
@@ -386,6 +394,8 @@ func TestRankRecursiveArrays(t *tes.T) {
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "The maximum recursion depth was exceeded: 100", e)
+		} else {
+			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
 	col.RankValues(array, array) // This should panic.
@@ -397,6 +407,8 @@ func TestRankRecursiveMaps(t *tes.T) {
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "The maximum recursion depth was exceeded: 100", e)
+		} else {
+			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
 	col.RankValues(m, m) // This should panic.

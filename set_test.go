@@ -108,6 +108,19 @@ func TestSetsWithSets(t *tes.T) {
 	ass.Equal(t, 0, set.GetSize())
 }
 
+func TestSetWithNot(t *tes.T) {
+	var set = col.Set[int]()
+	defer func() {
+		if e := recover(); e != nil {
+			ass.Equal(t, "Not(set) is meaningless, use Sans(fullSet, set) instead.", e)
+		} else {
+			ass.Fail(t, "Test should result in recovered panic.")
+		}
+	}()
+	col.Not(set) // This should panic.
+}
+
+
 func TestSetsWithAnd(t *tes.T) {
 	var list1 = col.ListFromArray([]int{3, 1, 2})
 	var list2 = col.ListFromArray([]int{3, 2, 4})

@@ -155,6 +155,41 @@ func TestComparison(t *tes.T) {
 	ass.True(t, col.CompareValues(m2, m2))
 }
 
+type invalid struct {
+}
+
+func TestCompareInvalidTypes(t *tes.T) {
+	var s invalid
+	defer func() {
+		if e := recover(); e != nil {
+			ass.Equal(t, "Attempted to compare:\n\tfirst: {}\n\ttype: collections_test.invalid\n\tkind: struct\nand\n\tsecond: {}\n\ttype: collections_test.invalid\n\tkind: struct\n", e)
+		}
+	}()
+	col.CompareValues(s, s) // This should panic.
+}
+
+func TestCompareRecursiveArrays(t *tes.T) {
+	var array = col.Array[any]([]any{0})
+	array.SetValue(1, array) // Now it is recursive.
+	defer func() {
+		if e := recover(); e != nil {
+			ass.Equal(t, "The maximum recursion depth was exceeded: 100", e)
+		}
+	}()
+	col.CompareValues(array, array) // This should panic.
+}
+
+func TestCompareRecursiveMaps(t *tes.T) {
+	var m = col.Map[string, any](map[string]any{"first":1})
+	m.SetValue("first", m) // Now it is recursive.
+	defer func() {
+		if e := recover(); e != nil {
+			ass.Equal(t, "The maximum recursion depth was exceeded: 100", e)
+		}
+	}()
+	col.CompareValues(m, m) // This should panic.
+}
+
 func TestRanking(t *tes.T) {
 	// Nil
 	var ShouldBeNil any
@@ -336,4 +371,36 @@ func TestRanking(t *tes.T) {
 	ass.Equal(t, 0, col.RankValues(m4, m4))
 	ass.Equal(t, 1, col.RankValues(m1, m4))
 	ass.Equal(t, 0, col.RankValues(m1, m1))
+}
+
+func TestRankInvalidTypes(t *tes.T) {
+	var s invalid
+	defer func() {
+		if e := recover(); e != nil {
+			ass.Equal(t, "Attempted to rank:\n\tfirst: {}\n\ttype: collections_test.invalid\n\tkind: struct\nand\n\tsecond: {}\n\ttype: collections_test.invalid\n\tkind: struct\n", e)
+		}
+	}()
+	col.RankValues(s, s) // This should panic.
+}
+
+func TestRankRecursiveArrays(t *tes.T) {
+	var array = col.Array[any]([]any{0})
+	array.SetValue(1, array) // Now it is recursive.
+	defer func() {
+		if e := recover(); e != nil {
+			ass.Equal(t, "The maximum recursion depth was exceeded: 100", e)
+		}
+	}()
+	col.RankValues(array, array) // This should panic.
+}
+
+func TestRankRecursiveMaps(t *tes.T) {
+	var m = col.Map[string, any](map[string]any{"first":1})
+	m.SetValue("first", m) // Now it is recursive.
+	defer func() {
+		if e := recover(); e != nil {
+			ass.Equal(t, "The maximum recursion depth was exceeded: 100", e)
+		}
+	}()
+	col.RankValues(m, m) // This should panic.
 }

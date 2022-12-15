@@ -16,6 +16,43 @@ import (
 	tes "testing"
 )
 
+func TestStackWithSmallCapacity(t *tes.T) {
+	var stack = col.StackWithCapacity[int](1)
+	stack.AddValue(1)
+	defer func() {
+		if e := recover(); e != nil {
+			ass.Equal(t, "Attempted to add a value onto a stack that has reached its capacity: 1\nvalue: 2\nstack: [\n\t1\n](stack)\n", e)
+		} else {
+			ass.Fail(t, "Test should result in recovered panic.")
+		}
+	}()
+	stack.AddValue(2) // This should panic.
+}
+
+func TestEmptyStackRetrieval(t *tes.T) {
+	var stack = col.Stack[int]()
+	defer func() {
+		if e := recover(); e != nil {
+			ass.Equal(t, "Attempted to retrieve the top of an empty stack!", e)
+		} else {
+			ass.Fail(t, "Test should result in recovered panic.")
+		}
+	}()
+	stack.GetTop() // This should panic.
+}
+
+func TestEmptyStackRemoval(t *tes.T) {
+	var stack = col.Stack[int]()
+	defer func() {
+		if e := recover(); e != nil {
+			ass.Equal(t, "Attempted to remove the top of an empty stack!", e)
+		} else {
+			ass.Fail(t, "Test should result in recovered panic.")
+		}
+	}()
+	stack.RemoveTop() // This should panic.
+}
+
 func TestStacksWithStrings(t *tes.T) {
 	var stack = col.Stack[string]()
 	ass.True(t, stack.IsEmpty())

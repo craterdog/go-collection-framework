@@ -269,7 +269,7 @@ func (v *queue[V]) RemoveHead() (V, bool) {
 	var ok bool
 
 	// Remove the head value from the queue if one exists.
-	_, ok = <-v.available // Will block until an value is available.
+	_, ok = <-v.available // Will block until a value is available.
 	if ok {
 		v.mutex.Lock()
 		head = v.values.RemoveValue(1)

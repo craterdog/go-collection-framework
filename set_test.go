@@ -120,7 +120,6 @@ func TestSetWithNot(t *tes.T) {
 	col.Not(set) // This should panic.
 }
 
-
 func TestSetsWithAnd(t *tes.T) {
 	var list1 = col.ListFromArray([]int{3, 1, 2})
 	var list2 = col.ListFromArray([]int{3, 2, 4})

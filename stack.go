@@ -62,7 +62,7 @@ func (v *stack[V]) GetCapacity() int {
 func (v *stack[V]) AddValue(value V) {
 	if v.values.GetSize() == v.capacity {
 		panic(fmt.Sprintf(
-			"Attempted to add an value onto a stack that has reached its capacity: %v\nvalue: %v\nstack: %v\n",
+			"Attempted to add a value onto a stack that has reached its capacity: %v\nvalue: %v\nstack: %v\n",
 			v.capacity,
 			value,
 			v))

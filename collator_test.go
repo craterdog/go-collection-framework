@@ -155,14 +155,11 @@ func TestComparison(t *tes.T) {
 	ass.True(t, col.CompareValues(m2, m2))
 }
 
-type invalid struct {
-}
-
 func TestCompareInvalidTypes(t *tes.T) {
-	var s invalid
+	var s struct{}
 	defer func() {
 		if e := recover(); e != nil {
-			ass.Equal(t, "Attempted to compare:\n\tfirst: {}\n\ttype: collections_test.invalid\n\tkind: struct\nand\n\tsecond: {}\n\ttype: collections_test.invalid\n\tkind: struct\n", e)
+			ass.Equal(t, "Attempted to compare:\n\tfirst: {}\n\ttype: struct {}\n\tkind: struct\nand\n\tsecond: {}\n\ttype: struct {}\n\tkind: struct\n", e)
 		}
 	}()
 	col.CompareValues(s, s) // This should panic.
@@ -374,10 +371,10 @@ func TestRanking(t *tes.T) {
 }
 
 func TestRankInvalidTypes(t *tes.T) {
-	var s invalid
+	var s struct{}
 	defer func() {
 		if e := recover(); e != nil {
-			ass.Equal(t, "Attempted to rank:\n\tfirst: {}\n\ttype: collections_test.invalid\n\tkind: struct\nand\n\tsecond: {}\n\ttype: collections_test.invalid\n\tkind: struct\n", e)
+			ass.Equal(t, "Attempted to rank:\n\tfirst: {}\n\ttype: struct {}\n\tkind: struct\nand\n\tsecond: {}\n\ttype: struct {}\n\tkind: struct\n", e)
 		}
 	}()
 	col.RankValues(s, s) // This should panic.

@@ -67,7 +67,7 @@ func Concatenate[V Value](first, second ListLike[V]) ListLike[V] {
 //   - V is any type of value.
 type list[V Value] struct {
 	ArrayLike[V]
-	values  []V
+	values  Array[V]
 	compare ComparisonFunction
 }
 
@@ -130,7 +130,7 @@ func (v *list[V]) InsertValues(slot int, values Sequential[V]) {
 // removed value is returned.
 func (v *list[V]) RemoveValue(index int) V {
 	// Remove the old value.
-	index = v.GoIndex(index)
+	index = v.values.GoIndex(index)
 	var old = v.values[index]
 	copy(v.values[index:], v.values[index+1:])
 
@@ -144,8 +144,8 @@ func (v *list[V]) RemoveValue(index int) V {
 // The removed values are returned.
 func (v *list[V]) RemoveValues(first int, last int) Sequential[V] {
 	// Remove the specified values.
-	first = v.GoIndex(first)
-	last = v.GoIndex(last)
+	first = v.values.GoIndex(first)
+	last = v.values.GoIndex(last)
 	var result = ListFromArray(v.values[first : last+1])
 	copy(v.values[first:], v.values[last+1:])
 

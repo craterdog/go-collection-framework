@@ -24,12 +24,6 @@ import (
 //   - V is any type of value.
 type Array[V Value] []V
 
-// STRINGER INTERFACE
-
-func (v Array[V]) String() string {
-	return FormatValue(v)
-}
-
 // SEQUENTIAL INTERFACE
 
 // This method determines whether or not this array is empty.
@@ -80,40 +74,6 @@ func (v Array[V]) GetIndex(value V) int {
 	}
 	// The value was not found.
 	return 0
-}
-
-// This method normalizes an index to match the Go (zero based) indexing. The
-// following transformation is performed:
-//
-//	[-length..-1] and [1..length] => [0..length)
-//
-// Notice that the specified index cannot be zero since zero is not an ORDINAL.
-func (v Array[V]) GoIndex(index int) int {
-	var length = len(v)
-	switch {
-	case length == 0:
-		// The array is empty.
-		panic("Cannot index an empty array.")
-	case index == 0:
-		// Zero is not an ordinal.
-		panic("Indices must be positive or negative ordinals, not zero.")
-	case index < -length || index > length:
-		// The index is outside the bounds of the specified range.
-		panic(fmt.Sprintf(
-			"The specified index is outside the allowed ranges [-%v..-1] and [1..%v]: %v",
-			length,
-			length,
-			index))
-	case index < 0:
-		// Convert a negative index.
-		return index + length
-	case index > 0:
-		// Convert a positive index.
-		return index - 1
-	default:
-		// This should never happen so time to...
-		panic(fmt.Sprintf("Go compiler problem, unexpected index value: %v", index))
-	}
 }
 
 // SEARCHABLE INTERFACE
@@ -167,4 +127,45 @@ func (v Array[V]) SetValue(index int, value V) {
 func (v Array[V]) SetValues(index int, values Sequential[V]) {
 	index = v.GoIndex(index)
 	copy(v[index:], values.AsArray())
+}
+
+// GO INTERFACE
+
+// This method is used by Go to generate a string from an array.
+func (v Array[V]) String() string {
+	return FormatValue(v)
+}
+
+// This method normalizes an index to match the Go (zero based) indexing. The
+// following transformation is performed:
+//
+//	[-length..-1] and [1..length] => [0..length)
+//
+// Notice that the specified index cannot be zero since zero is not an ORDINAL.
+func (v Array[V]) GoIndex(index int) int {
+	var length = len(v)
+	switch {
+	case length == 0:
+		// The array is empty.
+		panic("Cannot index an empty array.")
+	case index == 0:
+		// Zero is not an ordinal.
+		panic("Indices must be positive or negative ordinals, not zero.")
+	case index < -length || index > length:
+		// The index is outside the bounds of the specified range.
+		panic(fmt.Sprintf(
+			"The specified index is outside the allowed ranges [-%v..-1] and [1..%v]: %v",
+			length,
+			length,
+			index))
+	case index < 0:
+		// Convert a negative index.
+		return index + length
+	case index > 0:
+		// Convert a positive index.
+		return index - 1
+	default:
+		// This should never happen so time to...
+		panic(fmt.Sprintf("Go compiler problem, unexpected index value: %v", index))
+	}
 }

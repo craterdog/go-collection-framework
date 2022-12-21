@@ -486,7 +486,7 @@ func rankBooleans[T ~bool](v *collator, first ref.Value, second ref.Value) int {
 	return 0
 }
 
-// This private function returns the ranking order of the specified numberic
+// This private function returns the ranking order of the specified numeric
 // values.
 func rankNumbers[T ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uint | ~uintptr |
 	~int8 | ~int16 | ~int32 | ~int64 | ~int |

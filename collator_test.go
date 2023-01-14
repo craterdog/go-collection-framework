@@ -155,6 +155,55 @@ func TestComparison(t *tes.T) {
 	ass.True(t, col.CompareValues(m2, m2))
 }
 
+type Boolean bool
+type Integer int
+type String string
+
+func TestTildaTypes(t *tes.T) {
+	// Boolean
+	var False = Boolean(false)
+	var True = Boolean(true)
+	var ShouldBeFalse Boolean
+
+	ass.Equal(t, 0, col.RankValues(ShouldBeFalse, ShouldBeFalse))
+	ass.Equal(t, -1, col.RankValues(ShouldBeFalse, True))
+	ass.Equal(t, 0, col.RankValues(False, ShouldBeFalse))
+	ass.Equal(t, 1, col.RankValues(True, ShouldBeFalse))
+	ass.Equal(t, 0, col.RankValues(ShouldBeFalse, False))
+	ass.Equal(t, -1, col.RankValues(False, True))
+	ass.Equal(t, 0, col.RankValues(False, False))
+	ass.Equal(t, 1, col.RankValues(True, False))
+	ass.Equal(t, 0, col.RankValues(True, True))
+
+	// Integer
+	var Zilch = Integer(0)
+	var Two = Integer(2)
+	var Three = Integer(3)
+	var ShouldBeZilch Integer
+
+	ass.True(t, col.CompareValues(ShouldBeZilch, Zilch))
+	ass.False(t, col.CompareValues(Two, ShouldBeZilch))
+
+	ass.False(t, col.CompareValues(Two, Three))
+	ass.True(t, col.CompareValues(Two, Two))
+	ass.False(t, col.CompareValues(Three, Two))
+	ass.True(t, col.CompareValues(Three, Three))
+
+	// String
+	var Empty = String("")
+	var Hello = String("Hello")
+	var World = String("World")
+	var ShouldBeEmpty String
+
+	ass.True(t, col.CompareValues(ShouldBeEmpty, Empty))
+	ass.False(t, col.CompareValues(Hello, ShouldBeEmpty))
+
+	ass.False(t, col.CompareValues(World, Hello))
+	ass.True(t, col.CompareValues(World, World))
+	ass.False(t, col.CompareValues(Hello, World))
+	ass.True(t, col.CompareValues(Hello, Hello))
+}
+
 func TestCompareInvalidTypes(t *tes.T) {
 	var s struct{}
 	defer func() {
@@ -374,6 +423,19 @@ func TestRanking(t *tes.T) {
 	ass.Equal(t, 0, col.RankValues(m4, m4))
 	ass.Equal(t, 1, col.RankValues(m1, m4))
 	ass.Equal(t, 0, col.RankValues(m1, m1))
+}
+
+func TestTildaArrays(t *tes.T) {
+	var alpha = String("alpha")
+	var beta = String("beta")
+	var gamma = String("gamma")
+	var delta = String("delta")
+	var array = []String{alpha, beta, gamma, delta}
+	col.SortArray(array, col.RankValues)
+	ass.Equal(t, alpha, array[0])
+	ass.Equal(t, beta, array[1])
+	ass.Equal(t, delta, array[2])
+	ass.Equal(t, gamma, array[3])
 }
 
 func TestRankInvalidTypes(t *tes.T) {

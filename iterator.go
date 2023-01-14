@@ -13,7 +13,7 @@ package collections
 // ITERATOR IMPLEMENTATION
 
 // This constructor creates a new instance of an iterator that can be used to
-// traverse the values in the specified array.
+// traverse the values in the specified sequence.
 func Iterator[V Value](sequence Sequential[V]) IteratorLike[V] {
 	var values = sequence.AsArray() // The returned array is immutable.
 	var size = len(values)

@@ -140,6 +140,17 @@ func TestListsWithStrings(t *tes.T) {
 	ass.Equal(t, "bar", string(list.GetValue(1)))                      // ["bar", "foo"]
 }
 
+func TestListsWithTildas(t *tes.T) {
+	var list = col.ListFromArray([]Integer{3, 1, 4, 5, 9, 2})
+	ass.False(t, list.IsEmpty())            // [3,1,4,5,9,2]
+	ass.Equal(t, 6, list.GetSize())         // [3,1,4,5,9,2]
+	ass.Equal(t, 3, int(list.GetValue(1)))  // [3,1,4,5,9,2]
+	ass.Equal(t, 2, int(list.GetValue(-1))) // [3,1,4,5,9,2]
+	list.SortValues()                       // [1,2,3,4,5,9]
+	ass.Equal(t, 6, list.GetSize())         // [1,2,3,4,5,9]
+	ass.Equal(t, 3, int(list.GetValue(3)))  // [1,2,3,4,5,9]
+}
+
 func TestListsWithConcatenate(t *tes.T) {
 	var list1 = col.List[int]()
 	var onetwothree = col.ListFromArray([]int{1, 2, 3})

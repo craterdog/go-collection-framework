@@ -16,6 +16,17 @@ import (
 	tes "testing"
 )
 
+type Boolean bool
+type Integer int
+type String string
+type FooBar struct {
+	Foo int
+	Bar string
+}
+type Fuz struct {
+	Bar string
+}
+
 func TestComparison(t *tes.T) {
 	// Nil
 	var ShouldBeNil any
@@ -153,11 +164,17 @@ func TestComparison(t *tes.T) {
 	ass.True(t, col.CompareValues(m1, m1))
 	ass.False(t, col.CompareValues(m2, m1))
 	ass.True(t, col.CompareValues(m2, m2))
-}
 
-type Boolean bool
-type Integer int
-type String string
+	// Struct
+	var f1 = FooBar{1, "one"}
+	var f2 = FooBar{1, "one"}
+	var f3 = FooBar{2, "two"}
+	var f4 = Fuz{"two"}
+	ass.True(t, col.CompareValues(f1, f1))
+	ass.True(t, col.CompareValues(f1, f2))
+	ass.False(t, col.CompareValues(f2, f3))
+	ass.False(t, col.CompareValues(f3, f4))
+}
 
 func TestTildaTypes(t *tes.T) {
 	// Boolean
@@ -202,18 +219,6 @@ func TestTildaTypes(t *tes.T) {
 	ass.True(t, col.CompareValues(World, World))
 	ass.False(t, col.CompareValues(Hello, World))
 	ass.True(t, col.CompareValues(Hello, Hello))
-}
-
-func TestCompareInvalidTypes(t *tes.T) {
-	var s struct{}
-	defer func() {
-		if e := recover(); e != nil {
-			ass.Equal(t, "Attempted to compare:\n\tfirst: {}\n\ttype: struct {}\n\tkind: struct\nand\n\tsecond: {}\n\ttype: struct {}\n\tkind: struct\n", e)
-		} else {
-			ass.Fail(t, "Test should result in recovered panic.")
-		}
-	}()
-	col.CompareValues(s, s) // This should panic.
 }
 
 func TestCompareRecursiveArrays(t *tes.T) {
@@ -423,6 +428,18 @@ func TestRanking(t *tes.T) {
 	ass.Equal(t, 0, col.RankValues(m4, m4))
 	ass.Equal(t, 1, col.RankValues(m1, m4))
 	ass.Equal(t, 0, col.RankValues(m1, m1))
+
+	// Struct
+	var f1 = FooBar{1, "one"}
+	var f2 = FooBar{1, "two"}
+	var f3 = FooBar{2, "two"}
+	var f4 = Fuz{"two"}
+	ass.Equal(t, 0, col.RankValues(f1, f1))
+	ass.Equal(t, -1, col.RankValues(f1, f2))
+	ass.Equal(t, -1, col.RankValues(f2, f3))
+	ass.Equal(t, 1, col.RankValues(f3, f1))
+	ass.Equal(t, 1, col.RankValues(f3, f2))
+	ass.Equal(t, -1, col.RankValues(f3, f4))
 }
 
 func TestTildaArrays(t *tes.T) {
@@ -436,18 +453,6 @@ func TestTildaArrays(t *tes.T) {
 	ass.Equal(t, beta, array[1])
 	ass.Equal(t, delta, array[2])
 	ass.Equal(t, gamma, array[3])
-}
-
-func TestRankInvalidTypes(t *tes.T) {
-	var s struct{}
-	defer func() {
-		if e := recover(); e != nil {
-			ass.Equal(t, "Attempted to rank:\n\tfirst: {}\n\ttype: struct {}\n\tkind: struct\nand\n\tsecond: {}\n\ttype: struct {}\n\tkind: struct\n", e)
-		} else {
-			ass.Fail(t, "Test should result in recovered panic.")
-		}
-	}()
-	col.RankValues(s, s) // This should panic.
 }
 
 func TestRankRecursiveArrays(t *tes.T) {

@@ -59,9 +59,6 @@ type Indexed[V Value] interface {
 	GetValue(index int) V
 	GetValues(first int, last int) Sequential[V]
 	GetIndex(value V) int
-	// Deprecated: The GoIndex method should not be in a high-level interface
-	// and will be removed from this interface during the next major release.
-	GoIndex(index int) int
 }
 
 // This interface defines the methods supported by all searchable sequences of

@@ -151,6 +151,25 @@ func TestListsWithTildas(t *tes.T) {
 	ass.Equal(t, 3, int(list.GetValue(3)))  // [1,2,3,4,5,9]
 }
 
+func BadCompare(first col.Value, second col.Value) bool {
+	panic("KaPow!")
+}
+
+func TestListsWithComparer(t *tes.T) {
+	var list = col.ListWithComparer[int](BadCompare)
+	list.AddValue(1)
+	list.AddValue(2)
+	list.AddValue(3)
+	defer func() {
+		if e := recover(); e != nil {
+			ass.Equal(t, "KaPow!", e)
+		} else {
+			ass.Fail(t, "Test should result in recovered panic.")
+		}
+	}()
+	list.GetIndex(2)
+}
+
 func TestListsWithConcatenate(t *tes.T) {
 	var list1 = col.List[int]()
 	var onetwothree = col.ListFromArray([]int{1, 2, 3})

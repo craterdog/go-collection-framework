@@ -14,6 +14,7 @@ import (
 	fmt "fmt"
 	cmp "math/cmplx"
 	ref "reflect"
+	stc "strconv"
 	sts "strings"
 )
 
@@ -35,7 +36,7 @@ func RankValues(first Value, second Value) int {
 // This constructor creates a new instance of a collator that can be used to
 // compare or rank any two values.
 func Collator() CollatorLike {
-	return &collator{0}
+	return &collator{}
 }
 
 // COLLATOR IMPLEMENTATION
@@ -46,8 +47,10 @@ const maximumRecursion int = 100
 
 // This type defines the structure and methods for a natural collator agent.
 type collator struct {
-	depth int
+	depth int // The depth starts out at zero.
 }
+
+// DISCERNING INTERFACE
 
 // This method determines whether or not the specified values are equal.
 func (v *collator) CompareValues(first Value, second Value) bool {
@@ -58,6 +61,8 @@ func (v *collator) CompareValues(first Value, second Value) bool {
 func (v *collator) RankValues(first Value, second Value) int {
 	return v.rankValues(ref.ValueOf(first), ref.ValueOf(second))
 }
+
+// PRIVATE INTERFACE
 
 // This function determines whether or not the specified reflective values are
 // equal using reflection and a recursive descent algorithm.
@@ -245,57 +250,13 @@ func (v *collator) rankValues(first ref.Value, second ref.Value) int {
 	// and neither of the values is nil.
 	switch first.Kind() {
 
-	// Handle all primitive element types.
-	case ref.Bool:
-		return rankBooleans[bool](v, first, second)
-
-	case ref.Uint8:
-		return rankNumbers[uint8](v, first, second)
-
-	case ref.Uint16:
-		return rankNumbers[uint16](v, first, second)
-
-	case ref.Uint32:
-		return rankNumbers[uint32](v, first, second)
-
-	case ref.Uint64:
-		return rankNumbers[uint64](v, first, second)
-
-	case ref.Uint:
-		return rankNumbers[uint](v, first, second)
-
-	case ref.Uintptr:
-		return rankNumbers[uintptr](v, first, second)
-
-	case ref.Int8:
-		return rankNumbers[int8](v, first, second)
-
-	case ref.Int16:
-		return rankNumbers[int16](v, first, second)
-
-	case ref.Int32:
-		return rankNumbers[int32](v, first, second)
-
-	case ref.Int64:
-		return rankNumbers[int64](v, first, second)
-
-	case ref.Int:
-		return rankNumbers[int](v, first, second)
-
-	case ref.Float32:
-		return rankNumbers[float32](v, first, second)
-
-	case ref.Float64:
-		return rankNumbers[float64](v, first, second)
-
-	case ref.Complex64:
-		return rankVectors[complex64](v, first, second)
-
-	case ref.Complex128:
-		return rankVectors[complex128](v, first, second)
-
-	case ref.String:
-		return rankStrings[string](v, first, second)
+	// Handle all primitive elements.
+	case ref.Bool,
+		ref.Uint8, ref.Uint16, ref.Uint32, ref.Uint64, ref.Uint,
+		ref.Int8, ref.Int16, ref.Int32, ref.Int64, ref.Int,
+		ref.Float32, ref.Float64, ref.Complex64, ref.Complex128,
+		ref.String:
+		return v.rankElements(first.Interface(), second.Interface())
 
 	// Handle all primitive collection types.
 	case ref.Array, ref.Slice:
@@ -328,6 +289,135 @@ func (v *collator) rankValues(first ref.Value, second ref.Value) int {
 			second.Type(),
 			second.Kind()))
 	}
+}
+
+// This private method returns the ranking order of the specified elements. Note
+// that Go does not provide an easy way to a possible tilda type (e.g. ~string)
+// to its elemental (named) type without knowing whether or not it is actually a
+// tilda type. So we must convert it to a string and then parse it back again...
+// This method attempts to hide that ugliness from the rest of the code.
+func (v *collator) rankElements(first, second Value) int {
+	switch ref.ValueOf(first).Kind() {
+	case ref.Bool:
+		var firstBoolean, _ = stc.ParseBool(fmt.Sprintf("%v", first))
+		var secondBoolean, _ = stc.ParseBool(fmt.Sprintf("%v", second))
+		return v.rankBooleans(firstBoolean, secondBoolean)
+	case ref.Uint8, ref.Uint16, ref.Uint32, ref.Uint64, ref.Uint:
+		var firstUnsigned, _ = stc.ParseUint(fmt.Sprintf("%v", first), 10, 64)
+		var secondUnsigned, _ = stc.ParseUint(fmt.Sprintf("%v", second), 10, 64)
+		return v.rankUnsigned(firstUnsigned, secondUnsigned)
+	case ref.Int8, ref.Int16, ref.Int32, ref.Int64, ref.Int:
+		var firstSigned, _ = stc.ParseInt(fmt.Sprintf("%v", first), 10, 64)
+		var secondSigned, _ = stc.ParseInt(fmt.Sprintf("%v", second), 10, 64)
+		return v.rankSigned(firstSigned, secondSigned)
+	case ref.Float32, ref.Float64:
+		var firstFloat, _ = stc.ParseFloat(fmt.Sprintf("%v", first), 64)
+		var secondFloat, _ = stc.ParseFloat(fmt.Sprintf("%v", second), 64)
+		return v.rankFloats(firstFloat, secondFloat)
+	case ref.Complex64, ref.Complex128:
+		var firstComplex, _ = stc.ParseComplex(fmt.Sprintf("%v", first), 128)
+		var secondComplex, _ = stc.ParseComplex(fmt.Sprintf("%v", second), 128)
+		return v.rankComplex(firstComplex, secondComplex)
+	case ref.String:
+		var firstString = fmt.Sprintf("%v", first)
+		var secondString = fmt.Sprintf("%v", second)
+		return v.rankStrings(firstString, secondString)
+	default:
+		var message = fmt.Sprintf("Attempted to rank %v(%T) and %v(%T)", first, first, second, second)
+		panic(message)
+	}
+}
+
+// This private function returns the ranking order of the specified boolean
+// values.
+func (v *collator) rankBooleans(first, second bool) int {
+	if !first && second {
+		return -1
+	}
+	if first && !second {
+		return 1
+	}
+	return 0
+}
+
+// This private function returns the ranking order of the specified unsigned
+// integers.
+func (v *collator) rankUnsigned(first, second uint64) int {
+	if first < second {
+		return -1
+	}
+	if first > second {
+		return 1
+	}
+	return 0
+}
+
+// This private function returns the ranking order of the specified signed
+// integers.
+func (v *collator) rankSigned(first, second int64) int {
+	if first < second {
+		return -1
+	}
+	if first > second {
+		return 1
+	}
+	return 0
+}
+
+// This private function returns the ranking order of the specified floating
+// point numbers.
+func (v *collator) rankFloats(first, second float64) int {
+	if first < second {
+		return -1
+	}
+	if first > second {
+		return 1
+	}
+	return 0
+}
+
+// This private function returns the ranking order of the specified complex
+// number values.
+func (v *collator) rankComplex(first, second complex128) int {
+	if first == second {
+		return 0
+	}
+	switch {
+	case cmp.Abs(first) < cmp.Abs(second):
+		// The magnitude of the first vector is less than the second.
+		return -1
+	case cmp.Abs(first) > cmp.Abs(second):
+		// The magnitude of the first vector is greater than the second.
+		return 1
+	default:
+		// The magnitudes of the vectors are equal.
+		switch {
+		case cmp.Phase(first) < cmp.Phase(second):
+			// The phase of the first vector is less than the second.
+			return -1
+		case cmp.Phase(first) > cmp.Phase(second):
+			// The phase of the first vector is greater than the second.
+			return 1
+		default:
+			// The phases of the vectors are also equal.
+			return 0
+		}
+	}
+}
+
+// This private function returns the ranking order of the specified string
+// values.
+func (v *collator) rankStrings(first, second string) int {
+	if first < second {
+		// The first string comes before the second string lexigraphically.
+		return -1
+	}
+	if first > second {
+		// The first string comes after the second string lexigraphically.
+		return 1
+	}
+	// The two strings are the same.
+	return 0
 }
 
 // This private method returns the ranking order of the specified arrays using
@@ -472,84 +562,7 @@ func (v *collator) rankCollections(first ref.Value, second ref.Value) int {
 	return v.rankArrays(firstArray, secondArray)
 }
 
-// This private function returns the ranking order of the specified boolean
-// values.
-func rankBooleans[T ~bool](v *collator, first ref.Value, second ref.Value) int {
-	var firstBoolean = first.Interface().(T)
-	var secondBoolean = second.Interface().(T)
-	if !firstBoolean && secondBoolean {
-		return -1
-	}
-	if firstBoolean && !secondBoolean {
-		return 1
-	}
-	return 0
-}
-
-// This private function returns the ranking order of the specified numeric
-// values.
-func rankNumbers[T ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uint | ~uintptr |
-	~int8 | ~int16 | ~int32 | ~int64 | ~int |
-	~float32 | ~float64](v *collator, first ref.Value, second ref.Value) int {
-	var firstNumber = first.Interface().(T)
-	var secondNumber = second.Interface().(T)
-	if firstNumber < secondNumber {
-		return -1
-	}
-	if firstNumber > secondNumber {
-		return 1
-	}
-	return 0
-}
-
-// This private function returns the ranking order of the specified complex
-// number values.
-func rankVectors[T ~complex64 | ~complex128](v *collator, first ref.Value, second ref.Value) int {
-	// The cmplx library requires type complex128.
-	var firstVector = (complex128)(first.Interface().(T))
-	var secondVector = (complex128)(second.Interface().(T))
-	if firstVector == secondVector {
-		return 0
-	}
-	switch {
-	case cmp.Abs(firstVector) < cmp.Abs(secondVector):
-		// The magnitude of the first vector is less than the second.
-		return -1
-	case cmp.Abs(firstVector) > cmp.Abs(secondVector):
-		// The magnitude of the first vector is greater than the second.
-		return 1
-	default:
-		// The magnitudes of the vectors are equal.
-		switch {
-		case cmp.Phase(firstVector) < cmp.Phase(secondVector):
-			// The phase of the first vector is less than the second.
-			return -1
-		case cmp.Phase(firstVector) > cmp.Phase(secondVector):
-			// The phase of the first vector is greater than the second.
-			return 1
-		default:
-			// The phases of the vectors are also equal.
-			return 0
-		}
-	}
-}
-
-// This private function returns the ranking order of the specified string
-// values.
-func rankStrings[T ~string](v *collator, first ref.Value, second ref.Value) int {
-	var firstString = first.Interface().(T)
-	var secondString = second.Interface().(T)
-	if firstString < secondString {
-		// The first string comes before the second string lexigraphically.
-		return -1
-	}
-	if firstString > secondString {
-		// The first string comes after the second string lexigraphically.
-		return 1
-	}
-	// The two strings are the same.
-	return 0
-}
+// PRIVATE FUNCTIONS
 
 // This function removes the generics from the type string for the specified
 // type and converts an empty interface into type "any".

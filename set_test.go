@@ -83,9 +83,24 @@ func TestSetsWithIntegers(t *tes.T) {
 	ass.Equal(t, 9, int(set.GetValue(-1))) // [1,2,3,4,5,9]
 	set.RemoveValue(6)                     // [1,2,3,4,5,9]
 	ass.Equal(t, 6, set.GetSize())         // [1,2,3,4,5,9]
-	set.RemoveValue(3)                     // [1,2,3,4,5,9]
-	ass.Equal(t, 5, set.GetSize())         // [1,2,3,4,5,9]
-	ass.Equal(t, 4, int(set.GetValue(3)))  // [1,2,3,4,5,9]
+	set.RemoveValue(3)                     // [1,2,4,5,9]
+	ass.Equal(t, 5, set.GetSize())         // [1,2,4,5,9]
+	ass.Equal(t, 4, int(set.GetValue(3)))  // [1,2,4,5,9]
+}
+
+func TestSetsWithTildas(t *tes.T) {
+	var list = col.ListFromArray([]Integer{3, 1, 4, 5, 9, 2})
+	var set = col.Set[Integer]()           // [ ]
+	set.AddValues(list)                    // [1,2,3,4,5,9]
+	ass.False(t, set.IsEmpty())            // [1,2,3,4,5,9]
+	ass.Equal(t, 6, set.GetSize())         // [1,2,3,4,5,9]
+	ass.Equal(t, 1, int(set.GetValue(1)))  // [1,2,3,4,5,9]
+	ass.Equal(t, 9, int(set.GetValue(-1))) // [1,2,3,4,5,9]
+	set.RemoveValue(6)                     // [1,2,3,4,5,9]
+	ass.Equal(t, 6, set.GetSize())         // [1,2,3,4,5,9]
+	set.RemoveValue(3)                     // [1,2,4,5,9]
+	ass.Equal(t, 5, set.GetSize())         // [1,2,4,5,9]
+	ass.Equal(t, 4, int(set.GetValue(3)))  // [1,2,4,5,9]
 }
 
 func TestSetsWithSets(t *tes.T) {

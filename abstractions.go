@@ -13,7 +13,7 @@ This collections package defines a set of simple, pragmatic interfaces for
 collections of sequential values. It also provides efficient and compact
 implementations of the following collection types based on those interfaces:
   - array (native Go array)
-  - list (a sortable array)
+  - list (a sortable list)
   - set (an ordered set)
   - map (native Go map)
   - catalog (a sortable map)

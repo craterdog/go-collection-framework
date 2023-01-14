@@ -116,6 +116,11 @@ func (v *collator) compareValues(first ref.Value, second ref.Value) bool {
 			return v.compareValues(first, second)
 		}
 
+	// Handle all Go structures.
+	case ref.Struct:
+		// The Go comparison operator performs a deep comparison on structures.
+		return first.Interface() == second.Interface()
+
 	default:
 		panic(fmt.Sprintf(
 			"Attempted to compare:\n\tfirst: %v\n\ttype: %v\n\tkind: %v\nand\n\tsecond: %v\n\ttype: %v\n\tkind: %v\n",
@@ -278,6 +283,22 @@ func (v *collator) rankValues(first ref.Value, second ref.Value) int {
 			second = second.Elem()
 			return v.rankValues(first, second)
 		}
+
+	// Handle all Go structures.
+	case ref.Struct:
+		// We must do an explicit recursive descent ranking of the structures.
+		var size = first.NumField() // Structures of the same type are the same size.
+		for index := 0; index < size; index++ {
+			var firstField = first.Field(index)
+			var secondField = second.Field(index)
+			var ranking = v.rankValues(firstField, secondField)
+			if ranking != 0 {
+				// Found a difference.
+				return ranking
+			}
+		}
+		// All fields are equal.
+		return 0
 
 	default:
 		panic(fmt.Sprintf(

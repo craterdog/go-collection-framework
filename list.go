@@ -77,6 +77,23 @@ func (v *list[V]) String() string {
 	return FormatValue(v)
 }
 
+// INDEXED INTERFACE
+
+// This method returns the index of the FIRST occurrence of the specified value
+// in this list, or zero if this list does not contain the value. This method
+// overrides the array.GetIndex() method delegated to since that method always
+// uses the default comparer function.
+func (v *list[V]) GetIndex(value V) int {
+	for index, candidate := range v.values {
+		if v.compare(candidate, value) {
+			// Found the value.
+			return index + 1 // Convert to an ORDINAL based index.
+		}
+	}
+	// The value was not found.
+	return 0
+}
+
 // MALLEABLE INTERFACE
 
 // This method appends the specified value to the end of this list.

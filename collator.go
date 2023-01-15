@@ -195,23 +195,6 @@ func (v *collator) compareMaps(first ref.Value, second ref.Value) bool {
 	return true
 }
 
-// This private method determines whether or not the specified associations have
-// the same key value pair.
-func (v *collator) compareAssociations(first ref.Value, second ref.Value) bool {
-	// Compare the keys of the two associations.
-	var firstKey = first.MethodByName("GetKey").Call([]ref.Value{})[0]
-	var secondKey = second.MethodByName("GetKey").Call([]ref.Value{})[0]
-	if !v.compareValues(firstKey, secondKey) {
-		// The keys don't match.
-		return false
-	}
-
-	// The keys match so compare the values of the two associations.
-	var firstValue = first.MethodByName("GetValue").Call([]ref.Value{})[0]
-	var secondValue = second.MethodByName("GetValue").Call([]ref.Value{})[0]
-	return v.compareValues(firstValue, secondValue)
-}
-
 // This private method determines whether or not the specified sequences
 // have the same value.
 func (v *collator) compareSequences(first ref.Value, second ref.Value) bool {
@@ -571,27 +554,6 @@ func (v *collator) rankMaps(first ref.Value, second ref.Value) int {
 
 	// All keys and values match.
 	return 0
-}
-
-// This private method returns the ranking order of the specified associations.
-func (v *collator) rankAssociations(first ref.Value, second ref.Value) int {
-	// Rank the keys of the two associations.
-	var firstKey = first.MethodByName("GetKey").Call([]ref.Value{})[0]
-	var secondKey = second.MethodByName("GetKey").Call([]ref.Value{})[0]
-	var keyRank = v.rankValues(firstKey, secondKey)
-	if keyRank < 0 {
-		// The key in the first association comes before the second.
-		return -1
-	}
-	if keyRank > 0 {
-		// The key in the first association comes after the second.
-		return 1
-	}
-
-	// The keys match so rank the values of the two associations.
-	var firstValue = first.MethodByName("GetValue").Call([]ref.Value{})[0]
-	var secondValue = second.MethodByName("GetValue").Call([]ref.Value{})[0]
-	return v.rankValues(firstValue, secondValue)
 }
 
 // This private method returns the ranking order of the specified sequences

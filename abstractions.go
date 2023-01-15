@@ -44,10 +44,10 @@ type Sequential[V Value] interface {
 }
 
 // This interface defines the methods supported by all sequences whose values can
-// be indexed. The indices of an indexed sequence are ORDINAL rather than ZERO
-// based (which is "SO last century"). This allows for positive indices starting
-// at the beginning of the sequence, and negative indices starting at the end of
-// the sequence as follows:
+// be accessed using indices. The indices of an accessible sequence are ORDINAL
+// rather than ZERO based (which is "SO last century"). This allows for positive
+// indices starting at the beginning of the sequence, and negative indices
+// starting at the end of the sequence as follows:
 //
 //	    1           2           3             N
 //	[value 1] . [value 2] . [value 3] ... [value N]
@@ -55,18 +55,9 @@ type Sequential[V Value] interface {
 //
 // Notice that because the indices are ordinal based, the positive and negative
 // indices are symmetrical.
-type Indexed[V Value] interface {
+type Accessible[V Value] interface {
 	GetValue(index int) V
 	GetValues(first int, last int) Sequential[V]
-	GetIndex(value V) int
-}
-
-// This interface defines the methods supported by all searchable sequences of
-// values.
-type Searchable[V Value] interface {
-	ContainsValue(value V) bool
-	ContainsAny(values Sequential[V]) bool
-	ContainsAll(values Sequential[V]) bool
 }
 
 // This interface defines the methods supported by all updatable sequences of
@@ -74,6 +65,15 @@ type Searchable[V Value] interface {
 type Updatable[V Value] interface {
 	SetValue(index int, value V)
 	SetValues(index int, values Sequential[V])
+}
+
+// This interface defines the methods supported by all searchable sequences of
+// values.
+type Searchable[V Value] interface {
+	GetIndex(value V) int
+	ContainsValue(value V) bool
+	ContainsAny(values Sequential[V]) bool
+	ContainsAll(values Sequential[V]) bool
 }
 
 // This interface defines the methods supported by all sequences of values that
@@ -222,8 +222,7 @@ type Sort[V Value] func(array []V, rank RankingFunction)
 // sequences.
 type ArrayLike[V Value] interface {
 	Sequential[V]
-	Indexed[V]
-	Searchable[V]
+	Accessible[V]
 	Updatable[V]
 }
 
@@ -253,9 +252,9 @@ type CatalogLike[K Key, V Value] interface {
 // sequences.
 type ListLike[V Value] interface {
 	Sequential[V]
-	Indexed[V]
-	Searchable[V]
+	Accessible[V]
 	Updatable[V]
+	Searchable[V]
 	Malleable[V]
 	Sortable[V]
 }
@@ -271,7 +270,7 @@ type QueueLike[V Value] interface {
 // sequences.
 type SetLike[V Value] interface {
 	Sequential[V]
-	Indexed[V]
+	Accessible[V]
 	Searchable[V]
 	Flexible[V]
 }

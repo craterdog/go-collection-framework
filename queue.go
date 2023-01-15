@@ -201,12 +201,6 @@ type queue[V Value] struct {
 	mutex     syn.Mutex
 }
 
-// STRINGER INTERFACE
-
-func (v *queue[V]) String() string {
-	return FormatValue(v)
-}
-
 // SEQUENTIAL INTERFACE
 
 // This method determines whether or not this queue is empty.
@@ -285,4 +279,10 @@ func (v *queue[V]) CloseQueue() {
 	v.mutex.Lock()
 	close(v.available) // No more values can be placed on the queue.
 	v.mutex.Unlock()
+}
+
+// GO INTERFACE
+
+func (v *queue[V]) String() string {
+	return FormatValue(v)
 }

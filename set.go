@@ -99,18 +99,22 @@ func Xor[V Value](first, second SetLike[V]) SetLike[V] {
 type set[V Value] struct {
 	// Note: The delegated methods don't see the real collection type.
 	Sequential[V]
-	Indexed[V]
+	Accessible[V]
 	values ListLike[V]
 	rank   RankingFunction
 }
 
-// STRINGER INTERFACE
-
-func (v *set[V]) String() string {
-	return FormatValue(v)
-}
-
 // SEARCHABLE INTERFACE
+
+// This method returns the index of the FIRST occurrence of the specified value in
+// this list, or zero if this list does not contain the value.
+func (v *set[V]) GetIndex(value V) int {
+	var index, found = v.search(value)
+	if !found {
+		return 0
+	}
+	return index
+}
 
 // This method determines whether or not this set contains the specified value.
 func (v *set[V]) ContainsValue(value V) bool {
@@ -193,6 +197,12 @@ func (v *set[V]) RemoveValues(values Sequential[V]) {
 // This method removes all values from this set.
 func (v *set[V]) RemoveAll() {
 	v.values.RemoveAll()
+}
+
+// GO INTERFACE
+
+func (v *set[V]) String() string {
+	return FormatValue(v)
 }
 
 // PRIVATE INTERFACE

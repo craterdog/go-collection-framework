@@ -28,13 +28,6 @@ type association[K Key, V Value] struct {
 	value V
 }
 
-// STRINGER INTERFACE
-
-// This method returns a canonical string for this association.
-func (v *association[K, V]) String() string {
-	return FormatValue(v)
-}
-
 // BINDING INTERFACE
 
 // This method returns the key for this association.
@@ -50,6 +43,13 @@ func (v *association[K, V]) GetValue() V {
 // This method sets the value of this association to a new value.
 func (v *association[K, V]) SetValue(value V) {
 	v.value = value
+}
+
+// GO INTERFACE
+
+// This method returns a canonical string for this association.
+func (v *association[K, V]) String() string {
+	return FormatValue(v)
 }
 
 // CATALOG IMPLEMENTATION
@@ -117,12 +117,6 @@ type catalog[K Key, V Value] struct {
 	Sequential[Binding[K, V]]
 	associations ListLike[Binding[K, V]]
 	keys         map[Key]Binding[K, V]
-}
-
-// STRINGER INTERFACE
-
-func (v *catalog[K, V]) String() string {
-	return FormatValue(v)
 }
 
 // ASSOCIATIVE INTERFACE
@@ -249,4 +243,10 @@ func (v *catalog[K, V]) ReverseValues() {
 // catalog.
 func (v *catalog[K, V]) ShuffleValues() {
 	v.associations.ShuffleValues()
+}
+
+// GO INTERFACE
+
+func (v *catalog[K, V]) String() string {
+	return FormatValue(v)
 }

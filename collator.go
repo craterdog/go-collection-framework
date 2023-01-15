@@ -67,7 +67,7 @@ func (v *collator) RankValues(first Value, second Value) int {
 // This function determines whether or not the specified reflective values are
 // equal using reflection and a recursive descent algorithm.
 func (v *collator) compareValues(first ref.Value, second ref.Value) bool {
-	// Handle nil values.
+	// Handle any nil pointers.
 	if !first.IsValid() {
 		return !second.IsValid()
 	}
@@ -75,7 +75,7 @@ func (v *collator) compareValues(first ref.Value, second ref.Value) bool {
 		return false
 	}
 
-	// At this point, neither of the types are nil.
+	// At this point, neither of the values are nil.
 	var firstType = baseTypeName(first.Type())
 	var secondType = baseTypeName(second.Type())
 	if firstType != secondType && firstType != "any" && secondType != "any" {
@@ -83,33 +83,34 @@ func (v *collator) compareValues(first ref.Value, second ref.Value) bool {
 		return false
 	}
 
-	// At this point, the types of the values are the same, and neither of
+	// We now know that the types of the values are the same, and neither of
 	// the values is nil.
 	switch first.Kind() {
 
-	// Handle all primitive elements.
+	// Handle all native elemental types.
 	case ref.Bool,
-		ref.Uint8, ref.Int, ref.Int8, ref.Int16, ref.Int32, ref.Int64,
-		ref.Uint, ref.Uint16, ref.Uint32, ref.Uint64, ref.Uintptr,
+		ref.Uint8, ref.Uint16, ref.Uint32, ref.Uint64, ref.Uint,
+		ref.Int8, ref.Int16, ref.Int32, ref.Int64, ref.Int,
 		ref.Float32, ref.Float64, ref.Complex64, ref.Complex128,
 		ref.String:
 		return v.compareElements(first, second)
 
-	// Handle all primitive collections.
+	// Handle all native collection types.
 	case ref.Array, ref.Slice:
 		return v.compareArrays(first, second)
 	case ref.Map:
 		return v.compareMaps(first, second)
 
-	// Handle all sequential collections.
+	// Handle all interfaces and pointers.
 	case ref.Interface, ref.Pointer:
-		if first.MethodByName("AsArray").IsValid() {
-			// The value is a collection.
-			return v.compareCollections(first, second)
-		} else if first.MethodByName("GetKey").IsValid() {
-			// The value is an association.
-			return v.compareAssociations(first, second)
-		} else {
+		switch {
+		case first.MethodByName("AsArray").IsValid():
+			// The value is a sequence.
+			return v.compareSequences(first, second)
+		case first.NumMethod() > 0:
+			// The value is an interface or pointer to a structure with methods.
+			return v.compareInterfaces(first, second)
+		default:
 			// The values are pointers to the values to be compared.
 			first = first.Elem()
 			second = second.Elem()
@@ -135,7 +136,7 @@ func (v *collator) compareValues(first ref.Value, second ref.Value) bool {
 
 // This private method determines whether or not the specified elements have
 // the same value.
-func (v *collator) compareElements(first ref.Value, second ref.Value) bool {
+func (v *collator) compareElements(first, second ref.Value) bool {
 	return first.Interface() == second.Interface()
 }
 
@@ -211,13 +212,34 @@ func (v *collator) compareAssociations(first ref.Value, second ref.Value) bool {
 	return v.compareValues(firstValue, secondValue)
 }
 
-// This private method determines whether or not the specified collections
+// This private method determines whether or not the specified sequences
 // have the same value.
-func (v *collator) compareCollections(first ref.Value, second ref.Value) bool {
-	// Compare the arrays for the two collections.
+func (v *collator) compareSequences(first ref.Value, second ref.Value) bool {
+	// Compare the arrays for the two sequences.
 	var firstArray = first.MethodByName("AsArray").Call([]ref.Value{})[0]
 	var secondArray = second.MethodByName("AsArray").Call([]ref.Value{})[0]
 	return v.compareArrays(firstArray, secondArray)
+}
+
+
+// This private method determines whether or not the specified interfaces
+// have the same getter values.
+func (v *collator) compareInterfaces(first ref.Value, second ref.Value) bool {
+	var typeRef = first.Type() // We know the structures are the same type.
+	var count = first.NumMethod()
+	for index := 0; index < count; index++ {
+		var method = typeRef.Method(index)
+		if sts.HasPrefix(method.Name, "Get") {
+			var firstValue = first.Method(index).Call([]ref.Value{})[0]
+			var secondValue = second.Method(index).Call([]ref.Value{})[0]
+			if !v.compareValues(firstValue, secondValue) {
+				// Found a difference.
+				return false
+			}
+		}
+	}
+	// All getter values are equal.
+	return true
 }
 
 // PRIVATE FUNCTIONS
@@ -231,6 +253,7 @@ func (v *collator) rankReflective(first Value, second Value) int {
 // This private method returns the ranking order of the specified values using
 // reflection and a recursive descent algorithm.
 func (v *collator) rankValues(first ref.Value, second ref.Value) int {
+	// Handle any nil pointers.
 	if !first.IsValid() {
 		if !second.IsValid() {
 			// Both values are nil.
@@ -251,33 +274,34 @@ func (v *collator) rankValues(first ref.Value, second ref.Value) int {
 		return RankValues(firstType, secondType)
 	}
 
-	// At this point, the types of the values are the same,
-	// and neither of the values is nil.
+	// We now know that the types of the values are the same, and neither of
+	// the values is nil.
 	switch first.Kind() {
 
-	// Handle all primitive elements.
+	// Handle all native elemental types.
 	case ref.Bool,
 		ref.Uint8, ref.Uint16, ref.Uint32, ref.Uint64, ref.Uint,
 		ref.Int8, ref.Int16, ref.Int32, ref.Int64, ref.Int,
 		ref.Float32, ref.Float64, ref.Complex64, ref.Complex128,
 		ref.String:
-		return v.rankElements(first.Interface(), second.Interface())
+		return v.rankElements(first, second)
 
-	// Handle all primitive collection types.
+	// Handle all native collection types.
 	case ref.Array, ref.Slice:
 		return v.rankArrays(first, second)
 	case ref.Map:
 		return v.rankMaps(first, second)
 
-	// Handle all sequential collections.
+	// Handle all interfaces and pointers.
 	case ref.Interface, ref.Pointer:
-		if first.MethodByName("AsArray").IsValid() {
+		switch {
+		case first.MethodByName("AsArray").IsValid():
 			// The value is a collection.
-			return v.rankCollections(first, second)
-		} else if first.MethodByName("GetKey").IsValid() {
-			// The value is an association.
-			return v.rankAssociations(first, second)
-		} else {
+			return v.rankSequences(first, second)
+		case first.NumMethod() > 0:
+			// The value is an interface or pointer to a structure with methods.
+			return v.rankInterfaces(first, second)
+		default:
 			// The values are pointers to the values to be ranked.
 			first = first.Elem()
 			second = second.Elem()
@@ -286,19 +310,13 @@ func (v *collator) rankValues(first ref.Value, second ref.Value) int {
 
 	// Handle all Go structures.
 	case ref.Struct:
-		// We must do an explicit recursive descent ranking of the structures.
-		var size = first.NumField() // Structures of the same type are the same size.
-		for index := 0; index < size; index++ {
-			var firstField = first.Field(index)
-			var secondField = second.Field(index)
-			var ranking = v.rankValues(firstField, secondField)
-			if ranking != 0 {
-				// Found a difference.
-				return ranking
-			}
+		// Rank the corresponding fields for each structure.
+		var ranking = v.rankStructures(first, second) 
+		if ranking != 0 {
+			return ranking
 		}
-		// All fields are equal.
-		return 0
+		// Rank the corresponding getter values for each structure.
+		return v.rankInterfaces(first, second)
 
 	default:
 		panic(fmt.Sprintf(
@@ -317,34 +335,36 @@ func (v *collator) rankValues(first ref.Value, second ref.Value) int {
 // to its elemental (named) type without knowing whether or not it is actually a
 // tilda type. So we must convert it to a string and then parse it back again...
 // This method attempts to hide that ugliness from the rest of the code.
-func (v *collator) rankElements(first, second Value) int {
-	switch ref.ValueOf(first).Kind() {
+func (v *collator) rankElements(first, second ref.Value) int {
+	var firstValue = first.Interface()
+	var secondValue = second.Interface()
+	switch first.Kind() {
 	case ref.Bool:
-		var firstBoolean, _ = stc.ParseBool(fmt.Sprintf("%v", first))
-		var secondBoolean, _ = stc.ParseBool(fmt.Sprintf("%v", second))
+		var firstBoolean, _ = stc.ParseBool(fmt.Sprintf("%v", firstValue))
+		var secondBoolean, _ = stc.ParseBool(fmt.Sprintf("%v", secondValue))
 		return v.rankBooleans(firstBoolean, secondBoolean)
 	case ref.Uint8, ref.Uint16, ref.Uint32, ref.Uint64, ref.Uint:
-		var firstUnsigned, _ = stc.ParseUint(fmt.Sprintf("%v", first), 10, 64)
-		var secondUnsigned, _ = stc.ParseUint(fmt.Sprintf("%v", second), 10, 64)
+		var firstUnsigned, _ = stc.ParseUint(fmt.Sprintf("%v", firstValue), 10, 64)
+		var secondUnsigned, _ = stc.ParseUint(fmt.Sprintf("%v", secondValue), 10, 64)
 		return v.rankUnsigned(firstUnsigned, secondUnsigned)
 	case ref.Int8, ref.Int16, ref.Int32, ref.Int64, ref.Int:
-		var firstSigned, _ = stc.ParseInt(fmt.Sprintf("%v", first), 10, 64)
-		var secondSigned, _ = stc.ParseInt(fmt.Sprintf("%v", second), 10, 64)
+		var firstSigned, _ = stc.ParseInt(fmt.Sprintf("%v", firstValue), 10, 64)
+		var secondSigned, _ = stc.ParseInt(fmt.Sprintf("%v", secondValue), 10, 64)
 		return v.rankSigned(firstSigned, secondSigned)
 	case ref.Float32, ref.Float64:
-		var firstFloat, _ = stc.ParseFloat(fmt.Sprintf("%v", first), 64)
-		var secondFloat, _ = stc.ParseFloat(fmt.Sprintf("%v", second), 64)
+		var firstFloat, _ = stc.ParseFloat(fmt.Sprintf("%v", firstValue), 64)
+		var secondFloat, _ = stc.ParseFloat(fmt.Sprintf("%v", secondValue), 64)
 		return v.rankFloats(firstFloat, secondFloat)
 	case ref.Complex64, ref.Complex128:
-		var firstComplex, _ = stc.ParseComplex(fmt.Sprintf("%v", first), 128)
-		var secondComplex, _ = stc.ParseComplex(fmt.Sprintf("%v", second), 128)
+		var firstComplex, _ = stc.ParseComplex(fmt.Sprintf("%v", firstValue), 128)
+		var secondComplex, _ = stc.ParseComplex(fmt.Sprintf("%v", secondValue), 128)
 		return v.rankComplex(firstComplex, secondComplex)
 	case ref.String:
-		var firstString = fmt.Sprintf("%v", first)
-		var secondString = fmt.Sprintf("%v", second)
+		var firstString = fmt.Sprintf("%v", firstValue)
+		var secondString = fmt.Sprintf("%v", secondValue)
 		return v.rankStrings(firstString, secondString)
 	default:
-		var message = fmt.Sprintf("Attempted to rank %v(%T) and %v(%T)", first, first, second, second)
+		var message = fmt.Sprintf("Attempted to rank %v(%T) and %v(%T)", firstValue, firstValue, secondValue, secondValue)
 		panic(message)
 	}
 }
@@ -574,13 +594,53 @@ func (v *collator) rankAssociations(first ref.Value, second ref.Value) int {
 	return v.rankValues(firstValue, secondValue)
 }
 
-// This private method returns the ranking order of the specified collections
+// This private method returns the ranking order of the specified sequences
 // using a recursive descent algorithm.
-func (v *collator) rankCollections(first ref.Value, second ref.Value) int {
-	// Rank the arrays for the two collections.
+func (v *collator) rankSequences(first ref.Value, second ref.Value) int {
+	// Rank the arrays for the two sequences.
 	var firstArray = first.MethodByName("AsArray").Call([]ref.Value{})[0]
 	var secondArray = second.MethodByName("AsArray").Call([]ref.Value{})[0]
 	return v.rankArrays(firstArray, secondArray)
+}
+
+// This private method returns the ranking order of the specified structures
+// by ranking the associated fields.
+func (v *collator) rankStructures(first ref.Value, second ref.Value) int {
+	var count = first.NumField() // The structures are the same type.
+	for index := 0; index < count; index++ {
+		var firstField = first.Field(index)
+		var secondField = second.Field(index)
+		if firstField.CanInterface() {
+			var ranking = v.rankValues(firstField, secondField)
+			if ranking != 0 {
+				// Found a difference.
+				return ranking
+			}
+		}
+	}
+	// All fields have matching values.
+	return 0
+}
+
+// This private method returns the ranking order of the specified interfaces
+// by ranking the results of their getter methods.
+func (v *collator) rankInterfaces(first ref.Value, second ref.Value) int {
+	var typeRef = first.Type() // We know the structures are the same type.
+	var count = first.NumMethod()
+	for index := 0; index < count; index++ {
+		var method = typeRef.Method(index)
+		if sts.HasPrefix(method.Name, "Get") {
+			var firstValue = first.Method(index).Call([]ref.Value{})[0]
+			var secondValue = second.Method(index).Call([]ref.Value{})[0]
+			var ranking = v.rankValues(firstValue, secondValue)
+			if ranking != 0 {
+				// Found a difference.
+				return ranking
+			}
+		}
+	}
+	// All getter values are equal.
+	return 0
 }
 
 // PRIVATE FUNCTIONS

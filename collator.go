@@ -204,7 +204,6 @@ func (v *collator) compareSequences(first ref.Value, second ref.Value) bool {
 	return v.compareArrays(firstArray, secondArray)
 }
 
-
 // This private method determines whether or not the specified interfaces
 // have the same getter values.
 func (v *collator) compareInterfaces(first ref.Value, second ref.Value) bool {
@@ -294,7 +293,7 @@ func (v *collator) rankValues(first ref.Value, second ref.Value) int {
 	// Handle all Go structures.
 	case ref.Struct:
 		// Rank the corresponding fields for each structure.
-		var ranking = v.rankStructures(first, second) 
+		var ranking = v.rankStructures(first, second)
 		if ranking != 0 {
 			return ranking
 		}

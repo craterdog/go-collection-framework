@@ -27,8 +27,9 @@ type FooBar struct {
 	bar string
 	Baz bool
 }
-func (v *FooBar) GetFoo() int { return v.foo }
-func (v FooBar) GetFoo2() int { return v.foo }
+
+func (v *FooBar) GetFoo() int    { return v.foo }
+func (v FooBar) GetFoo2() int    { return v.foo }
 func (v *FooBar) GetBar() string { return v.bar }
 func (v FooBar) GetBar2() string { return v.bar }
 

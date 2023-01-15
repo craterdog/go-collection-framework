@@ -16,13 +16,24 @@ import (
 	tes "testing"
 )
 
+// Tilda Types
 type Boolean bool
 type Integer int
 type String string
+
+// Encapsulated Type
 type FooBar struct {
-	Foo int
-	Bar string
+	foo int
+	bar string
+	Baz bool
 }
+
+func (v *FooBar) GetFoo() int    { return v.foo }
+func (v FooBar) GetFoo2() int    { return v.foo }
+func (v *FooBar) GetBar() string { return v.bar }
+func (v FooBar) GetBar2() string { return v.bar }
+
+// Pure Structure
 type Fuz struct {
 	Bar string
 }
@@ -166,14 +177,25 @@ func TestComparison(t *tes.T) {
 	ass.True(t, col.CompareValues(m2, m2))
 
 	// Struct
-	var f1 = FooBar{1, "one"}
-	var f2 = FooBar{1, "one"}
-	var f3 = FooBar{2, "two"}
+	var f1 = &FooBar{1, "one", false}
+	var f2 = &FooBar{1, "one", false}
+	var f3 = &FooBar{2, "two", true}
 	var f4 = Fuz{"two"}
+	var f5 = Fuz{"two"}
+	var f6 = Fuz{"three"}
 	ass.True(t, col.CompareValues(f1, f1))
 	ass.True(t, col.CompareValues(f1, f2))
 	ass.False(t, col.CompareValues(f2, f3))
-	ass.False(t, col.CompareValues(f3, f4))
+	ass.True(t, col.CompareValues(*f1, *f1))
+	ass.True(t, col.CompareValues(*f1, *f2))
+	ass.False(t, col.CompareValues(*f2, *f3))
+	ass.False(t, col.CompareValues(*f3, f4))
+	ass.True(t, col.CompareValues(f4, f4))
+	ass.True(t, col.CompareValues(f4, f5))
+	ass.False(t, col.CompareValues(f5, f6))
+	ass.True(t, col.CompareValues(&f4, &f4))
+	ass.True(t, col.CompareValues(&f4, &f5))
+	ass.False(t, col.CompareValues(&f5, &f6))
 }
 
 func TestTildaTypes(t *tes.T) {
@@ -430,16 +452,30 @@ func TestRanking(t *tes.T) {
 	ass.Equal(t, 0, col.RankValues(m1, m1))
 
 	// Struct
-	var f1 = FooBar{1, "one"}
-	var f2 = FooBar{1, "two"}
-	var f3 = FooBar{2, "two"}
+	var f1 = &FooBar{1, "one", true}
+	var f2 = &FooBar{1, "two", true}
+	var f3 = &FooBar{2, "two", false}
 	var f4 = Fuz{"two"}
+	var f5 = Fuz{"two"}
+	var f6 = Fuz{"three"}
 	ass.Equal(t, 0, col.RankValues(f1, f1))
 	ass.Equal(t, -1, col.RankValues(f1, f2))
 	ass.Equal(t, -1, col.RankValues(f2, f3))
 	ass.Equal(t, 1, col.RankValues(f3, f1))
 	ass.Equal(t, 1, col.RankValues(f3, f2))
-	ass.Equal(t, -1, col.RankValues(f3, f4))
+	ass.Equal(t, 0, col.RankValues(*f1, *f1))
+	ass.Equal(t, -1, col.RankValues(*f1, *f2))
+	ass.Equal(t, 1, col.RankValues(*f2, *f3))
+	ass.Equal(t, -1, col.RankValues(*f3, *f1))
+	ass.Equal(t, -1, col.RankValues(*f3, *f2))
+	ass.Equal(t, -1, col.RankValues(*f3, f4))
+	ass.Equal(t, 0, col.RankValues(f4, f4))
+	ass.Equal(t, 0, col.RankValues(f4, f5))
+	ass.Equal(t, 1, col.RankValues(f5, f6))
+	ass.Equal(t, -1, col.RankValues(f3, &f4))
+	ass.Equal(t, 0, col.RankValues(&f4, &f4))
+	ass.Equal(t, 0, col.RankValues(&f4, &f5))
+	ass.Equal(t, 1, col.RankValues(&f5, &f6))
 }
 
 func TestTildaArrays(t *tes.T) {

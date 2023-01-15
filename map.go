@@ -46,22 +46,6 @@ func (v Map[K, V]) AsArray() []Binding[K, V] {
 
 // ASSOCIATIVE INTERFACE
 
-// This method appends the specified association to the end of this map.
-func (v Map[K, V]) AddAssociation(association Binding[K, V]) {
-	var key = association.GetKey()
-	var value = association.GetValue()
-	v.SetValue(key, value) // This copies the association.
-}
-
-// This method appends the specified associations to the end of this map.
-func (v Map[K, V]) AddAssociations(associations Sequential[Binding[K, V]]) {
-	var iterator = Iterator(associations)
-	for iterator.HasNext() {
-		var association = iterator.GetNext()
-		v.AddAssociation(association)
-	}
-}
-
 // This method returns the keys for this map.
 func (v Map[K, V]) GetKeys() Sequential[K] {
 	var keys = List[K]()

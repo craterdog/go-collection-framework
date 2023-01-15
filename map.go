@@ -18,12 +18,6 @@ package collections
 //   - V is any type of entity.
 type Map[K comparable, V Value] map[K]V
 
-// STRINGER INTERFACE
-
-func (v Map[K, V]) String() string {
-	return FormatValue(v)
-}
-
 // SEQUENTIAL INTERFACE
 
 // This method determines whether or not this map is empty.
@@ -134,4 +128,10 @@ func (v Map[K, V]) RemoveAll() {
 		var key = iterator.GetNext()
 		delete(v, key)
 	}
+}
+
+// GO INTERFACE
+
+func (v Map[K, V]) String() string {
+	return FormatValue(v)
 }

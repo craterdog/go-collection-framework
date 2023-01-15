@@ -71,18 +71,10 @@ type list[V Value] struct {
 	compare ComparisonFunction
 }
 
-// STRINGER INTERFACE
+// SEARCHABLE INTERFACE
 
-func (v *list[V]) String() string {
-	return FormatValue(v)
-}
-
-// INDEXED INTERFACE
-
-// This method returns the index of the FIRST occurrence of the specified value
-// in this list, or zero if this list does not contain the value. This method
-// overrides the array.GetIndex() method delegated to since that method always
-// uses the default comparer function.
+// This method returns the index of the FIRST occurrence of the specified value in
+// this list, or zero if this list does not contain the value.
 func (v *list[V]) GetIndex(value V) int {
 	for index, candidate := range v.values {
 		if v.compare(candidate, value) {
@@ -92,6 +84,41 @@ func (v *list[V]) GetIndex(value V) int {
 	}
 	// The value was not found.
 	return 0
+}
+
+// This method determines whether or not this list contains the specified value.
+func (v *list[V]) ContainsValue(value V) bool {
+	return v.GetIndex(value) > 0
+}
+
+// This method determines whether or not this list contains ANY of the specified
+// values.
+func (v *list[V]) ContainsAny(values Sequential[V]) bool {
+	var iterator = Iterator(values)
+	for iterator.HasNext() {
+		var candidate = iterator.GetNext()
+		if v.GetIndex(candidate) > 0 {
+			// Found one of the values.
+			return true
+		}
+	}
+	// Did not find any of the values.
+	return false
+}
+
+// This method determines whether or not this list contains ALL of the specified
+// values.
+func (v *list[V]) ContainsAll(values Sequential[V]) bool {
+	var iterator = Iterator(values)
+	for iterator.HasNext() {
+		var candidate = iterator.GetNext()
+		if v.GetIndex(candidate) == 0 {
+			// Didn't find one of the values.
+			return false
+		}
+	}
+	// Found all of the values.
+	return true
 }
 
 // MALLEABLE INTERFACE
@@ -204,6 +231,12 @@ func (v *list[V]) ReverseValues() {
 // This method pseudo-randomly shuffles the values in this list.
 func (v *list[V]) ShuffleValues() {
 	ShuffleArray(v.values)
+}
+
+// GO INTERFACE
+
+func (v *list[V]) String() string {
+	return FormatValue(v)
 }
 
 // PRIVATE INTERFACE

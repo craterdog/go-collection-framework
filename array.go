@@ -45,7 +45,7 @@ func (v Array[V]) AsArray() []V {
 	return result
 }
 
-// INDEXED INTERFACE
+// ACCESSIBLE INTERFACE
 
 // This method retrieves from this array the value that is associated with the
 // specified index.
@@ -61,56 +61,6 @@ func (v Array[V]) GetValues(first int, last int) Sequential[V] {
 	last = v.GoIndex(last)
 	var result = Array[V](v[first : last+1])
 	return result
-}
-
-// This method returns the index of the FIRST occurrence of the specified value in
-// this array, or zero if this array does not contain the value.
-func (v Array[V]) GetIndex(value V) int {
-	for index, candidate := range v {
-		if CompareValues(candidate, value) {
-			// Found the value.
-			return index + 1 // Convert to an ORDINAL based index.
-		}
-	}
-	// The value was not found.
-	return 0
-}
-
-// SEARCHABLE INTERFACE
-
-// This method determines whether or not this array contains the specified value.
-func (v Array[V]) ContainsValue(value V) bool {
-	return v.GetIndex(value) > 0
-}
-
-// This method determines whether or not this array contains ANY of the specified
-// values.
-func (v Array[V]) ContainsAny(values Sequential[V]) bool {
-	var iterator = Iterator(values)
-	for iterator.HasNext() {
-		var candidate = iterator.GetNext()
-		if v.GetIndex(candidate) > 0 {
-			// Found one of the values.
-			return true
-		}
-	}
-	// Did not find any of the values.
-	return false
-}
-
-// This method determines whether or not this array contains ALL of the specified
-// values.
-func (v Array[V]) ContainsAll(values Sequential[V]) bool {
-	var iterator = Iterator(values)
-	for iterator.HasNext() {
-		var candidate = iterator.GetNext()
-		if v.GetIndex(candidate) == 0 {
-			// Didn't find one of the values.
-			return false
-		}
-	}
-	// Found all of the values.
-	return true
 }
 
 // UPDATABLE INTERFACE

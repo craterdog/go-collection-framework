@@ -45,12 +45,6 @@ type stack[V Value] struct {
 	capacity int
 }
 
-// STRINGER INTERFACE
-
-func (v *stack[V]) String() string {
-	return FormatValue(v)
-}
-
 // LIFO INTERFACE
 
 // This method retrieves the capacity of this stack.
@@ -98,4 +92,10 @@ func (v *stack[V]) RemoveTop() V {
 // This method removes all values from this stack.
 func (v *stack[V]) RemoveAll() {
 	v.values.RemoveAll()
+}
+
+// GO INTERFACE
+
+func (v *stack[V]) String() string {
+	return FormatValue(v)
 }

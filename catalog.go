@@ -66,7 +66,9 @@ func Catalog[K Key, V Value]() CatalogLike[K, V] {
 func CatalogFromArray[K Key, V Value](array []Binding[K, V]) CatalogLike[K, V] {
 	var v = Catalog[K, V]()
 	for _, association := range array {
-		v.AddAssociation(association)
+		var key = association.GetKey()
+		var value = association.GetValue()
+		v.SetValue(key, value)
 	}
 	return v
 }
@@ -78,7 +80,9 @@ func CatalogFromSequence[K Key, V Value](sequence Sequential[Binding[K, V]]) Cat
 	var iterator = Iterator(sequence)
 	for iterator.HasNext() {
 		var association = iterator.GetNext()
-		v.AddAssociation(association)
+		var key = association.GetKey()
+		var value = association.GetValue()
+		v.SetValue(key, value)
 	}
 	return v
 }
@@ -87,9 +91,14 @@ func CatalogFromSequence[K Key, V Value](sequence Sequential[Binding[K, V]]) Cat
 // that are in the specified catalogs in the order that they appear in each
 // catalog.
 func Merge[K Key, V Value](first, second CatalogLike[K, V]) CatalogLike[K, V] {
-	var result = Catalog[K, V]()
-	result.AddAssociations(first)
-	result.AddAssociations(second)
+	var result = CatalogFromSequence[K, V](first)
+	var iterator = Iterator[Binding[K, V]](second)
+	for iterator.HasNext() {
+		var association = iterator.GetNext()
+		var key = association.GetKey()
+		var value = association.GetValue()
+		result.SetValue(key, value)
+	}
 	return result
 }
 
@@ -120,22 +129,6 @@ type catalog[K Key, V Value] struct {
 }
 
 // ASSOCIATIVE INTERFACE
-
-// This method appends the specified association to the end of this catalog.
-func (v *catalog[K, V]) AddAssociation(association Binding[K, V]) {
-	var key = association.GetKey()
-	var value = association.GetValue()
-	v.SetValue(key, value) // This copies the association.
-}
-
-// This method appends the specified associations to the end of this catalog.
-func (v *catalog[K, V]) AddAssociations(associations Sequential[Binding[K, V]]) {
-	var iterator = Iterator(associations)
-	for iterator.HasNext() {
-		var association = iterator.GetNext()
-		v.AddAssociation(association)
-	}
-}
 
 // This method returns the keys for this catalog.
 func (v *catalog[K, V]) GetKeys() Sequential[K] {

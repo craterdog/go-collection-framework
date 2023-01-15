@@ -118,8 +118,6 @@ type Binding[K Key, V Value] interface {
 // This interface defines the methods supported by all associative sequences
 // whose values consist of key-value pair associations.
 type Associative[K Key, V Value] interface {
-	AddAssociation(association Binding[K, V])
-	AddAssociations(associations Sequential[Binding[K, V]])
 	GetKeys() Sequential[K]
 	GetValues(keys Sequential[K]) Sequential[V]
 	GetValue(key K) V

@@ -248,10 +248,7 @@ func (v *queue[V]) AddValues(values Sequential[V]) {
 	var iterator = Iterator(values)
 	for iterator.HasNext() {
 		var value = iterator.GetNext()
-		v.mutex.Lock()
-		v.values.AddValue(value)
-		v.mutex.Unlock()
-		v.available <- true // Will block if at capacity.
+		v.AddValue(value)
 	}
 }
 

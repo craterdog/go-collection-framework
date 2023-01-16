@@ -64,15 +64,6 @@ func (v *stack[V]) AddValue(value V) {
 	v.values.AddValue(value)
 }
 
-// This method adds the specified values to the top of this stack.
-func (v *stack[V]) AddValues(values Sequential[V]) {
-	var iterator = Iterator(values)
-	for iterator.HasNext() {
-		var value = iterator.GetNext()
-		v.AddValue(value) // We must call this explicitly to get the capacity check.
-	}
-}
-
 // This method retrieves from this stack the value that is on top of it.
 func (v *stack[V]) GetTop() V {
 	if v.values.IsEmpty() {

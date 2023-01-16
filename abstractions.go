@@ -30,11 +30,14 @@ at the github repository maintaining this package:
 */
 package collections
 
+// TYPE DEFINITIONS
+
+type (
+	Key   any
+	Value any
+)
+
 // INDIVIDUAL INTERFACES
-
-type Key any
-
-type Value any
 
 // This interface defines the methods supported by all sequences of values.
 type Sequential[V Value] interface {
@@ -132,7 +135,6 @@ type Associative[K Key, V Value] interface {
 type FIFO[V Value] interface {
 	GetCapacity() int
 	AddValue(value V)
-	AddValues(values Sequential[V])
 	RemoveHead() (head V, ok bool)
 	CloseQueue()
 }
@@ -142,7 +144,6 @@ type FIFO[V Value] interface {
 type LIFO[V Value] interface {
 	GetCapacity() int
 	AddValue(value V)
-	AddValues(values Sequential[V])
 	GetTop() V
 	RemoveTop() V
 	RemoveAll()

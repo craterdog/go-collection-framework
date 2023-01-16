@@ -243,15 +243,6 @@ func (v *queue[V]) AddValue(value V) {
 	v.available <- true // Will block if at capacity.
 }
 
-// This method adds the specified values to the top of this queue.
-func (v *queue[V]) AddValues(values Sequential[V]) {
-	var iterator = Iterator(values)
-	for iterator.HasNext() {
-		var value = iterator.GetNext()
-		v.AddValue(value)
-	}
-}
-
 // This method removes from this queue the value that is at the head of it. It
 // returns the removed value and a "comma ok" value as the result.
 func (v *queue[V]) RemoveHead() (V, bool) {

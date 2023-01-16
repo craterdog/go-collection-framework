@@ -29,9 +29,11 @@ func TestQueueWithConcurrency(t *tes.T) {
 	ass.Equal(t, 0, queue.GetSize())
 
 	// Add some values to the queue.
+	var values = col.List[int]()
 	for i := 1; i < 10; i++ {
-		queue.AddValue(i)
+		values.AddValue(i)
 	}
+	queue.AddValues(values)
 	ass.Equal(t, 9, queue.GetSize())
 
 	// Remove values from the queue in the background.

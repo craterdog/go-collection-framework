@@ -33,7 +33,7 @@ package collections
 // TYPE DEFINITIONS
 
 type (
-	Key any
+	Key   any
 	Value any
 )
 

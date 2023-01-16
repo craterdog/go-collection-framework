@@ -32,8 +32,8 @@ func (v *FooBar) GetFoo() int    { return v.foo }
 func (v FooBar) GetFoo2() int    { return v.foo }
 func (v *FooBar) GetBar() string { return v.bar }
 func (v FooBar) GetBar2() string { return v.bar }
-func (v *FooBar) GetNil() any { return nil }
-func (v FooBar) GetNil2() any { return nil }
+func (v *FooBar) GetNil() any    { return nil }
+func (v FooBar) GetNil2() any    { return nil }
 
 // Pure Structure
 type Fuz struct {

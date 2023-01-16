@@ -201,12 +201,6 @@ type queue[V Value] struct {
 	mutex     syn.Mutex
 }
 
-// STRINGER INTERFACE
-
-func (v *queue[V]) String() string {
-	return FormatValue(v)
-}
-
 // SEQUENTIAL INTERFACE
 
 // This method determines whether or not this queue is empty.
@@ -249,18 +243,6 @@ func (v *queue[V]) AddValue(value V) {
 	v.available <- true // Will block if at capacity.
 }
 
-// This method adds the specified values to the top of this queue.
-func (v *queue[V]) AddValues(values Sequential[V]) {
-	var iterator = Iterator(values)
-	for iterator.HasNext() {
-		var value = iterator.GetNext()
-		v.mutex.Lock()
-		v.values.AddValue(value)
-		v.mutex.Unlock()
-		v.available <- true // Will block if at capacity.
-	}
-}
-
 // This method removes from this queue the value that is at the head of it. It
 // returns the removed value and a "comma ok" value as the result.
 func (v *queue[V]) RemoveHead() (V, bool) {
@@ -285,4 +267,10 @@ func (v *queue[V]) CloseQueue() {
 	v.mutex.Lock()
 	close(v.available) // No more values can be placed on the queue.
 	v.mutex.Unlock()
+}
+
+// GO INTERFACE
+
+func (v *queue[V]) String() string {
+	return FormatValue(v)
 }

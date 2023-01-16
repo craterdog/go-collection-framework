@@ -45,12 +45,6 @@ type stack[V Value] struct {
 	capacity int
 }
 
-// STRINGER INTERFACE
-
-func (v *stack[V]) String() string {
-	return FormatValue(v)
-}
-
 // LIFO INTERFACE
 
 // This method retrieves the capacity of this stack.
@@ -68,15 +62,6 @@ func (v *stack[V]) AddValue(value V) {
 			v))
 	}
 	v.values.AddValue(value)
-}
-
-// This method adds the specified values to the top of this stack.
-func (v *stack[V]) AddValues(values Sequential[V]) {
-	var iterator = Iterator(values)
-	for iterator.HasNext() {
-		var value = iterator.GetNext()
-		v.AddValue(value) // We must call this explicitly to get the capacity check.
-	}
 }
 
 // This method retrieves from this stack the value that is on top of it.
@@ -98,4 +83,10 @@ func (v *stack[V]) RemoveTop() V {
 // This method removes all values from this stack.
 func (v *stack[V]) RemoveAll() {
 	v.values.RemoveAll()
+}
+
+// GO INTERFACE
+
+func (v *stack[V]) String() string {
+	return FormatValue(v)
 }

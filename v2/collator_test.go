@@ -11,7 +11,7 @@
 package collections_test
 
 import (
-	col "github.com/craterdog/go-collection-framework"
+	col "github.com/craterdog/go-collection-framework/v2"
 	ass "github.com/stretchr/testify/assert"
 	tes "testing"
 )
@@ -32,6 +32,8 @@ func (v *FooBar) GetFoo() int    { return v.foo }
 func (v FooBar) GetFoo2() int    { return v.foo }
 func (v *FooBar) GetBar() string { return v.bar }
 func (v FooBar) GetBar2() string { return v.bar }
+func (v *FooBar) GetNil() any    { return nil }
+func (v FooBar) GetNil2() any    { return nil }
 
 // Pure Structure
 type Fuz struct {
@@ -166,6 +168,9 @@ func TestComparison(t *tes.T) {
 	var m2 = map[any]any{
 		One: True,
 		Two: Hello}
+	var m3 = map[any]any{
+		One: nil,
+		Two: Hello}
 	var ShouldBeM0 map[any]any
 
 	ass.True(t, col.CompareValues(ShouldBeM0, m0))
@@ -175,6 +180,7 @@ func TestComparison(t *tes.T) {
 	ass.True(t, col.CompareValues(m1, m1))
 	ass.False(t, col.CompareValues(m2, m1))
 	ass.True(t, col.CompareValues(m2, m2))
+	ass.False(t, col.CompareValues(m2, m3))
 
 	// Struct
 	var f1 = &FooBar{1, "one", false}

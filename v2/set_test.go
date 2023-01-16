@@ -11,7 +11,7 @@
 package collections_test
 
 import (
-	col "github.com/craterdog/go-collection-framework"
+	col "github.com/craterdog/go-collection-framework/v2"
 	ass "github.com/stretchr/testify/assert"
 	tes "testing"
 )
@@ -40,10 +40,12 @@ func TestSetsWithStrings(t *tes.T) {
 	ass.False(t, set.IsEmpty())                                   // ["foo"]
 	ass.Equal(t, 1, set.GetSize())                                // ["foo"]
 	ass.Equal(t, "foo", string(set.GetValue(1)))                  // ["foo"]
+	ass.Equal(t, 0, set.GetIndex("baz"))                          // ["foo"]
 	ass.True(t, set.ContainsValue("foo"))                         // ["foo"]
 	ass.False(t, set.ContainsValue("bax"))                        // ["foo"]
 	set.AddValues(bazbar)                                         // ["bar", "baz", "foo"]
 	ass.Equal(t, 3, set.GetSize())                                // ["bar", "baz", "foo"]
+	ass.Equal(t, 2, set.GetIndex("baz"))                          // ["bar", "baz", "foo"]
 	ass.Equal(t, "bar", string(set.GetValue(1)))                  // ["bar", "baz", "foo"]
 	ass.Equal(t, bazfoo.AsArray(), set.GetValues(2, 3).AsArray()) // ["bar", "baz", "foo"]
 	ass.Equal(t, bar.AsArray(), set.GetValues(1, 1).AsArray())    // ["bar", "baz", "foo"]

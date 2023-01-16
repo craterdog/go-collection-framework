@@ -18,12 +18,6 @@ package collections
 //   - V is any type of entity.
 type Map[K comparable, V Value] map[K]V
 
-// STRINGER INTERFACE
-
-func (v Map[K, V]) String() string {
-	return FormatValue(v)
-}
-
 // SEQUENTIAL INTERFACE
 
 // This method determines whether or not this map is empty.
@@ -51,22 +45,6 @@ func (v Map[K, V]) AsArray() []Binding[K, V] {
 }
 
 // ASSOCIATIVE INTERFACE
-
-// This method appends the specified association to the end of this map.
-func (v Map[K, V]) AddAssociation(association Binding[K, V]) {
-	var key = association.GetKey()
-	var value = association.GetValue()
-	v.SetValue(key, value) // This copies the association.
-}
-
-// This method appends the specified associations to the end of this map.
-func (v Map[K, V]) AddAssociations(associations Sequential[Binding[K, V]]) {
-	var iterator = Iterator(associations)
-	for iterator.HasNext() {
-		var association = iterator.GetNext()
-		v.AddAssociation(association)
-	}
-}
 
 // This method returns the keys for this map.
 func (v Map[K, V]) GetKeys() Sequential[K] {
@@ -134,4 +112,10 @@ func (v Map[K, V]) RemoveAll() {
 		var key = iterator.GetNext()
 		delete(v, key)
 	}
+}
+
+// GO INTERFACE
+
+func (v Map[K, V]) String() string {
+	return FormatValue(v)
 }

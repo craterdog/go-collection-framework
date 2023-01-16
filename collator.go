@@ -208,10 +208,11 @@ func (v *collator) compareSequences(first ref.Value, second ref.Value) bool {
 // have the same getter values.
 func (v *collator) compareInterfaces(first ref.Value, second ref.Value) bool {
 	var typeRef = first.Type() // We know the structures are the same type.
-	var count = first.NumMethod()
+	var count = typeRef.NumMethod()
 	for index := 0; index < count; index++ {
-		var method = typeRef.Method(index)
-		if sts.HasPrefix(method.Name, "Get") {
+		var name = typeRef.Method(index).Name
+		var arguments = first.Method(index).Type().NumIn()
+		if sts.HasPrefix(name, "Get") && arguments == 0 {
 			var firstValue = first.Method(index).Call([]ref.Value{})[0]
 			var secondValue = second.Method(index).Call([]ref.Value{})[0]
 			if !v.compareValues(firstValue, secondValue) {

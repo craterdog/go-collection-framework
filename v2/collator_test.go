@@ -21,19 +21,29 @@ type Boolean bool
 type Integer int
 type String string
 
-// Encapsulated Type
-type FooBar struct {
-	foo int
-	bar string
-	Baz bool
+type Foolish interface {
+	GetFoo() int
+	GetBar() string
+	GetNil() Foolish
 }
 
-func (v *FooBar) GetFoo() int    { return v.foo }
-func (v FooBar) GetFoo2() int    { return v.foo }
-func (v *FooBar) GetBar() string { return v.bar }
-func (v FooBar) GetBar2() string { return v.bar }
-func (v *FooBar) GetNil() any    { return nil }
-func (v FooBar) GetNil2() any    { return nil }
+func FooBar(foo int, bar string, baz Foolish) Foolish {
+	return &foobar{foo, bar, baz}
+}
+
+// Encapsulated Type
+type foobar struct {
+	foo int
+	bar string
+	Baz Foolish
+}
+
+func (v *foobar) GetFoo() int     { return v.foo }
+func (v foobar) GetFoo2() int     { return v.foo }
+func (v *foobar) GetBar() string  { return v.bar }
+func (v foobar) GetBar2() string  { return v.bar }
+func (v *foobar) GetNil() Foolish { return nil }
+func (v foobar) GetNil2() Foolish { return nil }
 
 // Pure Structure
 type Fuz struct {
@@ -150,10 +160,12 @@ func TestComparison(t *tes.T) {
 	var a0 = []any{}
 	var a1 = []any{Hello, World}
 	var a2 = []any{Hello, Universe}
-	var ShouldBeA0 []any
+	var aNil []any
 
-	ass.True(t, col.CompareValues(ShouldBeA0, a0))
-	ass.False(t, col.CompareValues(a1, ShouldBeA0))
+	ass.True(t, col.CompareValues(aNil, aNil))
+	ass.False(t, col.CompareValues(aNil, a0))
+	ass.False(t, col.CompareValues(a0, aNil))
+	ass.True(t, col.CompareValues(a0, a0))
 
 	ass.False(t, col.CompareValues(a1, a2))
 	ass.True(t, col.CompareValues(a1, a1))
@@ -171,10 +183,12 @@ func TestComparison(t *tes.T) {
 	var m3 = map[any]any{
 		One: nil,
 		Two: Hello}
-	var ShouldBeM0 map[any]any
+	var mNil map[any]any
 
-	ass.True(t, col.CompareValues(ShouldBeM0, m0))
-	ass.False(t, col.CompareValues(m1, ShouldBeM0))
+	ass.True(t, col.CompareValues(mNil, mNil))
+	ass.False(t, col.CompareValues(mNil, m0))
+	ass.False(t, col.CompareValues(m0, mNil))
+	ass.True(t, col.CompareValues(m0, m0))
 
 	ass.False(t, col.CompareValues(m1, m2))
 	ass.True(t, col.CompareValues(m1, m1))
@@ -183,19 +197,18 @@ func TestComparison(t *tes.T) {
 	ass.False(t, col.CompareValues(m2, m3))
 
 	// Struct
-	var f1 = &FooBar{1, "one", false}
-	var f2 = &FooBar{1, "one", false}
-	var f3 = &FooBar{2, "two", true}
+	var f0 Foolish
+	var f1 = FooBar(1, "one", nil)
+	var f2 = FooBar(1, "one", nil)
+	var f3 = FooBar(2, "two", nil)
 	var f4 = Fuz{"two"}
 	var f5 = Fuz{"two"}
 	var f6 = Fuz{"three"}
+	ass.True(t, col.CompareValues(f0, f0))
+	ass.False(t, col.CompareValues(f0, f1))
 	ass.True(t, col.CompareValues(f1, f1))
 	ass.True(t, col.CompareValues(f1, f2))
 	ass.False(t, col.CompareValues(f2, f3))
-	ass.True(t, col.CompareValues(*f1, *f1))
-	ass.True(t, col.CompareValues(*f1, *f2))
-	ass.False(t, col.CompareValues(*f2, *f3))
-	ass.False(t, col.CompareValues(*f3, f4))
 	ass.True(t, col.CompareValues(f4, f4))
 	ass.True(t, col.CompareValues(f4, f5))
 	ass.False(t, col.CompareValues(f5, f6))
@@ -401,13 +414,13 @@ func TestRanking(t *tes.T) {
 	var a2 = []any{Hello, Universe}
 	var a3 = []any{Hello, World, Universe}
 	var a4 = []any{Hello, Universe, World}
-	var ShouldBeA0 []any
+	var aNil []any
 
-	ass.Equal(t, 0, col.RankValues(ShouldBeA0, ShouldBeA0))
-	ass.Equal(t, -1, col.RankValues(ShouldBeA0, a1))
-	ass.Equal(t, 0, col.RankValues(a0, ShouldBeA0))
-	ass.Equal(t, 1, col.RankValues(a1, ShouldBeA0))
-	ass.Equal(t, 0, col.RankValues(ShouldBeA0, a0))
+	ass.Equal(t, 0, col.RankValues(aNil, aNil))
+	ass.Equal(t, -1, col.RankValues(aNil, a0))
+	ass.Equal(t, 1, col.RankValues(a0, aNil))
+	ass.Equal(t, 0, col.RankValues(a0, a0))
+	ass.Equal(t, 1, col.RankValues(a1, aNil))
 	ass.Equal(t, -1, col.RankValues(a2, a1))
 	ass.Equal(t, 0, col.RankValues(a2, a2))
 	ass.Equal(t, 1, col.RankValues(a1, a2))
@@ -437,13 +450,12 @@ func TestRanking(t *tes.T) {
 		One:   True,
 		Two:   Universe,
 		Three: World}
-	var ShouldBeM0 map[any]any
+	var mNil map[any]any
 
-	ass.Equal(t, 0, col.RankValues(ShouldBeM0, ShouldBeM0))
-	ass.Equal(t, -1, col.RankValues(ShouldBeM0, m1))
-	ass.Equal(t, 0, col.RankValues(m0, ShouldBeM0))
-	ass.Equal(t, 1, col.RankValues(m1, ShouldBeM0))
-	ass.Equal(t, 0, col.RankValues(ShouldBeM0, m0))
+	ass.Equal(t, 0, col.RankValues(mNil, mNil))
+	ass.Equal(t, -1, col.RankValues(mNil, m0))
+	ass.Equal(t, 1, col.RankValues(m0, mNil))
+	ass.Equal(t, 0, col.RankValues(m0, m0))
 	ass.Equal(t, -1, col.RankValues(m2, m1))
 	ass.Equal(t, 0, col.RankValues(m2, m2))
 	ass.Equal(t, 1, col.RankValues(m1, m2))
@@ -458,9 +470,9 @@ func TestRanking(t *tes.T) {
 	ass.Equal(t, 0, col.RankValues(m1, m1))
 
 	// Struct
-	var f1 = &FooBar{1, "one", true}
-	var f2 = &FooBar{1, "two", true}
-	var f3 = &FooBar{2, "two", false}
+	var f1 = FooBar(1, "one", nil)
+	var f2 = FooBar(1, "two", nil)
+	var f3 = FooBar(2, "two", nil)
 	var f4 = Fuz{"two"}
 	var f5 = Fuz{"two"}
 	var f6 = Fuz{"three"}
@@ -469,16 +481,10 @@ func TestRanking(t *tes.T) {
 	ass.Equal(t, -1, col.RankValues(f2, f3))
 	ass.Equal(t, 1, col.RankValues(f3, f1))
 	ass.Equal(t, 1, col.RankValues(f3, f2))
-	ass.Equal(t, 0, col.RankValues(*f1, *f1))
-	ass.Equal(t, -1, col.RankValues(*f1, *f2))
-	ass.Equal(t, 1, col.RankValues(*f2, *f3))
-	ass.Equal(t, -1, col.RankValues(*f3, *f1))
-	ass.Equal(t, -1, col.RankValues(*f3, *f2))
-	ass.Equal(t, -1, col.RankValues(*f3, f4))
 	ass.Equal(t, 0, col.RankValues(f4, f4))
 	ass.Equal(t, 0, col.RankValues(f4, f5))
 	ass.Equal(t, 1, col.RankValues(f5, f6))
-	ass.Equal(t, -1, col.RankValues(f3, &f4))
+	ass.Equal(t, 1, col.RankValues(f3, &f4))
 	ass.Equal(t, 0, col.RankValues(&f4, &f4))
 	ass.Equal(t, 0, col.RankValues(&f4, &f5))
 	ass.Equal(t, 1, col.RankValues(&f5, &f6))

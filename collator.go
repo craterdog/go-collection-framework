@@ -67,7 +67,7 @@ func (v *collator) RankValues(first Value, second Value) int {
 // This function determines whether or not the specified reflective values are
 // equal using reflection and a recursive descent algorithm.
 func (v *collator) compareValues(first ref.Value, second ref.Value) bool {
-	// Handle any nil pointers.
+	// Handle any invalid values.
 	if !first.IsValid() {
 		return !second.IsValid()
 	}
@@ -75,7 +75,7 @@ func (v *collator) compareValues(first ref.Value, second ref.Value) bool {
 		return false
 	}
 
-	// At this point, neither of the values are nil.
+	// At this point, neither of the values are invalid.
 	var firstType = baseTypeName(first.Type())
 	var secondType = baseTypeName(second.Type())
 	if firstType != secondType && firstType != "any" && secondType != "any" {
@@ -84,7 +84,7 @@ func (v *collator) compareValues(first ref.Value, second ref.Value) bool {
 	}
 
 	// We now know that the types of the values are the same, and neither of
-	// the values is nil.
+	// the values is invalid.
 	switch first.Kind() {
 
 	// Handle all native elemental types.
@@ -97,13 +97,31 @@ func (v *collator) compareValues(first ref.Value, second ref.Value) bool {
 
 	// Handle all native collection types.
 	case ref.Array, ref.Slice:
-		return v.compareArrays(first, second)
+		switch {
+		case first.IsNil():
+			return second.IsNil()
+		case second.IsNil():
+			return false // We know that first isn't nil.
+		default:
+			return v.compareArrays(first, second)
+		}
 	case ref.Map:
-		return v.compareMaps(first, second)
+		switch {
+		case first.IsNil():
+			return second.IsNil()
+		case second.IsNil():
+			return false // We know that first isn't nil.
+		default:
+			return v.compareMaps(first, second)
+		}
 
 	// Handle all interfaces and pointers.
 	case ref.Interface, ref.Pointer:
 		switch {
+		case first.IsNil():
+			return second.IsNil()
+		case second.IsNil():
+			return false // We know that first isn't nil.
 		case first.MethodByName("AsArray").IsValid():
 			// The value is a sequence.
 			return v.compareSequences(first, second)
@@ -208,10 +226,11 @@ func (v *collator) compareSequences(first ref.Value, second ref.Value) bool {
 // have the same getter values.
 func (v *collator) compareInterfaces(first ref.Value, second ref.Value) bool {
 	var typeRef = first.Type() // We know the structures are the same type.
-	var count = first.NumMethod()
+	var count = typeRef.NumMethod()
 	for index := 0; index < count; index++ {
-		var method = typeRef.Method(index)
-		if sts.HasPrefix(method.Name, "Get") {
+		var name = typeRef.Method(index).Name
+		var arguments = first.Method(index).Type().NumIn()
+		if sts.HasPrefix(name, "Get") && arguments == 0 {
 			var firstValue = first.Method(index).Call([]ref.Value{})[0]
 			var secondValue = second.Method(index).Call([]ref.Value{})[0]
 			if !v.compareValues(firstValue, secondValue) {
@@ -270,13 +289,43 @@ func (v *collator) rankValues(first ref.Value, second ref.Value) int {
 
 	// Handle all native collection types.
 	case ref.Array, ref.Slice:
-		return v.rankArrays(first, second)
+		switch {
+		case first.IsNil():
+			if second.IsNil() {
+				return 0
+			}
+			// Only the first value is nil.
+			return -1
+		case second.IsNil():
+			return 1 // We know that first isn't nil.
+		default:
+			return v.rankArrays(first, second)
+		}
 	case ref.Map:
-		return v.rankMaps(first, second)
+		switch {
+		case first.IsNil():
+			if second.IsNil() {
+				return 0
+			}
+			// Only the first value is nil.
+			return -1
+		case second.IsNil():
+			return 1 // We know that first isn't nil.
+		default:
+			return v.rankMaps(first, second)
+		}
 
 	// Handle all interfaces and pointers.
 	case ref.Interface, ref.Pointer:
 		switch {
+		case first.IsNil():
+			if second.IsNil() {
+				return 0
+			}
+			// Only the first value is nil.
+			return -1
+		case second.IsNil():
+			return 1 // We know that first isn't nil.
 		case first.MethodByName("AsArray").IsValid():
 			// The value is a collection.
 			return v.rankSequences(first, second)

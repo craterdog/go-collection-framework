@@ -38,12 +38,12 @@ type foobar struct {
 	Baz Foolish
 }
 
-func (v *foobar) GetFoo() int    { return v.foo }
-func (v foobar) GetFoo2() int    { return v.foo }
-func (v *foobar) GetBar() string { return v.bar }
-func (v foobar) GetBar2() string { return v.bar }
-func (v *foobar) GetNil() Foolish    { return nil }
-func (v foobar) GetNil2() Foolish    { return nil }
+func (v *foobar) GetFoo() int     { return v.foo }
+func (v foobar) GetFoo2() int     { return v.foo }
+func (v *foobar) GetBar() string  { return v.bar }
+func (v foobar) GetBar2() string  { return v.bar }
+func (v *foobar) GetNil() Foolish { return nil }
+func (v foobar) GetNil2() Foolish { return nil }
 
 // Pure Structure
 type Fuz struct {

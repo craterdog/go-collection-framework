@@ -101,7 +101,7 @@ func (v *collator) compareValues(first ref.Value, second ref.Value) bool {
 		case first.IsNil():
 			return second.IsNil()
 		case second.IsNil():
-			return false  // We know that first isn't nil.
+			return false // We know that first isn't nil.
 		default:
 			return v.compareArrays(first, second)
 		}
@@ -110,7 +110,7 @@ func (v *collator) compareValues(first ref.Value, second ref.Value) bool {
 		case first.IsNil():
 			return second.IsNil()
 		case second.IsNil():
-			return false  // We know that first isn't nil.
+			return false // We know that first isn't nil.
 		default:
 			return v.compareMaps(first, second)
 		}
@@ -121,7 +121,7 @@ func (v *collator) compareValues(first ref.Value, second ref.Value) bool {
 		case first.IsNil():
 			return second.IsNil()
 		case second.IsNil():
-			return false  // We know that first isn't nil.
+			return false // We know that first isn't nil.
 		case first.MethodByName("AsArray").IsValid():
 			// The value is a sequence.
 			return v.compareSequences(first, second)
@@ -297,7 +297,7 @@ func (v *collator) rankValues(first ref.Value, second ref.Value) int {
 			// Only the first value is nil.
 			return -1
 		case second.IsNil():
-			return 1  // We know that first isn't nil.
+			return 1 // We know that first isn't nil.
 		default:
 			return v.rankArrays(first, second)
 		}
@@ -310,7 +310,7 @@ func (v *collator) rankValues(first ref.Value, second ref.Value) int {
 			// Only the first value is nil.
 			return -1
 		case second.IsNil():
-			return 1  // We know that first isn't nil.
+			return 1 // We know that first isn't nil.
 		default:
 			return v.rankMaps(first, second)
 		}
@@ -325,7 +325,7 @@ func (v *collator) rankValues(first ref.Value, second ref.Value) int {
 			// Only the first value is nil.
 			return -1
 		case second.IsNil():
-			return 1  // We know that first isn't nil.
+			return 1 // We know that first isn't nil.
 		case first.MethodByName("AsArray").IsValid():
 			// The value is a collection.
 			return v.rankSequences(first, second)

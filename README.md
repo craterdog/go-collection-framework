@@ -25,4 +25,4 @@ import (
 Project contributors are always welcome. Check out the contributing guidelines
 [here](https://github.com/craterdog/go-collection-framework/blob/main/.github/CONTRIBUTING.md).
 
-<H3 align="center"> Copyright © 2009 - 2023  Crater Dog Technologies™. All rights reserved. </H3>
+<H5 align="center"> Copyright © 2009 - 2023  Crater Dog Technologies™. All rights reserved. </H5>

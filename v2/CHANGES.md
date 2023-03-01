@@ -1,9 +1,9 @@
 <img src="https://craterdog.com/images/CraterDog.png" width="50%">
 
 ## Go Collection Framework v2 Changes
+The following changes to the module interface where introduced in v2:
 
 ### Decoupling of the List and Array Types
-The following changes to the module interface where introduced in v2:
 There was a subtle problem with the implementation of the Array[V] type in
 v1. Since it depends on the default `CompareValues()` function and is just a
 tilde type for `[]V` it cannot depend on any other compare function. The
@@ -13,11 +13,11 @@ delegated several of its interfaces including `Searchable` to the `Array[V]`
 implementation. This coupling was too tight and broke the `List[V]` type in
 subtle ways that were hard to diagnose and work-around.
 
-To address this we moved the `GetIndex()` method from the into the `Searchable`
-interface and removed support for the `Searchable` interface from the `Array`
-type. The `List` type was rewritten to only delegate the `Sequential`, the
-`Accessible` (renamed from the old `Indexed` interface) and the `Updatable`
-interface implementations to the `Array` type.
+To address this we moved the `GetIndex()` method from the `Accessible` interface
+into the `Searchable` interface and removed support for the `Searchable` interface
+from the `Array` type. The `List` type was rewritten to only delegate the
+`Sequential`, the `Accessible` (renamed from the old `Indexed` interface), and the
+`Updatable` interface implementations to the `Array` type.
 
 ### Removal of the `AddAssociation()` and `AddAssociations()` Methods
 When attempting to define a new type that implements the `Associative[K, V]`

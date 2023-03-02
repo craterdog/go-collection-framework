@@ -19,6 +19,7 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version: 1.18
+          args: --config ./.github/workflows/golangci-lint.yml ./... ./v1 ./v2
       - uses: actions/checkout@v3
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3

@@ -19,7 +19,6 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version: 1.18
-          args: --config ./.github/workflows/golangci-lint.yml ./... ./v1 ./v2
       - uses: actions/checkout@v3
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
@@ -31,7 +30,7 @@ jobs:
           # working-directory: ./
 
           # Optional: golangci-lint command line arguments.
-          # args: --issues-exit-code=0
+          args: --config ./.github/workflows/golangci-lint.yml ./... ./v1 ./v2
 
           # Optional: show only new issues if it's a pull request. The default value is `false`.
           # only-new-issues: true

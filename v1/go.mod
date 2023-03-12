@@ -1,4 +1,4 @@
-module github.com/craterdog/go-collection-framework
+module github.com/craterdog/go-collection-framework/v1
 
 go 1.19
 

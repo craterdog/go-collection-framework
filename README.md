@@ -10,8 +10,8 @@ replace the use of the native Go array, slice and map types.
 ### Quick Links
 For more information on this project click on the following links:
  * [project documentation](https://github.com/craterdog/go-collection-framework/wiki)
- * [coding conventions](https://github.com/craterdog/go-collection-framework/wiki/coding-conventions)
- * [release notes](https://github.com/craterdog/go-collection-framework/wiki/release-notes)
+ * [coding conventions](https://github.com/craterdog/go-collection-framework/wiki/conventions)
+ * [release notes](https://github.com/craterdog/go-collection-framework/wiki/releases)
 
 ### Getting Started
 To include the Go packages for this module use the following import statement:

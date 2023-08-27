@@ -13,12 +13,12 @@ This collections package defines a set of simple, pragmatic interfaces for
 collections of sequential values. It also provides efficient and compact
 implementations of the following collection types based on those interfaces:
   - array (native Go array)
-  - list (a sortable list)
-  - set (an ordered set)
-  - map (native Go map)
   - catalog (a sortable map)
-  - stack (LIFO)
+  - list (a sortable list)
+  - map (native Go map)
   - queue (a blocking FIFO)
+  - set (an ordered set)
+  - stack (LIFO)
 
 Additional implementations of these collection types can be defined and used
 seemlessly since the interface definitions only depend on other interfaces and
@@ -33,8 +33,10 @@ package collections
 // TYPE DEFINITIONS
 
 type (
-	Key   any
-	Value any
+	Key        any
+	Value      any
+	Primitive  any
+	Collection any
 )
 
 // INDIVIDUAL INTERFACES

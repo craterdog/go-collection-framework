@@ -24,6 +24,12 @@ import (
 //   - V is any type of value.
 type Array[V Value] []V
 
+// This constructor creates a new array from the specified sequence of values.
+func ArrayFromSequence[V Value](sequence Sequential[V]) []V {
+	var v = sequence.AsArray()
+	return v
+}
+
 // SEQUENTIAL INTERFACE
 
 // This method determines whether or not this array is empty.

@@ -19,6 +19,12 @@ import (
 
 // FORMATTER INTERFACE
 
+// This constructor creates a new instance of a formatter that can be used to
+// format any value using the specified number of levels of indentation.
+func Formatter(indentation int) FormatterLike {
+	return &formatter{indentation: indentation}
+}
+
 // This function returns a string containing the canonical format for the
 // specified value.
 func FormatValue(value Value) string {
@@ -35,10 +41,11 @@ func FormatValueWithIndentation(value Value, indentation int) string {
 	return v.GetResult()
 }
 
-// This constructor creates a new instance of a formatter that can be used to
-// format any value using the specified number of levels of indentation.
-func Formatter(indentation int) FormatterLike {
-	return &formatter{indentation: indentation}
+// This function returns the bytes containing the canonical format for the
+// specified value including the POSIX standard trailing EOL.
+func FormatDocument(value Value) []byte {
+	var s = FormatValue(value) + EOL
+return []byte(s)
 }
 
 // FORMATTER IMPLEMENTATION
@@ -60,7 +67,8 @@ func (v *formatter) GetIndentation() int {
 	return v.indentation
 }
 
-// This method returns the canonical string for the specified value.
+// This method appends the canonical string for the specified value to the
+// result of the formatter.
 func (v *formatter) FormatValue(value Value) {
 	v.formatValue(ref.ValueOf(value))
 }
@@ -174,8 +182,8 @@ func (v *formatter) formatUnsigned(r ref.Value) {
 // point value to the result using scientific notation if necessary.
 func (v *formatter) formatFloat(r ref.Value) {
 	var flt = r.Float()
-	var str = stc.FormatFloat(flt, 'G', -1, 64)
-	if !sts.Contains(str, ".") && !sts.Contains(str, "E") {
+	var str = stc.FormatFloat(flt, 'g', -1, 64)
+	if !sts.Contains(str, ".") && !sts.Contains(str, "e") {
 		str += ".0"
 	}
 	v.AppendString(str)
@@ -185,7 +193,7 @@ func (v *formatter) formatFloat(r ref.Value) {
 // number value to the result using scientific notation if necessary.
 func (v *formatter) formatComplex(r ref.Value) {
 	var c = r.Complex()
-	v.AppendString(stc.FormatComplex(c, 'G', -1, 128))
+	v.AppendString(stc.FormatComplex(c, 'g', -1, 128))
 }
 
 // This private method appends the string for the specified rune value to the

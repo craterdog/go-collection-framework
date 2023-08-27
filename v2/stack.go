@@ -34,6 +34,19 @@ func StackWithCapacity[V Value](capacity int) StackLike[V] {
 	return &stack[V]{values, values, capacity}
 }
 
+// This constructor creates a new stack from the specified sequence. The stack
+// uses the default capacity
+func StackFromSequence[V Value](sequence Sequential[V]) StackLike[V] {
+	var v = Stack[V]()
+	var iterator = Iterator(sequence)
+	iterator.ToEnd()
+	for iterator.HasPrevious() {
+		var value = iterator.GetPrevious()
+		v.AddValue(value)
+	}
+	return v
+}
+
 // This type defines the structure and methods associated with a stack of
 // values. A stack implements last-in-first-out semantics.
 // This type is parameterized as follows:

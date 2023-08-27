@@ -142,7 +142,7 @@ func (v *collator) compareValues(first ref.Value, second ref.Value) bool {
 
 	default:
 		panic(fmt.Sprintf(
-			"Attempted to compare:\n\tfirst: %v\n\ttype: %v\n\tkind: %v\nand\n\tsecond: %v\n\ttype: %v\n\tkind: %v\n",
+			"Attempted to compare:\n    first: %v\n    type: %v\n    kind: %v\nand\n    second: %v\n    type: %v\n    kind: %v\n",
 			first.Interface(),
 			first.Type(),
 			first.Kind(),
@@ -351,7 +351,7 @@ func (v *collator) rankValues(first ref.Value, second ref.Value) int {
 
 	default:
 		panic(fmt.Sprintf(
-			"Attempted to rank:\n\tfirst: %v\n\ttype: %v\n\tkind: %v\nand\n\tsecond: %v\n\ttype: %v\n\tkind: %v\n",
+			"Attempted to rank:\n    first: %v\n    type: %v\n    kind: %v\nand\n    second: %v\n    type: %v\n    kind: %v\n",
 			first.Interface(),
 			first.Type(),
 			first.Kind(),

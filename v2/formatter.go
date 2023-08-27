@@ -82,7 +82,7 @@ func (v *formatter) AppendNewline() {
 	var separator = "\n"
 	var levels = v.depth + v.indentation
 	for level := 0; level < levels; level++ {
-		separator += "\t"
+		separator += "    "
 	}
 	v.result.WriteString(separator)
 }
@@ -135,7 +135,7 @@ func (v *formatter) formatValue(value ref.Value) {
 			v.formatNil(value)
 		} else {
 			panic(fmt.Sprintf(
-				"Attempted to format:\n\tvalue: %v\n\ttype: %v\n\tkind: %v\n",
+				"Attempted to format:\n    value: %v\n    type: %v\n    kind: %v\n",
 				value.Interface(),
 				value.Type(),
 				value.Kind()))

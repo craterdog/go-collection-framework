@@ -483,10 +483,9 @@ const (
 	imaginary = float + `i`
 	complex_  = `\((` + float + `)` + sign + `(` + imaginary + `)\)`
 	unicode   = `u` + base16 + `{4}`
-	escape    = `\\(?:` + unicode + `|["frnt\\])`
-	character = `(?:` + escape + `|[^"\f\r\n\t]` + `)`
-	rune_     = `'(` + character + `)'`
-	string_   = `"(` + character + `*)"`
+	escape    = `\\(?:` + unicode + `|[abfnrtv'"\\])`
+	rune_     = `'(` + escape + `|[^'\n]` + `)'`
+	string_   = `"(` + escape + `|[^"\n]` + `)*"`
 	context   = `array|catalog|list|map|queue|set|stack`
 	EOL       = "\n"
 )

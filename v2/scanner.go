@@ -477,7 +477,7 @@ const (
 	integer   = zero + `|` + sign + `?` + ordinal
 	unsigned  = `0x` + base16 + `+`
 	fraction  = `\.[0-9]+`
-	exponent  = `e` + sign + ordinal
+	exponent  = `[eE]` + sign + ordinal
 	scalar    = ordinal + fraction + `|` + zero + fraction
 	float     = sign + `?(?:` + scalar + `)(?:` + exponent + `)?`
 	imaginary = float + `i`

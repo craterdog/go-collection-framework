@@ -182,8 +182,8 @@ func (v *formatter) formatUnsigned(r ref.Value) {
 // point value to the result using scientific notation if necessary.
 func (v *formatter) formatFloat(r ref.Value) {
 	var flt = r.Float()
-	var str = stc.FormatFloat(flt, 'g', -1, 64)
-	if !sts.Contains(str, ".") && !sts.Contains(str, "e") {
+	var str = stc.FormatFloat(flt, 'G', -1, 64)
+	if !sts.Contains(str, ".") && !sts.Contains(str, "E") {
 		str += ".0"
 	}
 	v.AppendString(str)

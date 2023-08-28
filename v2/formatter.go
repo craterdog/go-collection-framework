@@ -192,22 +192,30 @@ func (v *formatter) formatFloat(r ref.Value) {
 // This private method appends the base 10 string for the specified complex
 // number value to the result using scientific notation if necessary.
 func (v *formatter) formatComplex(r ref.Value) {
-	var c = r.Complex()
-	v.AppendString(stc.FormatComplex(c, 'g', -1, 128))
+	var complex_ = r.Complex()
+	var real_ = ref.ValueOf(real(complex_))
+	var imag_ = ref.ValueOf(imag(complex_))
+	v.AppendString("(")
+	v.formatFloat(real_)
+	if imag_.Float() >= 0.0 {
+		v.AppendString("+")
+	}
+	v.formatFloat(imag_)
+	v.AppendString("i)")
 }
 
 // This private method appends the string for the specified rune value to the
 // result.
 func (v *formatter) formatRune(r ref.Value) {
-	var rn = r.Int()
-	v.AppendString(stc.QuoteRune(int32(rn)))
+	var rune_ = r.Int()
+	v.AppendString(stc.QuoteRune(int32(rune_)))
 }
 
 // This private method appends the string for the specified string value to the
 // result.
 func (v *formatter) formatString(r ref.Value) {
-	var str = r.String()
-	v.AppendString(stc.Quote(str))
+	var string_ = r.String()
+	v.AppendString(stc.Quote(string_))
 }
 
 // This private method appends the string for the specified array of values to

@@ -504,10 +504,7 @@ func (v *parser) parsePrimitive() (Primitive, *Token, bool) {
 	var ok bool
 	var token *Token
 	var primitive Primitive
-	primitive, token, ok = v.parseNil()
-	if !ok {
-		primitive, token, ok = v.parseBoolean()
-	}
+	primitive, token, ok = v.parseBoolean()
 	if !ok {
 		primitive, token, ok = v.parseComplex()
 	}
@@ -518,10 +515,16 @@ func (v *parser) parsePrimitive() (Primitive, *Token, bool) {
 		primitive, token, ok = v.parseInteger()
 	}
 	if !ok {
+		primitive, token, ok = v.parseNil()
+	}
+	if !ok {
 		primitive, token, ok = v.parseRune()
 	}
 	if !ok {
 		primitive, token, ok = v.parseString()
+	}
+	if !ok {
+		primitive, token, ok = v.parseUnsigned()
 	}
 	if !ok {
 		// Override any zero values returned from failed parsing attempts.
@@ -594,6 +597,18 @@ func (v *parser) parseComplex() (complex128, *Token, bool) {
 	}
 	complex_, _ = stc.ParseComplex(token.Value, 128)
 	return complex_, token, true
+}
+
+// This method attempts to parse the type of a collection. It returns the type
+// string and whether or not the type string was successfully parsed.
+func (v *parser) parseContext() (string, *Token, bool) {
+	var token *Token
+	token = v.nextToken()
+	if token.Type != TokenContext {
+		v.backupOne()
+		return "", token, false
+	}
+	return token.Value, token, true
 }
 
 // This method attempts to parse a floating point primitive. It returns the
@@ -676,14 +691,17 @@ func (v *parser) parseString() (string, *Token, bool) {
 	return string_, token, true
 }
 
-// This method attempts to parse the type of a collection. It returns the type
-// string and whether or not the type string was successfully parsed.
-func (v *parser) parseContext() (string, *Token, bool) {
+// This method attempts to parse an unsigned integer primitive. It returns the
+// unsigned integer primitive and whether or not the unsigned integer primitive
+// was successfully parsed.
+func (v *parser) parseUnsigned() (uint64, *Token, bool) {
 	var token *Token
+	var unsigned uint64
 	token = v.nextToken()
-	if token.Type != TokenContext {
+	if token.Type != TokenUnsigned {
 		v.backupOne()
-		return "", token, false
+		return unsigned, token, false
 	}
-	return token.Value, token, true
+	unsigned, _ = stc.ParseUint(token.Value[2:], 16, 64)
+	return unsigned, token, true
 }

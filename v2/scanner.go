@@ -25,36 +25,37 @@ type TokenType int
 
 // This enumeration defines all possible token types including the error token.
 const (
-	// The first two token types must be first.
 	TokenError TokenType = iota
-	TokenEOF
-	TokenEOL
 	TokenBoolean
 	TokenComplex
 	TokenContext
 	TokenDelimiter
+	TokenEOF
+	TokenEOL
 	TokenFloat
 	TokenInteger
 	TokenNil
 	TokenRune
 	TokenString
+	TokenUnsigned
 )
 
 // This method returns the string representation for each token type.
 func (v TokenType) String() string {
 	return [...]string{
 		"Error",
-		"EOF",
-		"EOL",
 		"Boolean",
 		"Complex",
 		"Context",
 		"Delimiter",
+		"EOF",
+		"EOL",
 		"Float",
 		"Integer",
 		"Nil",
 		"Rune",
 		"String",
+		"Unsigned",
 	}[v]
 }
 
@@ -132,11 +133,12 @@ func (v *scanner) scanToken() bool {
 	case v.foundContext():
 	case v.foundDelimiter():
 	case v.foundFloat():
-	case v.foundInteger():
 	case v.foundNil():
 	case v.foundRune():
 	case v.foundString():
-	case v.foundEOF():
+	case v.foundUnsigned():
+	case v.foundInteger():  // Must be after all other numeric types.
+	case v.foundEOF():      // Must be last.
 		// We are at the end of the source array.
 		return false
 	default:
@@ -345,11 +347,25 @@ func (v *scanner) foundString() bool {
 	return false
 }
 
+// This method adds an unsigned integer token with the current scanner
+// information to the token channel. It returns true if an unsigned integer
+// token was found.
+func (v *scanner) foundUnsigned() bool {
+	var s = v.source[v.nextByte:]
+	var matches = scanUnsigned(s)
+	if len(matches) > 0 {
+		v.nextByte += len(matches[0])
+		v.emitToken(TokenUnsigned)
+		return true
+	}
+	return false
+}
+
 // This scanner is used for matching boolean primitives.
 var booleanScanner = reg.MustCompile(`^(?:` + boolean + `)`)
 
 // This function returns for the specified string an array of the matching
-// subgroups for a boolean primitives. The first string in the array is the
+// subgroups for a boolean primitive. The first string in the array is the
 // entire matched string.
 func scanBoolean(v []byte) []string {
 	return bytesToStrings(booleanScanner.FindSubmatch(v))
@@ -369,7 +385,7 @@ func scanContext(v []byte) []string {
 var complexScanner = reg.MustCompile(`^(?:` + complex_ + `)`)
 
 // This function returns for the specified string an array of the matching
-// subgroups for a complex primitives. The first string in the array is the
+// subgroups for a complex primitive. The first string in the array is the
 // entire matched string.
 func scanComplex(v []byte) []string {
 	return bytesToStrings(complexScanner.FindSubmatch(v))
@@ -392,7 +408,7 @@ func scanDelimiter(v []byte) []string {
 var floatScanner = reg.MustCompile(`^(?:` + float + `)`)
 
 // This function returns for the specified string an array of the matching
-// subgroups for a float primitives. The first string in the array is the
+// subgroups for a float primitive. The first string in the array is the
 // entire matched string.
 func scanFloat(v []byte) []string {
 	return bytesToStrings(floatScanner.FindSubmatch(v))
@@ -402,7 +418,7 @@ func scanFloat(v []byte) []string {
 var integerScanner = reg.MustCompile(`^(?:` + integer + `)`)
 
 // This function returns for the specified string an array of the matching
-// subgroups for a integer primitives. The first string in the array is the
+// subgroups for an integer primitive. The first string in the array is the
 // entire matched string.
 func scanInteger(v []byte) []string {
 	return bytesToStrings(integerScanner.FindSubmatch(v))
@@ -412,7 +428,7 @@ func scanInteger(v []byte) []string {
 var nilScanner = reg.MustCompile(`^(?:` + nil_ + `)`)
 
 // This function returns for the specified string an array of the matching
-// subgroups for a nil primitives. The first string in the array is the
+// subgroups for a nil primitive. The first string in the array is the
 // entire matched string.
 func scanNil(v []byte) []string {
 	return bytesToStrings(nilScanner.FindSubmatch(v))
@@ -422,7 +438,7 @@ func scanNil(v []byte) []string {
 var runeScanner = reg.MustCompile(`^(?:` + rune_ + `)`)
 
 // This function returns for the specified string an array of the matching
-// subgroups for a rune primitives. The first string in the array is the
+// subgroups for a rune primitive. The first string in the array is the
 // entire matched string.
 func scanRune(v []byte) []string {
 	return bytesToStrings(runeScanner.FindSubmatch(v))
@@ -432,10 +448,20 @@ func scanRune(v []byte) []string {
 var stringScanner = reg.MustCompile(`^(?:` + string_ + `)`)
 
 // This function returns for the specified string an array of the matching
-// subgroups for a string primitives. The first string in the array is the
+// subgroups for a string primitive. The first string in the array is the
 // entire matched string.
 func scanString(v []byte) []string {
 	return bytesToStrings(stringScanner.FindSubmatch(v))
+}
+
+// This scanner is used for matching unsigned integer primitives.
+var unsignedScanner = reg.MustCompile(`^(?:` + unsigned + `)`)
+
+// This function returns for the specified string an array of the matching
+// subgroups for an unsigned integer primitive. The first string in the array is
+// the entire matched string.
+func scanUnsigned(v []byte) []string {
+	return bytesToStrings(unsignedScanner.FindSubmatch(v))
 }
 
 // CONSTANT DEFINITIONS
@@ -446,19 +472,21 @@ const (
 	boolean   = `false|true`
 	sign      = `[+-]`
 	zero      = `0`
+	base16    = `[0-9a-f]`
 	ordinal   = `[1-9][0-9]*`
 	integer   = zero + `|` + sign + `?` + ordinal
+	unsigned  = `0x` + base16 + `+`
 	fraction  = `\.[0-9]+`
 	exponent  = `e` + sign + ordinal
 	scalar    = ordinal + fraction + `|` + zero + fraction
 	float     = sign + `?(?:` + scalar + `)(?:` + exponent + `)?`
 	imaginary = float + `i`
 	complex_  = `\((` + float + `)` + sign + `(` + imaginary + `)\)`
-	base16    = `[0-9a-f]`
 	unicode   = `u` + base16 + `{4}`
 	escape    = `\\(?:` + unicode + `|["frnt\\])`
-	rune_     = `(?:` + escape + `|[^"\f\r\n\t]` + `)`
-	string_   = `"(` + rune_ + `*)"`
+	character = `(?:` + escape + `|[^"\f\r\n\t]` + `)`
+	rune_     = `'(` + character + `)'`
+	string_   = `"(` + character + `*)"`
 	context   = `array|catalog|list|map|queue|set|stack`
 	EOL       = "\n"
 )

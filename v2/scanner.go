@@ -466,28 +466,31 @@ func scanUnsigned(v []byte) []string {
 
 // CONSTANT DEFINITIONS
 
+// This is the POSIX standard end-of-line character constant.
+const EOL = "\n"
+
 // These constant definitions capture regular expression subpatterns.
 const (
-	nil_      = `nil`
-	boolean   = `false|true`
-	sign      = `[+-]`
-	zero      = `0`
+	base10    = `[0-9]`
 	base16    = `[0-9a-f]`
-	ordinal   = `[1-9][0-9]*`
-	integer   = zero + `|` + sign + `?` + ordinal
-	unsigned  = `0x` + base16 + `+`
-	fraction  = `\.[0-9]+`
-	exponent  = `[eE]` + sign + ordinal
-	scalar    = ordinal + fraction + `|` + zero + fraction
-	float     = sign + `?(?:` + scalar + `)(?:` + exponent + `)?`
-	imaginary = float + `i`
-	complex_  = `\((` + float + `)` + sign + `(` + imaginary + `)\)`
-	unicode   = `u` + base16 + `{4}`
-	escape    = `\\(?:` + unicode + `|[abfnrtv'"\\])`
-	rune_     = `'(` + escape + `|[^'\n]` + `)'`
-	string_   = `"(` + escape + `|[^"\n]` + `)*"`
+	boolean   = `false|true`
+	complex_  = `\((` + float + `)` + sign + `(` + float + `)i\)`
 	context   = `array|catalog|list|map|queue|set|stack`
-	EOL       = "\n"
+	eol       = `\n`
+	escape    = `\\(?:(?:` + unicode + `)|[abfnrtv'"\\])`
+	exponent  = `[eE]` + sign + ordinal
+	float     = sign + `?(?:` + scalar + `)(?:` + exponent + `)?`
+	fraction  = `\.` + base10 + `+`
+	integer   = zero + `|` + sign + `?` + ordinal
+	nil_      = `nil`
+	ordinal   = `[1-9][0-9]*`
+	rune_     = `'(` + escape + `|[^'` + eol + `])'`
+	scalar    = `(?:` + zero + `|` + ordinal + `)` + fraction
+	sign      = `[+-]`
+	string_   = `"(` + escape + `|[^"` + eol + `])*"`
+	unicode   = `u` + base16 + `{4}|U` + base16 + `{8}`
+	unsigned  = `0x` + base16 + `+`
+	zero      = `0`
 )
 
 // This array contains the set of delimiters that may be used to separate the

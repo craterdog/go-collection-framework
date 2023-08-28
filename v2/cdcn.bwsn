@@ -1,0 +1,73 @@
+!>
+    A formal definition of a document containing a collection using Bali Wirth
+    Syntax Notation™ (BWSN):
+        <https://github.com/bali-nebula/specifications/blob/main/bwsn.bwsn>
+
+    The token names are identified by all CAPITAL characters and the rule names
+    are identified by lowerCamelCase characters. The token and rule definitions
+    have been alphabetized to make it easier to locate specific definitions.
+    The starting rule is "$document".
+<!
+
+$BASE10: "0".."9"
+
+$BASE16: "0".."9" | "a".."f"
+
+$BOOLEAN: "false" | "true"
+
+$COMPLEX: "(" FLOAT "," FLOAT "i" ")"
+
+$DELIMITER: "]" | "[" | ")" | "(" | ":" | ","
+
+$EOL: "\n"
+
+$ESCAPE: '\' ('\' | 'a' | 'b' | 'f' | 'n' | 'r' | 't' | 'v' | '"' | "'" | UNICODE)
+
+$EXPONENT: "E" [SIGN] ORDINAL
+
+$FLOAT: [SIGN] SCALAR | ZERO
+
+$FRACTION: "." <BASE10>
+
+$ORDINAL: "1".."9" {BASE10}
+
+$RUNE: "'" (ESCAPE | ~("'" | EOL)) "'"
+
+$SCALAR: (ZERO FRACTION | ORDINAL [FRACTION]) [EXPONENT]
+
+$SIGN: "+" | "-"
+
+$SPACE: " "
+
+$STRING: '"' (ESCAPE | ~('"' | EOL))* '"'
+
+$UNICODE: 
+    "u" BASE16 BASE16 BASE16 BASE16 |
+    "U" BASE16 BASE16 BASE16 BASE16 BASE16 BASE16 BASE16 BASE16
+
+$ZERO: "0"
+
+$association: key ":" value
+
+$associations: 
+    association {"," association} |
+    EOL <association EOL> |
+    ":"  ! No associations.
+
+$collection: "[" (values | associations) "]" "(" context ")"
+
+$context: "array" | "catalog" | "list" | "map" | "queue" | "set" | "stack"
+
+$document: collection EOF  ! EOF is the end-of-file marker.
+
+$key: primitive
+
+$primitive: BOOLEAN | COMPLEX | FLOAT | INTEGER | NIL | RUNE | STRING
+
+$value: primitive | collection
+
+$values: 
+    value {"," value} |
+    EOL <value EOL> |
+    ! No values.
+

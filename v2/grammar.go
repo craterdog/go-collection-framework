@@ -18,8 +18,6 @@ import (
 // This map captures the syntax rules for collections of Go primitives.
 // This map is useful when creating scanner and parser error messages.
 var grammar = map[string]string{
-	"$BASE02":    `"0".."1"`,
-	"$BASE08":    `"0".."7"`,
 	"$BASE10":    `"0".."9"`,
 	"$BASE16":    `"0".."9" | "a".."f"`,
 	"$BOOLEAN":   `"false" | "true"`,
@@ -31,11 +29,11 @@ var grammar = map[string]string{
 	"$FLOAT":     `[SIGN] SCALAR | ZERO`,
 	"$FRACTION":  `"." <BASE10>`,
 	"$ORDINAL":   `"1".."9" {BASE10}`,
-	"$STRING":    `'"' {RUNE} '"'`,
-	"$RUNE":      `ESCAPE | ~('"' | EOL)`,
+	"$RUNE":      `"'" (ESCAPE | ~("'" | EOL)) "'"`,
 	"$SCALAR":    `(ZERO FRACTION | ORDINAL [FRACTION]) [EXPONENT]`,
 	"$SIGN":      `"+" | "-"`,
 	"$SPACE":     `" "`,
+	"$STRING":    `'"' (ESCAPE | ~('"' | EOL))* '"'`,
 	"$UNICODE": `
     "u" BASE16 BASE16 BASE16 BASE16 |
     "U" BASE16 BASE16 BASE16 BASE16 BASE16 BASE16 BASE16 BASE16`,
@@ -58,7 +56,7 @@ var grammar = map[string]string{
 }
 
 const header = `!>
-    A formal definition of a documents containing a collection using Bali Wirth
+    A formal definition of a document containing a collection using Bali Wirth
     Syntax Notation™ (BWSN):
         <https://github.com/bali-nebula/specifications/blob/main/bwsn.bwsn>
 

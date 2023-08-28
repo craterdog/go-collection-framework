@@ -18,6 +18,20 @@ package collections
 //   - V is any type of entity.
 type Map[K comparable, V Value] map[K]V
 
+// This constructor creates a new catalog from the specified sequence of
+// associations.
+func MapFromSequence[K comparable, V Value](sequence Sequential[Binding[K, V]]) map[K]V {
+	var v = make(map[K]V)
+	var iterator = Iterator(sequence)
+	for iterator.HasNext() {
+		var association = iterator.GetNext()
+		var key = association.GetKey()
+		var value = association.GetValue()
+		v[key] = value
+	}
+	return v
+}
+
 // SEQUENTIAL INTERFACE
 
 // This method determines whether or not this map is empty.

@@ -64,7 +64,7 @@ func TestFormatPrimitives(t *tes.T) {
 	fmt.Println("\nFloat: " + s4)
 
 	var s5 = col.FormatValue(v5)
-	ass.Equal(t, "(1+1i)", s5)
+	ass.Equal(t, "(1.0+1.0i)", s5)
 	fmt.Println("\nComplex: " + s5)
 
 	var s6 = col.FormatValue(v6)

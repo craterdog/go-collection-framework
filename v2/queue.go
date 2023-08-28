@@ -35,6 +35,18 @@ func QueueWithCapacity[V Value](capacity int) QueueLike[V] {
 	return &queue[V]{available: available, values: values}
 }
 
+// This constructor creates a new queue from the specified sequence. The queue
+// uses the default capacity
+func QueueFromSequence[V Value](sequence Sequential[V]) QueueLike[V] {
+	var v = Queue[V]()
+	var iterator = Iterator(sequence)
+	for iterator.HasNext() {
+		var value = iterator.GetNext()
+		v.AddValue(value)
+	}
+	return v
+}
+
 // This function connects the output of the specified input queue with a
 // number of new output queues specified by the size parameter and returns a
 // sequence of the new output queues. Each value added to the input queue will

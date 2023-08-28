@@ -214,29 +214,27 @@ func (v *parser) parseCollection() (Collection, *Token, bool) {
 				"$context")
 			panic(message)
 		}
-		switch collection.(type) {
+		switch sequence := collection.(type) {
 		case Sequential[Value]:
-			var values = collection.(Sequential[Value])
 			switch context {
 			case "array":
-				collection = ArrayFromSequence(values)
+				collection = ArrayFromSequence(sequence)
 			case "list":
-				collection = ListFromSequence(values)
+				collection = ListFromSequence(sequence)
 			case "queue":
-				collection = QueueFromSequence(values)
+				collection = QueueFromSequence(sequence)
 			case "set":
-				collection = SetFromSequence(values)
+				collection = SetFromSequence(sequence)
 			case "stack":
-				collection = StackFromSequence(values)
+				collection = StackFromSequence(sequence)
 			default:
 			}
 		case Sequential[Binding[Key, Value]]:
-			var attributes = collection.(Sequential[Binding[Key, Value]])
 			switch context {
 			case "catalog":
-				collection = CatalogFromSequence(attributes)
+				collection = CatalogFromSequence(sequence)
 			case "map":
-				collection = MapFromSequence(attributes)
+				collection = MapFromSequence(sequence)
 			default:
 			}
 		default:
@@ -385,7 +383,7 @@ func (v *parser) parseAssociations() (Sequential[Binding[Key, Value]], *Token, b
 	if !ok {
 		return associations, token, false
 	}
-	_, token, ok = v.parseEOL()
+	_, _, ok = v.parseEOL()
 	if !ok {
 		associations, token, ok = v.parseInlineAssociations()
 		if !ok {
@@ -544,7 +542,7 @@ func (v *parser) parseValues() (Sequential[Value], *Token, bool) {
 	if !ok {
 		return values, token, false
 	}
-	_, token, ok = v.parseEOL()
+	_, _, ok = v.parseEOL()
 	if !ok {
 		values, token, ok = v.parseInlineValues()
 		if !ok {
@@ -573,9 +571,8 @@ func (v *parser) parseValues() (Sequential[Value], *Token, bool) {
 // This method attempts to parse a boolean primitive. It returns the boolean
 // primitive and whether or not the boolean primitive was successfully parsed.
 func (v *parser) parseBoolean() (bool, *Token, bool) {
-	var token *Token
 	var boolean bool
-	token = v.nextToken()
+	var token = v.nextToken()
 	if token.Type != TokenBoolean {
 		v.backupOne()
 		return boolean, token, false
@@ -588,9 +585,8 @@ func (v *parser) parseBoolean() (bool, *Token, bool) {
 // complex number primitive and whether or not the complex number primitive was
 // successfully parsed.
 func (v *parser) parseComplex() (complex128, *Token, bool) {
-	var token *Token
 	var complex_ complex128
-	token = v.nextToken()
+	var token = v.nextToken()
 	if token.Type != TokenComplex {
 		v.backupOne()
 		return complex_, token, false
@@ -602,8 +598,7 @@ func (v *parser) parseComplex() (complex128, *Token, bool) {
 // This method attempts to parse the type of a collection. It returns the type
 // string and whether or not the type string was successfully parsed.
 func (v *parser) parseContext() (string, *Token, bool) {
-	var token *Token
-	token = v.nextToken()
+	var token = v.nextToken()
 	if token.Type != TokenContext {
 		v.backupOne()
 		return "", token, false
@@ -615,9 +610,8 @@ func (v *parser) parseContext() (string, *Token, bool) {
 // floating point primitive and whether or not the floating point primitive was
 // successfully parsed.
 func (v *parser) parseFloat() (float64, *Token, bool) {
-	var token *Token
 	var float float64
-	token = v.nextToken()
+	var token = v.nextToken()
 	if token.Type != TokenFloat {
 		v.backupOne()
 		return float, token, false
@@ -629,9 +623,8 @@ func (v *parser) parseFloat() (float64, *Token, bool) {
 // This method attempts to parse a integer primitive. It returns the integer
 // primitive and whether or not the integer primitive was successfully parsed.
 func (v *parser) parseInteger() (int64, *Token, bool) {
-	var token *Token
 	var integer int64
-	token = v.nextToken()
+	var token = v.nextToken()
 	if token.Type != TokenInteger {
 		v.backupOne()
 		return integer, token, false
@@ -643,8 +636,7 @@ func (v *parser) parseInteger() (int64, *Token, bool) {
 // This method attempts to parse a nil primitive. It returns the nil primitive
 // and whether or not the nil primitive was successfully parsed.
 func (v *parser) parseNil() (Value, *Token, bool) {
-	var token *Token
-	token = v.nextToken()
+	var token = v.nextToken()
 	if token.Type != TokenNil {
 		v.backupOne()
 		return nil, token, false
@@ -655,10 +647,9 @@ func (v *parser) parseNil() (Value, *Token, bool) {
 // This method attempts to parse a rune. It returns the rune and whether or not
 // the rune was successfully parsed.
 func (v *parser) parseRune() (rune, *Token, bool) {
-	var token *Token
 	var rune_ rune
 	var size int
-	token = v.nextToken()
+	var token = v.nextToken()
 	if token.Type != TokenRune {
 		v.backupOne()
 		return rune_, token, false
@@ -678,9 +669,8 @@ func (v *parser) parseRune() (rune, *Token, bool) {
 // This method attempts to parse a string primitive. It returns the string
 // primitive and whether or not the string primitive was successfully parsed.
 func (v *parser) parseString() (string, *Token, bool) {
-	var token *Token
 	var string_ string
-	token = v.nextToken()
+	var token = v.nextToken()
 	if token.Type != TokenString {
 		v.backupOne()
 		return string_, token, false
@@ -695,9 +685,8 @@ func (v *parser) parseString() (string, *Token, bool) {
 // unsigned integer primitive and whether or not the unsigned integer primitive
 // was successfully parsed.
 func (v *parser) parseUnsigned() (uint64, *Token, bool) {
-	var token *Token
 	var unsigned uint64
-	token = v.nextToken()
+	var token = v.nextToken()
 	if token.Type != TokenUnsigned {
 		v.backupOne()
 		return unsigned, token, false

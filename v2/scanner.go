@@ -511,11 +511,3 @@ func bytesToStrings(bytes [][]byte) []string {
 	}
 	return strings
 }
-
-func stringsToBytes(strings []string) [][]byte {
-	var bytes = make([][]byte, len(strings))
-	for index, s := range strings {
-		bytes[index] = []byte(s)
-	}
-	return bytes
-}

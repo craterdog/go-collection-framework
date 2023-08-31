@@ -127,20 +127,20 @@ func (v *scanner) scanTokens() {
 func (v *scanner) scanToken() bool {
 	v.skipSpaces()
 	switch {
-	case v.foundEOL():
 	case v.foundBoolean():
 	case v.foundComplex():
 	case v.foundContext():
 	case v.foundDelimiter():
+	case v.foundEOF():
+		// We are at the end of the source array.
+		return false
+	case v.foundEOL():
 	case v.foundFloat():
 	case v.foundNil():
 	case v.foundRune():
 	case v.foundString():
 	case v.foundUnsigned():
 	case v.foundInteger():  // Must be after all other numeric types.
-	case v.foundEOF():      // Must be last.
-		// We are at the end of the source array.
-		return false
 	default:
 		// No valid token was found.
 		v.foundError()
@@ -259,27 +259,37 @@ func (v *scanner) foundError() {
 }
 
 // This method adds an EOF token with the current scanner information to the token
-// channel. It returns true if an EOF token was found.
+// channel. It returns true if an EOF marker was found.
 func (v *scanner) foundEOF() bool {
-	if v.nextByte == len(v.source) {
-		v.emitToken(TokenEOF)
-		return true
+	// The last byte in a POSIX standard file must be an EOL character.
+	var s = v.source[v.nextByte:]
+	if !byt.HasPrefix(s, []byte(EOL)) {
+		return false
 	}
-	return false
+	v.nextByte++
+	v.line++
+	// Now make sure there are no more bytes.
+	if v.nextByte != len(v.source) {
+		v.nextByte--
+		v.line--
+		return false
+	}
+	v.emitToken(TokenEOF)
+	return true
 }
 
 // This method adds an EOL token with the current scanner information to the token
 // channel. It returns true if an EOL token was found.
 func (v *scanner) foundEOL() bool {
 	var s = v.source[v.nextByte:]
-	if byt.HasPrefix(s, []byte(EOL)) {
-		v.nextByte++
-		v.emitToken(TokenEOL)
-		v.line++
-		v.position = 1
-		return true
+	if !byt.HasPrefix(s, []byte(EOL)) {
+		return false
 	}
-	return false
+	v.nextByte++
+	v.emitToken(TokenEOL)
+	v.line++
+	v.position = 1
+	return true
 }
 
 // This method adds a floating point token with the current scanner information
@@ -466,8 +476,11 @@ func scanUnsigned(v []byte) []string {
 
 // CONSTANT DEFINITIONS
 
-// This is the POSIX standard end-of-line character constant.
-const EOL = "\n"
+// These constants define the POSIX standard representations.
+const (
+	EOF = "\n"  // Must be last byte in a file.
+	EOL = "\n"
+)
 
 // These constant definitions capture regular expression subpatterns.
 const (

@@ -19,43 +19,37 @@ import (
 
 // PARSER INTERFACE
 
-// This function parses the specified document retrieved from a POSIX compliant
-// file and returns the corresponding Go collection that was used to generate
-// the document using the collection formatting capabilities.
-// A POSIX compliant file must end with a EOL character before the EOF marker.
-func ParseDocument(document []byte) Collection {
+// This function parses the specified document source retrieved from a POSIX
+// compliant file and returns the corresponding collection that was used to
+// generate the document using the collection formatting capabilities.
+// A POSIX compliant file must end with an EOF marker.
+func ParseDocument(source []byte) Collection {
 	var ok bool
 	var token *Token
 	var collection Collection
-	var parser = Parser(document)
-	collection, token, ok = parser.parseCollection()
-	if ok {
-		_, token, ok = parser.parseEOL() // Required by POSIX.
-		if !ok {
-			var message = parser.formatError(token)
-			message += generateGrammar("EOL",
-				"$document",
-				"$collection",
-				"$values",
-				"$associations",
-				"$context")
-			panic(message)
-		}
-		_, token, ok = parser.parseEOF()
-		if !ok {
-			var message = parser.formatError(token)
-			message += generateGrammar("EOF",
-				"$document",
-				"$collection",
-				"$values",
-				"$associations",
-				"$context")
-			panic(message)
-		}
-	} else {
-		var message = parser.formatError(token)
+	var tokens = make(chan Token, 256)
+	Scanner(source, tokens) // Starts scanning in a separate go routine.
+	var p = &parser{
+		source: source,
+		next:   StackWithCapacity[*Token](4),
+		tokens: tokens,
+	}
+	collection, token, ok = p.parseCollection()
+	if !ok {
+		var message = p.formatError(token)
 		message += generateGrammar("collection",
-			"$document",
+			"$source",
+			"$collection",
+			"$values",
+			"$associations",
+			"$context")
+		panic(message)
+	}
+	_, token, ok = p.parseEOF()
+	if !ok {
+		var message = p.formatError(token)
+		message += generateGrammar("EOF",
+			"$source",
 			"$collection",
 			"$values",
 			"$associations",
@@ -68,23 +62,11 @@ func ParseDocument(document []byte) Collection {
 // This function parses a source string rather than the bytes from a document
 // file. It is useful when parsing strings within source code.
 func ParseCollection(source string) Collection {
-	var document = []byte(source + EOL) // Append the POSIX compliant EOL character.
+	var document = []byte(source + EOF) // Append the POSIX compliant EOF marker.
 	return ParseDocument(document)
 }
 
 // PARSER IMPLEMENTATION
-
-// This constructor creates a new parser using the specified byte array.
-func Parser(source []byte) *parser {
-	var tokens = make(chan Token, 256)
-	Scanner(source, tokens) // Starts scanning in a go routine.
-	var p = &parser{
-		source: source,
-		next:   StackWithCapacity[*Token](4),
-		tokens: tokens,
-	}
-	return p
-}
 
 // This type defines the structure and methods for the parser agent.
 type parser struct {

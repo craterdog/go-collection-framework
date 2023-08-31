@@ -202,7 +202,7 @@ func (v *set[V]) RemoveAll() {
 // GO INTERFACE
 
 func (v *set[V]) String() string {
-	return FormatValue(v)
+	return FormatCollection(v)
 }
 
 // PRIVATE INTERFACE

@@ -131,5 +131,5 @@ func (v Map[K, V]) RemoveAll() {
 // GO INTERFACE
 
 func (v Map[K, V]) String() string {
-	return FormatValue(v)
+	return FormatCollection(v)
 }

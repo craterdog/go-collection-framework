@@ -101,5 +101,5 @@ func (v *stack[V]) RemoveAll() {
 // GO INTERFACE
 
 func (v *stack[V]) String() string {
-	return FormatValue(v)
+	return FormatCollection(v)
 }

@@ -49,7 +49,7 @@ func (v *association[K, V]) SetValue(value V) {
 
 // This method returns a canonical string for this association.
 func (v *association[K, V]) String() string {
-	return FormatValue(v)
+	return FormatAssociation(v)
 }
 
 // CATALOG IMPLEMENTATION
@@ -241,5 +241,5 @@ func (v *catalog[K, V]) ShuffleValues() {
 // GO INTERFACE
 
 func (v *catalog[K, V]) String() string {
-	return FormatValue(v)
+	return FormatCollection(v)
 }

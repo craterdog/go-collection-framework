@@ -236,7 +236,7 @@ func (v *list[V]) ShuffleValues() {
 // GO INTERFACE
 
 func (v *list[V]) String() string {
-	return FormatValue(v)
+	return FormatCollection(v)
 }
 
 // PRIVATE INTERFACE

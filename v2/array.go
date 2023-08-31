@@ -89,7 +89,7 @@ func (v Array[V]) SetValues(index int, values Sequential[V]) {
 
 // This method is used by Go to generate a string from an array.
 func (v Array[V]) String() string {
-	return FormatValue(v)
+	return FormatCollection(v)
 }
 
 // This method normalizes an index to match the Go (zero based) indexing. The

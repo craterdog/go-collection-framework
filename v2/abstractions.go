@@ -176,16 +176,6 @@ type Ratcheted[V Value] interface {
 	GetNext() V
 }
 
-// This interface defines the methods supported by all canonical agents that can
-// format any value in a standard way.
-type Canonical interface {
-	GetIndentation() int
-	FormatValue(value Value)
-	AppendString(s string)
-	AppendNewline()
-	GetResult() string
-}
-
 // This interface defines the methods supported by all discerning agent types
 // that can compare and rank two values.
 type Discerning interface {
@@ -286,11 +276,6 @@ type StackLike[V Value] interface {
 // This interface defines the methods supported by all iterator-like types.
 type IteratorLike[V Value] interface {
 	Ratcheted[V]
-}
-
-// This interface defines the methods supported by all sorter-like types.
-type FormatterLike interface {
-	Canonical
 }
 
 // This interface defines the methods supported by all collator-like types.

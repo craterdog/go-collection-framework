@@ -19,32 +19,26 @@ import (
 
 // FORMATTER INTERFACE
 
-// This constructor creates a new instance of a formatter that can be used to
-// format any value using the specified number of levels of indentation.
-func Formatter(indentation int) FormatterLike {
-	return &formatter{indentation: indentation}
+// This function returns a string containing the canonical format for the
+// specified collection.
+func FormatAssociation(association Value) string {
+	var v = &formatter{}
+	v.formatAssociation(ref.ValueOf(association))
+	return v.getResult()
 }
 
 // This function returns a string containing the canonical format for the
-// specified value.
-func FormatValue(value Value) string {
-	var v = Formatter(0)
-	v.FormatValue(value)
-	return v.GetResult()
-}
-
-// This function returns a string containing the canonical format for the
-// specified value indented the specified number of levels.
-func FormatValueWithIndentation(value Value, indentation int) string {
-	var v = Formatter(indentation)
-	v.FormatValue(value)
-	return v.GetResult()
+// specified collection.
+func FormatCollection(collection Collection) string {
+	var v = &formatter{}
+	v.formatValue(ref.ValueOf(collection))
+	return v.getResult()
 }
 
 // This function returns the bytes containing the canonical format for the
-// specified value including the POSIX standard trailing EOL.
-func FormatDocument(value Value) []byte {
-	var s = FormatValue(value) + EOL
+// specified collection including the POSIX standard EOF marker.
+func FormatDocument(collection Collection) []byte {
+	var s = FormatCollection(collection) + EOF
 return []byte(s)
 }
 
@@ -61,32 +55,20 @@ type formatter struct {
 	result      sts.Builder
 }
 
-// This method returns the number of levels that each line is indented in the
-// resulting canonical string.
-func (v *formatter) GetIndentation() int {
-	return v.indentation
-}
-
-// This method appends the canonical string for the specified value to the
-// result of the formatter.
-func (v *formatter) FormatValue(value Value) {
-	v.formatValue(ref.ValueOf(value))
-}
-
 // This method returns the canonically formatted string result.
-func (v *formatter) GetResult() string {
+func (v *formatter) getResult() string {
 	var result = v.result.String()
 	v.result.Reset()
 	return result
 }
 
 // This method appends the specified string to the result.
-func (v *formatter) AppendString(s string) {
+func (v *formatter) appendString(s string) {
 	v.result.WriteString(s)
 }
 
 // This method appends a properly indented newline to the result.
-func (v *formatter) AppendNewline() {
+func (v *formatter) appendNewline() {
 	var separator = "\n"
 	var levels = v.depth + v.indentation
 	for level := 0; level < levels; level++ {
@@ -130,8 +112,8 @@ func (v *formatter) formatValue(value ref.Value) {
 			// The value is a collection.
 			v.formatCollection(value)
 		} else if value.MethodByName("GetKey").IsValid() {
-			// The value is an attribute.
-			v.formatAttribute(value)
+			// The value is an association.
+			v.formatAssociation(value)
 		} else {
 			// The value is a pointer to the value to be formatted.
 			value = value.Elem()
@@ -154,28 +136,28 @@ func (v *formatter) formatValue(value ref.Value) {
 // This private method appends the nil string for the specified value to the
 // result.
 func (v *formatter) formatNil(r ref.Value) {
-	v.AppendString("<nil>")
+	v.appendString("<nil>")
 }
 
 // This private method appends the name of the specified boolean value to the
 // result.
 func (v *formatter) formatBoolean(r ref.Value) {
 	var b = r.Bool()
-	v.AppendString(stc.FormatBool(b))
+	v.appendString(stc.FormatBool(b))
 }
 
 // This private method appends the base 10 string for the specified integer
 // value to the result.
 func (v *formatter) formatInteger(r ref.Value) {
 	var i = r.Int()
-	v.AppendString(stc.FormatInt(int64(i), 10))
+	v.appendString(stc.FormatInt(int64(i), 10))
 }
 
 // This private method appends the base 16 string for the specified unsigned
 // integer value to the result.
 func (v *formatter) formatUnsigned(r ref.Value) {
 	var u = r.Uint()
-	v.AppendString("0x" + stc.FormatUint(uint64(u), 16))
+	v.appendString("0x" + stc.FormatUint(uint64(u), 16))
 }
 
 // This private method appends the base 10 string for the specified floating
@@ -186,7 +168,7 @@ func (v *formatter) formatFloat(r ref.Value) {
 	if !sts.Contains(str, ".") && !sts.Contains(str, "E") {
 		str += ".0"
 	}
-	v.AppendString(str)
+	v.appendString(str)
 }
 
 // This private method appends the base 10 string for the specified complex
@@ -195,43 +177,43 @@ func (v *formatter) formatComplex(r ref.Value) {
 	var complex_ = r.Complex()
 	var real_ = ref.ValueOf(real(complex_))
 	var imag_ = ref.ValueOf(imag(complex_))
-	v.AppendString("(")
+	v.appendString("(")
 	v.formatFloat(real_)
 	if imag_.Float() >= 0.0 {
-		v.AppendString("+")
+		v.appendString("+")
 	}
 	v.formatFloat(imag_)
-	v.AppendString("i)")
+	v.appendString("i)")
 }
 
 // This private method appends the string for the specified rune value to the
 // result.
 func (v *formatter) formatRune(r ref.Value) {
 	var rune_ = r.Int()
-	v.AppendString(stc.QuoteRune(int32(rune_)))
+	v.appendString(stc.QuoteRune(int32(rune_)))
 }
 
 // This private method appends the string for the specified string value to the
 // result.
 func (v *formatter) formatString(r ref.Value) {
 	var string_ = r.String()
-	v.AppendString(stc.Quote(string_))
+	v.appendString(stc.Quote(string_))
 }
 
 // This private method appends the string for the specified array of values to
 // the result.
 func (v *formatter) formatArray(r ref.Value, typ string) {
 	var size = r.Len()
-	v.AppendString("[")
+	v.appendString("[")
 	if size > 0 {
 		if v.depth+1 > maximumDepth {
 			// Truncate the recursion.
-			v.AppendString("...")
+			v.appendString("...")
 		} else {
 			for i := 0; i < size; i++ {
 				var value ref.Value
 				v.depth++
-				v.AppendNewline()
+				v.appendNewline()
 				if typ == "stack" {
 					// Format values in reverse order.
 					value = r.Index(size - i - 1)
@@ -242,16 +224,16 @@ func (v *formatter) formatArray(r ref.Value, typ string) {
 				v.formatValue(value)
 				v.depth--
 			}
-			v.AppendNewline()
+			v.appendNewline()
 		}
 	} else {
 		if typ == "catalog" {
-			v.AppendString(":") // The array of attributes is empty: [:]
+			v.appendString(":") // The array of associations is empty: [:]
 		} else {
-			v.AppendString(" ") // The array of values is empty: [ ]
+			v.appendString(" ") // The array of values is empty: [ ]
 		}
 	}
-	v.AppendString("](" + typ + ")")
+	v.appendString("](" + typ + ")")
 }
 
 // This private method appends the string for the specified map of key-value
@@ -259,36 +241,36 @@ func (v *formatter) formatArray(r ref.Value, typ string) {
 func (v *formatter) formatMap(r ref.Value) {
 	var keys = r.MapKeys()
 	var size = len(keys)
-	v.AppendString("[")
+	v.appendString("[")
 	if size > 0 {
 		if v.depth+1 > maximumDepth {
 			// Truncate the recursion.
-			v.AppendString("...")
+			v.appendString("...")
 		} else {
 			for i := 0; i < size; i++ {
 				v.depth++
-				v.AppendNewline()
+				v.appendNewline()
 				var key = keys[i]
 				var value = r.MapIndex(key)
 				v.formatValue(key)
-				v.AppendString(": ")
+				v.appendString(": ")
 				v.formatValue(value)
 				v.depth--
 			}
-			v.AppendNewline()
+			v.appendNewline()
 		}
 	} else {
-		v.AppendString(":") // The map is empty: [:]
+		v.appendString(":") // The map is empty: [:]
 	}
-	v.AppendString("](map)")
+	v.appendString("](map)")
 }
 
 // This private method appends the string for the specified catalog of
 // key-value pairs to the result. It uses recursion to format each pair.
-func (v *formatter) formatAttribute(r ref.Value) {
+func (v *formatter) formatAssociation(r ref.Value) {
 	var key = r.MethodByName("GetKey").Call([]ref.Value{})[0]
 	v.formatValue(key)
-	v.AppendString(": ")
+	v.appendString(": ")
 	var value = r.MethodByName("GetValue").Call([]ref.Value{})[0]
 	v.formatValue(value)
 }

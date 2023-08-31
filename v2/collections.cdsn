@@ -1,12 +1,12 @@
 !>
-    A formal definition of a document containing a collection using Bali Wirth
-    Syntax Notation™ (BWSN):
-        <https://github.com/bali-nebula/specifications/blob/main/bwsn.bwsn>
+    A formal definition of a document containing a collection using Crater Dog
+    Syntax Notation™ (CDSN):
+        <https://github.com/craterdog/go-cdsn-validation/wiki>
 
     The token names are identified by all CAPITAL characters and the rule names
     are identified by lowerCamelCase characters. The token and rule definitions
     have been alphabetized to make it easier to locate specific definitions.
-    The starting rule is "$document".
+    The starting rule is "$source".
 <!
 
 $BASE10: "0".."9"
@@ -62,11 +62,11 @@ $associations:
 
 $collection: "[" (values | associations) "]" "(" CONTEXT ")"
 
-$document: collection EOF  ! EOF is the end-of-file marker.
-
 $key: primitive
 
 $primitive: BOOLEAN | COMPLEX | FLOAT | INTEGER | NIL | RUNE | STRING
+
+$source: collection EOF  ! EOF is the end-of-file marker.
 
 $value: primitive | collection
 

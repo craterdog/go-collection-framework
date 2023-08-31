@@ -284,5 +284,5 @@ func (v *queue[V]) CloseQueue() {
 // GO INTERFACE
 
 func (v *queue[V]) String() string {
-	return FormatValue(v)
+	return FormatCollection(v)
 }

@@ -17,10 +17,10 @@ import (
 	tes "testing"
 )
 
-const cdcn = "./cdcn.bwsn"
+const filename = "./collections.cdsn"
 
 func TestGenerateGrammar(t *tes.T) {
-	var err = osx.WriteFile(cdcn, []byte(bal.FormatGrammar()), 0644)
+	var err = osx.WriteFile(filename, []byte(bal.FormatGrammar()), 0644)
 	if err != nil {
 		var message = fmt.Sprintf("Could not create the bwsn file: %v.", err)
 		panic(message)

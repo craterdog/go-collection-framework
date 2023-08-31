@@ -37,69 +37,30 @@ var v6 rune = '☺'
 var v7 string = "Hello World!"
 var v8 = []int{1, 2, 3}
 
-func TestFormatWithIndentation(t *tes.T) {
-	var formatter = col.Formatter(1)
-	ass.Equal(t, 1, formatter.GetIndentation())
-}
-
-func TestFormatPrimitives(t *tes.T) {
-	var s0 = col.FormatValue(nil)
-	ass.Equal(t, "<nil>", s0)
-	fmt.Println("\nNil: " + s0)
-
-	var s1 = col.FormatValue(v1)
-	ass.Equal(t, "true", s1)
-	fmt.Println("\nBoolean: " + s1)
-
-	var s2 = col.FormatValue(v2)
-	ass.Equal(t, "0xa", s2)
-	fmt.Println("\nUnsigned: " + s2)
-
-	var s3 = col.FormatValue(v3)
-	ass.Equal(t, "42", s3)
-	fmt.Println("\nInteger: " + s3)
-
-	var s4 = col.FormatValue(v4)
-	ass.Equal(t, "0.125", s4)
-	fmt.Println("\nFloat: " + s4)
-
-	var s5 = col.FormatValue(v5)
-	ass.Equal(t, "(1.0+1.0i)", s5)
-	fmt.Println("\nComplex: " + s5)
-
-	var s6 = col.FormatValue(v6)
-	ass.Equal(t, "'☺'", s6)
-	fmt.Println("\nRune: " + s6)
-
-	var s7 = col.FormatValue(v7)
-	ass.Equal(t, "\"Hello World!\"", s7)
-	fmt.Println("\nString: " + s7)
-}
-
 func TestFormatEmptyArray(t *tes.T) {
 	var array = []any{}
-	var s = col.FormatValue(array)
+	var s = col.FormatCollection(array)
 	ass.Equal(t, "[ ](array)", s)
 	fmt.Println("\nEmpty Array: " + s)
 }
 
 func TestFormatArrayOfAny(t *tes.T) {
 	var array = []any{v1, v2, v3, v4, v5, v6, v7, v8}
-	var s = col.FormatValue(array)
+	var s = col.FormatCollection(array)
 	ass.Equal(t, "(array)", s[len(s)-7:])
 	fmt.Println("\nArray of Any: " + s)
 }
 
 func TestFormatArrayOfIntegers(t *tes.T) {
 	var array = []int{1, 2, 3, 4}
-	var s = col.FormatValue(array)
+	var s = col.FormatCollection(array)
 	ass.Equal(t, "(array)", s[len(s)-7:])
 	fmt.Println("\nArray of Integers: " + s)
 }
 
 func TestFormatEmptyMap(t *tes.T) {
 	var mapp = map[any]any{}
-	var s = col.FormatValue(mapp)
+	var s = col.FormatCollection(mapp)
 	ass.Equal(t, "[:](map)", s)
 	fmt.Println("\nEmpty Map: " + s)
 }
@@ -114,7 +75,7 @@ func TestFormatMapOfAnyToAny(t *tes.T) {
 		k6: v6,
 		k7: v7,
 		k8: v8}
-	var s = col.FormatValue(mapp)
+	var s = col.FormatCollection(mapp)
 	ass.Equal(t, "(map)", s[len(s)-5:])
 	fmt.Println("\nMap of Any to Any: " + s)
 }
@@ -124,21 +85,21 @@ func TestFormatMapOfStringToInteger(t *tes.T) {
 		"first":  1,
 		"second": 2,
 		"third":  3}
-	var s = col.FormatValue(mapp)
+	var s = col.FormatCollection(mapp)
 	ass.Equal(t, "(map)", s[len(s)-5:])
 	fmt.Println("\nMap of String to Integer: " + s)
 }
 
 func TestFormatEmptyList(t *tes.T) {
 	var list = col.List[any]()
-	var s = col.FormatValue(list)
+	var s = col.FormatCollection(list)
 	ass.Equal(t, "[ ](list)", s)
 	fmt.Println("\nEmpty List: " + s)
 }
 
 func TestFormatListOfAny(t *tes.T) {
 	var list = col.ListFromArray[any]([]any{v1, v2, v3, v4, v5, v6, v7, v8})
-	var s = col.FormatValue(list)
+	var s = col.FormatCollection(list)
 	ass.Equal(t, s, fmt.Sprintf("%s", list))
 	ass.Equal(t, "(list)", s[len(s)-6:])
 	fmt.Println("\nList of Any: " + s)
@@ -146,13 +107,13 @@ func TestFormatListOfAny(t *tes.T) {
 
 func TestFormatListOfBoolean(t *tes.T) {
 	var list = col.ListFromArray[bool]([]bool{k1, v1})
-	var s = col.FormatValue(list)
+	var s = col.FormatCollection(list)
 	fmt.Println("\nList of Boolean: " + s)
 }
 
 func TestFormatSetOfAny(t *tes.T) {
 	var set = col.SetFromArray[any]([]any{v1, v2, v3, v4, v5, v6, v7, v8})
-	var s = col.FormatValue(set)
+	var s = col.FormatCollection(set)
 	ass.Equal(t, s, fmt.Sprintf("%s", set))
 	ass.Equal(t, "(set)", s[len(s)-5:])
 	fmt.Println("\nSet of Any: " + s)
@@ -162,7 +123,7 @@ func TestFormatSetOfSet(t *tes.T) {
 	var set1 = col.SetFromArray[any]([]any{v1, v2, v3, v4, v5, v6, v7, v8})
 	var set2 = col.SetFromArray[any]([]any{k1, k2, k3, k4, k5, k6, k7, k8})
 	var set = col.SetFromArray[col.SetLike[any]]([]col.SetLike[any]{set1, set2})
-	var s = col.FormatValue(set)
+	var s = col.FormatCollection(set)
 	fmt.Println("\nSet of Set: " + s)
 }
 
@@ -175,7 +136,7 @@ func TestFormatStackOfAny(t *tes.T) {
 	stack.AddValue(v5)
 	stack.AddValue(v6)
 	stack.AddValue(v7)
-	var s = col.FormatValue(stack)
+	var s = col.FormatCollection(stack)
 	ass.Equal(t, s, fmt.Sprintf("%s", stack))
 	ass.Equal(t, "(stack)", s[len(s)-7:])
 	fmt.Println("\nStack: " + s)
@@ -190,28 +151,15 @@ func TestFormatQueueOfAny(t *tes.T) {
 	queue.AddValue(v5)
 	queue.AddValue(v6)
 	queue.AddValue(v7)
-	var s = col.FormatValue(queue)
+	var s = col.FormatCollection(queue)
 	ass.Equal(t, s, fmt.Sprintf("%s", queue))
 	ass.Equal(t, "(queue)", s[len(s)-7:])
 	fmt.Println("\nQueue: " + s)
 }
 
-func TestFormatAssociationOfAnyToAny(t *tes.T) {
-	var association = col.Association[any, any]("foo", 5)
-	var s = col.FormatValue(association)
-	ass.Equal(t, s, fmt.Sprintf("%s", association))
-	fmt.Println("\nAssociation of Any to Any: " + s)
-}
-
-func TestFormatAssociationOfStringToInteger(t *tes.T) {
-	var association = col.Association[string, int]("bar", 42)
-	var s = col.FormatValue(association)
-	fmt.Println("\nAssociation of String to Integer: " + s)
-}
-
 func TestFormatEmptyCatalog(t *tes.T) {
 	var catalog = col.Catalog[any, any]()
-	var s = col.FormatValue(catalog)
+	var s = col.FormatCollection(catalog)
 	ass.Equal(t, "[:](catalog)", s)
 	fmt.Println("\nEmpty Catalog: " + s)
 }
@@ -225,7 +173,7 @@ func TestFormatCatalogOfAnyToAny(t *tes.T) {
 	catalog.SetValue(k5, v5)
 	catalog.SetValue(k6, v6)
 	catalog.SetValue(k7, v7)
-	var s = col.FormatValue(catalog)
+	var s = col.FormatCollection(catalog)
 	ass.Equal(t, s, fmt.Sprintf("%s", catalog))
 	ass.Equal(t, "(catalog)", s[len(s)-9:])
 	fmt.Println("\nCatalog: " + s)
@@ -240,7 +188,7 @@ func TestFormatCatalogOfStringToAny(t *tes.T) {
 	catalog.SetValue("key5", v5)
 	catalog.SetValue("key6", v6)
 	catalog.SetValue("key7", v7)
-	var s = col.FormatValue(catalog)
+	var s = col.FormatCollection(catalog)
 	fmt.Println("\nCatalog of String to Any: " + s)
 }
 
@@ -253,7 +201,7 @@ func TestFormatCatalogOfStringToInteger(t *tes.T) {
 	catalog.SetValue("key5", 5)
 	catalog.SetValue("key6", 6)
 	catalog.SetValue("key7", 7)
-	var s = col.FormatValue(catalog)
+	var s = col.FormatCollection(catalog)
 	fmt.Println("\nCatalog of String to Integer: " + s)
 }
 
@@ -266,5 +214,5 @@ func TestFormatInvalidType(t *tes.T) {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
-	col.FormatValue(s) // This should panic.
+	col.FormatCollection(s) // This should panic.
 }

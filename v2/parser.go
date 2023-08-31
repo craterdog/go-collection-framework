@@ -141,16 +141,17 @@ func (v *parser) parseAssociation() (AssociationLike[Key, Value], *Token, bool) 
 	var token *Token
 	var key Key
 	var value Value
+	var association AssociationLike[Key, Value]
 	key, token, ok = v.parsePrimitive()
 	if !ok {
 		// This is not an association.
-		return nil, token, false
+		return association, token, false
 	}
 	_, token, ok = v.parseDelimiter(":")
 	if !ok {
 		// This is not an association.
 		v.backupOne() // Put back the primitive key token.
-		return nil, token, false
+		return association, token, false
 	}
 	// This must be an association.
 	value, token, ok = v.parseValue()
@@ -162,7 +163,7 @@ func (v *parser) parseAssociation() (AssociationLike[Key, Value], *Token, bool) 
 			"$value")
 		panic(message)
 	}
-	var association = Association(key, value)
+	association = Association[Key, Value](key, value)
 	return association, token, true
 }
 

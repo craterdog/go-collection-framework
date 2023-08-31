@@ -150,7 +150,7 @@ func (v *scanner) scanToken() bool {
 }
 
 // This method scans through any spaces in the source array and sets the next
-// byte index to the next non-white-space rune.
+// byte index to the next non-space rune.
 func (v *scanner) skipSpaces() {
 	if v.nextByte < len(v.source) {
 		for {
@@ -249,8 +249,8 @@ func (v *scanner) foundDelimiter() bool {
 	return false
 }
 
-// This method adds an error token with the current scanner information to the token
-// channel.
+// This method adds an error token with the current scanner information to the
+// token channel.
 func (v *scanner) foundError() {
 	var bytes = v.source[v.nextByte:]
 	var _, width = utf.DecodeRune(bytes)
@@ -258,8 +258,8 @@ func (v *scanner) foundError() {
 	v.emitToken(TokenError)
 }
 
-// This method adds an EOF token with the current scanner information to the token
-// channel. It returns true if an EOF marker was found.
+// This method adds an EOF token with the current scanner information to the
+// token channel. It returns true if an EOF marker was found.
 func (v *scanner) foundEOF() bool {
 	// The last byte in a POSIX standard file must be an EOL character.
 	var s = v.source[v.nextByte:]
@@ -278,8 +278,8 @@ func (v *scanner) foundEOF() bool {
 	return true
 }
 
-// This method adds an EOL token with the current scanner information to the token
-// channel. It returns true if an EOL token was found.
+// This method adds an EOL token with the current scanner information to the
+// token channel. It returns true if an EOL token was found.
 func (v *scanner) foundEOL() bool {
 	var s = v.source[v.nextByte:]
 	if !byt.HasPrefix(s, []byte(EOL)) {

@@ -140,7 +140,7 @@ func (v *scanner) scanToken() bool {
 	case v.foundRune():
 	case v.foundString():
 	case v.foundUnsigned():
-	case v.foundInteger():  // Must be after all other numeric types.
+	case v.foundInteger(): // Must be after all other numeric types.
 	default:
 		// No valid token was found.
 		v.foundError()
@@ -478,32 +478,32 @@ func scanUnsigned(v []byte) []string {
 
 // These constants define the POSIX standard representations.
 const (
-	EOF = "\n"  // Must be last byte in a file.
+	EOF = "\n" // Must be last byte in a file.
 	EOL = "\n"
 )
 
 // These constant definitions capture regular expression subpatterns.
 const (
-	base10    = `[0-9]`
-	base16    = `[0-9a-f]`
-	boolean   = `false|true`
-	complex_  = `\((` + float + `)` + sign + `(` + float + `)i\)`
-	context   = `array|catalog|list|map|queue|set|stack`
-	eol       = `\n`
-	escape    = `\\(?:(?:` + unicode + `)|[abfnrtv'"\\])`
-	exponent  = `[eE]` + sign + ordinal
-	float     = sign + `?(?:` + scalar + `)(?:` + exponent + `)?`
-	fraction  = `\.` + base10 + `+`
-	integer   = zero + `|` + sign + `?` + ordinal
-	nil_      = `nil`
-	ordinal   = `[1-9][0-9]*`
-	rune_     = `'(` + escape + `|[^'` + eol + `])'`
-	scalar    = `(?:` + zero + `|` + ordinal + `)` + fraction
-	sign      = `[+-]`
-	string_   = `"(` + escape + `|[^"` + eol + `])*"`
-	unicode   = `u` + base16 + `{4}|U` + base16 + `{8}`
-	unsigned  = `0x` + base16 + `+`
-	zero      = `0`
+	base10   = `[0-9]`
+	base16   = `[0-9a-f]`
+	boolean  = `false|true`
+	complex_ = `\((` + float + `)` + sign + `(` + float + `)i\)`
+	context  = `array|catalog|list|map|queue|set|stack`
+	eol      = `\n`
+	escape   = `\\(?:(?:` + unicode + `)|[abfnrtv'"\\])`
+	exponent = `[eE]` + sign + ordinal
+	float    = sign + `?(?:` + scalar + `)(?:` + exponent + `)?`
+	fraction = `\.` + base10 + `+`
+	integer  = zero + `|` + sign + `?` + ordinal
+	nil_     = `nil`
+	ordinal  = `[1-9][0-9]*`
+	rune_    = `'(` + escape + `|[^'` + eol + `])'`
+	scalar   = `(?:` + zero + `|` + ordinal + `)` + fraction
+	sign     = `[+-]`
+	string_  = `"(` + escape + `|[^"` + eol + `])*"`
+	unicode  = `u` + base16 + `{4}|U` + base16 + `{8}`
+	unsigned = `0x` + base16 + `+`
+	zero     = `0`
 )
 
 // This array contains the set of delimiters that may be used to separate the

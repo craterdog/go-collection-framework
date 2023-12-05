@@ -39,18 +39,18 @@ var grammar = map[string]string{
 	"$UNICODE": `
     "u" BASE16 BASE16 BASE16 BASE16 |
     "U" BASE16 BASE16 BASE16 BASE16 BASE16 BASE16 BASE16 BASE16`,
-	"$UNSIGNED":     `"0x" <BASE16>`,
-	"$ZERO":         `"0"`,
-	"$association":  `key ":" value`,
+	"$UNSIGNED":    `"0x" <BASE16>`,
+	"$ZERO":        `"0"`,
+	"$association": `key ":" value`,
 	"$associations": `
     association {"," association} |
     EOL <association EOL> |
     ":"  ! No associations.`,
 	"$collection": `"[" (values | associations) "]" "(" CONTEXT ")"`,
-	"$key":       `primitive`,
-	"$primitive": `BOOLEAN | COMPLEX | FLOAT | INTEGER | NIL | RUNE | STRING`,
-	"$source":  `collection EOF  ! EOF is the end-of-file marker.`,
-	"$value":     `primitive | collection`,
+	"$key":        `primitive`,
+	"$primitive":  `BOOLEAN | COMPLEX | FLOAT | INTEGER | NIL | RUNE | STRING`,
+	"$source":     `collection EOF  ! EOF is the end-of-file marker.`,
+	"$value":      `primitive | collection`,
 	"$values": `
     value {"," value} |
     EOL <value EOL> |

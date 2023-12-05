@@ -39,7 +39,7 @@ func FormatCollection(collection Collection) string {
 // specified collection including the POSIX standard EOF marker.
 func FormatDocument(collection Collection) []byte {
 	var s = FormatCollection(collection) + EOF
-return []byte(s)
+	return []byte(s)
 }
 
 // FORMATTER IMPLEMENTATION

@@ -1,0 +1,9 @@
+[
+    "integer": 1
+    "unsigned": 0x1234567890abcdef
+    "real": 2.0
+    "float": 1.23E+45
+    "complex": (3.0+4.0i)
+    "rune": '本'
+    "string": "To be... or not to be."
+](catalog)

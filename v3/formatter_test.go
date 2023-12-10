@@ -160,7 +160,8 @@ func TestFormatStackOfAny(t *tes.T) {
 }
 
 func TestFormatQueueOfAny(t *tes.T) {
-	var queue col.FIFO[any] = col.Queue[any]()
+	var Queue = col.Queue[any]()
+	var queue = Queue.FromNothing()
 	queue.AddValue(v1)
 	queue.AddValue(v2)
 	queue.AddValue(v3)

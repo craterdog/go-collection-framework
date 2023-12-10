@@ -23,7 +23,8 @@ func TestQueueWithConcurrency(t *tes.T) {
 	defer wg.Wait()
 
 	// Create a new queue with a specific capacity.
-	var queue = col.QueueWithCapacity[int](12)
+	var Queue = col.Queue[int]()
+	var queue = Queue.WithCapacity(12)
 	ass.Equal(t, 12, queue.GetCapacity())
 	ass.True(t, queue.IsEmpty())
 	ass.Equal(t, 0, queue.GetSize())
@@ -61,8 +62,9 @@ func TestQueueWithFork(t *tes.T) {
 	defer wg.Wait()
 
 	// Create a new queue with a fan out of two.
-	var input col.FIFO[int] = col.QueueWithCapacity[int](3)
-	var outputs = col.Fork(wg, input, 2)
+	var Queue = col.Queue[int]()
+	var input = Queue.WithCapacity(3)
+	var outputs = Queue.Fork(wg, input, 2)
 
 	// Remove values from the output queues in the background.
 	var readOutput = func(output col.FIFO[int], name string) {
@@ -96,7 +98,8 @@ func TestQueueWithInvalidFanOut(t *tes.T) {
 	defer wg.Wait()
 
 	// Create a new queue with an invalid fan out.
-	var input col.FIFO[int] = col.QueueWithCapacity[int](3)
+	var Queue = col.Queue[int]()
+	var input = Queue.WithCapacity(3)
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "The fan out size for a queue must be greater than one.", e)
@@ -104,7 +107,7 @@ func TestQueueWithInvalidFanOut(t *tes.T) {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
-	col.Fork(wg, input, 1) // Should panic here.
+	Queue.Fork(wg, input, 1) // Should panic here.
 }
 
 func TestQueueWithSplitAndJoin(t *tes.T) {
@@ -113,9 +116,10 @@ func TestQueueWithSplitAndJoin(t *tes.T) {
 	defer wg.Wait()
 
 	// Create a new queue with a split of five outputs and a join back to one.
-	var input col.FIFO[int] = col.QueueWithCapacity[int](3)
-	var split = col.Split(wg, input, 5)
-	var output = col.Join(wg, split)
+	var Queue = col.Queue[int]()
+	var input = Queue.WithCapacity(3)
+	var split = Queue.Split(wg, input, 5)
+	var output = Queue.Join(wg, split)
 
 	// Remove values from the output queue in the background.
 	wg.Add(1)
@@ -144,7 +148,8 @@ func TestQueueWithInvalidSplit(t *tes.T) {
 	defer wg.Wait()
 
 	// Create a new queue with an invalid fan out.
-	var input col.FIFO[int] = col.QueueWithCapacity[int](3)
+	var Queue = col.Queue[int]()
+	var input = Queue.WithCapacity(3)
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "The size of the split must be greater than one.", e)
@@ -152,7 +157,7 @@ func TestQueueWithInvalidSplit(t *tes.T) {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
-	col.Split(wg, input, 1) // Should panic here.
+	Queue.Split(wg, input, 1) // Should panic here.
 }
 
 func TestQueueWithInvalidJoin(t *tes.T) {
@@ -170,6 +175,7 @@ func TestQueueWithInvalidJoin(t *tes.T) {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
-	col.Join(wg, inputs) // Should panic here.
+	var Queue = col.Queue[int]()
+	Queue.Join(wg, inputs) // Should panic here.
 	defer wg.Done()
 }

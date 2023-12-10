@@ -70,10 +70,6 @@ func (v *sorter[V]) reverseArray(array []V) {
 	var half = length / 2 // Rounds down to the nearest integer.
 	for index := 0; index < half; index++ {
 		array[index], array[length-index-1] = array[length-index-1], array[index]
-		//var first = array[index]
-		//var last = array[length - index - 1]
-		//array[index] = last
-		//array[length - index - 1] = first
 	}
 }
 

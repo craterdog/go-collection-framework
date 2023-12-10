@@ -205,7 +205,7 @@ func (v array_[V]) ShuffleValues() {
 	ShuffleValues(v)
 }
 
-// Go Interface
+// Private Interface
 
 // This public class method is used by Go to generate a string from an array.
 func (v array_[V]) String() string {

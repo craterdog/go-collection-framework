@@ -259,7 +259,7 @@ func (v *catalog_[K, V]) ShuffleValues() {
 	v.associations.ShuffleValues()
 }
 
-// Go Stringer Interface
+// Private Interface
 
 // This public class method returns the canonical string for this catalog.
 func (v *catalog_[K, V]) String() string {

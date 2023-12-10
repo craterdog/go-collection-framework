@@ -45,7 +45,8 @@ func TestCatalogsWithStringsAndIntegers(t *tes.T) {
 	ass.Equal(t, 3, catalog.GetSize())
 	var catalog2 = Catalog.FromSequence(catalog)
 	ass.True(t, col.CompareValues(catalog, catalog2))
-	var m = col.Map[string, int](map[string]int{
+	var Map = col.Map[string, int]()
+	var m = Map.FromMap(map[string]int{
 		"foo": 1,
 		"bar": 2,
 		"baz": 3,

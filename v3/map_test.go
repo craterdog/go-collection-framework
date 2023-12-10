@@ -17,7 +17,8 @@ import (
 )
 
 func TestEmptyMaps(t *tes.T) {
-	var m = col.Map[string, int](map[string]int{})
+	var Map = col.Map[string, int]()
+	var m = Map.FromMap(map[string]int{})
 	ass.True(t, m.IsEmpty())
 	ass.Equal(t, 0, m.GetSize())
 	ass.Equal(t, []string{}, m.GetKeys().AsArray())
@@ -37,7 +38,8 @@ func TestMapsWithStringsAndIntegers(t *tes.T) {
 	var association1 = Association.FromPair("foo", 1)
 	var association2 = Association.FromPair("bar", 2)
 	var association3 = Association.FromPair("baz", 3)
-	var m = col.Map[string, int](map[string]int{})
+	var Map = col.Map[string, int]()
+	var m = Map.FromMap(map[string]int{})
 	m.SetValue(association1.GetKey(), association1.GetValue())
 	ass.False(t, m.IsEmpty())
 	ass.Equal(t, 1, m.GetSize())

@@ -222,9 +222,11 @@ func (v *parser) parseCollection() (Collection, *Token, bool) {
 		case Sequential[Binding[Key, Value]]:
 			switch context {
 			case "catalog":
-				collection = Catalog[Key, Value]().FromSequence(sequence)
+				var Catalog = Catalog[Key, Value]()
+				collection = Catalog.FromSequence(sequence)
 			case "map":
-				collection = MapFromSequence(sequence)
+				var Map = Map[Key, Value]()
+				collection = Map.FromArray(sequence.AsArray())
 			default:
 			}
 		default:

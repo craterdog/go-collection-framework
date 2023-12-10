@@ -47,7 +47,7 @@ func Array[V Value]() *arrayClass_[V] {
 // CLASS CONSTRUCTORS
 
 // This public class constructor creates a new array of the specified size.
-func (c *arrayClass_[V]) FromSize(size int) ArrayLike[V] {
+func (c *arrayClass_[V]) WithSize(size int) ArrayLike[V] {
 	var array = make([]V, size) // All values initialized to zero.
 	return array_[V](array)
 }

@@ -18,7 +18,7 @@ import (
 
 func TestEmptyArray(t *tes.T) {
 	var Array = col.Array[string]()
-	var array = Array.FromSize(0)
+	var array = Array.WithSize(0)
 	ass.True(t, array.IsEmpty())
 	ass.Equal(t, 0, array.GetSize())
 	ass.Equal(t, []string{}, array.AsArray())

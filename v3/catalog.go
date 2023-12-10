@@ -51,19 +51,7 @@ func (c *catalogClass_[K, V]) FromNothing() CatalogLike[K, V] {
 	var keys = map[Key]Binding[K, V]{}
 	var List = List[Binding[K, V]]()
 	var associations = List.FromNothing()
-	var catalog = &catalog_[K, V]{associations, associations, keys}
-	return catalog
-}
-
-// This public class constructor creates a new catalog from the specified
-// array of associations.
-func (c *catalogClass_[K, V]) FromArray(array []Binding[K, V]) CatalogLike[K, V] {
-	var catalog = c.FromNothing()
-	for _, association := range array {
-		var key = association.GetKey()
-		var value = association.GetValue()
-		catalog.SetValue(key, value)
-	}
+	var catalog = &catalog_[K, V]{associations, keys}
 	return catalog
 }
 
@@ -125,10 +113,34 @@ func (c *catalogClass_[K, V]) Extract(catalog CatalogLike[K, V], keys Sequential
 //   - K is a primitive type of key.
 //   - V is any type of entity.
 type catalog_[K Key, V Value] struct {
-	// Note: The delegated methods don't see the real collection type.
-	Sequential[Binding[K, V]]
 	associations ListLike[Binding[K, V]]
 	keys         map[Key]Binding[K, V]
+}
+
+// Sequential Interface
+
+// This public class method determines whether or not this catalog is empty.
+func (v *catalog_[K, V]) IsEmpty() bool {
+	return v.associations.IsEmpty()
+}
+
+// This public class method returns the number of associations contained in this
+// catalog.
+func (v *catalog_[K, V]) GetSize() int {
+	return v.associations.GetSize()
+}
+
+// This public class method returns all the associations in this catalog. The
+// associations
+// retrieved are in the same order as they are in the catalog.
+func (v *catalog_[K, V]) AsArray() []Binding[K, V] {
+	return v.associations.AsArray()
+}
+
+// This public class method generates for this catalog an iterator that can be
+// used to traverse its associations.
+func (v *catalog_[K, V]) GetIterator() Ratcheted[Binding[K, V]] {
+	return v.associations.GetIterator()
 }
 
 // Associative Interface

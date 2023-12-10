@@ -22,8 +22,6 @@ type setClass_[V Value] struct {
 	// This class defines no constants.
 }
 
-// Generic Namespace
-
 // This private constant defines a map to hold all the singleton references to
 // the type specific set namespaces.
 var setClassSingletons = map[string]any{}
@@ -178,7 +176,7 @@ func (v *set_[V]) GetValues(first int, last int) Sequential[V] {
 	return v.values.GetValues(first, last)
 }
 
-// SEARCHABLE INTERFACE
+// Searchable Interface
 
 // This public class method returns the comparing function for this set.
 func (v *set_[V]) GetComparer() ComparingFunction {
@@ -232,7 +230,7 @@ func (v *set_[V]) ContainsAll(values Sequential[V]) bool {
 	return true
 }
 
-// FLEXIBLE INTERFACE
+// Flexible Interface
 
 // This public class method returns the ranker function for this set.
 func (v *set_[V]) GetRanker() RankingFunction {
@@ -284,7 +282,7 @@ func (v *set_[V]) RemoveAll() {
 	v.values.RemoveAll()
 }
 
-// PRIVATE INTERFACE
+// Private Interface
 
 // This private class method is used by Go to generate a canonical string for
 // the set.

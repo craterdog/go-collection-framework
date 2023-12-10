@@ -29,9 +29,10 @@ func ParseDocument(source []byte) Collection {
 	var collection Collection
 	var tokens = make(chan Token, 256)
 	Scanner(source, tokens) // Starts scanning in a separate go routine.
+	var Stack = Stack[*Token]()
 	var p = &parser{
 		source: source,
-		next:   StackWithCapacity[*Token](4),
+		next:   Stack.WithCapacity(4),
 		tokens: tokens,
 	}
 	collection, token, ok = p.parseCollection()
@@ -213,7 +214,8 @@ func (v *parser) parseCollection() (Collection, *Token, bool) {
 				var Set = Set[Value]()
 				collection = Set.FromSequence(sequence)
 			case "stack":
-				collection = StackFromSequence(sequence)
+				var Stack = Stack[Value]()
+				collection = Stack.FromSequence(sequence)
 			default:
 			}
 		case Sequential[Binding[Key, Value]]:

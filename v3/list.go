@@ -50,7 +50,7 @@ func List[V Value]() *listClass_[V] {
 // The list uses the natural comparing function.
 func (c *listClass_[V]) FromNothing() ListLike[V] {
 	var Array = Array[V]() // Retrieve the array namespace.
-	var array = Array.FromSize(0)
+	var array = Array.WithSize(0)
 	var compare = CompareValues
 	var list = &list_[V]{array, compare}
 	return list
@@ -60,7 +60,7 @@ func (c *listClass_[V]) FromNothing() ListLike[V] {
 // specified comparing function.
 func (c *listClass_[V]) FromComparer(compare ComparingFunction) ListLike[V] {
 	var Array = Array[V]() // Retrieve the array namespace.
-	var array = Array.FromSize(0)
+	var array = Array.WithSize(0)
 	var list = &list_[V]{array, compare}
 	return list
 }
@@ -102,8 +102,85 @@ func (c *listClass_[V]) Concatenate(first, second ListLike[V]) ListLike[V] {
 // This type is parameterized as follows:
 //   - V is any type of value.
 type list_[V Value] struct {
-	ArrayLike[V]
+	values  ArrayLike[V]
 	compare ComparingFunction
+}
+
+// Sequential Interface
+
+// This public class method determines whether or not this array is empty.
+func (v list_[V]) IsEmpty() bool {
+	return v.values.IsEmpty()
+}
+
+// This public class method returns the number of values contained in this
+// array.
+func (v list_[V]) GetSize() int {
+	return v.values.GetSize()
+}
+
+// This public class method returns all the values in this array. The values
+// retrieved are in the same order as they are in the array.
+func (v list_[V]) AsArray() []V {
+	return v.values.AsArray()
+}
+
+// This public class method generates for this array an iterator that can be
+// used to traverse its values.
+func (v list_[V]) GetIterator() Ratcheted[V] {
+	return v.values.GetIterator()
+}
+
+// Accessible Interface
+
+// This public class method retrieves from this array the value that is
+// associated with the specified index.
+func (v list_[V]) GetValue(index int) V {
+	return v.values.GetValue(index)
+}
+
+// This public class method retrieves from this array all values from the first
+// index through the last index (inclusive).
+func (v list_[V]) GetValues(first int, last int) Sequential[V] {
+	return v.values.GetValues(first, last)
+}
+
+// Updatable Interface
+
+// This public class method sets the value in this array that is associated
+// with the specified index to be the specified value.
+func (v list_[V]) SetValue(index int, value V) {
+	v.values.SetValue(index, value)
+}
+
+// This public class method sets the values in this array starting with the
+// specified index to the specified values.
+func (v list_[V]) SetValues(index int, values Sequential[V]) {
+	v.values.SetValues(index, values)
+}
+
+// Sortable Interface
+
+// This public class method sorts the values in this list using the natural
+// ranking function.
+func (v list_[V]) SortValues() {
+	v.values.SortValues()
+}
+
+// This public class method sorts the values in this list using the specified
+// ranking function.
+func (v list_[V]) SortValuesWithRanker(ranker RankingFunction) {
+	v.values.SortValuesWithRanker(ranker)
+}
+
+// This public class method reverses the order of all values in this list.
+func (v list_[V]) ReverseValues() {
+	v.values.ReverseValues()
+}
+
+// This public class method pseudo-randomly shuffles the values in this list.
+func (v list_[V]) ShuffleValues() {
+	v.values.ShuffleValues()
 }
 
 // Searchable Interface
@@ -169,7 +246,7 @@ func (v *list_[V]) AppendValue(value V) {
 	// Create a new bigger array.
 	var size = v.GetSize() + 1
 	var Array = Array[V]()
-	var array = Array.FromSize(size)
+	var array = Array.WithSize(size)
 
 	// Copy the existing values into the new array.
 	var index int
@@ -185,7 +262,7 @@ func (v *list_[V]) AppendValue(value V) {
 	array.SetValue(index, value)
 
 	// Update the internal array.
-	v.ArrayLike = array
+	v.values = array
 }
 
 // This method appends the specified values to the end of this list.
@@ -194,7 +271,7 @@ func (v *list_[V]) AppendValues(values Sequential[V]) {
 	// Create a new bigger array.
 	var size = v.GetSize() + values.GetSize()
 	var Array = Array[V]()
-	var array = Array.FromSize(size)
+	var array = Array.WithSize(size)
 
 	// Copy the existing values into the new array.
 	var index int
@@ -214,7 +291,7 @@ func (v *list_[V]) AppendValues(values Sequential[V]) {
 	}
 
 	// Update the internal array.
-	v.ArrayLike = array
+	v.values = array
 }
 
 // This method inserts the specified value into this list in the specified
@@ -224,7 +301,7 @@ func (v *list_[V]) InsertValue(slot int, value V) {
 	// Create a new larger array.
 	var size = v.GetSize() + 1
 	var Array = Array[V]()
-	var array = Array.FromSize(size)
+	var array = Array.WithSize(size)
 
 	// Copy the values into the new array.
 	var iterator = v.GetIterator()
@@ -241,7 +318,7 @@ func (v *list_[V]) InsertValue(slot int, value V) {
 	}
 
 	// Update the internal array.
-	v.ArrayLike = array
+	v.values = array
 }
 
 // This method inserts the specified values into this list in the specified
@@ -251,7 +328,7 @@ func (v *list_[V]) InsertValues(slot int, values Sequential[V]) {
 	// Create a new bigger array.
 	var size = v.GetSize() + values.GetSize()
 	var Array = Array[V]()
-	var array = Array.FromSize(size)
+	var array = Array.WithSize(size)
 
 	// Copy the values into the new array.
 	var iterator = v.GetIterator()
@@ -272,7 +349,7 @@ func (v *list_[V]) InsertValues(slot int, values Sequential[V]) {
 	}
 
 	// Update the internal array.
-	v.ArrayLike = array
+	v.values = array
 }
 
 // This method removes the value at the specified index from this list. The
@@ -283,7 +360,7 @@ func (v *list_[V]) RemoveValue(index int) V {
 	var removed = v.GetValue(index)
 	var size = v.GetSize() - 1
 	var Array = Array[V]()
-	var array = Array.FromSize(size)
+	var array = Array.WithSize(size)
 
 	// Copy the remaining values into the new array.
 	var counter = v.normalized(index)
@@ -300,7 +377,7 @@ func (v *list_[V]) RemoveValue(index int) V {
 	}
 
 	// Update the internal array.
-	v.ArrayLike = array
+	v.values = array
 
 	return removed
 }
@@ -315,8 +392,8 @@ func (v *list_[V]) RemoveValues(first int, last int) Sequential[V] {
 	var delta = last - first + 1
 	var size = v.GetSize() - delta
 	var Array = Array[V]()
-	var removed = Array.FromSize(delta)
-	var array = Array.FromSize(size)
+	var removed = Array.WithSize(delta)
+	var array = Array.WithSize(size)
 
 	// Split the existing values into the two new arrays.
 	var counter int
@@ -336,7 +413,7 @@ func (v *list_[V]) RemoveValues(first int, last int) Sequential[V] {
 	}
 
 	// Update the internal array.
-	v.ArrayLike = array
+	v.values = array
 
 	return removed
 }
@@ -344,7 +421,7 @@ func (v *list_[V]) RemoveValues(first int, last int) Sequential[V] {
 // This method removes all values from this list.
 func (v *list_[V]) RemoveAll() {
 	var Array = Array[V]()
-	v.ArrayLike = Array.FromSize(0)
+	v.values = Array.WithSize(0)
 }
 
 // Private Interface

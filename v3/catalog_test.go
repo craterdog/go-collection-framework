@@ -43,7 +43,7 @@ func TestCatalogsWithStringsAndIntegers(t *tes.T) {
 	catalog.SetValue(association2.GetKey(), association2.GetValue())
 	catalog.SetValue(association3.GetKey(), association3.GetValue())
 	ass.Equal(t, 3, catalog.GetSize())
-	var catalog2 = Catalog.FromArray(catalog.AsArray())
+	var catalog2 = Catalog.FromSequence(catalog)
 	ass.True(t, col.CompareValues(catalog, catalog2))
 	var m = col.Map[string, int](map[string]int{
 		"foo": 1,
@@ -124,7 +124,7 @@ func TestCatalogsWithExtract(t *tes.T) {
 
 func TestCatalogsWithEmptyCatalogs(t *tes.T) {
 	var Array = col.Array[int]()
-	var keys = Array.FromSize(0)
+	var keys = Array.WithSize(0)
 	var Catalog = col.Catalog[int, string]()
 	var catalog1 = Catalog.FromNothing()
 	var catalog2 = Catalog.FromNothing()

@@ -144,7 +144,8 @@ func TestFormatSetOfSet(t *tes.T) {
 }
 
 func TestFormatStackOfAny(t *tes.T) {
-	var stack = col.Stack[any]()
+	var Stack = col.Stack[any]()
+	var stack = Stack.FromNothing()
 	stack.AddValue(v1)
 	stack.AddValue(v2)
 	stack.AddValue(v3)

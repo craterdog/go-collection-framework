@@ -361,10 +361,11 @@ func (v *collator) rankValues(first ref.Value, second ref.Value) int {
 	}
 }
 
-// This private method returns the ranking order of the specified elements. Note
-// that Go does not provide an easy way to a possible tilde type (e.g. ~string)
-// to its elemental (named) type without knowing whether or not it is actually a
-// tilde type. So we must convert it to a string and then parse it back again...
+// This private method returns the ranking order of the specified elements.
+// NOTE: Go does not provide an easy way to a apply a possible tilde type
+// (e.g. ~string) to its elemental (named) type without knowing whether or not
+// it is actually a tilde type. So we must convert it to a string and then parse
+// it back again...
 // This method attempts to hide that ugliness from the rest of the code.
 func (v *collator) rankElements(first, second ref.Value) int {
 	var firstValue = first.Interface()
@@ -535,7 +536,7 @@ func (v *collator) rankArrays(first ref.Value, second ref.Value) int {
 }
 
 // This private method returns the ranking order of the specified maps using a
-// recursive descent algorithm. Note: currently the implementation of Go maps is
+// recursive descent algorithm. NOTE: currently the implementation of Go maps is
 // hashtable based. The order of the keys is random, even for two maps with the
 // same keys if the associations were entered in different sequences. Therefore
 // at this time it is necessary to sort the key arrays for each map. This

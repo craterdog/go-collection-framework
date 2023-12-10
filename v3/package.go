@@ -289,9 +289,8 @@ type ListLike[V Value] interface {
 }
 
 // This abstract type defines the set of abstract interfaces that must be
-// supported by all map-like types.  Note, that the order of the key-value
-// pairs in a native map is random, even for two maps containing the same
-// keys.
+// supported by all map-like types.  NOTE: The order of the key-value pairs in a
+// native map is random, even for two maps containing the same keys.
 type MapLike[K Key, V Value] interface {
 	Sequential[Binding[K, V]]
 	Associative[K, V]

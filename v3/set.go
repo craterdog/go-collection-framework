@@ -326,7 +326,7 @@ func (v *set_[V]) search(value V) (index int, found bool) {
 		}
 	}
 	// The value was not found, the last index represents the SLOT where it
-	// would be inserted. Note that since the value was not found, the
-	// indexes are inverted: last < first (i.e. last = first - 1).
+	// would be inserted. NOTE: Since the value was not found, the indexes are
+	// inverted: last < first (i.e. last = first - 1).
 	return last, false
 }

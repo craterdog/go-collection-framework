@@ -18,6 +18,8 @@ import (
 
 // This private type defines the namespace structure associated with the
 // constants, constructors and functions for the map class namespace.
+// NOTE: the Go language requires the key type here support the "comparable"
+// interface so we must narrow it down from "any".
 type mapClass_[K comparable, V Value] struct {
 	// This class defines no constants.
 }
@@ -28,6 +30,8 @@ var mapClassSingletons = map[string]any{}
 
 // This public function returns the singleton reference to a type specific
 // map namespace.  It also initializes any class constants as needed.
+// NOTE: the Go language requires the key type here support the "comparable"
+// interface so we must narrow it down from "any".
 func Map[K comparable, V Value]() *mapClass_[K, V] {
 	var class *mapClass_[K, V]
 	var key = fmt.Sprintf("%T", class)

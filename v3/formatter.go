@@ -78,8 +78,8 @@ func (v *formatter) appendNewline() {
 }
 
 // This private method determines the actual type of the specified value and
-// calls the corresponding format function for that type. Note that because the
-// Go language doesn't really support polymorphism the selection of the actual
+// calls the corresponding format function for that type. NOTE: Because the Go
+// language doesn't really support polymorphism, the selection of the actual
 // function called must be done explicitly using reflection and a type switch.
 func (v *formatter) formatValue(value ref.Value) {
 	switch value.Kind() {

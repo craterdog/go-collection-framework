@@ -73,7 +73,7 @@ func (c *queueClass_[V]) WithCapacity(capacity int) QueueLike[V] {
 	var values = List.FromNothing()
 	var queue = &queue_[V]{
 		available: available,
-		values: values,
+		values:    values,
 	}
 	return queue
 }

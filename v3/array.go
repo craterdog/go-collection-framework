@@ -181,31 +181,28 @@ func (v array_[V]) SetValues(index int, values Sequential[V]) {
 
 // Sortable Interface
 
-// This public class method sorts the values in this list using the natural rank
-// function.
+// This public class method sorts the values in this list using the natural
+// ranking function.
 func (v array_[V]) SortValues() {
-	v.SortValuesWithRanker(nil)
+	v.SortValuesWithRanker(RankValues)
 }
 
 // This public class method sorts the values in this list using the specified
-// rank function.
-func (v array_[V]) SortValuesWithRanker(rank RankingFunction) {
-	if rank == nil {
-		rank = RankValues
-	}
+// ranking function.
+func (v array_[V]) SortValuesWithRanker(ranker RankingFunction) {
 	if v.GetSize() > 1 {
-		SortArray(v, rank)
+		SortValues(v, ranker)
 	}
 }
 
 // This public class method reverses the order of all values in this list.
 func (v array_[V]) ReverseValues() {
-	ReverseArray(v)
+	ReverseValues(v)
 }
 
 // This public class method pseudo-randomly shuffles the values in this list.
 func (v array_[V]) ShuffleValues() {
-	ShuffleArray(v)
+	ShuffleValues(v)
 }
 
 // Go Interface

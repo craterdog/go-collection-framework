@@ -119,7 +119,10 @@ func TestFormatListOfBoolean(t *tes.T) {
 }
 
 func TestFormatSetOfAny(t *tes.T) {
-	var set = col.SetFromArray[any]([]any{v1, v2, v3, v4, v5, v6, v7, v8})
+	var Array = col.Array[any]()
+	var array = Array.FromArray([]any{v1, v2, v3, v4, v5, v6, v7, v8})
+	var Set = col.Set[any]()
+	var set = Set.FromSequence(array)
 	var s = col.FormatCollection(set)
 	ass.Equal(t, s, fmt.Sprintf("%s", set))
 	ass.Equal(t, "(set)", s[len(s)-5:])
@@ -127,9 +130,15 @@ func TestFormatSetOfAny(t *tes.T) {
 }
 
 func TestFormatSetOfSet(t *tes.T) {
-	var set1 = col.SetFromArray[any]([]any{v1, v2, v3, v4, v5, v6, v7, v8})
-	var set2 = col.SetFromArray[any]([]any{k1, k2, k3, k4, k5, k6, k7, k8})
-	var set = col.SetFromArray[col.SetLike[any]]([]col.SetLike[any]{set1, set2})
+	var Array = col.Array[any]()
+	var array1 = Array.FromArray([]any{v1, v2, v3, v4, v5, v6, v7, v8})
+	var array2 = Array.FromArray([]any{k1, k2, k3, k4, k5, k6, k7, k8})
+	var Set = col.Set[any]()
+	var set1 = Set.FromSequence(array1)
+	var set2 = Set.FromSequence(array2)
+	var set = Set.FromNothing()
+	set.AddValue(set1)
+	set.AddValue(set2)
 	var s = col.FormatCollection(set)
 	fmt.Println("\nSet of Set: " + s)
 }

@@ -210,7 +210,8 @@ func (v *parser) parseCollection() (Collection, *Token, bool) {
 			case "queue":
 				collection = QueueFromSequence(sequence)
 			case "set":
-				collection = SetFromSequence(sequence)
+				var Set = Set[Value]()
+				collection = Set.FromSequence(sequence)
 			case "stack":
 				collection = StackFromSequence(sequence)
 			default:

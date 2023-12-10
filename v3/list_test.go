@@ -142,7 +142,7 @@ func TestListsWithStrings(t *tes.T) {
 	ass.Equal(t, "bar", string(list.GetValue(1)))                      // ["bar", "foo"]
 }
 
-func TestListsWithTildas(t *tes.T) {
+func TestListsWithTildes(t *tes.T) {
 	var Array = col.Array[Integer]()
 	var array = Array.FromArray([]Integer{3, 1, 4, 5, 9, 2})
 	var List = col.List[Integer]()

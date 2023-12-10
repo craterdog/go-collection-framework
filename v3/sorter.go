@@ -18,28 +18,28 @@ import (
 // SORTER INTERFACE
 
 // This function reverses the order of the values in the specified array.
-func ReverseArray[V Value](array []V) {
+func ReverseValues[V Value](array []V) {
 	var v = Sorter[V](nil)
-	v.ReverseArray(array)
+	v.ReverseValues(array)
 }
 
 // This function randomly shuffles the values in the specified array.
-func ShuffleArray[V Value](array []V) {
+func ShuffleValues[V Value](array []V) {
 	var v = Sorter[V](nil)
-	v.ShuffleArray(array)
+	v.ShuffleValues(array)
 }
 
 // This function sorts the values in the specified array using the specified
 // ranking function.
-func SortArray[V Value](array []V, rank RankingFunction) {
-	var v = Sorter[V](rank)
-	v.SortArray(array)
+func SortValues[V Value](array []V, ranker RankingFunction) {
+	var v = Sorter[V](ranker)
+	v.SortValues(array)
 }
 
 // This constructor creates a new instance of a sorter that can be used to
 // sort an array using a specific ranking function.
-func Sorter[V Value](rank RankingFunction) SorterLike[V] {
-	return &sorter[V]{rank: rank}
+func Sorter[V Value](ranker RankingFunction) SorterLike[V] {
+	return &sorter[V]{ranker}
 }
 
 // SORTER IMPLEMENTATION
@@ -50,21 +50,21 @@ type sorter[V Value] struct {
 }
 
 // This method reverses the order of the values in the specified array in place.
-func (v *sorter[V]) ReverseArray(array []V) {
+func (v *sorter[V]) ReverseValues(array []V) {
 	v.reverseArray(array)
 }
 
 // This method randomly shuffles the values in the specified array in place.
-func (v *sorter[V]) ShuffleArray(array []V) {
+func (v *sorter[V]) ShuffleValues(array []V) {
 	v.shuffleArray(array)
 }
 
 // This method sorts the values in the specified array in place.
-func (v *sorter[V]) SortArray(array []V) {
+func (v *sorter[V]) SortValues(array []V) {
 	v.sortArray(array)
 }
 
-// This method reverses the the order of the values in the specified array.
+// This method reverses the order of the values in the specified array.
 func (v *sorter[V]) reverseArray(array []V) {
 	var length = len(array)
 	var half = length / 2 // Rounds down to the nearest integer.

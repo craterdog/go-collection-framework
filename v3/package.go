@@ -59,7 +59,7 @@ type Value any
 
 // This function type defines the signature for any function that can determine
 // whether or not two specified values are equal to each other.
-type ComparisonFunction func(first Value, second Value) bool
+type ComparingFunction func(first Value, second Value) bool
 
 // This function type defines the signature for any function that can determine
 // the relative ordering of two specified values. The result must be one of
@@ -71,7 +71,7 @@ type RankingFunction func(first Value, second Value) int
 
 // This function type defines the signature for any function that can sort an
 // array of values using a ranking function.
-type SortFunction[V Value] func(array []V, rank RankingFunction)
+type SortingFunction[V Value] func(array []V, ranker RankingFunction)
 
 // PACKAGE ABSTRACTIONS
 
@@ -150,6 +150,7 @@ type FIFO[V Value] interface {
 // supported by all sequences of values that allow new values to be added and
 // existing values to be removed.
 type Flexible[V Value] interface {
+	GetRanker() RankingFunction
 	AddValue(value V)
 	AddValues(values Sequential[V])
 	RemoveValue(value V)
@@ -198,6 +199,7 @@ type Ratcheted[V Value] interface {
 // This abstract interface defines the set of method signatures that must be
 // supported by all searchable sequences of values.
 type Searchable[V Value] interface {
+	GetComparer() ComparingFunction
 	GetIndex(value V) int
 	ContainsValue(value V) bool
 	ContainsAny(values Sequential[V]) bool
@@ -218,7 +220,7 @@ type Sequential[V Value] interface {
 // sorting algorithms.
 type Sortable[V Value] interface {
 	SortValues()
-	SortValuesWithRanker(rank RankingFunction)
+	SortValuesWithRanker(ranker RankingFunction)
 	ReverseValues()
 	ShuffleValues()
 }
@@ -227,9 +229,9 @@ type Sortable[V Value] interface {
 // supported by all systematic agents that can shuffle or sort an array of
 // values.
 type Systematic[V Value] interface {
-	ReverseArray(array []V)
-	ShuffleArray(array []V)
-	SortArray(array []V)
+	ReverseValues(array []V)
+	ShuffleValues(array []V)
+	SortValues(array []V)
 }
 
 // This abstract interface defines the set of method signatures that must be

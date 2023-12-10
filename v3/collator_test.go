@@ -16,7 +16,7 @@ import (
 	tes "testing"
 )
 
-// Tilda Types
+// Tilde Types
 type Boolean bool
 type Integer int
 type String string
@@ -217,7 +217,7 @@ func TestComparison(t *tes.T) {
 	ass.False(t, col.CompareValues(&f5, &f6))
 }
 
-func TestTildaTypes(t *tes.T) {
+func TestTildeTypes(t *tes.T) {
 	// Boolean
 	var False = Boolean(false)
 	var True = Boolean(true)
@@ -491,13 +491,13 @@ func TestRanking(t *tes.T) {
 	ass.Equal(t, 1, col.RankValues(&f5, &f6))
 }
 
-func TestTildaArrays(t *tes.T) {
+func TestTildeArrays(t *tes.T) {
 	var alpha = String("alpha")
 	var beta = String("beta")
 	var gamma = String("gamma")
 	var delta = String("delta")
 	var array = []String{alpha, beta, gamma, delta}
-	col.SortArray(array, col.RankValues)
+	col.SortValues(array, col.RankValues)
 	ass.Equal(t, alpha, array[0])
 	ass.Equal(t, beta, array[1])
 	ass.Equal(t, delta, array[2])

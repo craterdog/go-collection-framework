@@ -229,10 +229,10 @@ func (v *catalog_[K, V]) SortValues() {
 	v.associations.SortValues()
 }
 
-// This public class method sorts this catalog using the specified rank function
-// to compare the keys.
-func (v *catalog_[K, V]) SortValuesWithRanker(rank RankingFunction) {
-	v.associations.SortValuesWithRanker(rank)
+// This public class method sorts this catalog using the specified ranking
+// function to compare the keys.
+func (v *catalog_[K, V]) SortValuesWithRanker(ranking RankingFunction) {
+	v.associations.SortValuesWithRanker(ranking)
 }
 
 // This public class method reverses the order of all associations in this

@@ -47,7 +47,7 @@ func List[V Value]() *listClass_[V] {
 // CLASS CONSTRUCTORS
 
 // This public class constructor creates a new empty list.
-// The list uses the natural compare function.
+// The list uses the natural comparing function.
 func (c *listClass_[V]) FromNothing() ListLike[V] {
 	var Array = Array[V]() // Retrieve the array namespace.
 	var array = Array.FromSize(0)
@@ -57,8 +57,8 @@ func (c *listClass_[V]) FromNothing() ListLike[V] {
 }
 
 // This public class constructor creates a new empty list that uses the
-// specified compare function.
-func (c *listClass_[V]) FromComparer(compare ComparisonFunction) ListLike[V] {
+// specified comparing function.
+func (c *listClass_[V]) FromComparer(compare ComparingFunction) ListLike[V] {
 	var Array = Array[V]() // Retrieve the array namespace.
 	var array = Array.FromSize(0)
 	var list = &list_[V]{array, compare}
@@ -103,10 +103,15 @@ func (c *listClass_[V]) Concatenate(first, second ListLike[V]) ListLike[V] {
 //   - V is any type of value.
 type list_[V Value] struct {
 	ArrayLike[V]
-	compare ComparisonFunction
+	compare ComparingFunction
 }
 
 // Searchable Interface
+
+// This public class method returns the comparing function for this list.
+func (v *list_[V]) GetComparer() ComparingFunction {
+	return v.compare
+}
 
 // This method returns the index of the FIRST occurrence of the specified value in
 // this list, or zero if this list does not contain the value.

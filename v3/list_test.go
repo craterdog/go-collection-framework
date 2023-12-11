@@ -17,6 +17,7 @@ import (
 )
 
 func TestListsWithStrings(t *tes.T) {
+	var Collator = col.Collator()
 	var Array = col.Array[string]()
 	var foo = Array.FromArray([]string{"foo"})
 	var bar = Array.FromArray([]string{"bar"})
@@ -55,12 +56,12 @@ func TestListsWithStrings(t *tes.T) {
 	ass.Equal(t, barbaz.AsArray(), list.GetValues(2, 3).AsArray())
 	ass.Equal(t, foo.AsArray(), list.GetValues(1, 1).AsArray())
 	var list2 = List.FromSequence(list)
-	ass.True(t, col.CompareValues(list, list2))
+	ass.True(t, Collator.CompareValues(list, list2))
 	var array = Array.FromArray([]string{"foo", "bar", "baz"})
 	var list3 = List.FromSequence(array)
 	list2.SortValues()
 	list3.SortValues()
-	ass.True(t, col.CompareValues(list2, list3))
+	ass.True(t, Collator.CompareValues(list2, list3))
 	iterator = list.GetIterator()                       // ["foo", "bar", "baz"]
 	ass.True(t, iterator.HasNext())                     // ["foo", "bar", "baz"]
 	ass.False(t, iterator.HasPrevious())                // ["foo", "bar", "baz"]
@@ -177,6 +178,7 @@ func TestListsWithComparer(t *tes.T) {
 }
 
 func TestListsWithConcatenate(t *tes.T) {
+	var Collator = col.Collator()
 	var Array = col.Array[int]()
 	var onetwothree = Array.FromArray([]int{1, 2, 3})
 	var fourfivesix = Array.FromArray([]int{4, 5, 6})
@@ -189,15 +191,16 @@ func TestListsWithConcatenate(t *tes.T) {
 	var list3 = List.Concatenate(list1, list2)
 	var list4 = List.FromNothing()
 	list4.AppendValues(onethrusix)
-	ass.True(t, col.CompareValues(list3, list4))
+	ass.True(t, Collator.CompareValues(list3, list4))
 }
 
 func TestListsWithEmptyLists(t *tes.T) {
+	var Collator = col.Collator()
 	var List = col.List[int]()
 	var empty = List.FromNothing()
 	var list = List.Concatenate(empty, empty)
-	ass.True(t, col.CompareValues(empty, empty))
-	ass.True(t, col.CompareValues(list, empty))
-	ass.True(t, col.CompareValues(empty, list))
-	ass.True(t, col.CompareValues(list, list))
+	ass.True(t, Collator.CompareValues(empty, empty))
+	ass.True(t, Collator.CompareValues(list, empty))
+	ass.True(t, Collator.CompareValues(empty, list))
+	ass.True(t, Collator.CompareValues(list, list))
 }

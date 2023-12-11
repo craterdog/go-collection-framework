@@ -17,6 +17,7 @@ import (
 )
 
 func TestSetsWithStrings(t *tes.T) {
+	var Collator = col.Collator()
 	var Array = col.Array[string]()
 	var empty = []string{}
 	var bazbar = Array.FromArray([]string{"baz", "bar"})
@@ -52,10 +53,10 @@ func TestSetsWithStrings(t *tes.T) {
 	ass.Equal(t, bazfoo.AsArray(), set.GetValues(2, 3).AsArray()) // ["bar", "baz", "foo"]
 	ass.Equal(t, bar.AsArray(), set.GetValues(1, 1).AsArray())    // ["bar", "baz", "foo"]
 	var set2 = Set.FromSequence(set)                              // ["bar", "baz", "foo"]
-	ass.True(t, col.CompareValues(set, set2))                     // ["bar", "baz", "foo"]
+	ass.True(t, Collator.CompareValues(set, set2))                // ["bar", "baz", "foo"]
 	var array = Array.FromArray([]string{"foo", "bar", "baz"})    // ["bar", "baz", "foo"]
 	var set3 = Set.FromSequence(array)                            // ["bar", "baz", "foo"]
-	ass.True(t, col.CompareValues(set2, set3))                    // ["bar", "baz", "foo"]
+	ass.True(t, Collator.CompareValues(set2, set3))               // ["bar", "baz", "foo"]
 	iterator = set.GetIterator()                                  // ["bar", "baz", "foo"]
 	ass.True(t, iterator.HasNext())                               // ["bar", "baz", "foo"]
 	ass.False(t, iterator.HasPrevious())                          // ["bar", "baz", "foo"]
@@ -134,6 +135,7 @@ func TestSetsWithSets(t *tes.T) {
 }
 
 func TestSetsWithAnd(t *tes.T) {
+	var Collator = col.Collator()
 	var Array = col.Array[int]()
 	var array1 = Array.FromArray([]int{3, 1, 2})
 	var array2 = Array.FromArray([]int{3, 2, 4})
@@ -146,10 +148,11 @@ func TestSetsWithAnd(t *tes.T) {
 	var set3 = Set.And(set1, set2)
 	var set4 = Set.FromNothing()
 	set4.AddValues(array3)
-	ass.True(t, col.CompareValues(set3, set4))
+	ass.True(t, Collator.CompareValues(set3, set4))
 }
 
 func TestSetsWithSans(t *tes.T) {
+	var Collator = col.Collator()
 	var Array = col.Array[int]()
 	var array1 = Array.FromArray([]int{3, 1, 2})
 	var array2 = Array.FromArray([]int{3, 2, 4})
@@ -162,10 +165,11 @@ func TestSetsWithSans(t *tes.T) {
 	var set3 = Set.Sans(set1, set2)
 	var set4 = Set.FromNothing()
 	set4.AddValues(array3)
-	ass.True(t, col.CompareValues(set3, set4))
+	ass.True(t, Collator.CompareValues(set3, set4))
 }
 
 func TestSetsWithOr(t *tes.T) {
+	var Collator = col.Collator()
 	var Array = col.Array[int]()
 	var array1 = Array.FromArray([]int{3, 1, 5})
 	var array2 = Array.FromArray([]int{6, 2, 4})
@@ -180,10 +184,11 @@ func TestSetsWithOr(t *tes.T) {
 	ass.True(t, set3.ContainsAll(set2))
 	var set4 = Set.FromNothing()
 	set4.AddValues(array3)
-	ass.True(t, col.CompareValues(set3, set4))
+	ass.True(t, Collator.CompareValues(set3, set4))
 }
 
 func TestSetsWithXor(t *tes.T) {
+	var Collator = col.Collator()
 	var Array = col.Array[int]()
 	var array1 = Array.FromArray([]int{2, 3, 1, 5})
 	var array2 = Array.FromArray([]int{6, 2, 5, 4})
@@ -196,10 +201,11 @@ func TestSetsWithXor(t *tes.T) {
 	var set3 = Set.Xor(set1, set2)
 	var set4 = Set.FromNothing()
 	set4.AddValues(array3)
-	ass.True(t, col.CompareValues(set3, set4))
+	ass.True(t, Collator.CompareValues(set3, set4))
 }
 
 func TestSetsWithEmptySets(t *tes.T) {
+	var Collator = col.Collator()
 	var Set = col.Set[int]()
 	var set1 = Set.FromNothing()
 	var set2 = Set.FromNothing()
@@ -207,8 +213,8 @@ func TestSetsWithEmptySets(t *tes.T) {
 	var set4 = Set.Sans(set1, set2)
 	var set5 = Set.Or(set1, set2)
 	var set6 = Set.Xor(set1, set2)
-	ass.True(t, col.CompareValues(set3, set4))
-	ass.True(t, col.CompareValues(set4, set5))
-	ass.True(t, col.CompareValues(set5, set6))
-	ass.True(t, col.CompareValues(set6, set1))
+	ass.True(t, Collator.CompareValues(set3, set4))
+	ass.True(t, Collator.CompareValues(set4, set5))
+	ass.True(t, Collator.CompareValues(set5, set6))
+	ass.True(t, Collator.CompareValues(set6, set1))
 }

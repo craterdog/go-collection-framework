@@ -50,7 +50,7 @@ func (c *formatterClass_) GetDefaultDepth() int {
 
 // This public class constructor creates a new formatter with the default
 // maximum traversal depth.
-func (c *formatterClass_) FromNothing() FormatterLike {
+func (c *formatterClass_) WithDefaultDepth() FormatterLike {
 	var formatter = &formatter_{
 		maximumDepth: c.defaultDepth,
 	}
@@ -74,7 +74,7 @@ func (c *formatterClass_) WithMaximumDepth(maximumDepth int) FormatterLike {
 // This public class function returns a string containing the canonical format
 // for the specified association.
 func (c *formatterClass_) FormatAssociation(association Value) string {
-	var formatter = c.FromNothing()
+	var formatter = c.WithDefaultDepth()
 	var string_ = formatter.FormatAssociation(association)
 	return string_
 }
@@ -82,7 +82,7 @@ func (c *formatterClass_) FormatAssociation(association Value) string {
 // This public class function returns a string containing the canonical format
 // for the specified collection.
 func (c *formatterClass_) FormatCollection(collection Collection) string {
-	var formatter = c.FromNothing()
+	var formatter = c.WithDefaultDepth()
 	var string_ = formatter.FormatCollection(collection)
 	return string_
 }
@@ -90,7 +90,7 @@ func (c *formatterClass_) FormatCollection(collection Collection) string {
 // This public class function returns the bytes containing the canonical format
 // for the specified collection including the POSIX standard EOF marker.
 func (c *formatterClass_) FormatDocument(collection Collection) []byte {
-	var formatter = c.FromNothing()
+	var formatter = c.WithDefaultDepth()
 	var string_ = formatter.FormatCollection(collection) + EOF
 	return []byte(string_)
 }

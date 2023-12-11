@@ -51,7 +51,8 @@ func List[V Value]() *listClass_[V] {
 func (c *listClass_[V]) FromNothing() ListLike[V] {
 	var Array = Array[V]() // Retrieve the array namespace.
 	var array = Array.WithSize(0)
-	var compare = CompareValues
+	var Collator = Collator()
+	var compare = Collator.CompareValues
 	var list = &list_[V]{array, compare}
 	return list
 }

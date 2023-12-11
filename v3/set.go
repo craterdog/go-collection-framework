@@ -49,7 +49,8 @@ func Set[V Value]() *setClass_[V] {
 // This public class constructor creates a new empty set.
 // The set uses the natural ranking function to order its values.
 func (c *setClass_[V]) FromNothing() SetLike[V] {
-	var set = c.WithRanker(RankValues)
+	var Collator = Collator()
+	var set = c.WithRanker(Collator.RankValues)
 	return set
 }
 
@@ -65,7 +66,8 @@ func (c *setClass_[V]) WithRanker(ranker RankingFunction) SetLike[V] {
 // This public class constructor creates a new set from the specified sequence.
 // The set uses the natural ranking function to order its values.
 func (c *setClass_[V]) FromSequence(sequence Sequential[V]) SetLike[V] {
-	var set = c.FromSequenceWithRanker(sequence, RankValues)
+	var Collator = Collator()
+	var set = c.FromSequenceWithRanker(sequence, Collator.RankValues)
 	return set
 }
 

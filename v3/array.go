@@ -184,7 +184,8 @@ func (v array_[V]) SetValues(index int, values Sequential[V]) {
 // This public class method sorts the values in this list using the natural
 // ranking function.
 func (v array_[V]) SortValues() {
-	v.SortValuesWithRanker(RankValues)
+	var Collator = Collator()
+	v.SortValuesWithRanker(Collator.RankValues)
 }
 
 // This public class method sorts the values in this list using the specified

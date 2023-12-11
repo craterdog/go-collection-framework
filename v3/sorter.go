@@ -133,6 +133,7 @@ func (v *sorter_[V]) ShuffleValues(array []V) {
 // using an iterative merge sort along with the ranking function associated with
 // this sorter.  The algorithm is documented here:
 //   - https://en.wikipedia.org/wiki/Merge_sort#Bottom-up_implementation
+//
 // This iterative approach saves on memory allocation by swapping between two
 // arrays of the same size rather than allocating new arrays for each sub-array.
 // This results in stable O[nlog(n)] time and O[n] space performance.
@@ -226,4 +227,3 @@ func (v *sorter_[V]) randomIndex(size int) int {
 	}
 	return int(random.Int64())
 }
-

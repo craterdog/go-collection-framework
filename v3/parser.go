@@ -283,7 +283,7 @@ func (v *parser) parseInlineAssociations() (Sequential[Binding[Key, Value]], *To
 	var token *Token
 	var association Binding[Key, Value]
 	var List = List[Binding[Key, Value]]()
-	var associations = List.FromNothing()
+	var associations = List.Empty()
 	_, token, ok = v.parseDelimiter(":")
 	if ok {
 		// This is an empty sequence of associations.
@@ -330,7 +330,7 @@ func (v *parser) parseInlineValues() (Sequential[Value], *Token, bool) {
 	var token *Token
 	var value Value
 	var List = List[Value]()
-	var values = List.FromNothing()
+	var values = List.Empty()
 	_, token, ok = v.parseDelimiter("]")
 	if ok {
 		// This is an empty sequence of values.
@@ -413,7 +413,7 @@ func (v *parser) parseMultilineAssociations() (Sequential[Binding[Key, Value]], 
 	var token *Token
 	var association AssociationLike[Key, Value]
 	var List = List[Binding[Key, Value]]()
-	var associations = List.FromNothing()
+	var associations = List.Empty()
 	association, token, ok = v.parseAssociation()
 	if !ok {
 		// A non-empty sequence must have at least one association.
@@ -449,7 +449,7 @@ func (v *parser) parseMultilineValues() (Sequential[Value], *Token, bool) {
 	var token *Token
 	var value Value
 	var List = List[Value]()
-	var values = List.FromNothing()
+	var values = List.Empty()
 	value, token, ok = v.parseValue()
 	if !ok {
 		// A non-empty sequence must have at least one value.

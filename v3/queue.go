@@ -57,7 +57,7 @@ func (c *queueClass_[V]) DefaultCapacity() int {
 
 // This public class constructor creates a new empty queue with the default
 // capacity.
-func (c *queueClass_[V]) FromNothing() QueueLike[V] {
+func (c *queueClass_[V]) Empty() QueueLike[V] {
 	var queue = c.WithCapacity(c.defaultCapacity)
 	return queue
 }
@@ -70,7 +70,7 @@ func (c *queueClass_[V]) WithCapacity(capacity int) QueueLike[V] {
 	}
 	var available = make(chan bool, capacity)
 	var List = List[V]()
-	var values = List.FromNothing()
+	var values = List.Empty()
 	var queue = &queue_[V]{
 		available: available,
 		values:    values,
@@ -107,7 +107,7 @@ func (c *queueClass_[V]) Fork(wg *syn.WaitGroup, input FIFO[V], size int) Sequen
 	// Create the new output queues.
 	var capacity = input.GetCapacity()
 	var List = List[FIFO[V]]()
-	var outputs = List.FromNothing()
+	var outputs = List.Empty()
 	for i := 0; i < size; i++ {
 		outputs.AppendValue(c.WithCapacity(capacity))
 	}
@@ -162,7 +162,7 @@ func (c *queueClass_[V]) Split(wg *syn.WaitGroup, input FIFO[V], size int) Seque
 	// Create the new output queues.
 	var capacity = input.GetCapacity()
 	var List = List[FIFO[V]]()
-	var outputs = List.FromNothing()
+	var outputs = List.Empty()
 	for i := 0; i < size; i++ {
 		outputs.AppendValue(c.WithCapacity(capacity))
 	}

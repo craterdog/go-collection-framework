@@ -32,7 +32,7 @@ func TestStackWithSmallCapacity(t *tes.T) {
 
 func TestEmptyStackRetrieval(t *tes.T) {
 	var Stack = col.Stack[int]()
-	var stack = Stack.FromNothing()
+	var stack = Stack.Empty()
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "Attempted to retrieve the top of an empty stack!", e)
@@ -45,7 +45,7 @@ func TestEmptyStackRetrieval(t *tes.T) {
 
 func TestEmptyStackRemoval(t *tes.T) {
 	var Stack = col.Stack[int]()
-	var stack = Stack.FromNothing()
+	var stack = Stack.Empty()
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "Attempted to remove the top of an empty stack!", e)
@@ -58,7 +58,7 @@ func TestEmptyStackRemoval(t *tes.T) {
 
 func TestStacksWithStrings(t *tes.T) {
 	var Stack = col.Stack[string]()
-	var stack = Stack.FromNothing()
+	var stack = Stack.Empty()
 	ass.True(t, stack.IsEmpty())
 	ass.Equal(t, 0, stack.GetSize())
 	stack.RemoveAll()

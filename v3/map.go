@@ -127,7 +127,7 @@ func (v map_[K, V]) GetIterator() Ratcheted[Binding[K, V]] {
 // This public class method returns the keys for this map.
 func (v map_[K, V]) GetKeys() Sequential[K] {
 	var List = List[K]()
-	var keys = List.FromNothing()
+	var keys = List.Empty()
 	var iterator = v.GetIterator()
 	for iterator.HasNext() {
 		var association = iterator.GetNext()
@@ -141,7 +141,7 @@ func (v map_[K, V]) GetKeys() Sequential[K] {
 // the map.
 func (v map_[K, V]) GetValues(keys Sequential[K]) Sequential[V] {
 	var List = List[V]()
-	var values = List.FromNothing()
+	var values = List.Empty()
 	var iterator = keys.GetIterator()
 	for iterator.HasNext() {
 		var key = iterator.GetNext()
@@ -177,7 +177,7 @@ func (v map_[K, V]) RemoveValue(key K) V {
 // specified keys from the map and returns the removed values.
 func (v map_[K, V]) RemoveValues(keys Sequential[K]) Sequential[V] {
 	var List = List[V]()
-	var values = List.FromNothing()
+	var values = List.Empty()
 	var iterator = keys.GetIterator()
 	for iterator.HasNext() {
 		var key = iterator.GetNext()

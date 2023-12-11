@@ -48,7 +48,7 @@ func List[V Value]() *listClass_[V] {
 
 // This public class constructor creates a new empty list.
 // The list uses the natural comparing function.
-func (c *listClass_[V]) FromNothing() ListLike[V] {
+func (c *listClass_[V]) Empty() ListLike[V] {
 	var Array = Array[V]() // Retrieve the array namespace.
 	var array = Array.WithSize(0)
 	var Collator = Collator()
@@ -69,7 +69,7 @@ func (c *listClass_[V]) FromComparer(compare ComparingFunction) ListLike[V] {
 // This public class constructor creates a new list from the specified sequence.
 // The list uses the natural compare function.
 func (c *listClass_[V]) FromSequence(sequence Sequential[V]) ListLike[V] {
-	var list = c.FromNothing()
+	var list = c.Empty()
 	var iterator = sequence.GetIterator()
 	for iterator.HasNext() {
 		var value = iterator.GetNext()
@@ -83,7 +83,7 @@ func (c *listClass_[V]) FromSequence(sequence Sequential[V]) ListLike[V] {
 // This public class function returns the concatenation of the two specified
 // lists.
 func (c *listClass_[V]) Concatenate(first, second ListLike[V]) ListLike[V] {
-	var list = c.FromNothing()
+	var list = c.Empty()
 	list.AppendValues(first)
 	list.AppendValues(second)
 	return list

@@ -56,7 +56,7 @@ func (c *stackClass_[V]) DefaultCapacity() int {
 
 // This public class constructor creates a new empty stack with the default
 // capacity.
-func (c *stackClass_[V]) FromNothing() StackLike[V] {
+func (c *stackClass_[V]) Empty() StackLike[V] {
 	var stack = c.WithCapacity(c.defaultCapacity)
 	return stack
 }
@@ -65,7 +65,7 @@ func (c *stackClass_[V]) FromNothing() StackLike[V] {
 // capacity.
 func (c *stackClass_[V]) WithCapacity(capacity int) StackLike[V] {
 	var List = List[V]()
-	var values = List.FromNothing()
+	var values = List.Empty()
 	if capacity < 1 {
 		capacity = c.defaultCapacity
 	}
@@ -76,7 +76,7 @@ func (c *stackClass_[V]) WithCapacity(capacity int) StackLike[V] {
 // This public class constructor creates a new stack from the specified
 // sequence. The stack uses the default capacity.
 func (c *stackClass_[V]) FromSequence(sequence Sequential[V]) StackLike[V] {
-	var stack = c.FromNothing()
+	var stack = c.Empty()
 	var iterator = sequence.GetIterator()
 	iterator.ToEnd()
 	for iterator.HasPrevious() {

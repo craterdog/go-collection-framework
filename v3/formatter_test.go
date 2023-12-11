@@ -99,7 +99,7 @@ func TestFormatMapOfStringToInteger(t *tes.T) {
 func TestFormatEmptyList(t *tes.T) {
 	var Formatter = col.Formatter()
 	var List = col.List[any]()
-	var list = List.FromNothing()
+	var list = List.Empty()
 	var s = Formatter.FormatCollection(list)
 	ass.Equal(t, "[ ](list)", s)
 	fmt.Println("\nEmpty List: " + s)
@@ -147,7 +147,7 @@ func TestFormatSetOfSet(t *tes.T) {
 	var Set = col.Set[any]()
 	var set1 = Set.FromSequence(array1)
 	var set2 = Set.FromSequence(array2)
-	var set = Set.FromNothing()
+	var set = Set.Empty()
 	set.AddValue(set1)
 	set.AddValue(set2)
 	var s = Formatter.FormatCollection(set)
@@ -157,7 +157,7 @@ func TestFormatSetOfSet(t *tes.T) {
 func TestFormatStackOfAny(t *tes.T) {
 	var Formatter = col.Formatter()
 	var Stack = col.Stack[any]()
-	var stack = Stack.FromNothing()
+	var stack = Stack.Empty()
 	stack.AddValue(v1)
 	stack.AddValue(v2)
 	stack.AddValue(v3)
@@ -174,7 +174,7 @@ func TestFormatStackOfAny(t *tes.T) {
 func TestFormatQueueOfAny(t *tes.T) {
 	var Formatter = col.Formatter()
 	var Queue = col.Queue[any]()
-	var queue = Queue.FromNothing()
+	var queue = Queue.Empty()
 	queue.AddValue(v1)
 	queue.AddValue(v2)
 	queue.AddValue(v3)
@@ -191,7 +191,7 @@ func TestFormatQueueOfAny(t *tes.T) {
 func TestFormatEmptyCatalog(t *tes.T) {
 	var Formatter = col.Formatter()
 	var Catalog = col.Catalog[any, any]()
-	var catalog = Catalog.FromNothing()
+	var catalog = Catalog.Empty()
 	var s = Formatter.FormatCollection(catalog)
 	ass.Equal(t, "[:](catalog)", s)
 	fmt.Println("\nEmpty Catalog: " + s)
@@ -200,7 +200,7 @@ func TestFormatEmptyCatalog(t *tes.T) {
 func TestFormatCatalogOfAnyToAny(t *tes.T) {
 	var Formatter = col.Formatter()
 	var Catalog = col.Catalog[any, any]()
-	var catalog = Catalog.FromNothing()
+	var catalog = Catalog.Empty()
 	catalog.SetValue(k1, v1)
 	catalog.SetValue(k2, v2)
 	catalog.SetValue(k3, v3)
@@ -217,7 +217,7 @@ func TestFormatCatalogOfAnyToAny(t *tes.T) {
 func TestFormatCatalogOfStringToAny(t *tes.T) {
 	var Formatter = col.Formatter()
 	var Catalog = col.Catalog[string, any]()
-	var catalog = Catalog.FromNothing()
+	var catalog = Catalog.Empty()
 	catalog.SetValue("key1", v1)
 	catalog.SetValue("key2", v2)
 	catalog.SetValue("key3", v3)
@@ -232,7 +232,7 @@ func TestFormatCatalogOfStringToAny(t *tes.T) {
 func TestFormatCatalogOfStringToInteger(t *tes.T) {
 	var Formatter = col.Formatter()
 	var Catalog = col.Catalog[string, int]()
-	var catalog = Catalog.FromNothing()
+	var catalog = Catalog.Empty()
 	catalog.SetValue("key1", 1)
 	catalog.SetValue("key2", 2)
 	catalog.SetValue("key3", 3)

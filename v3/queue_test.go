@@ -167,7 +167,7 @@ func TestQueueWithInvalidJoin(t *tes.T) {
 
 	// Create a new queue with an invalid fan out.
 	var List = col.List[col.FIFO[int]]()
-	var inputs = List.FromNothing()
+	var inputs = List.Empty()
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "The number of input queues for a join must be at least one.", e)

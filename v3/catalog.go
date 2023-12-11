@@ -47,10 +47,10 @@ func Catalog[K Key, V Value]() *catalogClass_[K, V] {
 // CLASS CONSTRUCTORS
 
 // This public class constructor creates a new empty catalog.
-func (c *catalogClass_[K, V]) FromNothing() CatalogLike[K, V] {
+func (c *catalogClass_[K, V]) Empty() CatalogLike[K, V] {
 	var keys = map[Key]Binding[K, V]{}
 	var List = List[Binding[K, V]]()
-	var associations = List.FromNothing()
+	var associations = List.Empty()
 	var catalog = &catalog_[K, V]{associations, keys}
 	return catalog
 }
@@ -58,7 +58,7 @@ func (c *catalogClass_[K, V]) FromNothing() CatalogLike[K, V] {
 // This public class constructor creates a new catalog from the specified
 // sequence of associations.
 func (c *catalogClass_[K, V]) FromSequence(sequence Sequential[Binding[K, V]]) CatalogLike[K, V] {
-	var catalog = c.FromNothing()
+	var catalog = c.Empty()
 	var iterator = sequence.GetIterator()
 	for iterator.HasNext() {
 		var association = iterator.GetNext()
@@ -92,7 +92,7 @@ func (c *catalogClass_[K, V]) Merge(first, second CatalogLike[K, V]) CatalogLike
 // The associations in the resulting catalog will be in the same order as the
 // specified keys.
 func (c *catalogClass_[K, V]) Extract(catalog CatalogLike[K, V], keys Sequential[K]) CatalogLike[K, V] {
-	var result = c.FromNothing()
+	var result = c.Empty()
 	var iterator = keys.GetIterator()
 	for iterator.HasNext() {
 		var key = iterator.GetNext()
@@ -148,7 +148,7 @@ func (v *catalog_[K, V]) GetIterator() Ratcheted[Binding[K, V]] {
 // This public class method returns the keys for this catalog.
 func (v *catalog_[K, V]) GetKeys() Sequential[K] {
 	var List = List[K]()
-	var keys = List.FromNothing()
+	var keys = List.Empty()
 	var iterator = v.associations.GetIterator()
 	for iterator.HasNext() {
 		var association = iterator.GetNext()
@@ -162,7 +162,7 @@ func (v *catalog_[K, V]) GetKeys() Sequential[K] {
 // in the catalog.
 func (v *catalog_[K, V]) GetValues(keys Sequential[K]) Sequential[V] {
 	var List = List[V]()
-	var values = List.FromNothing()
+	var values = List.Empty()
 	var iterator = keys.GetIterator()
 	for iterator.HasNext() {
 		var key = iterator.GetNext()
@@ -217,7 +217,7 @@ func (v *catalog_[K, V]) RemoveValue(key K) V {
 // specified keys from the catalog and returns the removed values.
 func (v *catalog_[K, V]) RemoveValues(keys Sequential[K]) Sequential[V] {
 	var List = List[V]()
-	var values = List.FromNothing()
+	var values = List.Empty()
 	var Iterator = Iterator[K]()
 	var iterator = Iterator.FromSequence(keys)
 	for iterator.HasNext() {

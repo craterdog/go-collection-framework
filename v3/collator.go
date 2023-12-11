@@ -89,20 +89,6 @@ func (c *collatorClass_) RankValues(first Value, second Value) int {
 	return v.RankValues(first, second)
 }
 
-// This private class function removes the generics from the type string for the
-// specified type and converts an empty interface into type "any".
-func (c *collatorClass_) baseTypeName(t ref.Type) string {
-	var result = t.String()
-	var index = sts.Index(result, "[")
-	if index > -1 {
-		result = result[:index]
-	}
-	if result == "interface {}" {
-		result = "any"
-	}
-	return result
-}
-
 // CLASS TYPE
 
 // Encapsulated Type
@@ -141,8 +127,8 @@ func (v *collator_) compareValues(first ref.Value, second ref.Value) bool {
 	}
 
 	// At this point, neither of the values are invalid.
-	var firstType = collatorClassSingleton.baseTypeName(first.Type())
-	var secondType = collatorClassSingleton.baseTypeName(second.Type())
+	var firstType = v.baseTypeName(first.Type())
+	var secondType = v.baseTypeName(second.Type())
 	if firstType != secondType && firstType != "any" && secondType != "any" {
 		// The values have different types.
 		return false
@@ -333,8 +319,8 @@ func (v *collator_) rankValues(first ref.Value, second ref.Value) int {
 	}
 
 	// At this point, neither of the values are nil.
-	var firstType = collatorClassSingleton.baseTypeName(first.Type())
-	var secondType = collatorClassSingleton.baseTypeName(second.Type())
+	var firstType = v.baseTypeName(first.Type())
+	var secondType = v.baseTypeName(second.Type())
 	if firstType != secondType && firstType != "any" && secondType != "any" {
 		// The values have different types.
 		return v.RankValues(firstType, secondType)
@@ -610,10 +596,11 @@ func (v *collator_) rankArrays(first ref.Value, second ref.Value) int {
 // type).
 func (v *collator_) rankMaps(first ref.Value, second ref.Value) int {
 	// Extract and sort the keys for the two maps.
+	var Sorter = Sorter[ref.Value]()
 	var firstKeys = first.MapKeys() // The returned keys are in random order.
-	SortValues(firstKeys, v.rankReflective)
+	Sorter.SortValues(firstKeys, v.rankReflective)
 	var secondKeys = second.MapKeys() // The returned keys are in random order.
-	SortValues(secondKeys, v.rankReflective)
+	Sorter.SortValues(secondKeys, v.rankReflective)
 
 	// Determine the smallest map.
 	var firstSize = len(firstKeys)
@@ -718,4 +705,18 @@ func (v *collator_) rankInterfaces(first ref.Value, second ref.Value) int {
 	}
 	// All getter values are equal.
 	return 0
+}
+
+// This private class method removes the generics from the type string for the
+// specified type and converts an empty interface into type "any".
+func (v *collator_) baseTypeName(t ref.Type) string {
+	var result = t.String()
+	var index = sts.Index(result, "[")
+	if index > -1 {
+		result = result[:index]
+	}
+	if result == "interface {}" {
+		result = "any"
+	}
+	return result
 }

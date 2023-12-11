@@ -1,5 +1,5 @@
 /*******************************************************************************
- *   Copyright (c) 2009-2022 Crater Dog Technologies™.  All Rights Reserved.   *
+ *   Copyright (c) 2009-2023 Crater Dog Technologies™.  All Rights Reserved.   *
  *******************************************************************************
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.               *
  *                                                                             *
@@ -12,60 +12,106 @@ package collections
 
 import (
 	ran "crypto/rand"
+	fmt "fmt"
 	big "math/big"
 )
 
-// SORTER INTERFACE
+// CLASS NAMESPACE
 
-// This function reverses the order of the values in the specified array.
-func ReverseValues[V Value](array []V) {
-	var v = Sorter[V](nil)
+// This private type defines the namespace structure associated with the
+// constants, constructors and functions for the sorter class namespace.
+type sorterClass_[V Value] struct {
+	naturalRanker RankingFunction
+}
+
+// This private constant defines a map to hold all the singleton references to
+// the type specific sorter namespaces.
+var sorterClassSingletons = map[string]any{}
+
+// This public function returns the singleton reference to a type specific
+// sorter namespace.  It also initializes any class constants as needed.
+func Sorter[V Value]() *sorterClass_[V] {
+	var class *sorterClass_[V]
+	var key = fmt.Sprintf("%T", class)
+	var value = sorterClassSingletons[key]
+	switch actual := value.(type) {
+	case *sorterClass_[V]:
+		class = actual
+	default:
+		class = &sorterClass_[V]{
+			naturalRanker: Collator().RankValues,
+		}
+		sorterClassSingletons[key] = class
+	}
+	return class
+}
+
+// CLASS CONSTANTS
+
+// This public class constant represents the natural ranking function.
+func (c *sorterClass_[V]) NaturalRanker() RankingFunction {
+	return c.naturalRanker
+}
+
+// CLASS CONSTRUCTORS
+
+// This public class constructor creates a new sorter that can be used to sort
+// an array using the specified ranking function.
+func (c *sorterClass_[V]) WithNaturalRanker() SorterLike[V] {
+	var sorter = &sorter_[V]{
+		rank: c.naturalRanker,
+	}
+	return sorter
+}
+
+// This public class constructor creates a new sorter that can be used to sort
+// an array using the specified ranking function.
+func (c *sorterClass_[V]) WithRanker(ranker RankingFunction) SorterLike[V] {
+	var sorter = &sorter_[V]{
+		rank: ranker,
+	}
+	return sorter
+}
+
+// CLASS FUNCTIONS
+
+// This public class function reverses the order of the values in the specified
+// array.
+func (c *sorterClass_[V]) ReverseValues(array []V) {
+	var v = c.WithNaturalRanker()
 	v.ReverseValues(array)
 }
 
-// This function randomly shuffles the values in the specified array.
-func ShuffleValues[V Value](array []V) {
-	var v = Sorter[V](nil)
+// This public class function randomly shuffles the values in the specified
+// array.
+func (c *sorterClass_[V]) ShuffleValues(array []V) {
+	var v = c.WithNaturalRanker()
 	v.ShuffleValues(array)
 }
 
-// This function sorts the values in the specified array using the specified
-// ranking function.
-func SortValues[V Value](array []V, ranker RankingFunction) {
-	var v = Sorter[V](ranker)
+// This public class function sorts the values in the specified array using the
+// specified ranking function.
+func (c *sorterClass_[V]) SortValues(array []V, ranker RankingFunction) {
+	var v = c.WithRanker(ranker)
 	v.SortValues(array)
 }
 
-// This constructor creates a new instance of a sorter that can be used to
-// sort an array using a specific ranking function.
-func Sorter[V Value](ranker RankingFunction) SorterLike[V] {
-	return &sorter[V]{ranker}
-}
+// CLASS TYPE
 
-// SORTER IMPLEMENTATION
+// Encapsulated Type
 
-// This type defines the structure and methods for a merge sorter agent.
-type sorter[V Value] struct {
+// This private class type encapsulates a Go structure containing private
+// attributes that can only be accessed and manipulated using methods that
+// implement the sorter-like abstract type.
+type sorter_[V Value] struct {
 	rank RankingFunction
 }
 
-// This method reverses the order of the values in the specified array in place.
-func (v *sorter[V]) ReverseValues(array []V) {
-	v.reverseArray(array)
-}
+// Systematic Interface
 
-// This method randomly shuffles the values in the specified array in place.
-func (v *sorter[V]) ShuffleValues(array []V) {
-	v.shuffleArray(array)
-}
-
-// This method sorts the values in the specified array in place.
-func (v *sorter[V]) SortValues(array []V) {
-	v.sortArray(array)
-}
-
-// This method reverses the order of the values in the specified array.
-func (v *sorter[V]) reverseArray(array []V) {
+// This public class method reverses the order of the values in the specified
+// array in place.
+func (v *sorter_[V]) ReverseValues(array []V) {
 	var length = len(array)
 	var half = length / 2 // Rounds down to the nearest integer.
 	for index := 0; index < half; index++ {
@@ -73,41 +119,30 @@ func (v *sorter[V]) reverseArray(array []V) {
 	}
 }
 
-// This method pseudo-randomly shuffles the values in the specified array.
-func (v *sorter[V]) shuffleArray(array []V) {
+// This public class method randomly shuffles the values in the specified array
+// in place.
+func (v *sorter_[V]) ShuffleValues(array []V) {
 	var size = len(array)
 	for i := 0; i < size; i++ {
-		var r = randomIndex(size)
+		var r = v.randomIndex(size)
 		array[i], array[r] = array[r], array[i]
 	}
 }
 
-// This function generates a cryptographically secure random index in the
-// range [0..size).
-func randomIndex(size int) int {
-	var random, err = ran.Int(ran.Reader, big.NewInt(int64(size)))
-	if err != nil {
-		// There was an issue with the underlying OS so time to...
-		panic("Unable to generate a random index:\n" + err.Error())
-	}
-	return int(random.Int64())
-}
-
-// The following methods are used to sort an array using the ranking function
-// that is associated with the sorter. These methods implement a merge sort
-// that has been optimized to be iterative rather than recursive. They also
-// save on memory allocation by swapping between two arrays of the same size
-// rather than allocating new arrays for each subarray.  This results in stable
-// O[nlog(n)] time and O[n] space performance. The algorithm is documented here:
+// This public class method sorts the values in the specified array in place
+// using an iterative merge sort along with the ranking function associated with
+// this sorter.  The algorithm is documented here:
 //   - https://en.wikipedia.org/wiki/Merge_sort#Bottom-up_implementation
-
-func (v *sorter[V]) sortArray(array []V) {
+// This iterative approach saves on memory allocation by swapping between two
+// arrays of the same size rather than allocating new arrays for each sub-array.
+// This results in stable O[nlog(n)] time and O[n] space performance.
+func (v *sorter_[V]) SortValues(array []V) {
 	// Create a buffer array.
 	var length = len(array)
 	var buffer = make([]V, length)
 	copy(buffer, array) // Make a copy of the original unsorted array.
 
-	// Iterate through subarray widths of 2, 4, 8, ... length.
+	// Iterate through sub-array widths of 2, 4, 8, ... length.
 	for width := 1; width < length; width *= 2 {
 
 		// Split the buffer array into two arrays.
@@ -125,7 +160,7 @@ func (v *sorter[V]) sortArray(array []V) {
 				right = length
 			}
 
-			// Sort and merge the subarrays.
+			// Sort and merge the sub-arrays.
 			v.mergeArrays(
 				buffer[left:middle],
 				buffer[middle:right],
@@ -140,7 +175,11 @@ func (v *sorter[V]) sortArray(array []V) {
 	copy(array, buffer) // Both arrays are now sorted.
 }
 
-func (v *sorter[V]) mergeArrays(left []V, right []V, merged []V) {
+// Private Interface
+
+// This private class method is used for the merging part of the merge sort
+// algorithm.
+func (v *sorter_[V]) mergeArrays(left []V, right []V, merged []V) {
 	var leftIndex = 0
 	var leftLength = len(left)
 	var rightIndex = 0
@@ -176,3 +215,15 @@ func (v *sorter[V]) mergeArrays(left []V, right []V, merged []V) {
 		mergedIndex++
 	}
 }
+
+// This private class method generates a cryptographically secure random index
+// in the range [0..size).
+func (v *sorter_[V]) randomIndex(size int) int {
+	var random, err = ran.Int(ran.Reader, big.NewInt(int64(size)))
+	if err != nil {
+		// There was an issue with the underlying OS so time to...
+		panic("Unable to generate a random index:\n" + err.Error())
+	}
+	return int(random.Int64())
+}
+

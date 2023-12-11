@@ -192,18 +192,21 @@ func (v array_[V]) SortValues() {
 // ranking function.
 func (v array_[V]) SortValuesWithRanker(ranker RankingFunction) {
 	if v.GetSize() > 1 {
-		SortValues(v, ranker)
+		var Sorter = Sorter[V]()
+		Sorter.SortValues(v, ranker)
 	}
 }
 
 // This public class method reverses the order of all values in this list.
 func (v array_[V]) ReverseValues() {
-	ReverseValues(v)
+	var Sorter = Sorter[V]()
+	Sorter.ReverseValues(v)
 }
 
 // This public class method pseudo-randomly shuffles the values in this list.
 func (v array_[V]) ShuffleValues() {
-	ShuffleValues(v)
+	var Sorter = Sorter[V]()
+	Sorter.ShuffleValues(v)
 }
 
 // Private Interface

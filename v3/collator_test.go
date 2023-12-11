@@ -501,13 +501,14 @@ func TestRanking(t *tes.T) {
 }
 
 func TestTildeArrays(t *tes.T) {
+	var Sorter = col.Sorter[String]()
 	var Collator = col.Collator()
 	var alpha = String("alpha")
 	var beta = String("beta")
 	var gamma = String("gamma")
 	var delta = String("delta")
 	var array = []String{alpha, beta, gamma, delta}
-	col.SortValues(array, Collator.RankValues)
+	Sorter.SortValues(array, Collator.RankValues)
 	ass.Equal(t, alpha, array[0])
 	ass.Equal(t, beta, array[1])
 	ass.Equal(t, delta, array[2])

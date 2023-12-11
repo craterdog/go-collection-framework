@@ -347,8 +347,9 @@ func (v *queue_[V]) CloseQueue() {
 
 // Private Interface
 
-// This private class method is used by Go to generate a canonical string for
+// This public class method is used by Go to generate a canonical string for
 // the queue.
 func (v *queue_[V]) String() string {
-	return FormatCollection(v)
+	var Formatter = Formatter()
+	return Formatter.FormatCollection(v)
 }

@@ -117,6 +117,13 @@ type Binding[K Key, V Value] interface {
 }
 
 // This abstract interface defines the set of method signatures that must be
+// supported by all canonical agents that can generate formatted strings.
+type Canonical interface {
+	FormatAssociation(association Value) string
+	FormatCollection(collection Collection) string
+}
+
+// This abstract interface defines the set of method signatures that must be
 // supported by all discerning agents that can compare and rank two values.
 type Discerning interface {
 	CompareValues(first Value, second Value) bool
@@ -269,6 +276,12 @@ type CatalogLike[K Key, V Value] interface {
 // This interface defines the methods supported by all collator-like types.
 type CollatorLike interface {
 	Discerning
+}
+
+// This abstract type defines the set of abstract interfaces that must be
+// supported by all formatter-like types.
+type FormatterLike interface {
+	Canonical
 }
 
 // This abstract type defines the set of abstract interfaces that must be

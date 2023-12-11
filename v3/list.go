@@ -190,8 +190,9 @@ func (v *list_[V]) GetComparer() ComparingFunction {
 	return v.compare
 }
 
-// This method returns the index of the FIRST occurrence of the specified value in
-// this list, or zero if this list does not contain the value.
+// This public class method returns the index of the FIRST occurrence of the
+// specified value in this list, or zero if this list does not contain the
+// value.
 func (v *list_[V]) GetIndex(value V) int {
 	for index, candidate := range v.AsArray() {
 		if v.compare(candidate, value) {
@@ -203,13 +204,14 @@ func (v *list_[V]) GetIndex(value V) int {
 	return 0
 }
 
-// This method determines whether or not this list contains the specified value.
+// This public class method determines whether or not this list contains the
+// specified value.
 func (v *list_[V]) ContainsValue(value V) bool {
 	return v.GetIndex(value) > 0
 }
 
-// This method determines whether or not this list contains ANY of the specified
-// values.
+// This public class method determines whether or not this list contains ANY of
+// the specified values.
 func (v *list_[V]) ContainsAny(values Sequential[V]) bool {
 	var iterator = values.GetIterator()
 	for iterator.HasNext() {
@@ -223,8 +225,8 @@ func (v *list_[V]) ContainsAny(values Sequential[V]) bool {
 	return false
 }
 
-// This method determines whether or not this list contains ALL of the specified
-// values.
+// This public class method determines whether or not this list contains ALL of
+// the specified values.
 func (v *list_[V]) ContainsAll(values Sequential[V]) bool {
 	var iterator = values.GetIterator()
 	for iterator.HasNext() {
@@ -240,7 +242,7 @@ func (v *list_[V]) ContainsAll(values Sequential[V]) bool {
 
 // Expandable Interface
 
-// This method appends the specified value to the end of this list.
+// This public class method appends the specified value to the end of this list.
 func (v *list_[V]) AppendValue(value V) {
 
 	// Create a new bigger array.
@@ -265,7 +267,8 @@ func (v *list_[V]) AppendValue(value V) {
 	v.values = array
 }
 
-// This method appends the specified values to the end of this list.
+// This public class method appends the specified values to the end of this
+// list.
 func (v *list_[V]) AppendValues(values Sequential[V]) {
 
 	// Create a new bigger array.
@@ -294,8 +297,8 @@ func (v *list_[V]) AppendValues(values Sequential[V]) {
 	v.values = array
 }
 
-// This method inserts the specified value into this list in the specified
-// slot between the existing values.
+// This public class method inserts the specified value into this list in the
+// specified slot between the existing values.
 func (v *list_[V]) InsertValue(slot int, value V) {
 
 	// Create a new larger array.
@@ -321,8 +324,8 @@ func (v *list_[V]) InsertValue(slot int, value V) {
 	v.values = array
 }
 
-// This method inserts the specified values into this list in the specified
-// slot between existing values.
+// This public class method inserts the specified values into this list in the
+// specified slot between existing values.
 func (v *list_[V]) InsertValues(slot int, values Sequential[V]) {
 
 	// Create a new bigger array.
@@ -352,8 +355,8 @@ func (v *list_[V]) InsertValues(slot int, values Sequential[V]) {
 	v.values = array
 }
 
-// This method removes the value at the specified index from this list. The
-// removed value is returned.
+// This public class method removes the value at the specified index from this
+// list. The removed value is returned.
 func (v *list_[V]) RemoveValue(index int) V {
 
 	// Create a new smaller array.
@@ -382,8 +385,8 @@ func (v *list_[V]) RemoveValue(index int) V {
 	return removed
 }
 
-// This method removes the values in the specified index range from this list.
-// The removed values are returned.
+// This public class method removes the values in the specified index range from
+// this list.  The removed values are returned.
 func (v *list_[V]) RemoveValues(first int, last int) Sequential[V] {
 
 	// Create two smaller arrays.
@@ -418,7 +421,7 @@ func (v *list_[V]) RemoveValues(first int, last int) Sequential[V] {
 	return removed
 }
 
-// This method removes all values from this list.
+// This public class method removes all values from this list.
 func (v *list_[V]) RemoveAll() {
 	var Array = Array[V]()
 	v.values = Array.WithSize(0)
@@ -426,10 +429,11 @@ func (v *list_[V]) RemoveAll() {
 
 // Private Interface
 
-// This private class method is used by Go to generate a canonical string for
+// This public class method is used by Go to generate a canonical string for
 // the list.
 func (v *list_[V]) String() string {
-	return FormatCollection(v)
+	var Formatter = Formatter()
+	return Formatter.FormatCollection(v)
 }
 
 // This private class method normalizes the specified index.  The following

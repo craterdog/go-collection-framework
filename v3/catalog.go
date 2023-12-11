@@ -263,5 +263,6 @@ func (v *catalog_[K, V]) ShuffleValues() {
 
 // This public class method returns the canonical string for this catalog.
 func (v *catalog_[K, V]) String() string {
-	return FormatCollection(v)
+	var Formatter = Formatter()
+	return Formatter.FormatCollection(v)
 }

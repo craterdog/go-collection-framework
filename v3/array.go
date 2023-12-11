@@ -209,5 +209,6 @@ func (v array_[V]) ShuffleValues() {
 
 // This public class method is used by Go to generate a string from an array.
 func (v array_[V]) String() string {
-	return FormatCollection(v)
+	var Formatter = Formatter()
+	return Formatter.FormatCollection(v)
 }

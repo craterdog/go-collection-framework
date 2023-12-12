@@ -33,6 +33,31 @@ type scannerClass_ struct {
 	unsignedMatcher  *reg.Regexp
 }
 
+// These private constants define regular expression sub-patterns.
+const (
+	base10    = `[0-9]`
+	base16    = `[0-9a-f]`
+	boolean   = `false|true`
+	complex_  = `\((` + float + `)` + sign + `(` + float + `)i\)`
+	context   = `array|catalog|list|map|queue|set|stack`
+	delimiter = `\[|\]|\(|\)|:|,`
+	eol       = `\n`
+	escape    = `\\(?:(?:` + unicode + `)|[abfnrtv'"\\])`
+	exponent  = `[eE]` + sign + ordinal
+	float     = sign + `?(?:` + scalar + `)(?:` + exponent + `)?`
+	fraction  = `\.` + base10 + `+`
+	integer   = zero + `|` + sign + `?` + ordinal
+	nil_      = `nil`
+	ordinal   = `[1-9][0-9]*`
+	rune_     = `'(` + escape + `|[^'` + eol + `])'`
+	scalar    = `(?:` + zero + `|` + ordinal + `)` + fraction
+	sign      = `[+-]`
+	string_   = `"(` + escape + `|[^"` + eol + `])*"`
+	unicode   = `u` + base16 + `{4}|U` + base16 + `{8}`
+	unsigned  = `0x` + base16 + `+`
+	zero      = `0`
+)
+
 // This private constant defines the singleton reference to the scanner
 // class namespace.  It also initializes any class constants as needed.
 var scannerClassSingleton = &scannerClass_{
@@ -130,7 +155,7 @@ func (c *scannerClass_) FromSource(
 		position: 1,
 		tokens:   tokens,
 	}
-	go scanner.scanTokens() // Start scanning in the background.
+	go scanner.scanTokens() // Start scanning tokens in the background.
 	return scanner
 }
 
@@ -261,9 +286,8 @@ func (v *scanner_) scanToken() bool {
 	case v.foundString():
 	case v.foundUnsigned():
 	case v.foundInteger(): // Must be after all other numeric types.
-	default:
+	case v.foundError(): // Must be last.
 		// No valid token was found.
-		v.foundError()
 		return false
 	}
 	return true
@@ -373,12 +397,13 @@ func (v *scanner_) foundDelimiter() bool {
 }
 
 // This private class method adds an error token with the current scanner
-// information to the token channel.
-func (v *scanner_) foundError() {
+// information to the token channel. It always returns true.
+func (v *scanner_) foundError() bool {
 	var bytes = v.source[v.nextByte:]
 	var _, width = utf.DecodeRune(bytes)
 	v.nextByte += width
 	v.emitToken(Token().TypeError())
+	return true
 }
 
 // This private class method adds an EOF token with the current scanner
@@ -496,36 +521,3 @@ func (v *scanner_) foundUnsigned() bool {
 	}
 	return false
 }
-
-// CONSTANT DEFINITIONS
-
-// These constants define the POSIX standard representations.
-const (
-	EOF = "\n" // Must be last byte in a file.
-	EOL = "\n"
-)
-
-// These constant definitions capture regular expression subpatterns.
-const (
-	base10    = `[0-9]`
-	base16    = `[0-9a-f]`
-	boolean   = `false|true`
-	complex_  = `\((` + float + `)` + sign + `(` + float + `)i\)`
-	context   = `array|catalog|list|map|queue|set|stack`
-	delimiter = `\[|\]|\(|\)|:|,`
-	eol       = `\n`
-	escape    = `\\(?:(?:` + unicode + `)|[abfnrtv'"\\])`
-	exponent  = `[eE]` + sign + ordinal
-	float     = sign + `?(?:` + scalar + `)(?:` + exponent + `)?`
-	fraction  = `\.` + base10 + `+`
-	integer   = zero + `|` + sign + `?` + ordinal
-	nil_      = `nil`
-	ordinal   = `[1-9][0-9]*`
-	rune_     = `'(` + escape + `|[^'` + eol + `])'`
-	scalar    = `(?:` + zero + `|` + ordinal + `)` + fraction
-	sign      = `[+-]`
-	string_   = `"(` + escape + `|[^"` + eol + `])*"`
-	unicode   = `u` + base16 + `{4}|U` + base16 + `{8}`
-	unsigned  = `0x` + base16 + `+`
-	zero      = `0`
-)

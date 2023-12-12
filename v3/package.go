@@ -73,6 +73,14 @@ type RankingFunction func(first Value, second Value) int
 // array of values using a ranking function.
 type SortingFunction[V Value] func(array []V, ranker RankingFunction)
 
+// PACKAGE CONSTANTS
+
+// These constants define POSIX standard representations.
+const (
+	EOF = "\n" // Must be last byte in a file.
+	EOL = "\n"
+)
+
 // PACKAGE ABSTRACTIONS
 
 // Abstract Interfaces

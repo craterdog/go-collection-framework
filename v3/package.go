@@ -124,6 +124,15 @@ type Canonical interface {
 }
 
 // This abstract interface defines the set of method signatures that must be
+// supported by all contextual tokens.
+type Contextual interface {
+	GetType() string
+	GetValue() string
+	GetLine() int
+	GetPosition() int
+}
+
+// This abstract interface defines the set of method signatures that must be
 // supported by all discerning agents that can compare and rank two values.
 type Discerning interface {
 	CompareValues(first Value, second Value) bool
@@ -317,6 +326,11 @@ type QueueLike[V Value] interface {
 }
 
 // This abstract type defines the set of abstract interfaces that must be
+// supported by all scanner-like types.
+type ScannerLike interface {
+}
+
+// This abstract type defines the set of abstract interfaces that must be
 // supported by all set-like types.
 type SetLike[V Value] interface {
 	Sequential[V]
@@ -336,4 +350,10 @@ type SorterLike[V Value] interface {
 type StackLike[V Value] interface {
 	Sequential[V]
 	LIFO[V]
+}
+
+// This abstract type defines the set of abstract interfaces that must be
+// supported by all token-like types.
+type TokenLike interface {
+	Contextual
 }

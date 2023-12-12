@@ -25,11 +25,11 @@ import (
 // A POSIX compliant file must end with an EOF marker.
 func ParseDocument(source []byte) Collection {
 	var ok bool
-	var token *Token
+	var token TokenLike
 	var collection Collection
-	var tokens = make(chan Token, 256)
-	Scanner(source, tokens) // Starts scanning in a separate go routine.
-	var Stack = Stack[*Token]()
+	var tokens = make(chan TokenLike, 256)
+	Scanner().FromSource(source, tokens) // Starts scanning in a separate go routine.
+	var Stack = Stack[TokenLike]()
 	var p = &parser{
 		source: source,
 		next:   Stack.WithCapacity(4),
@@ -72,22 +72,23 @@ func ParseCollection(source string) Collection {
 // This type defines the structure and methods for the parser agent.
 type parser struct {
 	source         []byte
-	next           StackLike[*Token] // The stack of the retrieved tokens that have been put back.
-	tokens         chan Token        // The queue of unread tokens coming from the scanner.
-	p1, p2, p3, p4 *Token            // The previous four tokens that have been retrieved.
+	next           StackLike[TokenLike] // The stack of the retrieved tokens that have been put back.
+	tokens         chan TokenLike       // The queue of unread tokens coming from the scanner.
+	p1, p2, p3, p4 TokenLike            // The previous four tokens that have been retrieved.
 }
 
 // This method attempts to read the next token from the token stream and return
 // it.
-func (v *parser) nextToken() *Token {
-	var next *Token
+func (v *parser) nextToken() TokenLike {
+	var Token = Token()
+	var next TokenLike
 	if v.next.IsEmpty() {
 		var token, ok = <-v.tokens
 		if !ok {
 			panic("The token channel terminated without an EOF or error token.")
 		}
-		next = &token
-		if next.Type == TokenError {
+		next = token
+		if next.GetType() == Token.TypeError() {
 			var message = v.formatError(next)
 			panic(message)
 		}
@@ -107,9 +108,9 @@ func (v *parser) backupOne() {
 
 // This method returns an error message containing the context for a parsing
 // error.
-func (v *parser) formatError(token *Token) string {
+func (v *parser) formatError(token TokenLike) string {
 	var message = fmt.Sprintf("An unexpected token was received by the parser: %v\n", token)
-	var line = token.Line
+	var line = token.GetLine()
 	var lines = sts.Split(string(v.source), EOL)
 
 	message += "\033[36m"
@@ -120,7 +121,7 @@ func (v *parser) formatError(token *Token) string {
 
 	message += " \033[32m>>>─"
 	var count = 0
-	for count < token.Position {
+	for count < token.GetPosition() {
 		message += "─"
 		count++
 	}
@@ -137,9 +138,9 @@ func (v *parser) formatError(token *Token) string {
 // This method attempts to parse an association between a key and value. It
 // returns the association and whether or not the association was successfully
 // parsed.
-func (v *parser) parseAssociation() (AssociationLike[Key, Value], *Token, bool) {
+func (v *parser) parseAssociation() (AssociationLike[Key, Value], TokenLike, bool) {
 	var ok bool
-	var token *Token
+	var token TokenLike
 	var key Key
 	var value Value
 	var association AssociationLike[Key, Value]
@@ -171,9 +172,9 @@ func (v *parser) parseAssociation() (AssociationLike[Key, Value], *Token, bool) 
 
 // This method attempts to parse a collection of values. It returns the
 // collection and whether or not the collection was successfully parsed.
-func (v *parser) parseCollection() (Collection, *Token, bool) {
+func (v *parser) parseCollection() (Collection, TokenLike, bool) {
 	var ok bool
-	var token *Token
+	var token TokenLike
 	var collection Collection
 	var context string
 	collection, token, ok = v.parseAssociations()
@@ -245,9 +246,10 @@ func (v *parser) parseCollection() (Collection, *Token, bool) {
 
 // This method attempts to parse the specified delimiter. It returns
 // the token and whether or not the delimiter was found.
-func (v *parser) parseDelimiter(delimiter string) (string, *Token, bool) {
+func (v *parser) parseDelimiter(delimiter string) (string, TokenLike, bool) {
+	var Token = Token()
 	var token = v.nextToken()
-	if token.Type == TokenEOF || token.Value != delimiter {
+	if token.GetType() == Token.TypeEOF() || token.GetValue() != delimiter {
 		v.backupOne()
 		return delimiter, token, false
 	}
@@ -256,9 +258,10 @@ func (v *parser) parseDelimiter(delimiter string) (string, *Token, bool) {
 
 // This method attempts to parse the end-of-file (EOF) marker. It returns
 // the token and whether or not an EOL token was found.
-func (v *parser) parseEOF() (*Token, *Token, bool) {
+func (v *parser) parseEOF() (TokenLike, TokenLike, bool) {
+	var Token = Token()
 	var token = v.nextToken()
-	if token.Type != TokenEOF {
+	if token.GetType() != Token.TypeEOF() {
 		v.backupOne()
 		return token, token, false
 	}
@@ -267,9 +270,10 @@ func (v *parser) parseEOF() (*Token, *Token, bool) {
 
 // This method attempts to parse the end-of-line (EOL) marker. It returns
 // the token and whether or not an EOF token was found.
-func (v *parser) parseEOL() (*Token, *Token, bool) {
+func (v *parser) parseEOL() (TokenLike, TokenLike, bool) {
+	var Token = Token()
 	var token = v.nextToken()
-	if token.Type != TokenEOL {
+	if token.GetType() != Token.TypeEOL() {
 		v.backupOne()
 		return token, token, false
 	}
@@ -278,9 +282,9 @@ func (v *parser) parseEOL() (*Token, *Token, bool) {
 
 // It returns a sequence of associations and whether or not the sequence of
 // associations was successfully parsed.
-func (v *parser) parseInlineAssociations() (Sequential[Binding[Key, Value]], *Token, bool) {
+func (v *parser) parseInlineAssociations() (Sequential[Binding[Key, Value]], TokenLike, bool) {
 	var ok bool
-	var token *Token
+	var token TokenLike
 	var association Binding[Key, Value]
 	var List = List[Binding[Key, Value]]()
 	var associations = List.Empty()
@@ -325,9 +329,9 @@ func (v *parser) parseInlineAssociations() (Sequential[Binding[Key, Value]], *To
 // This method attempts to parse a sequence containing inline values. It returns
 // the sequence of values and whether or not the sequence of values was
 // successfully parsed.
-func (v *parser) parseInlineValues() (Sequential[Value], *Token, bool) {
+func (v *parser) parseInlineValues() (Sequential[Value], TokenLike, bool) {
 	var ok bool
-	var token *Token
+	var token TokenLike
 	var value Value
 	var List = List[Value]()
 	var values = List.Empty()
@@ -369,9 +373,9 @@ func (v *parser) parseInlineValues() (Sequential[Value], *Token, bool) {
 // This method attempts to parse a sequence of associations. It returns the
 // sequence of associations and whether or not the sequence of associations was
 // successfully parsed.
-func (v *parser) parseAssociations() (Sequential[Binding[Key, Value]], *Token, bool) {
+func (v *parser) parseAssociations() (Sequential[Binding[Key, Value]], TokenLike, bool) {
 	var ok bool
-	var token *Token
+	var token TokenLike
 	var associations Sequential[Binding[Key, Value]]
 	_, token, ok = v.parseDelimiter("[")
 	if !ok {
@@ -408,9 +412,9 @@ func (v *parser) parseAssociations() (Sequential[Binding[Key, Value]], *Token, b
 // This method attempts to parse a sequence containing multiline associations.
 // It returns the sequence of associations and whether or not the sequence of
 // associations was successfully parsed.
-func (v *parser) parseMultilineAssociations() (Sequential[Binding[Key, Value]], *Token, bool) {
+func (v *parser) parseMultilineAssociations() (Sequential[Binding[Key, Value]], TokenLike, bool) {
 	var ok bool
-	var token *Token
+	var token TokenLike
 	var association AssociationLike[Key, Value]
 	var List = List[Binding[Key, Value]]()
 	var associations = List.Empty()
@@ -444,9 +448,9 @@ func (v *parser) parseMultilineAssociations() (Sequential[Binding[Key, Value]], 
 // This method attempts to parse a sequence containing multiline values. It
 // returns the sequence of values and whether or not the sequence of values was
 // successfully parsed.
-func (v *parser) parseMultilineValues() (Sequential[Value], *Token, bool) {
+func (v *parser) parseMultilineValues() (Sequential[Value], TokenLike, bool) {
 	var ok bool
-	var token *Token
+	var token TokenLike
 	var value Value
 	var List = List[Value]()
 	var values = List.Empty()
@@ -481,9 +485,9 @@ func (v *parser) parseMultilineValues() (Sequential[Value], *Token, bool) {
 
 // This method attempts to parse a component entity. It returns the component
 // entity and whether or not the component entity was successfully parsed.
-func (v *parser) parseValue() (Value, *Token, bool) {
+func (v *parser) parseValue() (Value, TokenLike, bool) {
 	var ok bool
-	var token *Token
+	var token TokenLike
 	var value Value
 	value, token, ok = v.parsePrimitive()
 	if !ok {
@@ -494,9 +498,9 @@ func (v *parser) parseValue() (Value, *Token, bool) {
 
 // This method attempts to parse a primitive. It returns the primitive and
 // whether or not the primitive was successfully parsed.
-func (v *parser) parsePrimitive() (Primitive, *Token, bool) {
+func (v *parser) parsePrimitive() (Primitive, TokenLike, bool) {
 	var ok bool
-	var token *Token
+	var token TokenLike
 	var primitive Primitive
 	primitive, token, ok = v.parseBoolean()
 	if !ok {
@@ -530,9 +534,9 @@ func (v *parser) parsePrimitive() (Primitive, *Token, bool) {
 // This method attempts to parse a sequence of values. It returns the
 // sequence of values and whether or not the sequence of values was
 // successfully parsed.
-func (v *parser) parseValues() (Sequential[Value], *Token, bool) {
+func (v *parser) parseValues() (Sequential[Value], TokenLike, bool) {
 	var ok bool
-	var token *Token
+	var token TokenLike
 	var values Sequential[Value]
 	_, token, ok = v.parseDelimiter("[")
 	if !ok {
@@ -566,74 +570,80 @@ func (v *parser) parseValues() (Sequential[Value], *Token, bool) {
 
 // This method attempts to parse a boolean primitive. It returns the boolean
 // primitive and whether or not the boolean primitive was successfully parsed.
-func (v *parser) parseBoolean() (bool, *Token, bool) {
+func (v *parser) parseBoolean() (bool, TokenLike, bool) {
+	var Token = Token()
 	var boolean bool
 	var token = v.nextToken()
-	if token.Type != TokenBoolean {
+	if token.GetType() != Token.TypeBoolean() {
 		v.backupOne()
 		return boolean, token, false
 	}
-	boolean, _ = stc.ParseBool(token.Value)
+	boolean, _ = stc.ParseBool(token.GetValue())
 	return boolean, token, true
 }
 
 // This method attempts to parse a complex number primitive. It returns the
 // complex number primitive and whether or not the complex number primitive was
 // successfully parsed.
-func (v *parser) parseComplex() (complex128, *Token, bool) {
+func (v *parser) parseComplex() (complex128, TokenLike, bool) {
+	var Token = Token()
 	var complex_ complex128
 	var token = v.nextToken()
-	if token.Type != TokenComplex {
+	if token.GetType() != Token.TypeComplex() {
 		v.backupOne()
 		return complex_, token, false
 	}
-	complex_, _ = stc.ParseComplex(token.Value, 128)
+	complex_, _ = stc.ParseComplex(token.GetValue(), 128)
 	return complex_, token, true
 }
 
 // This method attempts to parse the type of a collection. It returns the type
 // string and whether or not the type string was successfully parsed.
-func (v *parser) parseContext() (string, *Token, bool) {
+func (v *parser) parseContext() (string, TokenLike, bool) {
+	var Token = Token()
 	var token = v.nextToken()
-	if token.Type != TokenContext {
+	if token.GetType() != Token.TypeContext() {
 		v.backupOne()
 		return "", token, false
 	}
-	return token.Value, token, true
+	return token.GetValue(), token, true
 }
 
 // This method attempts to parse a floating point primitive. It returns the
 // floating point primitive and whether or not the floating point primitive was
 // successfully parsed.
-func (v *parser) parseFloat() (float64, *Token, bool) {
+func (v *parser) parseFloat() (float64, TokenLike, bool) {
+	var Token = Token()
 	var float float64
 	var token = v.nextToken()
-	if token.Type != TokenFloat {
+	if token.GetType() != Token.TypeFloat() {
 		v.backupOne()
 		return float, token, false
 	}
-	float, _ = stc.ParseFloat(token.Value, 64)
+	float, _ = stc.ParseFloat(token.GetValue(), 64)
 	return float, token, true
 }
 
 // This method attempts to parse a integer primitive. It returns the integer
 // primitive and whether or not the integer primitive was successfully parsed.
-func (v *parser) parseInteger() (int64, *Token, bool) {
+func (v *parser) parseInteger() (int64, TokenLike, bool) {
+	var Token = Token()
 	var integer int64
 	var token = v.nextToken()
-	if token.Type != TokenInteger {
+	if token.GetType() != Token.TypeInteger() {
 		v.backupOne()
 		return integer, token, false
 	}
-	integer, _ = stc.ParseInt(token.Value, 10, 64)
+	integer, _ = stc.ParseInt(token.GetValue(), 10, 64)
 	return integer, token, true
 }
 
 // This method attempts to parse a nil primitive. It returns the nil primitive
 // and whether or not the nil primitive was successfully parsed.
-func (v *parser) parseNil() (Value, *Token, bool) {
+func (v *parser) parseNil() (Value, TokenLike, bool) {
+	var Token = Token()
 	var token = v.nextToken()
-	if token.Type != TokenNil {
+	if token.GetType() != Token.TypeNil() {
 		v.backupOne()
 		return nil, token, false
 	}
@@ -642,15 +652,16 @@ func (v *parser) parseNil() (Value, *Token, bool) {
 
 // This method attempts to parse a rune. It returns the rune and whether or not
 // the rune was successfully parsed.
-func (v *parser) parseRune() (rune, *Token, bool) {
+func (v *parser) parseRune() (rune, TokenLike, bool) {
+	var Token = Token()
 	var rune_ rune
 	var size int
 	var token = v.nextToken()
-	if token.Type != TokenRune {
+	if token.GetType() != Token.TypeRune() {
 		v.backupOne()
 		return rune_, token, false
 	}
-	var matches = scanRune([]byte(token.Value))
+	var matches = Scanner().MatchRune(token.GetValue())
 	// We must unquote the full token string properly.
 	var s, _ = stc.Unquote(matches[0])
 	rune_, size = utf.DecodeRuneInString(s)
@@ -664,14 +675,15 @@ func (v *parser) parseRune() (rune, *Token, bool) {
 
 // This method attempts to parse a string primitive. It returns the string
 // primitive and whether or not the string primitive was successfully parsed.
-func (v *parser) parseString() (string, *Token, bool) {
+func (v *parser) parseString() (string, TokenLike, bool) {
+	var Token = Token()
 	var string_ string
 	var token = v.nextToken()
-	if token.Type != TokenString {
+	if token.GetType() != Token.TypeString() {
 		v.backupOne()
 		return string_, token, false
 	}
-	var matches = scanString([]byte(token.Value))
+	var matches = Scanner().MatchString(token.GetValue())
 	// We must unquote the full token string properly.
 	string_, _ = stc.Unquote(matches[0])
 	return string_, token, true
@@ -680,14 +692,15 @@ func (v *parser) parseString() (string, *Token, bool) {
 // This method attempts to parse an unsigned integer primitive. It returns the
 // unsigned integer primitive and whether or not the unsigned integer primitive
 // was successfully parsed.
-func (v *parser) parseUnsigned() (uint64, *Token, bool) {
+func (v *parser) parseUnsigned() (uint64, TokenLike, bool) {
+	var Token = Token()
 	var unsigned uint64
 	var token = v.nextToken()
-	if token.Type != TokenUnsigned {
+	if token.GetType() != Token.TypeUnsigned() {
 		v.backupOne()
 		return unsigned, token, false
 	}
-	unsigned, _ = stc.ParseUint(token.Value[2:], 16, 64)
+	unsigned, _ = stc.ParseUint(token.GetValue()[2:], 16, 64)
 	return unsigned, token, true
 }
 

@@ -22,8 +22,6 @@ import (
 const testDirectory = "./test/"
 
 func TestParsingRoundtrips(t *tes.T) {
-	var Formatter = col.Formatter()
-
 	var files, err = osx.ReadDir(testDirectory)
 	if err != nil {
 		panic("Could not find the ./test directory.")
@@ -35,7 +33,7 @@ func TestParsingRoundtrips(t *tes.T) {
 			fmt.Println(filename)
 			var expected, _ = osx.ReadFile(filename)
 			var value = col.ParseDocument(expected)
-			var document = Formatter.FormatDocument(value)
+			var document = col.Formatter().FormatDocument(value)
 			ass.Equal(t, string(expected), string(document))
 		}
 	}

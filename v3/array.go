@@ -184,8 +184,7 @@ func (v array_[V]) SetValues(index int, values Sequential[V]) {
 // This public class method sorts the values in this list using the natural
 // ranking function.
 func (v array_[V]) SortValues() {
-	var Collator = Collator()
-	v.SortValuesWithRanker(Collator.RankValues)
+	v.SortValuesWithRanker(Collator().RankValues)
 }
 
 // This public class method sorts the values in this list using the specified
@@ -213,6 +212,5 @@ func (v array_[V]) ShuffleValues() {
 
 // This public class method is used by Go to generate a string from an array.
 func (v array_[V]) String() string {
-	var Formatter = Formatter()
-	return Formatter.FormatCollection(v)
+	return Formatter().FormatCollection(v)
 }

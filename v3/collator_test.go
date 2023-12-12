@@ -501,8 +501,8 @@ func TestRanking(t *tes.T) {
 }
 
 func TestTildeArrays(t *tes.T) {
-	var Sorter = col.Sorter[String]()
 	var Collator = col.Collator()
+	var Sorter = col.Sorter[String]()
 	var alpha = String("alpha")
 	var beta = String("beta")
 	var gamma = String("gamma")

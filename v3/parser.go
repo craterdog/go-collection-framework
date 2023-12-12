@@ -80,7 +80,6 @@ type parser struct {
 // This method attempts to read the next token from the token stream and return
 // it.
 func (v *parser) nextToken() TokenLike {
-	var Token = Token()
 	var next TokenLike
 	if v.next.IsEmpty() {
 		var token, ok = <-v.tokens
@@ -88,7 +87,7 @@ func (v *parser) nextToken() TokenLike {
 			panic("The token channel terminated without an EOF or error token.")
 		}
 		next = token
-		if next.GetType() == Token.TypeError() {
+		if next.GetType() == Token().TypeError() {
 			var message = v.formatError(next)
 			panic(message)
 		}
@@ -247,9 +246,8 @@ func (v *parser) parseCollection() (Collection, TokenLike, bool) {
 // This method attempts to parse the specified delimiter. It returns
 // the token and whether or not the delimiter was found.
 func (v *parser) parseDelimiter(delimiter string) (string, TokenLike, bool) {
-	var Token = Token()
 	var token = v.nextToken()
-	if token.GetType() == Token.TypeEOF() || token.GetValue() != delimiter {
+	if token.GetType() == Token().TypeEOF() || token.GetValue() != delimiter {
 		v.backupOne()
 		return delimiter, token, false
 	}
@@ -259,9 +257,8 @@ func (v *parser) parseDelimiter(delimiter string) (string, TokenLike, bool) {
 // This method attempts to parse the end-of-file (EOF) marker. It returns
 // the token and whether or not an EOL token was found.
 func (v *parser) parseEOF() (TokenLike, TokenLike, bool) {
-	var Token = Token()
 	var token = v.nextToken()
-	if token.GetType() != Token.TypeEOF() {
+	if token.GetType() != Token().TypeEOF() {
 		v.backupOne()
 		return token, token, false
 	}
@@ -271,9 +268,8 @@ func (v *parser) parseEOF() (TokenLike, TokenLike, bool) {
 // This method attempts to parse the end-of-line (EOL) marker. It returns
 // the token and whether or not an EOF token was found.
 func (v *parser) parseEOL() (TokenLike, TokenLike, bool) {
-	var Token = Token()
 	var token = v.nextToken()
-	if token.GetType() != Token.TypeEOL() {
+	if token.GetType() != Token().TypeEOL() {
 		v.backupOne()
 		return token, token, false
 	}
@@ -571,10 +567,9 @@ func (v *parser) parseValues() (Sequential[Value], TokenLike, bool) {
 // This method attempts to parse a boolean primitive. It returns the boolean
 // primitive and whether or not the boolean primitive was successfully parsed.
 func (v *parser) parseBoolean() (bool, TokenLike, bool) {
-	var Token = Token()
 	var boolean bool
 	var token = v.nextToken()
-	if token.GetType() != Token.TypeBoolean() {
+	if token.GetType() != Token().TypeBoolean() {
 		v.backupOne()
 		return boolean, token, false
 	}
@@ -586,10 +581,9 @@ func (v *parser) parseBoolean() (bool, TokenLike, bool) {
 // complex number primitive and whether or not the complex number primitive was
 // successfully parsed.
 func (v *parser) parseComplex() (complex128, TokenLike, bool) {
-	var Token = Token()
 	var complex_ complex128
 	var token = v.nextToken()
-	if token.GetType() != Token.TypeComplex() {
+	if token.GetType() != Token().TypeComplex() {
 		v.backupOne()
 		return complex_, token, false
 	}
@@ -600,9 +594,8 @@ func (v *parser) parseComplex() (complex128, TokenLike, bool) {
 // This method attempts to parse the type of a collection. It returns the type
 // string and whether or not the type string was successfully parsed.
 func (v *parser) parseContext() (string, TokenLike, bool) {
-	var Token = Token()
 	var token = v.nextToken()
-	if token.GetType() != Token.TypeContext() {
+	if token.GetType() != Token().TypeContext() {
 		v.backupOne()
 		return "", token, false
 	}
@@ -613,10 +606,9 @@ func (v *parser) parseContext() (string, TokenLike, bool) {
 // floating point primitive and whether or not the floating point primitive was
 // successfully parsed.
 func (v *parser) parseFloat() (float64, TokenLike, bool) {
-	var Token = Token()
 	var float float64
 	var token = v.nextToken()
-	if token.GetType() != Token.TypeFloat() {
+	if token.GetType() != Token().TypeFloat() {
 		v.backupOne()
 		return float, token, false
 	}
@@ -627,10 +619,9 @@ func (v *parser) parseFloat() (float64, TokenLike, bool) {
 // This method attempts to parse a integer primitive. It returns the integer
 // primitive and whether or not the integer primitive was successfully parsed.
 func (v *parser) parseInteger() (int64, TokenLike, bool) {
-	var Token = Token()
 	var integer int64
 	var token = v.nextToken()
-	if token.GetType() != Token.TypeInteger() {
+	if token.GetType() != Token().TypeInteger() {
 		v.backupOne()
 		return integer, token, false
 	}
@@ -641,9 +632,8 @@ func (v *parser) parseInteger() (int64, TokenLike, bool) {
 // This method attempts to parse a nil primitive. It returns the nil primitive
 // and whether or not the nil primitive was successfully parsed.
 func (v *parser) parseNil() (Value, TokenLike, bool) {
-	var Token = Token()
 	var token = v.nextToken()
-	if token.GetType() != Token.TypeNil() {
+	if token.GetType() != Token().TypeNil() {
 		v.backupOne()
 		return nil, token, false
 	}
@@ -653,11 +643,10 @@ func (v *parser) parseNil() (Value, TokenLike, bool) {
 // This method attempts to parse a rune. It returns the rune and whether or not
 // the rune was successfully parsed.
 func (v *parser) parseRune() (rune, TokenLike, bool) {
-	var Token = Token()
 	var rune_ rune
 	var size int
 	var token = v.nextToken()
-	if token.GetType() != Token.TypeRune() {
+	if token.GetType() != Token().TypeRune() {
 		v.backupOne()
 		return rune_, token, false
 	}
@@ -676,10 +665,9 @@ func (v *parser) parseRune() (rune, TokenLike, bool) {
 // This method attempts to parse a string primitive. It returns the string
 // primitive and whether or not the string primitive was successfully parsed.
 func (v *parser) parseString() (string, TokenLike, bool) {
-	var Token = Token()
 	var string_ string
 	var token = v.nextToken()
-	if token.GetType() != Token.TypeString() {
+	if token.GetType() != Token().TypeString() {
 		v.backupOne()
 		return string_, token, false
 	}
@@ -693,10 +681,9 @@ func (v *parser) parseString() (string, TokenLike, bool) {
 // unsigned integer primitive and whether or not the unsigned integer primitive
 // was successfully parsed.
 func (v *parser) parseUnsigned() (uint64, TokenLike, bool) {
-	var Token = Token()
 	var unsigned uint64
 	var token = v.nextToken()
-	if token.GetType() != Token.TypeUnsigned() {
+	if token.GetType() != Token().TypeUnsigned() {
 		v.backupOne()
 		return unsigned, token, false
 	}

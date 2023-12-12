@@ -200,6 +200,5 @@ func (v map_[K, V]) RemoveAll() {
 
 // This public class method is used by Go to generate a string from a map.
 func (v map_[K, V]) String() string {
-	var Formatter = Formatter()
-	return Formatter.FormatCollection(v)
+	return Formatter().FormatCollection(v)
 }

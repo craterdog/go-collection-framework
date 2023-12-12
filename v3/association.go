@@ -89,6 +89,5 @@ func (v *association_[K, V]) SetValue(value V) {
 
 // This public class method returns a canonical string for this association.
 func (v *association_[K, V]) String() string {
-	var Formatter = Formatter()
-	return Formatter.FormatAssociation(v)
+	return Formatter().FormatAssociation(v)
 }

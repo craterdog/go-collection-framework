@@ -49,8 +49,7 @@ func Set[V Value]() *setClass_[V] {
 // This public class constructor creates a new empty set.
 // The set uses the natural ranking function to order its values.
 func (c *setClass_[V]) Empty() SetLike[V] {
-	var Collator = Collator()
-	var set = c.WithRanker(Collator.RankValues)
+	var set = c.WithRanker(Collator().RankValues)
 	return set
 }
 
@@ -66,8 +65,7 @@ func (c *setClass_[V]) WithRanker(ranker RankingFunction) SetLike[V] {
 // This public class constructor creates a new set from the specified sequence.
 // The set uses the natural ranking function to order its values.
 func (c *setClass_[V]) FromSequence(sequence Sequential[V]) SetLike[V] {
-	var Collator = Collator()
-	var set = c.FromSequenceWithRanker(sequence, Collator.RankValues)
+	var set = c.FromSequenceWithRanker(sequence, Collator().RankValues)
 	return set
 }
 
@@ -289,8 +287,7 @@ func (v *set_[V]) RemoveAll() {
 // This public class method is used by Go to generate a canonical string for
 // the set.
 func (v *set_[V]) String() string {
-	var Formatter = Formatter()
-	return Formatter.FormatCollection(v)
+	return Formatter().FormatCollection(v)
 }
 
 // This private class method performs a binary search of the set for the

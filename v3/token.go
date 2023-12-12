@@ -184,12 +184,11 @@ func (v *token_) GetPosition() int {
 
 // This public class method returns the canonical string version of this token.
 func (v *token_) String() string {
-	var Token = Token()
 	var s string
 	switch {
-	case v.tokenType == Token.typeEOF:
+	case v.tokenType == Token().typeEOF:
 		s = "<EOF>"
-	case v.tokenType == Token.typeEOL:
+	case v.tokenType == Token().typeEOL:
 		s = "<EOL>"
 	case len(v.tokenValue) > 60:
 		s = fmt.Sprintf("%.60q...", v.tokenValue)

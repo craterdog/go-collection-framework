@@ -350,6 +350,5 @@ func (v *queue_[V]) CloseQueue() {
 // This public class method is used by Go to generate a canonical string for
 // the queue.
 func (v *queue_[V]) String() string {
-	var Formatter = Formatter()
-	return Formatter.FormatCollection(v)
+	return Formatter().FormatCollection(v)
 }

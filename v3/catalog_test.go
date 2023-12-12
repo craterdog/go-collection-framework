@@ -17,7 +17,6 @@ import (
 )
 
 func TestCatalogsWithStringsAndIntegers(t *tes.T) {
-	var Collator = col.Collator()
 	var Array = col.Array[string]()
 	var keys = Array.FromArray([]string{"foo", "bar"})
 	var Association = col.Association[string, int]()
@@ -45,7 +44,7 @@ func TestCatalogsWithStringsAndIntegers(t *tes.T) {
 	catalog.SetValue(association3.GetKey(), association3.GetValue())
 	ass.Equal(t, 3, catalog.GetSize())
 	var catalog2 = Catalog.FromSequence(catalog)
-	ass.True(t, Collator.CompareValues(catalog, catalog2))
+	ass.True(t, col.Collator().CompareValues(catalog, catalog2))
 	var Map = col.Map[string, int]()
 	var m = Map.FromMap(map[string]int{
 		"foo": 1,
@@ -55,7 +54,7 @@ func TestCatalogsWithStringsAndIntegers(t *tes.T) {
 	var catalog3 = Catalog.FromSequence(m)
 	catalog2.SortValues()
 	catalog3.SortValues()
-	ass.True(t, Collator.CompareValues(catalog2, catalog3))
+	ass.True(t, col.Collator().CompareValues(catalog2, catalog3))
 	iterator = catalog.GetIterator()
 	ass.True(t, iterator.HasNext())
 	ass.False(t, iterator.HasPrevious())
@@ -86,7 +85,6 @@ func TestCatalogsWithStringsAndIntegers(t *tes.T) {
 }
 
 func TestCatalogsWithMerge(t *tes.T) {
-	var Collator = col.Collator()
 	var Association = col.Association[string, int]()
 	var association1 = Association.FromPair("foo", 1)
 	var association2 = Association.FromPair("bar", 2)
@@ -103,11 +101,10 @@ func TestCatalogsWithMerge(t *tes.T) {
 	catalog4.SetValue(association1.GetKey(), association1.GetValue())
 	catalog4.SetValue(association2.GetKey(), association2.GetValue())
 	catalog4.SetValue(association3.GetKey(), association3.GetValue())
-	ass.True(t, Collator.CompareValues(catalog3, catalog4))
+	ass.True(t, col.Collator().CompareValues(catalog3, catalog4))
 }
 
 func TestCatalogsWithExtract(t *tes.T) {
-	var Collator = col.Collator()
 	var Array = col.Array[string]()
 	var keys = Array.FromArray([]string{"foo", "baz"})
 	var Association = col.Association[string, int]()
@@ -123,11 +120,10 @@ func TestCatalogsWithExtract(t *tes.T) {
 	var catalog3 = Catalog.Empty()
 	catalog3.SetValue(association1.GetKey(), association1.GetValue())
 	catalog3.SetValue(association3.GetKey(), association3.GetValue())
-	ass.True(t, Collator.CompareValues(catalog2, catalog3))
+	ass.True(t, col.Collator().CompareValues(catalog2, catalog3))
 }
 
 func TestCatalogsWithEmptyCatalogs(t *tes.T) {
-	var Collator = col.Collator()
 	var Array = col.Array[int]()
 	var keys = Array.WithSize(0)
 	var Catalog = col.Catalog[int, string]()
@@ -135,8 +131,8 @@ func TestCatalogsWithEmptyCatalogs(t *tes.T) {
 	var catalog2 = Catalog.Empty()
 	var catalog3 = Catalog.Merge(catalog1, catalog2)
 	var catalog4 = Catalog.Extract(catalog1, keys)
-	ass.True(t, Collator.CompareValues(catalog1, catalog2))
-	ass.True(t, Collator.CompareValues(catalog2, catalog3))
-	ass.True(t, Collator.CompareValues(catalog3, catalog4))
-	ass.True(t, Collator.CompareValues(catalog4, catalog1))
+	ass.True(t, col.Collator().CompareValues(catalog1, catalog2))
+	ass.True(t, col.Collator().CompareValues(catalog2, catalog3))
+	ass.True(t, col.Collator().CompareValues(catalog3, catalog4))
+	ass.True(t, col.Collator().CompareValues(catalog4, catalog1))
 }

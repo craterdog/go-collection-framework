@@ -313,12 +313,11 @@ func (v *scanner_) skipSpaces() {
 // to the next byte index position. It returns the token type of the type added
 // to the channel.
 func (v *scanner_) emitToken(tokenType string) string {
-	var Token = Token()
 	var tokenValue = string(v.source[v.firstByte:v.nextByte])
-	if tokenType == Token.TypeEOF() {
+	if tokenType == Token().TypeEOF() {
 		tokenValue = "<EOF>"
 	}
-	if tokenType == Token.TypeError() {
+	if tokenType == Token().TypeError() {
 		switch tokenValue {
 		case "\a":
 			tokenValue = "<BELL>"
@@ -334,7 +333,7 @@ func (v *scanner_) emitToken(tokenType string) string {
 			tokenValue = "<VTAB>"
 		}
 	}
-	var token = Token.FromContext(tokenType, tokenValue, v.line, v.position)
+	var token = Token().FromContext(tokenType, tokenValue, v.line, v.position)
 	//fmt.Println(token)
 	v.tokens <- token
 	v.firstByte = v.nextByte

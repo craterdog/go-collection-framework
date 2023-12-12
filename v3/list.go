@@ -51,8 +51,7 @@ func List[V Value]() *listClass_[V] {
 func (c *listClass_[V]) Empty() ListLike[V] {
 	var Array = Array[V]() // Retrieve the array namespace.
 	var array = Array.WithSize(0)
-	var Collator = Collator()
-	var compare = Collator.CompareValues
+	var compare = Collator().CompareValues
 	var list = &list_[V]{array, compare}
 	return list
 }
@@ -433,8 +432,7 @@ func (v *list_[V]) RemoveAll() {
 // This public class method is used by Go to generate a canonical string for
 // the list.
 func (v *list_[V]) String() string {
-	var Formatter = Formatter()
-	return Formatter.FormatCollection(v)
+	return Formatter().FormatCollection(v)
 }
 
 // This private class method normalizes the specified index.  The following

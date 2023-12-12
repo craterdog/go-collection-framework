@@ -171,6 +171,5 @@ func (v *stack_[V]) RemoveAll() {
 // This public class method is used by Go to generate a canonical string for
 // the stack.
 func (v *stack_[V]) String() string {
-	var Formatter = Formatter()
-	return Formatter.FormatCollection(v)
+	return Formatter().FormatCollection(v)
 }

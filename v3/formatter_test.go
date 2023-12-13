@@ -40,29 +40,29 @@ var v8 = []int{1, 2, 3}
 func TestFormatEmptyArray(t *tes.T) {
 	var array = []any{}
 	var s = col.Formatter().FormatCollection(array)
-	ass.Equal(t, "[ ](array)", s)
-	fmt.Println("\nEmpty Array: " + s)
+	ass.Equal(t, "[ ](array)\n", s)
+	fmt.Println("Empty Array: " + s)
 }
 
 func TestFormatArrayOfAny(t *tes.T) {
 	var array = []any{v1, v2, v3, v4, v5, v6, v7, v8}
 	var s = col.Formatter().FormatCollection(array)
-	ass.Equal(t, "(array)", s[len(s)-7:])
-	fmt.Println("\nArray of Any: " + s)
+	ass.Equal(t, "(array)\n", s[len(s)-8:])
+	fmt.Println("Array of Any: " + s)
 }
 
 func TestFormatArrayOfIntegers(t *tes.T) {
 	var array = []int{1, 2, 3, 4}
 	var s = col.Formatter().FormatCollection(array)
-	ass.Equal(t, "(array)", s[len(s)-7:])
-	fmt.Println("\nArray of Integers: " + s)
+	ass.Equal(t, "(array)\n", s[len(s)-8:])
+	fmt.Println("Array of Integers: " + s)
 }
 
 func TestFormatEmptyMap(t *tes.T) {
 	var mapp = map[any]any{}
 	var s = col.Formatter().FormatCollection(mapp)
-	ass.Equal(t, "[:](map)", s)
-	fmt.Println("\nEmpty Map: " + s)
+	ass.Equal(t, "[:](map)\n", s)
+	fmt.Println("Empty Map: " + s)
 }
 
 func TestFormatMapOfAnyToAny(t *tes.T) {
@@ -76,8 +76,8 @@ func TestFormatMapOfAnyToAny(t *tes.T) {
 		k7: v7,
 		k8: v8}
 	var s = col.Formatter().FormatCollection(mapp)
-	ass.Equal(t, "(map)", s[len(s)-5:])
-	fmt.Println("\nMap of Any to Any: " + s)
+	ass.Equal(t, "(map)\n", s[len(s)-6:])
+	fmt.Println("Map of Any to Any: " + s)
 }
 
 func TestFormatMapOfStringToInteger(t *tes.T) {
@@ -86,16 +86,16 @@ func TestFormatMapOfStringToInteger(t *tes.T) {
 		"second": 2,
 		"third":  3}
 	var s = col.Formatter().FormatCollection(mapp)
-	ass.Equal(t, "(map)", s[len(s)-5:])
-	fmt.Println("\nMap of String to Integer: " + s)
+	ass.Equal(t, "(map)\n", s[len(s)-6:])
+	fmt.Println("Map of String to Integer: " + s)
 }
 
 func TestFormatEmptyList(t *tes.T) {
 	var List = col.List[any]()
 	var list = List.Empty()
 	var s = col.Formatter().FormatCollection(list)
-	ass.Equal(t, "[ ](list)", s)
-	fmt.Println("\nEmpty List: " + s)
+	ass.Equal(t, "[ ](list)\n", s)
+	fmt.Println("Empty List: " + s)
 }
 
 func TestFormatListOfAny(t *tes.T) {
@@ -105,8 +105,8 @@ func TestFormatListOfAny(t *tes.T) {
 	var list = List.FromSequence(array)
 	var s = col.Formatter().FormatCollection(list)
 	ass.Equal(t, s, fmt.Sprintf("%s", list))
-	ass.Equal(t, "(list)", s[len(s)-6:])
-	fmt.Println("\nList of Any: " + s)
+	ass.Equal(t, "(list)\n", s[len(s)-7:])
+	fmt.Println("List of Any: " + s)
 }
 
 func TestFormatListOfBoolean(t *tes.T) {
@@ -115,7 +115,7 @@ func TestFormatListOfBoolean(t *tes.T) {
 	var List = col.List[bool]()
 	var list = List.FromSequence(array)
 	var s = col.Formatter().FormatCollection(list)
-	fmt.Println("\nList of Boolean: " + s)
+	fmt.Println("List of Boolean: " + s)
 }
 
 func TestFormatSetOfAny(t *tes.T) {
@@ -125,8 +125,8 @@ func TestFormatSetOfAny(t *tes.T) {
 	var set = Set.FromSequence(array)
 	var s = col.Formatter().FormatCollection(set)
 	ass.Equal(t, s, fmt.Sprintf("%s", set))
-	ass.Equal(t, "(set)", s[len(s)-5:])
-	fmt.Println("\nSet of Any: " + s)
+	ass.Equal(t, "(set)\n", s[len(s)-6:])
+	fmt.Println("Set of Any: " + s)
 }
 
 func TestFormatSetOfSet(t *tes.T) {
@@ -140,7 +140,7 @@ func TestFormatSetOfSet(t *tes.T) {
 	set.AddValue(set1)
 	set.AddValue(set2)
 	var s = col.Formatter().FormatCollection(set)
-	fmt.Println("\nSet of Set: " + s)
+	fmt.Println("Set of Set: " + s)
 }
 
 func TestFormatStackOfAny(t *tes.T) {
@@ -155,8 +155,8 @@ func TestFormatStackOfAny(t *tes.T) {
 	stack.AddValue(v7)
 	var s = col.Formatter().FormatCollection(stack)
 	ass.Equal(t, s, fmt.Sprintf("%s", stack))
-	ass.Equal(t, "(stack)", s[len(s)-7:])
-	fmt.Println("\nStack: " + s)
+	ass.Equal(t, "(stack)\n", s[len(s)-8:])
+	fmt.Println("Stack: " + s)
 }
 
 func TestFormatQueueOfAny(t *tes.T) {
@@ -171,16 +171,16 @@ func TestFormatQueueOfAny(t *tes.T) {
 	queue.AddValue(v7)
 	var s = col.Formatter().FormatCollection(queue)
 	ass.Equal(t, s, fmt.Sprintf("%s", queue))
-	ass.Equal(t, "(queue)", s[len(s)-7:])
-	fmt.Println("\nQueue: " + s)
+	ass.Equal(t, "(queue)\n", s[len(s)-8:])
+	fmt.Println("Queue: " + s)
 }
 
 func TestFormatEmptyCatalog(t *tes.T) {
 	var Catalog = col.Catalog[any, any]()
 	var catalog = Catalog.Empty()
 	var s = col.Formatter().FormatCollection(catalog)
-	ass.Equal(t, "[:](catalog)", s)
-	fmt.Println("\nEmpty Catalog: " + s)
+	ass.Equal(t, "[:](catalog)\n", s)
+	fmt.Println("Empty Catalog: " + s)
 }
 
 func TestFormatCatalogOfAnyToAny(t *tes.T) {
@@ -195,8 +195,8 @@ func TestFormatCatalogOfAnyToAny(t *tes.T) {
 	catalog.SetValue(k7, v7)
 	var s = col.Formatter().FormatCollection(catalog)
 	ass.Equal(t, s, fmt.Sprintf("%s", catalog))
-	ass.Equal(t, "(catalog)", s[len(s)-9:])
-	fmt.Println("\nCatalog: " + s)
+	ass.Equal(t, "(catalog)\n", s[len(s)-10:])
+	fmt.Println("Catalog: " + s)
 }
 
 func TestFormatCatalogOfStringToAny(t *tes.T) {

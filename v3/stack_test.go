@@ -22,7 +22,7 @@ func TestStackWithSmallCapacity(t *tes.T) {
 	stack.AddValue(1)
 	defer func() {
 		if e := recover(); e != nil {
-			ass.Equal(t, "Attempted to add a value onto a stack that has reached its capacity: 1\nvalue: 2\nstack: [\n    1\n](stack)\n", e)
+			ass.Equal(t, "Attempted to add a value onto a stack that has reached its capacity: 1\nvalue: 2\nstack: [\n    1\n](stack)\n\n", e)
 		} else {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}

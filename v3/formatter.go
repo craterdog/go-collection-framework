@@ -23,12 +23,14 @@ import (
 // constants, constructors and functions for the formatter class namespace.
 type formatterClass_ struct {
 	defaultDepth int
+	eof          string
 }
 
 // This private constant defines the singleton reference to the formatter
 // class namespace.  It also initializes any class constants as needed.
 var formatterClassSingleton = &formatterClass_{
 	defaultDepth: 8,
+	eof:          "\n",
 }
 
 // This public function returns the singleton reference to the formatter
@@ -80,19 +82,11 @@ func (c *formatterClass_) FormatAssociation(association Value) string {
 }
 
 // This public class function returns a string containing the canonical format
-// for the specified collection.
+// for the specified collection including the POSIX end-of-file marker.
 func (c *formatterClass_) FormatCollection(collection Collection) string {
 	var formatter = c.WithDefaultDepth()
 	var string_ = formatter.FormatCollection(collection)
 	return string_
-}
-
-// This public class function returns the bytes containing the canonical format
-// for the specified collection including the POSIX standard EOF marker.
-func (c *formatterClass_) FormatDocument(collection Collection) []byte {
-	var formatter = c.WithDefaultDepth()
-	var string_ = formatter.FormatCollection(collection) + EOF
-	return []byte(string_)
 }
 
 // CLASS TYPE
@@ -122,6 +116,7 @@ func (v *formatter_) FormatAssociation(association Value) string {
 // for the specified collection.
 func (v *formatter_) FormatCollection(collection Collection) string {
 	v.formatValue(ref.ValueOf(collection))
+	v.appendString(formatterClassSingleton.eof)
 	return v.getResult()
 }
 
@@ -357,23 +352,23 @@ func (v *formatter_) formatCollection(r ref.Value) {
 		type_ = "array"
 	case sts.HasPrefix(type_, "map["):
 		type_ = "map"
-	case sts.HasPrefix(type_, "*collections.set"):
+	case sts.HasPrefix(type_, "*collections.set_"):
 		type_ = "set"
 	case sts.HasPrefix(type_, "collections.SetLike"):
 		type_ = "set"
-	case sts.HasPrefix(type_, "*collections.queue"):
+	case sts.HasPrefix(type_, "*collections.queue_"):
 		type_ = "queue"
 	case sts.HasPrefix(type_, "collections.QueueLike"):
 		type_ = "queue"
-	case sts.HasPrefix(type_, "*collections.stack"):
+	case sts.HasPrefix(type_, "*collections.stack_"):
 		type_ = "stack"
 	case sts.HasPrefix(type_, "collections.StackLike"):
 		type_ = "stack"
-	case sts.HasPrefix(type_, "*collections.list"):
+	case sts.HasPrefix(type_, "*collections.list_"):
 		type_ = "list"
 	case sts.HasPrefix(type_, "collections.ListLike"):
 		type_ = "list"
-	case sts.HasPrefix(type_, "*collections.catalog"):
+	case sts.HasPrefix(type_, "*collections.catalog_"):
 		type_ = "catalog"
 	case sts.HasPrefix(type_, "collections.CatalogLike"):
 		type_ = "catalog"

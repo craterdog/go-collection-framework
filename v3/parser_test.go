@@ -32,8 +32,8 @@ func TestParsingRoundtrips(t *tes.T) {
 		if sts.HasSuffix(filename, ".cdcn") {
 			fmt.Println(filename)
 			var expected, _ = osx.ReadFile(filename)
-			var value = col.ParseDocument(expected)
-			var document = col.Formatter().FormatDocument(value)
+			var value = col.Parser().ParseCollection(expected)
+			var document = col.Formatter().FormatCollection(value)
 			ass.Equal(t, string(expected), string(document))
 		}
 	}

@@ -75,11 +75,8 @@ type SortingFunction[V Value] func(array []V, ranker RankingFunction)
 
 // PACKAGE CONSTANTS
 
-// These constants define POSIX standard representations.
-const (
-	EOF = "\n" // Must be last byte in a file.
-	EOL = "\n"
-)
+// This constant defines the POSIX standard for the end-of-line character.
+const EOL = "\n"
 
 // PACKAGE ABSTRACTIONS
 
@@ -180,6 +177,13 @@ type Flexible[V Value] interface {
 	RemoveValue(value V)
 	RemoveValues(values Sequential[V])
 	RemoveAll()
+}
+
+// This abstract interface defines the set of method signatures that must be
+// supported by all lexical agents that can parse source bytes read from a
+// POSIX compliant file.
+type Lexical interface {
+	ParseCollection() Collection
 }
 
 // This abstract interface defines the set of method signatures that must be
@@ -324,6 +328,12 @@ type ListLike[V Value] interface {
 type MapLike[K Key, V Value] interface {
 	Sequential[Binding[K, V]]
 	Associative[K, V]
+}
+
+// This abstract type defines the set of abstract interfaces that must be
+// supported by all parser-like types.
+type ParserLike interface {
+	Lexical
 }
 
 // This abstract type defines the set of abstract interfaces that must be

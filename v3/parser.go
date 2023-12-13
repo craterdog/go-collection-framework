@@ -92,9 +92,7 @@ func (v *parser_) ParseCollection() Collection {
 		message += generateGrammar("collection",
 			"$source",
 			"$collection",
-			"$values",
-			"$associations",
-			"$context")
+		)
 		panic(message)
 	}
 	_, token, ok = v.parseEOF()
@@ -103,9 +101,7 @@ func (v *parser_) ParseCollection() Collection {
 		message += generateGrammar("EOF",
 			"$source",
 			"$collection",
-			"$values",
-			"$associations",
-			"$context")
+		)
 		panic(message)
 	}
 	return collection
@@ -176,16 +172,17 @@ func (v *parser_) parseAssociation() (AssociationLike[Key, Value], TokenLike, bo
 	var token TokenLike
 	var key Primitive
 	var value Value
+	var association AssociationLike[Key, Value]
 	key, token, ok = v.parsePrimitive()
 	if !ok {
 		// This is not an association.
-		return nil, token, false
+		return association, token, false
 	}
 	_, _, ok = v.parseDelimiter(":")
 	if !ok {
 		// This is not an association.
 		v.putBack(token) // Put back the primitive key token.
-		return nil, token, false
+		return association, token, false
 	}
 	// This must be an association.
 	value, token, ok = v.parseValue()
@@ -197,7 +194,7 @@ func (v *parser_) parseAssociation() (AssociationLike[Key, Value], TokenLike, bo
 			"$value")
 		panic(message)
 	}
-	var association = Association[Key, Value]().FromPair(key, value)
+	association = Association[Key, Value]().FromPair(key, value)
 	return association, token, true
 }
 
@@ -207,8 +204,8 @@ func (v *parser_) parseAssociation() (AssociationLike[Key, Value], TokenLike, bo
 func (v *parser_) parseCollection() (Collection, TokenLike, bool) {
 	var ok bool
 	var token TokenLike
-	var collection Collection
 	var context string
+	var collection Collection
 	_, token, ok = v.parseDelimiter("[")
 	if !ok {
 		// This is not a collection.
@@ -230,8 +227,8 @@ func (v *parser_) parseCollection() (Collection, TokenLike, bool) {
 		var message = v.formatError(token)
 		message += generateGrammar("]",
 			"$collection",
+			"$values",
 			"$associations",
-			"$association",
 		)
 		panic(message)
 	}
@@ -240,15 +237,19 @@ func (v *parser_) parseCollection() (Collection, TokenLike, bool) {
 		var message = v.formatError(token)
 		message += generateGrammar("(",
 			"$collection",
-			"$context")
+			"$values",
+			"$associations",
+		)
 		panic(message)
 	}
 	context, token, ok = v.parseContext()
 	if !ok {
 		var message = v.formatError(token)
-		message += generateGrammar("context",
+		message += generateGrammar("CONTEXT",
 			"$collection",
-			"$context")
+			"$values",
+			"$associations",
+		)
 		panic(message)
 	}
 	switch sequence := collection.(type) {
@@ -297,7 +298,7 @@ func (v *parser_) parseDelimiter(delimiter string) (string, TokenLike, bool) {
 }
 
 // This private class method attempts to parse the end-of-file (EOF) marker. It
-// returns the token and whether or not an EOL token was found.
+// returns the token and whether or not an EOF token was found.
 func (v *parser_) parseEOF() (TokenLike, TokenLike, bool) {
 	var token = v.nextToken()
 	if token.GetType() != Token().TypeEOF() {
@@ -308,7 +309,7 @@ func (v *parser_) parseEOF() (TokenLike, TokenLike, bool) {
 }
 
 // This private class method attempts to parse the end-of-line (EOL) marker. It
-// returns the token and whether or not an EOF token was found.
+// returns the token and whether or not an EOL token was found.
 func (v *parser_) parseEOL() (TokenLike, TokenLike, bool) {
 	var token = v.nextToken()
 	if token.GetType() != Token().TypeEOL() {
@@ -428,7 +429,7 @@ func (v *parser_) parseMultilineAssociations() (Sequential[Binding[Key, Value]],
 
 	association, token, ok = v.parseAssociation()
 	if !ok {
-		// This is not a multiline associations.
+		// This is not a multi-line associations.
 		return associations, token, false
 	}
 	// Every association must be followed by an EOL.
@@ -475,7 +476,7 @@ func (v *parser_) parseMultilineValues() (Sequential[Value], TokenLike, bool) {
 	var values = List[Value]().Empty()
 	value, token, ok = v.parseValue()
 	if !ok {
-		// This is not a multiline values.
+		// This is not a multi-line values.
 		return values, token, false
 	}
 	// Every value must be followed by an EOL.
@@ -723,43 +724,20 @@ func (v *parser_) parseUnsigned() (uint64, TokenLike, bool) {
 // This map captures the syntax rules for collections of Go primitives.
 // This map is useful when creating scanner and parser error messages.
 var grammar = map[string]string{
-	"$BASE10":    `"0".."9"`,
-	"$BASE16":    `"0".."9" | "a".."f"`,
-	"$BOOLEAN":   `"false" | "true"`,
-	"$COMPLEX":   `"(" FLOAT SIGN FLOAT "i)"`,
-	"$CONTEXT":   `"array" | "catalog" | "list" | "map" | "queue" | "set" | "stack"`,
-	"$DELIMITER": `"]" | "[" | ")" | "(" | ":" | ","`,
-	"$EOL":       `"\n"`,
-	"$ESCAPE":    `'\' (UNICODE | 'a' | 'b' | 'f' | 'n' | 'r' | 't' | 'v' | '"' | "'" | '\')`,
-	"$EXPONENT":  `("e" | "E") SIGN ORDINAL`,
-	"$FLOAT":     `[SIGN] SCALAR [EXPONENT]`,
-	"$FRACTION":  `"." <BASE10>`,
-	"$INTEGER":   `ZERO | [SIGN] ORDINAL`,
-	"$NIL":       `"nil"`,
-	"$ORDINAL":   `"1".."9" {"0".."9"}`,
-	"$RUNE":      `"'" (ESCAPE | ~("'" | EOL)) "'"`,
-	"$SCALAR":    `(ZERO | ORDINAL) FRACTION`,
-	"$SIGN":      `"+" | "-"`,
-	"$STRING":    `'"' {ESCAPE | ~('"' | EOL)} '"'`,
-	"$UNICODE": `
-    "u" BASE16 BASE16 BASE16 BASE16 |
-    "U" BASE16 BASE16 BASE16 BASE16 BASE16 BASE16 BASE16 BASE16`,
-	"$UNSIGNED":    `"0x" <BASE16>`,
-	"$ZERO":        `"0"`,
 	"$association": `key ":" value`,
 	"$associations": `
-    association {"," association} |
-    EOL <association EOL> |
-    ":"  ! No associations.`,
+      association ("," association)*
+    | EOL (association EOL)+
+    | ":"  ! No associations.`,
 	"$collection": `"[" (values | associations) "]" "(" CONTEXT ")"`,
 	"$key":        `primitive`,
 	"$primitive":  `BOOLEAN | COMPLEX | FLOAT | INTEGER | NIL | RUNE | STRING`,
 	"$source":     `collection EOF  ! EOF is the end-of-file marker.`,
 	"$value":      `primitive | collection`,
 	"$values": `
-    value {"," value} |
-    EOL <value EOL> |
-    ! No values.`,
+      value ("," value)*
+    | EOL (value EOL)+
+    | " "  ! No values.`,
 }
 
 // PRIVATE FUNCTIONS

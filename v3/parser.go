@@ -89,7 +89,7 @@ func (v *parser_) ParseCollection() Collection {
 	var collection, token, ok = v.parseCollection()
 	if !ok {
 		var message = v.formatError(token)
-		message += generateGrammar("collection",
+		message += v.generateGrammar("collection",
 			"$source",
 			"$collection",
 		)
@@ -98,7 +98,7 @@ func (v *parser_) ParseCollection() Collection {
 	_, token, ok = v.parseEOF()
 	if !ok {
 		var message = v.formatError(token)
-		message += generateGrammar("EOF",
+		message += v.generateGrammar("EOF",
 			"$source",
 			"$collection",
 		)
@@ -188,7 +188,7 @@ func (v *parser_) parseAssociation() (AssociationLike[Key, Value], TokenLike, bo
 	value, token, ok = v.parseValue()
 	if !ok {
 		var message = v.formatError(token)
-		message += generateGrammar("value",
+		message += v.generateGrammar("value",
 			"$association",
 			"$key",
 			"$value")
@@ -225,7 +225,7 @@ func (v *parser_) parseCollection() (Collection, TokenLike, bool) {
 	_, token, ok = v.parseDelimiter("]")
 	if !ok {
 		var message = v.formatError(token)
-		message += generateGrammar("]",
+		message += v.generateGrammar("]",
 			"$collection",
 			"$values",
 			"$associations",
@@ -235,7 +235,7 @@ func (v *parser_) parseCollection() (Collection, TokenLike, bool) {
 	_, token, ok = v.parseDelimiter("(")
 	if !ok {
 		var message = v.formatError(token)
-		message += generateGrammar("(",
+		message += v.generateGrammar("(",
 			"$collection",
 			"$values",
 			"$associations",
@@ -245,7 +245,7 @@ func (v *parser_) parseCollection() (Collection, TokenLike, bool) {
 	context, token, ok = v.parseContext()
 	if !ok {
 		var message = v.formatError(token)
-		message += generateGrammar("CONTEXT",
+		message += v.generateGrammar("CONTEXT",
 			"$collection",
 			"$values",
 			"$associations",
@@ -278,7 +278,7 @@ func (v *parser_) parseCollection() (Collection, TokenLike, bool) {
 	_, token, ok = v.parseDelimiter(")")
 	if !ok {
 		var message = v.formatError(token)
-		message += generateGrammar(")",
+		message += v.generateGrammar(")",
 			"$collection",
 			"$context")
 		panic(message)
@@ -345,7 +345,7 @@ func (v *parser_) parseInlineAssociations() (Sequential[Binding[Key, Value]], To
 		association, token, ok = v.parseAssociation()
 		if !ok {
 			var message = v.formatError(token)
-			message += generateGrammar("association",
+			message += v.generateGrammar("association",
 				"$collection",
 				"$associations",
 				"$association",
@@ -379,7 +379,7 @@ func (v *parser_) parseInlineValues() (Sequential[Value], TokenLike, bool) {
 		value, token, ok = v.parseValue()
 		if !ok {
 			var message = v.formatError(token)
-			message += generateGrammar("value",
+			message += v.generateGrammar("value",
 				"$collection",
 				"$values",
 				"$value",
@@ -436,7 +436,7 @@ func (v *parser_) parseMultilineAssociations() (Sequential[Binding[Key, Value]],
 	_, token, ok = v.parseEOL()
 	if !ok {
 		var message = v.formatError(token)
-		message += generateGrammar("EOL",
+		message += v.generateGrammar("EOL",
 			"$collection",
 			"$associations",
 			"$association",
@@ -456,7 +456,7 @@ func (v *parser_) parseMultilineAssociations() (Sequential[Binding[Key, Value]],
 		_, token, ok = v.parseEOL()
 		if !ok {
 			var message = v.formatError(token)
-			message += generateGrammar("EOL",
+			message += v.generateGrammar("EOL",
 				"$collection",
 				"$associations",
 				"$association",
@@ -483,7 +483,7 @@ func (v *parser_) parseMultilineValues() (Sequential[Value], TokenLike, bool) {
 	_, token, ok = v.parseEOL()
 	if !ok {
 		var message = v.formatError(token)
-		message += generateGrammar("EOL",
+		message += v.generateGrammar("EOL",
 			"$collection",
 			"$values",
 			"$value",
@@ -501,7 +501,7 @@ func (v *parser_) parseMultilineValues() (Sequential[Value], TokenLike, bool) {
 		_, token, ok = v.parseEOL()
 		if !ok {
 			var message = v.formatError(token)
-			message += generateGrammar("EOL",
+			message += v.generateGrammar("EOL",
 				"$collection",
 				"$values",
 				"$value",
@@ -721,8 +721,17 @@ func (v *parser_) parseUnsigned() (uint64, TokenLike, bool) {
 	return unsigned, token, true
 }
 
+// This private class method is useful when creating scanner and parser error
+// messages.
+func (v *parser_) generateGrammar(expected string, symbols ...string) string {
+	var message = "Was expecting '" + expected + "' from:\n"
+	for _, symbol := range symbols {
+		message += fmt.Sprintf("  \033[32m%v: \033[33m%v\033[0m\n\n", symbol, grammar[symbol])
+	}
+	return message
+}
+
 // This map captures the syntax rules for collections of Go primitives.
-// This map is useful when creating scanner and parser error messages.
 var grammar = map[string]string{
 	"$association": `key ":" value`,
 	"$associations": `
@@ -738,14 +747,4 @@ var grammar = map[string]string{
       value ("," value)*
     | EOL (value EOL)+
     | " "  ! No values.`,
-}
-
-// PRIVATE FUNCTIONS
-
-func generateGrammar(expected string, symbols ...string) string {
-	var message = "Was expecting '" + expected + "' from:\n"
-	for _, symbol := range symbols {
-		message += fmt.Sprintf("  \033[32m%v: \033[33m%v\033[0m\n\n", symbol, grammar[symbol])
-	}
-	return message
 }

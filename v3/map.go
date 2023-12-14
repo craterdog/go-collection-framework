@@ -17,29 +17,31 @@ import (
 // CLASS NAMESPACE
 
 // This private type defines the namespace structure associated with the
-// constants, constructors and functions for the map class namespace.
+// constants, constructors and functions for the Map class namespace.
 // NOTE: the Go language requires the key type here support the "comparable"
 // interface so we must narrow it down from "any".
 type mapClass_[K comparable, V Value] struct {
 	// This class defines no constants.
 }
 
-// This private constant defines a map to hold all the singleton references to
-// the type specific map namespaces.
+// This private constant defines a Map to hold all the singleton references to
+// the type specific Map class namespaces.
 var mapClassSingletons = map[string]any{}
 
 // This public function returns the singleton reference to a type specific
-// map namespace.  It also initializes any class constants as needed.
+// Map class namespace.  It also initializes any class constants as needed.
 // NOTE: the Go language requires the key type here support the "comparable"
 // interface so we must narrow it down from "any".
 func Map[K comparable, V Value]() *mapClass_[K, V] {
 	var class *mapClass_[K, V]
-	var key = fmt.Sprintf("%T", class)
+	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
 	var value = mapClassSingletons[key]
 	switch actual := value.(type) {
 	case *mapClass_[K, V]:
+		// This bound class type already exists.
 		class = actual
 	default:
+		// Create a new bound class type.
 		class = &mapClass_[K, V]{
 			// This class defines no constants.
 		}
@@ -50,7 +52,7 @@ func Map[K comparable, V Value]() *mapClass_[K, V] {
 
 // CLASS CONSTRUCTORS
 
-// This public class constructor creates a new map from the specified
+// This public class constructor creates a new Map from the specified
 // Go array of associations.
 func (c *mapClass_[K, V]) FromArray(associations []Binding[K, V]) MapLike[K, V] {
 	var length = len(associations)
@@ -63,7 +65,7 @@ func (c *mapClass_[K, V]) FromArray(associations []Binding[K, V]) MapLike[K, V] 
 	return map_[K, V](duplicate)
 }
 
-// This public class constructor creates a new map from the specified
+// This public class constructor creates a new Map from the specified
 // Go map of associations.
 func (c *mapClass_[K, V]) FromMap(associations map[K]V) MapLike[K, V] {
 	var length = len(associations)
@@ -79,7 +81,7 @@ func (c *mapClass_[K, V]) FromMap(associations map[K]V) MapLike[K, V] {
 // Extended Type
 
 // This private class type extends the primitive Go "map[K]V" data type and
-// defines the methods that implement the map-like abstract type.  The map
+// defines the methods that implement the map-like abstract type.  The Map
 // extended type manages key-value pair associations.
 // This type is parameterized as follows:
 //   - K is a primitive type of key.
@@ -88,18 +90,18 @@ type map_[K comparable, V Value] map[K]V
 
 // Sequential Interface
 
-// This public class method determines whether or not this map is empty.
+// This public class method determines whether or not this Map is empty.
 func (v map_[K, V]) IsEmpty() bool {
 	return len(v) == 0
 }
 
-// This public class method returns the number of values contained in this map.
+// This public class method returns the number of values contained in this Map.
 func (v map_[K, V]) GetSize() int {
 	return len(v)
 }
 
-// This public class method returns all the associations that are in this map.
-// The associations retrieved are in the same order as they are in the map.
+// This public class method returns all the associations that are in this Map.
+// The associations retrieved are in the same order as they are in the Map.
 func (v map_[K, V]) AsArray() []Binding[K, V] {
 	var length = len(v)
 	var result = make([]Binding[K, V], length)
@@ -113,7 +115,7 @@ func (v map_[K, V]) AsArray() []Binding[K, V] {
 	return result
 }
 
-// This public class method generates for this map an iterator that can be used
+// This public class method generates for this Map an iterator that can be used
 // to traverse its associations.
 func (v map_[K, V]) GetIterator() Ratcheted[Binding[K, V]] {
 	var Array = Array[Binding[K, V]]()
@@ -124,7 +126,7 @@ func (v map_[K, V]) GetIterator() Ratcheted[Binding[K, V]] {
 
 // Associative Interface
 
-// This public class method returns the keys for this map.
+// This public class method returns the keys for this Map.
 func (v map_[K, V]) GetKeys() Sequential[K] {
 	var List = List[K]()
 	var keys = List.Empty()
@@ -137,8 +139,8 @@ func (v map_[K, V]) GetKeys() Sequential[K] {
 }
 
 // This public class method returns the values associated with the specified
-// keys for this map. The values are returned in the same order as the keys in
-// the map.
+// keys for this Map. The values are returned in the same order as the keys in
+// the Map.
 func (v map_[K, V]) GetValues(keys Sequential[K]) Sequential[V] {
 	var List = List[V]()
 	var values = List.Empty()
@@ -151,7 +153,7 @@ func (v map_[K, V]) GetValues(keys Sequential[K]) Sequential[V] {
 }
 
 // This public class method returns the value that is associated with the
-// specified key in this map.
+// specified key in this Map.
 func (v map_[K, V]) GetValue(key K) V {
 	var value = v[key]
 	return value
@@ -164,7 +166,7 @@ func (v map_[K, V]) SetValue(key K, value V) {
 }
 
 // This public class method removes the association associated with the
-// specified key from the map and returns it.
+// specified key from the Map and returns it.
 func (v map_[K, V]) RemoveValue(key K) V {
 	var value, exists = v[key]
 	if exists {
@@ -174,7 +176,7 @@ func (v map_[K, V]) RemoveValue(key K) V {
 }
 
 // This public class method removes the associations associated with the
-// specified keys from the map and returns the removed values.
+// specified keys from the Map and returns the removed values.
 func (v map_[K, V]) RemoveValues(keys Sequential[K]) Sequential[V] {
 	var List = List[V]()
 	var values = List.Empty()
@@ -186,7 +188,7 @@ func (v map_[K, V]) RemoveValues(keys Sequential[K]) Sequential[V] {
 	return values
 }
 
-// This public class method removes all associations from this map.
+// This public class method removes all associations from this Map.
 func (v map_[K, V]) RemoveAll() {
 	var keys = v.GetKeys()
 	var iterator = keys.GetIterator()
@@ -198,7 +200,7 @@ func (v map_[K, V]) RemoveAll() {
 
 // Private Interface
 
-// This public class method is used by Go to generate a string from a map.
+// This public class method is used by Go to generate a string from a Map.
 func (v map_[K, V]) String() string {
 	return Formatter().FormatCollection(v)
 }

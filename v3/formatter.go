@@ -20,20 +20,20 @@ import (
 // CLASS NAMESPACE
 
 // This private type defines the namespace structure associated with the
-// constants, constructors and functions for the formatter class namespace.
+// constants, constructors and functions for the Formatter class namespace.
 type formatterClass_ struct {
 	defaultDepth int
 	eof          string
 }
 
-// This private constant defines the singleton reference to the formatter
+// This private constant defines the singleton reference to the Formatter
 // class namespace.  It also initializes any class constants as needed.
 var formatterClassSingleton = &formatterClass_{
 	defaultDepth: 8,
 	eof:          "\n",
 }
 
-// This public function returns the singleton reference to the formatter
+// This public function returns the singleton reference to the Formatter
 // class namespace.
 func Formatter() *formatterClass_ {
 	return formatterClassSingleton
@@ -42,7 +42,7 @@ func Formatter() *formatterClass_ {
 // CLASS CONSTANTS
 
 // This public class constant represents the default depth of a collection
-// at which the formatter gives up and inserts "...".  This handles cycles
+// at which the Formatter gives up and inserts "...".  This handles cycles
 // in a sensible and efficient manner.
 func (c *formatterClass_) GetDefaultDepth() int {
 	return c.defaultDepth
@@ -50,7 +50,7 @@ func (c *formatterClass_) GetDefaultDepth() int {
 
 // CLASS CONSTRUCTORS
 
-// This public class constructor creates a new formatter with the default
+// This public class constructor creates a new Formatter with the default
 // maximum traversal depth.
 func (c *formatterClass_) WithDefaultDepth() FormatterLike {
 	var formatter = &formatter_{
@@ -59,7 +59,7 @@ func (c *formatterClass_) WithDefaultDepth() FormatterLike {
 	return formatter
 }
 
-// This public class constructor creates a new formatter with the specified
+// This public class constructor creates a new Formatter with the specified
 // maximum traversal depth.
 func (c *formatterClass_) WithMaximumDepth(maximumDepth int) FormatterLike {
 	if maximumDepth < 1 || maximumDepth > c.defaultDepth {
@@ -213,7 +213,7 @@ func (v *formatter_) formatValue(value any) {
 }
 
 // This private class method adds the canonical format for the specified array
-// of values to the state of the formatter.
+// of values to the state of the Formatter.
 func (v *formatter_) formatArray(array ref.Value) {
 	var size = array.Len()
 	switch size {
@@ -240,7 +240,7 @@ func (v *formatter_) formatArray(array ref.Value) {
 }
 
 // This private class method adds the canonical format for the specified map of
-// key-value pairs to the state of the formatter.
+// key-value pairs to the state of the Formatter.
 func (v *formatter_) formatMap(map_ ref.Value) {
 	var keys = map_.MapKeys()
 	var size = len(keys)

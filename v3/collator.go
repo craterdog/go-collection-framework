@@ -21,18 +21,18 @@ import (
 // CLASS NAMESPACE
 
 // This private type defines the namespace structure associated with the
-// constants, constructors and functions for the collator class namespace.
+// constants, constructors and functions for the Collator class namespace.
 type collatorClass_ struct {
 	defaultDepth int
 }
 
-// This private constant defines the singleton reference to the collator
+// This private constant defines the singleton reference to the Collator
 // class namespace.  It also initializes any class constants as needed.
 var collatorClassSingleton = &collatorClass_{
 	defaultDepth: 16,
 }
 
-// This public function returns the singleton reference to the collator
+// This public function returns the singleton reference to the Collator
 // class namespace.
 func Collator() *collatorClass_ {
 	return collatorClassSingleton
@@ -41,7 +41,7 @@ func Collator() *collatorClass_ {
 // CLASS CONSTANTS
 
 // This public class constant represents the default depth of a collection
-// at which the collator gives up trying to collate.  This handles cycles
+// at which the Collator gives up trying to collate.  This handles cycles
 // in a sensible and efficient manner.
 func (c *collatorClass_) GetDefaultDepth() int {
 	return c.defaultDepth
@@ -49,7 +49,7 @@ func (c *collatorClass_) GetDefaultDepth() int {
 
 // CLASS CONSTRUCTORS
 
-// This public class constructor creates a new collator with the default
+// This public class constructor creates a new Collator with the default
 // maximum traversal depth.
 func (c *collatorClass_) WithDefaultDepth() CollatorLike {
 	var collator = &collator_{
@@ -58,7 +58,7 @@ func (c *collatorClass_) WithDefaultDepth() CollatorLike {
 	return collator
 }
 
-// This public class constructor creates a new collator with the specified
+// This public class constructor creates a new Collator with the specified
 // maximum traversal depth.
 func (c *collatorClass_) WithMaximumDepth(maximumDepth int) CollatorLike {
 	if maximumDepth < 1 || maximumDepth > c.defaultDepth {
@@ -592,7 +592,7 @@ func (v *collator_) rankArrays(first ref.Value, second ref.Value) int {
 // with the same keys if the associations were entered in different sequences.
 // Therefore at this time it is necessary to sort the key arrays for each map.
 // This introduces a circular dependency between the implementation of the
-// collator and the sorter (i.e. rankMaps() -> SortValues() -> RankingFunction
+// Collator and the sorter (i.e. rankMaps() -> SortValues() -> RankingFunction
 // type).
 func (v *collator_) rankMaps(first ref.Value, second ref.Value) int {
 	// Extract and sort the keys for the two maps.

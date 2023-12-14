@@ -22,7 +22,7 @@ func TestStackWithSmallCapacity(t *tes.T) {
 	stack.AddValue(1)
 	defer func() {
 		if e := recover(); e != nil {
-			ass.Equal(t, "Attempted to add a value onto a stack that has reached its capacity: 1\nvalue: 2\nstack: [1](Stack)\n\n", e)
+			ass.Equal(t, "Attempted to add a value onto a Stack that has reached its capacity: 1\nvalue: 2\nstack: [1](Stack)\n\n", e)
 		} else {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
@@ -35,7 +35,7 @@ func TestEmptyStackRetrieval(t *tes.T) {
 	var stack = Stack.Empty()
 	defer func() {
 		if e := recover(); e != nil {
-			ass.Equal(t, "Attempted to retrieve the top of an empty stack!", e)
+			ass.Equal(t, "Attempted to retrieve the top of an empty Stack!", e)
 		} else {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
@@ -48,7 +48,7 @@ func TestEmptyStackRemoval(t *tes.T) {
 	var stack = Stack.Empty()
 	defer func() {
 		if e := recover(); e != nil {
-			ass.Equal(t, "Attempted to remove the top of an empty stack!", e)
+			ass.Equal(t, "Attempted to remove the top of an empty Stack!", e)
 		} else {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}

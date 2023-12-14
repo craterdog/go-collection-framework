@@ -19,25 +19,27 @@ import (
 // CLASS NAMESPACE
 
 // This private type defines the namespace structure associated with the
-// constants, constructors and functions for the sorter class namespace.
+// constants, constructors and functions for the Sorter class namespace.
 type sorterClass_[V Value] struct {
 	naturalRanker RankingFunction
 }
 
 // This private constant defines a map to hold all the singleton references to
-// the type specific sorter namespaces.
+// the type specific Sorter class namespaces.
 var sorterClassSingletons = map[string]any{}
 
 // This public function returns the singleton reference to a type specific
-// sorter namespace.  It also initializes any class constants as needed.
+// Sorter class namespace.  It also initializes any class constants as needed.
 func Sorter[V Value]() *sorterClass_[V] {
 	var class *sorterClass_[V]
-	var key = fmt.Sprintf("%T", class)
+	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
 	var value = sorterClassSingletons[key]
 	switch actual := value.(type) {
 	case *sorterClass_[V]:
+		// This bound class type already exists.
 		class = actual
 	default:
+		// Create a new bound class type.
 		class = &sorterClass_[V]{
 			naturalRanker: Collator().RankValues,
 		}
@@ -55,7 +57,7 @@ func (c *sorterClass_[V]) NaturalRanker() RankingFunction {
 
 // CLASS CONSTRUCTORS
 
-// This public class constructor creates a new sorter that can be used to sort
+// This public class constructor creates a new Sorter that can be used to sort
 // an array using the specified ranking function.
 func (c *sorterClass_[V]) WithNaturalRanker() SorterLike[V] {
 	var sorter = &sorter_[V]{
@@ -64,7 +66,7 @@ func (c *sorterClass_[V]) WithNaturalRanker() SorterLike[V] {
 	return sorter
 }
 
-// This public class constructor creates a new sorter that can be used to sort
+// This public class constructor creates a new Sorter that can be used to sort
 // an array using the specified ranking function.
 func (c *sorterClass_[V]) WithRanker(ranker RankingFunction) SorterLike[V] {
 	var sorter = &sorter_[V]{
@@ -131,7 +133,7 @@ func (v *sorter_[V]) ShuffleValues(array []V) {
 
 // This public class method sorts the values in the specified array in place
 // using an iterative merge sort along with the ranking function associated with
-// this sorter.  The algorithm is documented here:
+// this Sorter.  The algorithm is documented here:
 //   - https://en.wikipedia.org/wiki/Merge_sort#Bottom-up_implementation
 //
 // This iterative approach saves on memory allocation by swapping between two

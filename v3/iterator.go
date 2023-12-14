@@ -17,25 +17,27 @@ import (
 // CLASS NAMESPACE
 
 // This private type defines the namespace structure associated with the
-// constants, constructors and functions for the iterator class namespace.
+// constants, constructors and functions for the Iterator class namespace.
 type iteratorClass_[V Value] struct {
 	// This class does not define any constants.
 }
 
 // This private constant defines a map to hold all the singleton references to
-// the type specific iterator namespaces.
+// the type specific Iterator class namespaces.
 var iteratorClassSingletons = map[string]any{}
 
 // This public function returns the singleton reference to a type specific
-// iterator namespace.  It also initializes any class constants as needed.
+// Iterator class namespace.  It also initializes any class constants as needed.
 func Iterator[V Value]() *iteratorClass_[V] {
 	var class *iteratorClass_[V]
-	var key = fmt.Sprintf("%T", class)
+	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
 	var value = iteratorClassSingletons[key]
 	switch actual := value.(type) {
 	case *iteratorClass_[V]:
+		// This bound class type already exists.
 		class = actual
 	default:
+		// Create a new bound class type.
 		class = &iteratorClass_[V]{
 			// This class does not define any constants.
 		}
@@ -46,8 +48,8 @@ func Iterator[V Value]() *iteratorClass_[V] {
 
 // CLASS CONSTRUCTORS
 
-// This public class constructor creates a new iterator from the specified
-// sequence value.  The iterator that can be used to traverse the values in the
+// This public class constructor creates a new Iterator from the specified
+// sequence value.  The Iterator that can be used to traverse the values in the
 // specified sequence.
 func (c *iteratorClass_[V]) FromSequence(sequence Sequential[V]) IteratorLike[V] {
 	var values = sequence.AsArray() // The returned array is immutable.
@@ -73,12 +75,12 @@ type iterator_[V Value] struct {
 // Ratcheted Interface
 
 // This public class method returns the current slot between values that this
-// iterator is currently locked into.
+// Iterator is currently locked into.
 func (v *iterator_[V]) GetSlot() int {
 	return v.slot
 }
 
-// This public class method moves this iterator to the specified slot between
+// This public class method moves this Iterator to the specified slot between
 // values.
 func (v *iterator_[V]) ToSlot(slot int) {
 	if slot > v.size {
@@ -93,13 +95,13 @@ func (v *iterator_[V]) ToSlot(slot int) {
 	v.slot = slot
 }
 
-// This public class method moves this iterator to the slot before the first
+// This public class method moves this Iterator to the slot before the first
 // value.
 func (v *iterator_[V]) ToStart() {
 	v.slot = 0
 }
 
-// This public class method moves this iterator to the slot after the last
+// This public class method moves this Iterator to the slot after the last
 // value.
 func (v *iterator_[V]) ToEnd() {
 	v.slot = v.size

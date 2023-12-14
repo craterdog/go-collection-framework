@@ -19,7 +19,7 @@ import (
 // CLASS NAMESPACE
 
 // This private type defines the namespace structure associated with the
-// constants, constructors and functions for the scanner class namespace.
+// constants, constructors and functions for the Scanner class namespace.
 type scannerClass_ struct {
 	booleanMatcher   *reg.Regexp
 	complexMatcher   *reg.Regexp
@@ -58,7 +58,7 @@ const (
 	zero      = `0`
 )
 
-// This private constant defines the singleton reference to the scanner
+// This private constant defines the singleton reference to the Scanner
 // class namespace.  It also initializes any class constants as needed.
 var scannerClassSingleton = &scannerClass_{
 	booleanMatcher:   reg.MustCompile(`^(?:` + boolean + `)`),
@@ -73,7 +73,7 @@ var scannerClassSingleton = &scannerClass_{
 	unsignedMatcher:  reg.MustCompile(`^(?:` + unsigned + `)`),
 }
 
-// This public function returns the singleton reference to the scanner
+// This public function returns the singleton reference to the Scanner
 // class namespace.
 func Scanner() *scannerClass_ {
 	return scannerClassSingleton
@@ -143,7 +143,7 @@ func (c *scannerClass_) UnsignedMatcher() *reg.Regexp {
 
 // CLASS CONSTRUCTORS
 
-// This public class constructor creates a new scanner from the specified
+// This public class constructor creates a new Scanner from the specified
 // source bytes.
 func (c *scannerClass_) FromSource(
 	source []byte,
@@ -309,7 +309,7 @@ func (v *scanner_) skipSpaces() {
 }
 
 // This private class method adds a token of the specified type with the current
-// scanner information to the token channel. It then resets the first byte index
+// Scanner information to the token channel. It then resets the first byte index
 // to the next byte index position. It returns the token type of the type added
 // to the channel.
 func (v *scanner_) emitToken(tokenType string) string {
@@ -341,7 +341,7 @@ func (v *scanner_) emitToken(tokenType string) string {
 	return tokenType
 }
 
-// This private class method adds a boolean token with the current scanner
+// This private class method adds a boolean token with the current Scanner
 // information to the token channel. It returns true if a boolean token was found.
 func (v *scanner_) foundBoolean() bool {
 	var string_ = string(v.source[v.nextByte:])
@@ -355,7 +355,7 @@ func (v *scanner_) foundBoolean() bool {
 }
 
 // This private class method adds a complex number token with the current
-// scanner information to the token channel. It returns true if a complex number
+// Scanner information to the token channel. It returns true if a complex number
 // token was found.
 func (v *scanner_) foundComplex() bool {
 	var string_ = string(v.source[v.nextByte:])
@@ -368,7 +368,7 @@ func (v *scanner_) foundComplex() bool {
 	return false
 }
 
-// This private class method adds a context token with the current scanner
+// This private class method adds a context token with the current Scanner
 // information to the token channel. It returns true if a type token was found.
 func (v *scanner_) foundContext() bool {
 	var string_ = string(v.source[v.nextByte:])
@@ -381,7 +381,7 @@ func (v *scanner_) foundContext() bool {
 	return false
 }
 
-// This private class method adds a delimiter token with the current scanner
+// This private class method adds a delimiter token with the current Scanner
 // information to the token channel. It returns true if a delimiter token was
 // found.
 func (v *scanner_) foundDelimiter() bool {
@@ -395,7 +395,7 @@ func (v *scanner_) foundDelimiter() bool {
 	return false
 }
 
-// This private class method adds an error token with the current scanner
+// This private class method adds an error token with the current Scanner
 // information to the token channel. It always returns true.
 func (v *scanner_) foundError() bool {
 	var bytes = v.source[v.nextByte:]
@@ -405,7 +405,7 @@ func (v *scanner_) foundError() bool {
 	return true
 }
 
-// This private class method adds an EOF token with the current scanner
+// This private class method adds an EOF token with the current Scanner
 // information to the token channel. It returns true if an EOF marker was found.
 func (v *scanner_) foundEOF() bool {
 	// The last byte in a POSIX standard file must be an EOL character.
@@ -425,7 +425,7 @@ func (v *scanner_) foundEOF() bool {
 	return true
 }
 
-// This private class method adds an EOL token with the current scanner
+// This private class method adds an EOL token with the current Scanner
 // information to the token channel. It returns true if an EOL token was found.
 func (v *scanner_) foundEOL() bool {
 	var string_ = string(v.source[v.nextByte:])
@@ -440,7 +440,7 @@ func (v *scanner_) foundEOL() bool {
 }
 
 // This private class method adds a floating point token with the current
-// scanner information to the token channel. It returns true if a floating point
+// Scanner information to the token channel. It returns true if a floating point
 // token was found.
 func (v *scanner_) foundFloat() bool {
 	var string_ = string(v.source[v.nextByte:])
@@ -453,7 +453,7 @@ func (v *scanner_) foundFloat() bool {
 	return false
 }
 
-// This private class method adds a integer token with the current scanner
+// This private class method adds a integer token with the current Scanner
 // information to the token channel. It returns true if a integer token was
 // found.
 func (v *scanner_) foundInteger() bool {
@@ -467,7 +467,7 @@ func (v *scanner_) foundInteger() bool {
 	return false
 }
 
-// This private class method adds a nil token with the current scanner
+// This private class method adds a nil token with the current Scanner
 // information to the token channel. It returns true if a nil token was found.
 func (v *scanner_) foundNil() bool {
 	var string_ = string(v.source[v.nextByte:])
@@ -480,7 +480,7 @@ func (v *scanner_) foundNil() bool {
 	return false
 }
 
-// This private class method adds a rune token with the current scanner
+// This private class method adds a rune token with the current Scanner
 // information to the token channel. It returns true if a rune token was found.
 func (v *scanner_) foundRune() bool {
 	var string_ = string(v.source[v.nextByte:])
@@ -493,7 +493,7 @@ func (v *scanner_) foundRune() bool {
 	return false
 }
 
-// This private class method adds a string token with the current scanner
+// This private class method adds a string token with the current Scanner
 // information to the token channel. It returns true if a string token was
 // found.
 func (v *scanner_) foundString() bool {
@@ -508,7 +508,7 @@ func (v *scanner_) foundString() bool {
 }
 
 // This private class method adds an unsigned integer token with the current
-// scanner information to the token channel. It returns true if an unsigned
+// Scanner information to the token channel. It returns true if an unsigned
 // integer token was found.
 func (v *scanner_) foundUnsigned() bool {
 	var string_ = string(v.source[v.nextByte:])

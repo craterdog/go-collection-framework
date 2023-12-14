@@ -17,25 +17,27 @@ import (
 // CLASS NAMESPACE
 
 // This private type defines the namespace structure associated with the
-// constants, constructors and functions for the list class namespace.
+// constants, constructors and functions for the List class namespace.
 type listClass_[V Value] struct {
 	// This class defines no constants.
 }
 
 // This private constant defines a map to hold all the singleton references to
-// the type specific list namespaces.
+// the type specific List class namespaces.
 var listClassSingletons = map[string]any{}
 
 // This public function returns the singleton reference to a type specific
-// list namespace.  It also initializes any class constants as needed.
+// List class namespace.  It also initializes any class constants as needed.
 func List[V Value]() *listClass_[V] {
 	var class *listClass_[V]
-	var key = fmt.Sprintf("%T", class)
+	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
 	var value = listClassSingletons[key]
 	switch actual := value.(type) {
 	case *listClass_[V]:
+		// This bound class type already exists.
 		class = actual
 	default:
+		// Create a new bound class type.
 		class = &listClass_[V]{
 			// This class defines no constants.
 		}
@@ -46,8 +48,8 @@ func List[V Value]() *listClass_[V] {
 
 // CLASS CONSTRUCTORS
 
-// This public class constructor creates a new empty list.
-// The list uses the natural comparing function.
+// This public class constructor creates a new empty List.
+// The List uses the natural comparing function.
 func (c *listClass_[V]) Empty() ListLike[V] {
 	var Array = Array[V]() // Retrieve the array namespace.
 	var array = Array.WithSize(0)
@@ -56,7 +58,7 @@ func (c *listClass_[V]) Empty() ListLike[V] {
 	return list
 }
 
-// This public class constructor creates a new empty list that uses the
+// This public class constructor creates a new empty List that uses the
 // specified comparing function.
 func (c *listClass_[V]) FromComparer(compare ComparingFunction) ListLike[V] {
 	var Array = Array[V]() // Retrieve the array namespace.
@@ -65,8 +67,8 @@ func (c *listClass_[V]) FromComparer(compare ComparingFunction) ListLike[V] {
 	return list
 }
 
-// This public class constructor creates a new list from the specified sequence.
-// The list uses the natural compare function.
+// This public class constructor creates a new List from the specified sequence.
+// The List uses the natural compare function.
 func (c *listClass_[V]) FromSequence(sequence Sequential[V]) ListLike[V] {
 	var list = c.Empty()
 	var iterator = sequence.GetIterator()
@@ -94,10 +96,10 @@ func (c *listClass_[V]) Concatenate(first, second ListLike[V]) ListLike[V] {
 
 // This private class type encapsulates a Go structure containing private
 // attributes that can only be accessed and manipulated using methods that
-// implement the list-like abstract type.  Each value in a list is associated
-// with an implicit positive integer index. The list uses ORDINAL based indexing
+// implement the list-like abstract type.  Each value in a List is associated
+// with an implicit positive integer index. The List uses ORDINAL based indexing
 // rather than ZERO based indexing (see the description of what this means in
-// the sequential interface definition).  The comparison of values in the list
+// the sequential interface definition).  The comparison of values in the List
 // use a configurable comparison function.
 // This type is parameterized as follows:
 //   - V is any type of value.
@@ -161,37 +163,37 @@ func (v list_[V]) SetValues(index int, values Sequential[V]) {
 
 // Sortable Interface
 
-// This public class method sorts the values in this list using the natural
+// This public class method sorts the values in this List using the natural
 // ranking function.
 func (v list_[V]) SortValues() {
 	v.values.SortValues()
 }
 
-// This public class method sorts the values in this list using the specified
+// This public class method sorts the values in this List using the specified
 // ranking function.
 func (v list_[V]) SortValuesWithRanker(ranker RankingFunction) {
 	v.values.SortValuesWithRanker(ranker)
 }
 
-// This public class method reverses the order of all values in this list.
+// This public class method reverses the order of all values in this List.
 func (v list_[V]) ReverseValues() {
 	v.values.ReverseValues()
 }
 
-// This public class method pseudo-randomly shuffles the values in this list.
+// This public class method pseudo-randomly shuffles the values in this List.
 func (v list_[V]) ShuffleValues() {
 	v.values.ShuffleValues()
 }
 
 // Searchable Interface
 
-// This public class method returns the comparing function for this list.
+// This public class method returns the comparing function for this List.
 func (v *list_[V]) GetComparer() ComparingFunction {
 	return v.compare
 }
 
 // This public class method returns the index of the FIRST occurrence of the
-// specified value in this list, or zero if this list does not contain the
+// specified value in this list, or zero if this List does not contain the
 // value.
 func (v *list_[V]) GetIndex(value V) int {
 	for index, candidate := range v.AsArray() {
@@ -204,13 +206,13 @@ func (v *list_[V]) GetIndex(value V) int {
 	return 0
 }
 
-// This public class method determines whether or not this list contains the
+// This public class method determines whether or not this List contains the
 // specified value.
 func (v *list_[V]) ContainsValue(value V) bool {
 	return v.GetIndex(value) > 0
 }
 
-// This public class method determines whether or not this list contains ANY of
+// This public class method determines whether or not this List contains ANY of
 // the specified values.
 func (v *list_[V]) ContainsAny(values Sequential[V]) bool {
 	var iterator = values.GetIterator()
@@ -225,7 +227,7 @@ func (v *list_[V]) ContainsAny(values Sequential[V]) bool {
 	return false
 }
 
-// This public class method determines whether or not this list contains ALL of
+// This public class method determines whether or not this List contains ALL of
 // the specified values.
 func (v *list_[V]) ContainsAll(values Sequential[V]) bool {
 	var iterator = values.GetIterator()
@@ -242,7 +244,7 @@ func (v *list_[V]) ContainsAll(values Sequential[V]) bool {
 
 // Expandable Interface
 
-// This public class method appends the specified value to the end of this list.
+// This public class method appends the specified value to the end of this List.
 func (v *list_[V]) AppendValue(value V) {
 
 	// Create a new bigger array.
@@ -268,7 +270,7 @@ func (v *list_[V]) AppendValue(value V) {
 }
 
 // This public class method appends the specified values to the end of this
-// list.
+// List.
 func (v *list_[V]) AppendValues(values Sequential[V]) {
 
 	// Create a new bigger array.
@@ -297,7 +299,7 @@ func (v *list_[V]) AppendValues(values Sequential[V]) {
 	v.values = array
 }
 
-// This public class method inserts the specified value into this list in the
+// This public class method inserts the specified value into this List in the
 // specified slot between the existing values.
 func (v *list_[V]) InsertValue(slot int, value V) {
 
@@ -324,7 +326,7 @@ func (v *list_[V]) InsertValue(slot int, value V) {
 	v.values = array
 }
 
-// This public class method inserts the specified values into this list in the
+// This public class method inserts the specified values into this List in the
 // specified slot between existing values.
 func (v *list_[V]) InsertValues(slot int, values Sequential[V]) {
 
@@ -356,7 +358,7 @@ func (v *list_[V]) InsertValues(slot int, values Sequential[V]) {
 }
 
 // This public class method removes the value at the specified index from this
-// list. The removed value is returned.
+// List. The removed value is returned.
 func (v *list_[V]) RemoveValue(index int) V {
 
 	// Create a new smaller array.
@@ -386,7 +388,7 @@ func (v *list_[V]) RemoveValue(index int) V {
 }
 
 // This public class method removes the values in the specified index range from
-// this list.  The removed values are returned.
+// this List.  The removed values are returned.
 func (v *list_[V]) RemoveValues(first int, last int) Sequential[V] {
 
 	// Create two smaller arrays.
@@ -421,7 +423,7 @@ func (v *list_[V]) RemoveValues(first int, last int) Sequential[V] {
 	return removed
 }
 
-// This public class method removes all values from this list.
+// This public class method removes all values from this List.
 func (v *list_[V]) RemoveAll() {
 	var Array = Array[V]()
 	v.values = Array.WithSize(0)
@@ -430,7 +432,7 @@ func (v *list_[V]) RemoveAll() {
 // Private Interface
 
 // This public class method is used by Go to generate a canonical string for
-// the list.
+// the List.
 func (v *list_[V]) String() string {
 	return Formatter().FormatCollection(v)
 }
@@ -442,8 +444,8 @@ func (v *list_[V]) normalized(index int) int {
 	var size = v.GetSize()
 	switch {
 	case size == 0:
-		// The list is empty.
-		panic("Cannot index an empty list.")
+		// The List is empty.
+		panic("Cannot index an empty List.")
 	case index == 0:
 		// Zero is not an ordinal.
 		panic("Indices must be positive or negative ordinals, not zero.")

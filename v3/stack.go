@@ -17,25 +17,27 @@ import (
 // CLASS NAMESPACE
 
 // This private type defines the namespace structure associated with the
-// constants, constructors and functions for the stack class namespace.
+// constants, constructors and functions for the Stack class namespace.
 type stackClass_[V Value] struct {
 	defaultCapacity int
 }
 
 // This private constant defines a map to hold all the singleton references to
-// the type specific stack namespaces.
+// the type specific Stack class namespaces.
 var stackClassSingletons = map[string]any{}
 
 // This public function returns the singleton reference to a type specific
-// stack namespace.  It also initializes any class constants as needed.
+// Stack class namespace.  It also initializes any class constants as needed.
 func Stack[V Value]() *stackClass_[V] {
 	var class *stackClass_[V]
-	var key = fmt.Sprintf("%T", class)
+	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
 	var value = stackClassSingletons[key]
 	switch actual := value.(type) {
 	case *stackClass_[V]:
+		// This bound class type already exists.
 		class = actual
 	default:
+		// Create a new bound class type.
 		class = &stackClass_[V]{
 			defaultCapacity: 16,
 		}
@@ -47,21 +49,21 @@ func Stack[V Value]() *stackClass_[V] {
 // CLASS CONSTANTS
 
 // This public class constant represents the default maximum capacity for a
-// stack.
+// Stack.
 func (c *stackClass_[V]) DefaultCapacity() int {
 	return c.defaultCapacity
 }
 
 // CLASS CONSTRUCTORS
 
-// This public class constructor creates a new empty stack with the default
+// This public class constructor creates a new empty Stack with the default
 // capacity.
 func (c *stackClass_[V]) Empty() StackLike[V] {
 	var stack = c.WithCapacity(c.defaultCapacity)
 	return stack
 }
 
-// This public class constructor creates a new empty stack with the specified
+// This public class constructor creates a new empty Stack with the specified
 // capacity.
 func (c *stackClass_[V]) WithCapacity(capacity int) StackLike[V] {
 	var List = List[V]()
@@ -73,8 +75,8 @@ func (c *stackClass_[V]) WithCapacity(capacity int) StackLike[V] {
 	return stack
 }
 
-// This public class constructor creates a new stack from the specified
-// sequence. The stack uses the default capacity.
+// This public class constructor creates a new Stack from the specified
+// sequence. The Stack uses the default capacity.
 func (c *stackClass_[V]) FromSequence(sequence Sequential[V]) StackLike[V] {
 	var stack = c.Empty()
 	var iterator = sequence.GetIterator()
@@ -92,7 +94,7 @@ func (c *stackClass_[V]) FromSequence(sequence Sequential[V]) StackLike[V] {
 
 // This private class type encapsulates a Go structure containing private
 // attributes that can only be accessed and manipulated using methods that
-// implement the stack-like abstract type.  A stack implements last-in-first-out
+// implement the stack-like abstract type.  A Stack implements last-in-first-out
 // semantics.
 // This type is parameterized as follows:
 //   - V is any type of value.
@@ -103,24 +105,24 @@ type stack_[V Value] struct {
 
 // Sequential Interface
 
-// This public class method determines whether or not this stack is empty.
+// This public class method determines whether or not this Stack is empty.
 func (v stack_[V]) IsEmpty() bool {
 	return v.values.IsEmpty()
 }
 
 // This public class method returns the number of values contained in this
-// stack.
+// Stack.
 func (v stack_[V]) GetSize() int {
 	return v.values.GetSize()
 }
 
-// This public class method returns all the values in this stack. The values
-// retrieved are in the same order as they are in the stack.
+// This public class method returns all the values in this Stack. The values
+// retrieved are in the same order as they are in the Stack.
 func (v stack_[V]) AsArray() []V {
 	return v.values.AsArray()
 }
 
-// This public class method generates for this stack an iterator that can be
+// This public class method generates for this Stack an iterator that can be
 // used to traverse its values.
 func (v stack_[V]) GetIterator() Ratcheted[V] {
 	return v.values.GetIterator()
@@ -128,16 +130,16 @@ func (v stack_[V]) GetIterator() Ratcheted[V] {
 
 // LIFO Interface
 
-// This public class method retrieves the capacity of this stack.
+// This public class method retrieves the capacity of this Stack.
 func (v *stack_[V]) GetCapacity() int {
 	return v.capacity
 }
 
-// This public class method adds the specified value to the top of this stack.
+// This public class method adds the specified value to the top of this Stack.
 func (v *stack_[V]) AddValue(value V) {
 	if v.values.GetSize() == v.capacity {
 		panic(fmt.Sprintf(
-			"Attempted to add a value onto a stack that has reached its capacity: %v\nvalue: %v\nstack: %v\n",
+			"Attempted to add a value onto a Stack that has reached its capacity: %v\nvalue: %v\nstack: %v\n",
 			v.capacity,
 			value,
 			v))
@@ -145,23 +147,23 @@ func (v *stack_[V]) AddValue(value V) {
 	v.values.InsertValue(0, value)
 }
 
-// This public class method retrieves from this stack the value that is on top of it.
+// This public class method retrieves from this Stack the value that is on top of it.
 func (v *stack_[V]) GetTop() V {
 	if v.values.IsEmpty() {
-		panic("Attempted to retrieve the top of an empty stack!")
+		panic("Attempted to retrieve the top of an empty Stack!")
 	}
 	return v.values.GetValue(1)
 }
 
-// This public class method removes from this stack the value that is on top of it.
+// This public class method removes from this Stack the value that is on top of it.
 func (v *stack_[V]) RemoveTop() V {
 	if v.values.IsEmpty() {
-		panic("Attempted to remove the top of an empty stack!")
+		panic("Attempted to remove the top of an empty Stack!")
 	}
 	return v.values.RemoveValue(1)
 }
 
-// This public class method removes all values from this stack.
+// This public class method removes all values from this Stack.
 func (v *stack_[V]) RemoveAll() {
 	v.values.RemoveAll()
 }
@@ -169,7 +171,7 @@ func (v *stack_[V]) RemoveAll() {
 // Private Interface
 
 // This public class method is used by Go to generate a canonical string for
-// the stack.
+// the Stack.
 func (v *stack_[V]) String() string {
 	return Formatter().FormatCollection(v)
 }

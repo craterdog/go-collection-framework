@@ -20,7 +20,7 @@ import (
 // CLASS NAMESPACE
 
 // This private type defines the namespace structure associated with the
-// constants, constructors and functions for the parser class namespace.
+// constants, constructors and functions for the Parser class namespace.
 type parserClass_ struct {
 	channelSize int
 	stackSize   int
@@ -28,14 +28,14 @@ type parserClass_ struct {
 
 // Specific Namespace
 
-// This private constant defines the singleton reference to the parser
+// This private constant defines the singleton reference to the Parser
 // class namespace.  It also initializes any class constants as needed.
 var parserClassSingleton = &parserClass_{
 	channelSize: 128,
 	stackSize:   4,
 }
 
-// This public function returns the singleton reference to the parser
+// This public function returns the singleton reference to the Parser
 // class namespace.
 func Parser() *parserClass_ {
 	return parserClassSingleton
@@ -43,7 +43,7 @@ func Parser() *parserClass_ {
 
 // CLASS CONSTRUCTORS
 
-// This public class constructor creates a new parser from the specified
+// This public class constructor creates a new Parser from the specified
 // source bytes.
 func (c *parserClass_) FromSource(source []byte) ParserLike {
 	var tokens = make(chan TokenLike, c.channelSize)
@@ -83,7 +83,7 @@ type parser_ struct {
 
 // Lexical Interface
 
-// This public class method uses the parser to parse a collection from the
+// This public class method uses the Parser to parse a collection from the
 // current source bytes.
 func (v *parser_) ParseCollection() Collection {
 	var collection, token, ok = v.parseCollection()
@@ -725,7 +725,7 @@ func (v *parser_) parseUnsigned() (uint64, TokenLike, bool) {
 	return unsigned, token, true
 }
 
-// This private class method is useful when creating scanner and parser error
+// This private class method is useful when creating Scanner and Parser error
 // messages.
 func (v *parser_) generateGrammar(expected string, symbols ...string) string {
 	var message = "Was expecting '" + expected + "' from:\n"

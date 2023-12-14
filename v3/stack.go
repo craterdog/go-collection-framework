@@ -142,7 +142,7 @@ func (v *stack_[V]) AddValue(value V) {
 			value,
 			v))
 	}
-	v.values.AppendValue(value)
+	v.values.InsertValue(0, value)
 }
 
 // This public class method retrieves from this stack the value that is on top of it.
@@ -150,7 +150,7 @@ func (v *stack_[V]) GetTop() V {
 	if v.values.IsEmpty() {
 		panic("Attempted to retrieve the top of an empty stack!")
 	}
-	return v.values.GetValue(-1)
+	return v.values.GetValue(1)
 }
 
 // This public class method removes from this stack the value that is on top of it.
@@ -158,7 +158,7 @@ func (v *stack_[V]) RemoveTop() V {
 	if v.values.IsEmpty() {
 		panic("Attempted to remove the top of an empty stack!")
 	}
-	return v.values.RemoveValue(-1)
+	return v.values.RemoveValue(1)
 }
 
 // This public class method removes all values from this stack.

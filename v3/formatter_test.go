@@ -94,7 +94,7 @@ func TestFormatEmptyList(t *tes.T) {
 	var List = col.List[any]()
 	var list = List.Empty()
 	var s = col.Formatter().FormatCollection(list)
-	ass.Equal(t, "[ ](list)\n", s)
+	ass.Equal(t, "[ ](List)\n", s)
 	fmt.Println("Empty List: " + s)
 }
 
@@ -105,7 +105,7 @@ func TestFormatListOfAny(t *tes.T) {
 	var list = List.FromSequence(array)
 	var s = col.Formatter().FormatCollection(list)
 	ass.Equal(t, s, fmt.Sprintf("%s", list))
-	ass.Equal(t, "(list)\n", s[len(s)-7:])
+	ass.Equal(t, "(List)\n", s[len(s)-7:])
 	fmt.Println("List of Any: " + s)
 }
 
@@ -125,7 +125,7 @@ func TestFormatSetOfAny(t *tes.T) {
 	var set = Set.FromSequence(array)
 	var s = col.Formatter().FormatCollection(set)
 	ass.Equal(t, s, fmt.Sprintf("%s", set))
-	ass.Equal(t, "(set)\n", s[len(s)-6:])
+	ass.Equal(t, "(Set)\n", s[len(s)-6:])
 	fmt.Println("Set of Any: " + s)
 }
 
@@ -155,7 +155,7 @@ func TestFormatStackOfAny(t *tes.T) {
 	stack.AddValue(v7)
 	var s = col.Formatter().FormatCollection(stack)
 	ass.Equal(t, s, fmt.Sprintf("%s", stack))
-	ass.Equal(t, "(stack)\n", s[len(s)-8:])
+	ass.Equal(t, "(Stack)\n", s[len(s)-8:])
 	fmt.Println("Stack: " + s)
 }
 
@@ -171,7 +171,7 @@ func TestFormatQueueOfAny(t *tes.T) {
 	queue.AddValue(v7)
 	var s = col.Formatter().FormatCollection(queue)
 	ass.Equal(t, s, fmt.Sprintf("%s", queue))
-	ass.Equal(t, "(queue)\n", s[len(s)-8:])
+	ass.Equal(t, "(Queue)\n", s[len(s)-8:])
 	fmt.Println("Queue: " + s)
 }
 
@@ -179,7 +179,7 @@ func TestFormatEmptyCatalog(t *tes.T) {
 	var Catalog = col.Catalog[any, any]()
 	var catalog = Catalog.Empty()
 	var s = col.Formatter().FormatCollection(catalog)
-	ass.Equal(t, "[:](catalog)\n", s)
+	ass.Equal(t, "[:](Catalog)\n", s)
 	fmt.Println("Empty Catalog: " + s)
 }
 
@@ -195,7 +195,7 @@ func TestFormatCatalogOfAnyToAny(t *tes.T) {
 	catalog.SetValue(k7, v7)
 	var s = col.Formatter().FormatCollection(catalog)
 	ass.Equal(t, s, fmt.Sprintf("%s", catalog))
-	ass.Equal(t, "(catalog)\n", s[len(s)-10:])
+	ass.Equal(t, "(Catalog)\n", s[len(s)-10:])
 	fmt.Println("Catalog: " + s)
 }
 

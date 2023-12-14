@@ -257,22 +257,26 @@ func (v *parser_) parseCollection() (Collection, TokenLike, bool) {
 		switch context {
 		case "array":
 			collection = Array[Value]().FromArray(sequence.AsArray())
-		case "list":
+		case "Array":
+			collection = Array[Value]().FromArray(sequence.AsArray())
+		case "List":
 			collection = List[Value]().FromSequence(sequence)
-		case "queue":
+		case "Queue":
 			collection = Queue[Value]().FromSequence(sequence)
-		case "set":
+		case "Set":
 			collection = Set[Value]().FromSequence(sequence)
-		case "stack":
+		case "Stack":
 			collection = Stack[Value]().FromSequence(sequence)
 		default:
 		}
 	case Sequential[Binding[Key, Value]]:
 		switch context {
-		case "catalog":
-			collection = Catalog[Key, Value]().FromSequence(sequence)
 		case "map":
 			collection = Map[Key, Value]().FromArray(sequence.AsArray())
+		case "Map":
+			collection = Map[Key, Value]().FromArray(sequence.AsArray())
+		case "Catalog":
+			collection = Catalog[Key, Value]().FromSequence(sequence)
 		}
 	}
 	_, token, ok = v.parseDelimiter(")")

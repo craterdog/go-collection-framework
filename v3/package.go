@@ -124,7 +124,7 @@ type Binding[K Key, V Value] interface {
 // This abstract interface defines the set of method signatures that must be
 // supported by all canonical agents that can generate formatted strings.
 type Canonical interface {
-	FormatAssociation(association Value) string
+	FormatValue(value Value) string
 	FormatCollection(collection Collection) string
 }
 

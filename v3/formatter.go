@@ -74,10 +74,10 @@ func (c *formatterClass_) WithMaximumDepth(maximumDepth int) FormatterLike {
 // CLASS FUNCTIONS
 
 // This public class function returns a string containing the canonical format
-// for the specified association.
-func (c *formatterClass_) FormatAssociation(association Value) string {
+// for the specified value.
+func (c *formatterClass_) FormatValue(value Value) string {
 	var formatter = c.WithDefaultDepth()
-	var string_ = formatter.FormatAssociation(association)
+	var string_ = formatter.FormatValue(value)
 	return string_
 }
 
@@ -106,16 +106,17 @@ type formatter_ struct {
 // Canonical Interface
 
 // This public class method returns a string containing the canonical format
-// for the specified association.
-func (v *formatter_) FormatAssociation(association Value) string {
-	v.formatAssociation(ref.ValueOf(association))
+// for the specified value.
+func (v *formatter_) FormatValue(value Value) string {
+	v.formatValue(value)
 	return v.getResult()
 }
 
 // This public class method returns a string containing the canonical format
 // for the specified collection.
 func (v *formatter_) FormatCollection(collection Collection) string {
-	v.formatValue(ref.ValueOf(collection))
+	var reflected = ref.ValueOf(collection)
+	v.formatCollection(reflected)
 	v.appendString(formatterClassSingleton.eof)
 	return v.getResult()
 }
@@ -145,93 +146,161 @@ func (v *formatter_) appendNewline() {
 }
 
 // This private class method determines the actual type of the specified value
-// and calls the corresponding format function for that type. NOTE: Because the
-// Go language doesn't really support polymorphism, the selection of the actual
-// function called must be done explicitly using reflection and a type switch.
-func (v *formatter_) formatValue(value ref.Value) {
-	switch value.Kind() {
+// and calls the corresponding format function for that type.  NOTE: Because the
+// Go language doesn't handle generic types very well in type switches, we use
+// reflection to handle all generic types.
+func (v *formatter_) formatValue(value any) {
+	switch actual := value.(type) {
+	// Handle primitive types.
+	case nil:
+		v.formatNil(actual)
+	case bool:
+		v.formatBoolean(actual)
+	case uint:
+		v.formatUnsigned(uint64(actual))
+	case uint8:
+		v.formatUnsigned(uint64(actual))
+	case uint16:
+		v.formatUnsigned(uint64(actual))
+	case uint32:
+		v.formatUnsigned(uint64(actual))
+	case uint64:
+		v.formatUnsigned(uint64(actual))
+	case uintptr:
+		v.formatUnsigned(uint64(actual))
+	case int:
+		v.formatInteger(int64(actual))
+	case int8:
+		v.formatInteger(int64(actual))
+	case int16:
+		v.formatInteger(int64(actual))
+	case int64:
+		v.formatInteger(int64(actual))
+	case float32:
+		v.formatFloat(float64(actual))
+	case float64:
+		v.formatFloat(float64(actual))
+	case complex64:
+		v.formatComplex(complex128(actual))
+	case complex128:
+		v.formatComplex(complex128(actual))
+	case rune:
+		v.formatRune(rune(actual))
+	case string:
+		v.formatString(actual)
 
-	// Handle all primitive types.
-	case ref.Bool:
-		v.formatBoolean(value)
-	case ref.Uint, ref.Uint8, ref.Uint16, ref.Uint32, ref.Uint64, ref.Uintptr:
-		v.formatUnsigned(value)
-	case ref.Int, ref.Int8, ref.Int16, ref.Int64:
-		v.formatInteger(value)
-	case ref.Float32, ref.Float64:
-		v.formatFloat(value)
-	case ref.Complex64, ref.Complex128:
-		v.formatComplex(value)
-	case ref.Int32:
-		v.formatRune(value)
-	case ref.String:
-		v.formatString(value)
-
-	// Handle all primitive collections.
-	case ref.Array, ref.Slice:
-		v.formatArray(value, "array")
-	case ref.Map:
-		v.formatMap(value)
-
-	// Handle all sequential collections.
-	case ref.Interface, ref.Pointer:
-		if value.MethodByName("AsArray").IsValid() {
-			// The value is a collection.
-			v.formatCollection(value)
-		} else if value.MethodByName("GetKey").IsValid() {
-			// The value is an association.
-			v.formatAssociation(value)
-		} else {
-			// The value is a pointer to the value to be formatted.
-			value = value.Elem()
-			v.formatValue(value)
-		}
-
+	// Handle generic types.
 	default:
-		if !value.IsValid() {
-			v.formatNil(value)
+		var reflected = ref.ValueOf(value)
+		if reflected.MethodByName("GetKey").IsValid() {
+			v.formatAssociation(reflected)
+		} else if reflected.MethodByName("AsArray").IsValid() {
+			v.formatCollection(reflected)
 		} else {
-			panic(fmt.Sprintf(
-				"Attempted to format:\n    value: %v\n    type: %v\n    kind: %v\n",
-				value.Interface(),
-				value.Type(),
-				value.Kind()))
+			switch reflected.Kind() {
+			case ref.Array, ref.Slice, ref.Map:
+				v.formatCollection(reflected)
+			default:
+				panic(fmt.Sprintf(
+					"Attempted to format:\n    value: %v\n    type: %v\n    kind: %v\n",
+					reflected.Interface(),
+					reflected.Type(),
+					reflected.Kind(),
+				))
+			}
 		}
+	}
+}
+
+// This private class method adds the canonical format for the specified array
+// of values to the state of the formatter.
+func (v *formatter_) formatArray(array ref.Value) {
+	var size = array.Len()
+	switch size {
+	case 0:
+		v.appendString(" ")
+	case 1:
+		var value = array.Index(0)
+		v.formatValue(value.Interface())
+	default:
+		v.depth++
+		if v.depth > v.maximumDepth {
+			// Truncate the recursion.
+			v.appendString("...")
+		} else {
+			for i := 0; i < size; i++ {
+				v.appendNewline()
+				var value = array.Index(i)
+				v.formatValue(value.Interface())
+			}
+		}
+		v.depth--
+		v.appendNewline()
+	}
+}
+
+// This private class method adds the canonical format for the specified map of
+// key-value pairs to the state of the formatter.
+func (v *formatter_) formatMap(map_ ref.Value) {
+	var keys = map_.MapKeys()
+	var size = len(keys)
+	switch size {
+	case 0:
+		v.appendString(":")
+	case 1:
+		var key = keys[0]
+		var value = map_.MapIndex(key)
+		v.formatValue(key.Interface())
+		v.appendString(": ")
+		v.formatValue(value.Interface())
+	default:
+		v.depth++
+		if v.depth > v.maximumDepth {
+			// Truncate the recursion.
+			v.appendString("...")
+		} else {
+			for i := 0; i < size; i++ {
+				v.appendNewline()
+				var key = keys[i]
+				var value = map_.MapIndex(key)
+				v.formatValue(key.Interface())
+				v.appendString(": ")
+				v.formatValue(value.Interface())
+			}
+		}
+		v.depth--
+		v.appendNewline()
 	}
 }
 
 // This private class method appends the nil string for the specified value to
 // the result.
-func (v *formatter_) formatNil(r ref.Value) {
+func (v *formatter_) formatNil(value any) {
 	v.appendString("<nil>")
 }
 
 // This private class method appends the name of the specified boolean value to
 // the result.
-func (v *formatter_) formatBoolean(r ref.Value) {
-	var b = r.Bool()
-	v.appendString(stc.FormatBool(b))
+func (v *formatter_) formatBoolean(boolean bool) {
+	v.appendString(stc.FormatBool(boolean))
 }
 
 // This private class method appends the base 10 string for the specified
 // integer value to the result.
-func (v *formatter_) formatInteger(r ref.Value) {
-	var i = r.Int()
-	v.appendString(stc.FormatInt(int64(i), 10))
+func (v *formatter_) formatInteger(integer int64) {
+	v.appendString(stc.FormatInt(integer, 10))
 }
 
 // This private class method appends the base 16 string for the specified
 // unsigned integer value to the result.
-func (v *formatter_) formatUnsigned(r ref.Value) {
-	var u = r.Uint()
-	v.appendString("0x" + stc.FormatUint(uint64(u), 16))
+func (v *formatter_) formatUnsigned(unsigned uint64) {
+	v.appendString("0x" + stc.FormatUint(unsigned, 16))
 }
 
 // This private class method appends the base 10 string for the specified
 // floating point value to the result using scientific notation if necessary.
-func (v *formatter_) formatFloat(r ref.Value) {
-	var flt = r.Float()
-	var str = stc.FormatFloat(flt, 'G', -1, 64)
+func (v *formatter_) formatFloat(float float64) {
+	var str = stc.FormatFloat(float, 'G', -1, 64)
 	if !sts.Contains(str, ".") && !sts.Contains(str, "E") {
 		str += ".0"
 	}
@@ -240,13 +309,12 @@ func (v *formatter_) formatFloat(r ref.Value) {
 
 // This private class method appends the base 10 string for the specified
 // complex number value to the result using scientific notation if necessary.
-func (v *formatter_) formatComplex(r ref.Value) {
-	var complex_ = r.Complex()
-	var real_ = ref.ValueOf(real(complex_))
-	var imag_ = ref.ValueOf(imag(complex_))
+func (v *formatter_) formatComplex(complex_ complex128) {
+	var real_ = real(complex_)
+	var imag_ = imag(complex_)
 	v.appendString("(")
 	v.formatFloat(real_)
-	if imag_.Float() >= 0.0 {
+	if imag_ >= 0.0 {
 		v.appendString("+")
 	}
 	v.formatFloat(imag_)
@@ -255,126 +323,124 @@ func (v *formatter_) formatComplex(r ref.Value) {
 
 // This private class method appends the string for the specified rune value to
 // the result.
-func (v *formatter_) formatRune(r ref.Value) {
-	var rune_ = r.Int()
-	v.appendString(stc.QuoteRune(int32(rune_)))
+func (v *formatter_) formatRune(rune_ rune) {
+	v.appendString(stc.QuoteRune(rune_))
 }
 
 // This private class method appends the string for the specified string value
 // to the result.
-func (v *formatter_) formatString(r ref.Value) {
-	var string_ = r.String()
+func (v *formatter_) formatString(string_ string) {
 	v.appendString(stc.Quote(string_))
 }
 
-// This private class method appends the string for the specified array of
-// values to the result.
-func (v *formatter_) formatArray(r ref.Value, typ string) {
-	var size = r.Len()
-	v.appendString("[")
-	if size > 0 {
-		if v.depth+1 > v.maximumDepth {
-			// Truncate the recursion.
-			v.appendString("...")
-		} else {
-			for i := 0; i < size; i++ {
-				var value ref.Value
-				v.depth++
-				v.appendNewline()
-				if typ == "stack" {
-					// Format values in reverse order.
-					value = r.Index(size - i - 1)
-				} else {
-					// Format values in actual order.
-					value = r.Index(i)
-				}
-				v.formatValue(value)
-				v.depth--
-			}
-			v.appendNewline()
-		}
-	} else {
-		if typ == "catalog" {
-			v.appendString(":") // The array of associations is empty: [:]
-		} else {
-			v.appendString(" ") // The array of values is empty: [ ]
-		}
-	}
-	v.appendString("](" + typ + ")")
-}
-
-// This private class method appends the string for the specified map of
-// key-value pairs to the result.
-func (v *formatter_) formatMap(r ref.Value) {
-	var keys = r.MapKeys()
-	var size = len(keys)
-	v.appendString("[")
-	if size > 0 {
-		if v.depth+1 > v.maximumDepth {
-			// Truncate the recursion.
-			v.appendString("...")
-		} else {
-			for i := 0; i < size; i++ {
-				v.depth++
-				v.appendNewline()
-				var key = keys[i]
-				var value = r.MapIndex(key)
-				v.formatValue(key)
-				v.appendString(": ")
-				v.formatValue(value)
-				v.depth--
-			}
-			v.appendNewline()
-		}
-	} else {
-		v.appendString(":") // The map is empty: [:]
-	}
-	v.appendString("](map)")
-}
-
-// This private class method appends the string for the specified catalog of
-// key-value pairs to the result. It uses recursion to format each pair.
-func (v *formatter_) formatAssociation(r ref.Value) {
-	var key = r.MethodByName("GetKey").Call([]ref.Value{})[0]
-	v.formatValue(key)
+// This private class method appends the string for the specified association to
+// the result.
+func (v *formatter_) formatAssociation(association ref.Value) {
+	var key = association.MethodByName("GetKey").Call([]ref.Value{})[0]
+	v.formatValue(key.Interface())
 	v.appendString(": ")
-	var value = r.MethodByName("GetValue").Call([]ref.Value{})[0]
-	v.formatValue(value)
+	var value = association.MethodByName("GetValue").Call([]ref.Value{})[0]
+	v.formatValue(value.Interface())
+}
+
+// This private class method appends the string for the specified sequence of
+// associations to the result.
+func (v *formatter_) formatSequence(sequence ref.Value) {
+	var iterator = sequence.MethodByName("GetIterator").Call([]ref.Value{})[0]
+	var size = sequence.MethodByName("GetSize").Call([]ref.Value{})[0]
+	switch size.Interface() {
+	case 0:
+		if sequence.MethodByName("GetKeys").IsValid() {
+			v.appendString(":") // This is an empty sequence of associations.
+		} else {
+			v.appendString(" ") // This is an empty sequence of values.
+		}
+	case 1:
+		var value = iterator.MethodByName("GetNext").Call([]ref.Value{})[0]
+		v.formatValue(value.Interface())
+	default:
+		v.depth++
+		if v.depth > v.maximumDepth {
+			// Truncate the recursion.
+			v.appendString("...")
+		} else {
+			for iterator.MethodByName("HasNext").Call([]ref.Value{})[0].Interface().(bool) {
+				v.appendNewline()
+				var value = iterator.MethodByName("GetNext").Call([]ref.Value{})[0]
+				v.formatValue(value.Interface())
+			}
+		}
+		v.depth--
+		v.appendNewline()
+	}
 }
 
 // This private class method appends the string for the specified collection of
 // values to the result. It uses recursion to format each value.
-func (v *formatter_) formatCollection(r ref.Value) {
-	var array = r.MethodByName("AsArray").Call([]ref.Value{})[0]
-	var type_ = r.Type().String()
+func (v *formatter_) formatCollection(collection ref.Value) {
+	v.appendString("[")
+	var type_ = v.extractType(collection)
+	switch collection.Kind() {
+	case ref.Array, ref.Slice:
+		v.formatArray(collection)
+	case ref.Map:
+		v.formatMap(collection)
+	case ref.Interface, ref.Pointer:
+		v.formatSequence(collection)
+	default:
+		panic(fmt.Sprintf(
+			"Attempted to format:\n    value: %v\n    type: %v\n    kind: %v\n",
+			collection.Interface(),
+			collection.Type(),
+			collection.Kind(),
+		))
+	}
+	v.appendString("](" + type_ + ")")
+}
+
+// This private class method extracts the type name string from the full
+// reflected type.  NOTE: This hack is necessary since Go does not handle type
+// switches with generics very well.
+func (v *formatter_) extractType(collection ref.Value) string {
+	var type_ = collection.Type().String()
 	switch {
 	case sts.HasPrefix(type_, "[]"):
-		type_ = "array"
+		return "array"
+	case sts.HasPrefix(type_, "collections.ArrayLike"):
+		return "Array"
+	case sts.HasPrefix(type_, "collections.array_"):
+		return "Array"
 	case sts.HasPrefix(type_, "map["):
-		type_ = "map"
+		return "map"
+	case sts.HasPrefix(type_, "collections.MapLike"):
+		return "Map"
+	case sts.HasPrefix(type_, "collections.map_"):
+		return "Map"
 	case sts.HasPrefix(type_, "*collections.set_"):
-		type_ = "set"
+		return "Set"
 	case sts.HasPrefix(type_, "collections.SetLike"):
-		type_ = "set"
+		return "Set"
 	case sts.HasPrefix(type_, "*collections.queue_"):
-		type_ = "queue"
+		return "Queue"
 	case sts.HasPrefix(type_, "collections.QueueLike"):
-		type_ = "queue"
+		return "Queue"
 	case sts.HasPrefix(type_, "*collections.stack_"):
-		type_ = "stack"
+		return "Stack"
 	case sts.HasPrefix(type_, "collections.StackLike"):
-		type_ = "stack"
+		return "Stack"
 	case sts.HasPrefix(type_, "*collections.list_"):
-		type_ = "list"
+		return "List"
 	case sts.HasPrefix(type_, "collections.ListLike"):
-		type_ = "list"
+		return "List"
 	case sts.HasPrefix(type_, "*collections.catalog_"):
-		type_ = "catalog"
+		return "Catalog"
 	case sts.HasPrefix(type_, "collections.CatalogLike"):
-		type_ = "catalog"
+		return "Catalog"
+	case sts.HasPrefix(type_, "*collections.association_"):
+		return "Association"
+	case sts.HasPrefix(type_, "collections.AssociationLike"):
+		return "Association"
 	default:
-		fmt.Printf("UNKNOWN: %v\n", type_)
-		type_ = "unknown"
+		return "<unknown>"
 	}
-	v.formatArray(array, type_)
 }

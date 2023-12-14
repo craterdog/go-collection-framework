@@ -39,7 +39,7 @@ const (
 	base16    = `[0-9a-f]`
 	boolean   = `false|true`
 	complex_  = `\((` + float + `)` + sign + `(` + float + `)i\)`
-	context   = `array|catalog|list|map|queue|set|stack`
+	context   = `[Aa]rray|Catalog|List|[Ma]ap|Queue|Set|Stack`
 	delimiter = `\[|\]|\(|\)|:|,`
 	eol       = `\n`
 	escape    = `\\(?:(?:` + unicode + `)|[abfnrtv'"\\])`

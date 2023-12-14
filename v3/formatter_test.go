@@ -26,6 +26,7 @@ var k5 complex128
 var k6 rune
 var k7 string
 var k8 string = "array"
+var k9 string = "map"
 
 // Define the values.
 var v1 bool = true
@@ -36,6 +37,7 @@ var v5 complex128 = 1 + 1i
 var v6 rune = '☺'
 var v7 string = "Hello World!"
 var v8 = []int{1, 2, 3}
+var v9 = map[string]int{"one": 1, "two": 2, "three": 3}
 
 func TestFormatEmptyArray(t *tes.T) {
 	var array = []any{}
@@ -45,9 +47,10 @@ func TestFormatEmptyArray(t *tes.T) {
 }
 
 func TestFormatArrayOfAny(t *tes.T) {
-	var array = []any{v1, v2, v3, v4, v5, v6, v7, v8}
-	var s = col.Formatter().FormatCollection(array)
-	ass.Equal(t, "(array)\n", s[len(s)-8:])
+	var array = []any{v1, v2, v3, v4, v5, v6, v7, v8, v9}
+	var Array = col.Array[any]().FromArray(array)
+	var s = col.Formatter().FormatCollection(Array)
+	ass.Equal(t, "(Array)\n", s[len(s)-8:])
 	fmt.Println("Array of Any: " + s)
 }
 
@@ -66,7 +69,7 @@ func TestFormatEmptyMap(t *tes.T) {
 }
 
 func TestFormatMapOfAnyToAny(t *tes.T) {
-	var mapp = map[any]any{
+	var map_ = map[any]any{
 		k1: v1,
 		k2: v2,
 		k3: v3,
@@ -74,9 +77,12 @@ func TestFormatMapOfAnyToAny(t *tes.T) {
 		k5: v5,
 		k6: v6,
 		k7: v7,
-		k8: v8}
-	var s = col.Formatter().FormatCollection(mapp)
-	ass.Equal(t, "(map)\n", s[len(s)-6:])
+		k8: v8,
+		k9: v9,
+	}
+	var Map = col.Map[any, any]().FromMap(map_)
+	var s = col.Formatter().FormatCollection(Map)
+	ass.Equal(t, "(Map)\n", s[len(s)-6:])
 	fmt.Println("Map of Any to Any: " + s)
 }
 

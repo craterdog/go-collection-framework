@@ -48,12 +48,6 @@ func Array[V Value]() *arrayClass_[V] {
 
 // CLASS CONSTRUCTORS
 
-// This public class constructor creates a new Array of the specified size.
-func (c *arrayClass_[V]) WithSize(size int) ArrayLike[V] {
-	var array = make([]V, size) // All values initialized to zero.
-	return array_[V](array)
-}
-
 // This public class constructor creates a new Array from the specified
 // Go array of values.
 func (c *arrayClass_[V]) FromArray(array []V) ArrayLike[V] {
@@ -61,6 +55,12 @@ func (c *arrayClass_[V]) FromArray(array []V) ArrayLike[V] {
 	var duplicate = make([]V, length)
 	copy(duplicate, array)
 	return array_[V](duplicate)
+}
+
+// This public class constructor creates a new Array of the specified size.
+func (c *arrayClass_[V]) WithSize(size int) ArrayLike[V] {
+	var array = make([]V, size) // All values initialized to zero.
+	return array_[V](array)
 }
 
 // CLASS TYPE
@@ -75,36 +75,6 @@ func (c *arrayClass_[V]) FromArray(array []V) ArrayLike[V] {
 // This type is parameterized as follows:
 //   - V is any type of value.
 type array_[V Value] []V
-
-// Sequential Interface
-
-// This public class method determines whether or not this Array is empty.
-func (v array_[V]) IsEmpty() bool {
-	return len(v) == 0
-}
-
-// This public class method returns the number of values contained in this
-// Array.
-func (v array_[V]) GetSize() int {
-	return len(v)
-}
-
-// This public class method returns all the values in this Array. The values
-// retrieved are in the same order as they are in the Array.
-func (v array_[V]) AsArray() []V {
-	var length = len(v)
-	var array = make([]V, length)
-	copy(array, v)
-	return array
-}
-
-// This public class method generates for this Array an iterator that can be
-// used to traverse its values.
-func (v array_[V]) GetIterator() Ratcheted[V] {
-	var Iterator = Iterator[V]()
-	var iterator = Iterator.FromSequence(v)
-	return iterator
-}
 
 // Accessible Interface
 
@@ -123,6 +93,65 @@ func (v array_[V]) GetValues(first int, last int) Sequential[V] {
 	var sequence = v[first : last+1]
 	var array = Array[V]().FromArray(sequence) // This copies the underlying array.
 	return array
+}
+
+// Sequential Interface
+
+// This public class method returns all the values in this Array. The values
+// retrieved are in the same order as they are in the Array.
+func (v array_[V]) AsArray() []V {
+	var length = len(v)
+	var array = make([]V, length)
+	copy(array, v)
+	return array
+}
+
+// This public class method generates for this Array an iterator that can be
+// used to traverse its values.
+func (v array_[V]) GetIterator() Ratcheted[V] {
+	var Iterator = Iterator[V]()
+	var iterator = Iterator.FromSequence(v)
+	return iterator
+}
+
+// This public class method returns the number of values contained in this
+// Array.
+func (v array_[V]) GetSize() int {
+	return len(v)
+}
+
+// This public class method determines whether or not this Array is empty.
+func (v array_[V]) IsEmpty() bool {
+	return len(v) == 0
+}
+
+// Sortable Interface
+
+// This public class method reverses the order of all values in this list.
+func (v array_[V]) ReverseValues() {
+	var Sorter = Sorter[V]()
+	Sorter.ReverseValues(v)
+}
+
+// This public class method pseudo-randomly shuffles the values in this list.
+func (v array_[V]) ShuffleValues() {
+	var Sorter = Sorter[V]()
+	Sorter.ShuffleValues(v)
+}
+
+// This public class method sorts the values in this list using the natural
+// ranking function.
+func (v array_[V]) SortValues() {
+	v.SortValuesWithRanker(Collator().RankValues)
+}
+
+// This public class method sorts the values in this list using the specified
+// ranking function.
+func (v array_[V]) SortValuesWithRanker(ranker RankingFunction) {
+	if v.GetSize() > 1 {
+		var Sorter = Sorter[V]()
+		Sorter.SortValues(v, ranker)
+	}
 }
 
 // Updatable Interface
@@ -144,35 +173,6 @@ func (v array_[V]) SetValues(index int, values Sequential[V]) {
 	copy(v[first:last], values.AsArray())
 }
 
-// Sortable Interface
-
-// This public class method sorts the values in this list using the natural
-// ranking function.
-func (v array_[V]) SortValues() {
-	v.SortValuesWithRanker(Collator().RankValues)
-}
-
-// This public class method sorts the values in this list using the specified
-// ranking function.
-func (v array_[V]) SortValuesWithRanker(ranker RankingFunction) {
-	if v.GetSize() > 1 {
-		var Sorter = Sorter[V]()
-		Sorter.SortValues(v, ranker)
-	}
-}
-
-// This public class method reverses the order of all values in this list.
-func (v array_[V]) ReverseValues() {
-	var Sorter = Sorter[V]()
-	Sorter.ReverseValues(v)
-}
-
-// This public class method pseudo-randomly shuffles the values in this list.
-func (v array_[V]) ShuffleValues() {
-	var Sorter = Sorter[V]()
-	Sorter.ShuffleValues(v)
-}
-
 // Private Interface
 
 // This public class method is used by Go to generate a string from an Array.
@@ -186,7 +186,7 @@ func (v array_[V]) String() string {
 //	[-size..-1] and [1..size] => [0..size)
 //
 // Notice that the specified index cannot be zero since zero is not an ORDINAL.
-func (v *array_[V]) goIndex(index int) int {
+func (v array_[V]) goIndex(index int) int {
 	var size = v.GetSize()
 	switch {
 	case size == 0:

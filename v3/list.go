@@ -51,19 +51,8 @@ func List[V Value]() *listClass_[V] {
 // This public class constructor creates a new empty List.
 // The List uses the natural comparing function.
 func (c *listClass_[V]) Empty() ListLike[V] {
-	var Array = Array[V]() // Retrieve the array namespace.
-	var array = Array.WithSize(0)
 	var compare = Collator().CompareValues
-	var list = &list_[V]{array, compare}
-	return list
-}
-
-// This public class constructor creates a new empty List that uses the
-// specified comparing function.
-func (c *listClass_[V]) FromComparer(compare ComparingFunction) ListLike[V] {
-	var Array = Array[V]() // Retrieve the array namespace.
-	var array = Array.WithSize(0)
-	var list = &list_[V]{array, compare}
+	var list = c.WithComparer(compare)
 	return list
 }
 
@@ -75,6 +64,18 @@ func (c *listClass_[V]) FromSequence(sequence Sequential[V]) ListLike[V] {
 	for iterator.HasNext() {
 		var value = iterator.GetNext()
 		list.AppendValue(value)
+	}
+	return list
+}
+
+// This public class constructor creates a new empty List that uses the
+// specified comparing function.
+func (c *listClass_[V]) WithComparer(compare ComparingFunction) ListLike[V] {
+	var Array = Array[V]() // Retrieve the array namespace.
+	var values = Array.WithSize(0)
+	var list = &list_[V]{
+		compare: compare,
+		values:  values,
 	}
 	return list
 }
@@ -104,33 +105,8 @@ func (c *listClass_[V]) Concatenate(first, second ListLike[V]) ListLike[V] {
 // This type is parameterized as follows:
 //   - V is any type of value.
 type list_[V Value] struct {
-	values  ArrayLike[V]
 	compare ComparingFunction
-}
-
-// Sequential Interface
-
-// This public class method determines whether or not this array is empty.
-func (v list_[V]) IsEmpty() bool {
-	return v.values.IsEmpty()
-}
-
-// This public class method returns the number of values contained in this
-// array.
-func (v list_[V]) GetSize() int {
-	return v.values.GetSize()
-}
-
-// This public class method returns all the values in this array. The values
-// retrieved are in the same order as they are in the array.
-func (v list_[V]) AsArray() []V {
-	return v.values.AsArray()
-}
-
-// This public class method generates for this array an iterator that can be
-// used to traverse its values.
-func (v list_[V]) GetIterator() Ratcheted[V] {
-	return v.values.GetIterator()
+	values  ArrayLike[V]
 }
 
 // Accessible Interface
@@ -145,101 +121,6 @@ func (v list_[V]) GetValue(index int) V {
 // index through the last index (inclusive).
 func (v list_[V]) GetValues(first int, last int) Sequential[V] {
 	return v.values.GetValues(first, last)
-}
-
-// Updatable Interface
-
-// This public class method sets the value in this array that is associated
-// with the specified index to be the specified value.
-func (v list_[V]) SetValue(index int, value V) {
-	v.values.SetValue(index, value)
-}
-
-// This public class method sets the values in this array starting with the
-// specified index to the specified values.
-func (v list_[V]) SetValues(index int, values Sequential[V]) {
-	v.values.SetValues(index, values)
-}
-
-// Sortable Interface
-
-// This public class method sorts the values in this List using the natural
-// ranking function.
-func (v list_[V]) SortValues() {
-	v.values.SortValues()
-}
-
-// This public class method sorts the values in this List using the specified
-// ranking function.
-func (v list_[V]) SortValuesWithRanker(ranker RankingFunction) {
-	v.values.SortValuesWithRanker(ranker)
-}
-
-// This public class method reverses the order of all values in this List.
-func (v list_[V]) ReverseValues() {
-	v.values.ReverseValues()
-}
-
-// This public class method pseudo-randomly shuffles the values in this List.
-func (v list_[V]) ShuffleValues() {
-	v.values.ShuffleValues()
-}
-
-// Searchable Interface
-
-// This public class method returns the comparing function for this List.
-func (v *list_[V]) GetComparer() ComparingFunction {
-	return v.compare
-}
-
-// This public class method returns the index of the FIRST occurrence of the
-// specified value in this list, or zero if this List does not contain the
-// value.
-func (v *list_[V]) GetIndex(value V) int {
-	for index, candidate := range v.AsArray() {
-		if v.compare(candidate, value) {
-			// Found the value.
-			return index + 1 // Convert to an ORDINAL based index.
-		}
-	}
-	// The value was not found.
-	return 0
-}
-
-// This public class method determines whether or not this List contains the
-// specified value.
-func (v *list_[V]) ContainsValue(value V) bool {
-	return v.GetIndex(value) > 0
-}
-
-// This public class method determines whether or not this List contains ANY of
-// the specified values.
-func (v *list_[V]) ContainsAny(values Sequential[V]) bool {
-	var iterator = values.GetIterator()
-	for iterator.HasNext() {
-		var candidate = iterator.GetNext()
-		if v.GetIndex(candidate) > 0 {
-			// Found one of the values.
-			return true
-		}
-	}
-	// Did not find any of the values.
-	return false
-}
-
-// This public class method determines whether or not this List contains ALL of
-// the specified values.
-func (v *list_[V]) ContainsAll(values Sequential[V]) bool {
-	var iterator = values.GetIterator()
-	for iterator.HasNext() {
-		var candidate = iterator.GetNext()
-		if v.GetIndex(candidate) == 0 {
-			// Didn't find one of the values.
-			return false
-		}
-	}
-	// Found all of the values.
-	return true
 }
 
 // Expandable Interface
@@ -357,6 +238,12 @@ func (v *list_[V]) InsertValues(slot int, values Sequential[V]) {
 	v.values = array
 }
 
+// This public class method removes all values from this List.
+func (v *list_[V]) RemoveAll() {
+	var Array = Array[V]()
+	v.values = Array.WithSize(0)
+}
+
 // This public class method removes the value at the specified index from this
 // List. The removed value is returned.
 func (v *list_[V]) RemoveValue(index int) V {
@@ -423,10 +310,124 @@ func (v *list_[V]) RemoveValues(first int, last int) Sequential[V] {
 	return removed
 }
 
-// This public class method removes all values from this List.
-func (v *list_[V]) RemoveAll() {
-	var Array = Array[V]()
-	v.values = Array.WithSize(0)
+// Searchable Interface
+
+// This public class method determines whether or not this List contains ALL of
+// the specified values.
+func (v *list_[V]) ContainsAll(values Sequential[V]) bool {
+	var iterator = values.GetIterator()
+	for iterator.HasNext() {
+		var candidate = iterator.GetNext()
+		if v.GetIndex(candidate) == 0 {
+			// Didn't find one of the values.
+			return false
+		}
+	}
+	// Found all of the values.
+	return true
+}
+
+// This public class method determines whether or not this List contains ANY of
+// the specified values.
+func (v *list_[V]) ContainsAny(values Sequential[V]) bool {
+	var iterator = values.GetIterator()
+	for iterator.HasNext() {
+		var candidate = iterator.GetNext()
+		if v.GetIndex(candidate) > 0 {
+			// Found one of the values.
+			return true
+		}
+	}
+	// Did not find any of the values.
+	return false
+}
+
+// This public class method determines whether or not this List contains the
+// specified value.
+func (v *list_[V]) ContainsValue(value V) bool {
+	return v.GetIndex(value) > 0
+}
+
+// This public class method returns the comparing function for this List.
+func (v *list_[V]) GetComparer() ComparingFunction {
+	return v.compare
+}
+
+// This public class method returns the index of the FIRST occurrence of the
+// specified value in this list, or zero if this List does not contain the
+// value.
+func (v *list_[V]) GetIndex(value V) int {
+	for index, candidate := range v.AsArray() {
+		if v.compare(candidate, value) {
+			// Found the value.
+			return index + 1 // Convert to an ORDINAL based index.
+		}
+	}
+	// The value was not found.
+	return 0
+}
+
+// Sequential Interface
+
+// This public class method returns all the values in this array. The values
+// retrieved are in the same order as they are in the array.
+func (v list_[V]) AsArray() []V {
+	return v.values.AsArray()
+}
+
+// This public class method generates for this array an iterator that can be
+// used to traverse its values.
+func (v list_[V]) GetIterator() Ratcheted[V] {
+	return v.values.GetIterator()
+}
+
+// This public class method returns the number of values contained in this
+// array.
+func (v list_[V]) GetSize() int {
+	return v.values.GetSize()
+}
+
+// This public class method determines whether or not this array is empty.
+func (v list_[V]) IsEmpty() bool {
+	return v.values.IsEmpty()
+}
+
+// Sortable Interface
+
+// This public class method reverses the order of all values in this List.
+func (v list_[V]) ReverseValues() {
+	v.values.ReverseValues()
+}
+
+// This public class method pseudo-randomly shuffles the values in this List.
+func (v list_[V]) ShuffleValues() {
+	v.values.ShuffleValues()
+}
+
+// This public class method sorts the values in this List using the natural
+// ranking function.
+func (v list_[V]) SortValues() {
+	v.values.SortValues()
+}
+
+// This public class method sorts the values in this List using the specified
+// ranking function.
+func (v list_[V]) SortValuesWithRanker(ranker RankingFunction) {
+	v.values.SortValuesWithRanker(ranker)
+}
+
+// Updatable Interface
+
+// This public class method sets the value in this array that is associated
+// with the specified index to be the specified value.
+func (v list_[V]) SetValue(index int, value V) {
+	v.values.SetValue(index, value)
+}
+
+// This public class method sets the values in this array starting with the
+// specified index to the specified values.
+func (v list_[V]) SetValues(index int, values Sequential[V]) {
+	v.values.SetValues(index, values)
 }
 
 // Private Interface

@@ -39,6 +39,34 @@ var v7 string = "Hello World!"
 var v8 = []int{1, 2, 3}
 var v9 = map[string]int{"one": 1, "two": 2, "three": 3}
 
+func TestFormatPrimitives(t *tes.T) {
+	var Formatter = col.Formatter()
+	ass.Equal(t, "true", Formatter.FormatValue(v1))
+	ass.Equal(t, "0xa", Formatter.FormatValue(v2))
+	ass.Equal(t, "42", Formatter.FormatValue(v3))
+	ass.Equal(t, "0.125", Formatter.FormatValue(v4))
+	ass.Equal(t, "(1.0+1.0i)", Formatter.FormatValue(v5))
+	ass.Equal(t, "'☺'", Formatter.FormatValue(v6))
+	ass.Equal(t, "\"Hello World!\"", Formatter.FormatValue(v7))
+}
+
+func TestFormatterConstants(t *tes.T) {
+	ass.Equal(t, 8, col.Formatter().DefaultDepth())
+}
+
+func TestFormatSpecificDepths(t *tes.T) {
+	var array = col.Array[any]().FromArray([]any{1, []any{1, 2, []any{1, 2, 3}}})
+	var collator = col.Formatter().WithSpecificDepth(0)
+	var s = collator.FormatCollection(array)
+	ass.Equal(t, "[...](Array)\n", s)
+	collator = col.Formatter().WithSpecificDepth(1)
+	s = collator.FormatCollection(array)
+	ass.Equal(t, "[\n    1\n    [...](array)\n](Array)\n", s)
+	collator = col.Formatter().WithSpecificDepth(2)
+	s = collator.FormatCollection(array)
+	ass.Equal(t, "[\n    1\n    [\n        1\n        2\n        [...](array)\n    ](array)\n](Array)\n", s)
+}
+
 func TestFormatEmptyArray(t *tes.T) {
 	var array = []any{}
 	var s = col.Formatter().FormatCollection(array)

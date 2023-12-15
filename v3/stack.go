@@ -103,31 +103,6 @@ type stack_[V Value] struct {
 	capacity int
 }
 
-// Sequential Interface
-
-// This public class method determines whether or not this Stack is empty.
-func (v stack_[V]) IsEmpty() bool {
-	return v.values.IsEmpty()
-}
-
-// This public class method returns the number of values contained in this
-// Stack.
-func (v stack_[V]) GetSize() int {
-	return v.values.GetSize()
-}
-
-// This public class method returns all the values in this Stack. The values
-// retrieved are in the same order as they are in the Stack.
-func (v stack_[V]) AsArray() []V {
-	return v.values.AsArray()
-}
-
-// This public class method generates for this Stack an iterator that can be
-// used to traverse its values.
-func (v stack_[V]) GetIterator() Ratcheted[V] {
-	return v.values.GetIterator()
-}
-
 // LIFO Interface
 
 // This public class method retrieves the capacity of this Stack.
@@ -166,6 +141,31 @@ func (v *stack_[V]) RemoveTop() V {
 // This public class method removes all values from this Stack.
 func (v *stack_[V]) RemoveAll() {
 	v.values.RemoveAll()
+}
+
+// Sequential Interface
+
+// This public class method determines whether or not this Stack is empty.
+func (v stack_[V]) IsEmpty() bool {
+	return v.values.IsEmpty()
+}
+
+// This public class method returns the number of values contained in this
+// Stack.
+func (v stack_[V]) GetSize() int {
+	return v.values.GetSize()
+}
+
+// This public class method returns all the values in this Stack. The values
+// retrieved are in the same order as they are in the Stack.
+func (v stack_[V]) AsArray() []V {
+	return v.values.AsArray()
+}
+
+// This public class method generates for this Stack an iterator that can be
+// used to traverse its values.
+func (v stack_[V]) GetIterator() Ratcheted[V] {
+	return v.values.GetIterator()
 }
 
 // Private Interface

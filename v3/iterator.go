@@ -54,8 +54,10 @@ func Iterator[V Value]() *iteratorClass_[V] {
 func (c *iteratorClass_[V]) FromSequence(sequence Sequential[V]) IteratorLike[V] {
 	var values = sequence.AsArray() // The returned array is immutable.
 	var size = len(values)
-	var slot = 0
-	var iterator = &iterator_[V]{values, size, slot}
+	var iterator = &iterator_[V]{
+		size:   size,
+		values: values,
+	}
 	return iterator
 }
 
@@ -67,17 +69,55 @@ func (c *iteratorClass_[V]) FromSequence(sequence Sequential[V]) IteratorLike[V]
 // attributes that can only be accessed and manipulated using methods that
 // implement the iterator-like abstract type.
 type iterator_[V Value] struct {
-	values []V // The array of values is immutable.
 	size   int // So we can safely cache the size.
-	slot   int // The default slot is zero.
+	slot   int // The initial slot is zero.
+	values []V // The array of values is immutable.
 }
 
 // Ratcheted Interface
+
+// This public class method retrieves the value after the current slot.
+func (v *iterator_[V]) GetNext() V {
+	var result V
+	if v.slot < v.size {
+		v.slot = v.slot + 1
+		result = v.values[v.slot-1] // convert to ZERO based indexing
+	}
+	return result
+}
+
+// This public class method retrieves the value before the current slot.
+func (v *iterator_[V]) GetPrevious() V {
+	var result V
+	if v.slot > 0 {
+		result = v.values[v.slot-1] // convert to ZERO based indexing
+		v.slot = v.slot - 1
+	}
+	return result
+}
 
 // This public class method returns the current slot between values that this
 // Iterator is currently locked into.
 func (v *iterator_[V]) GetSlot() int {
 	return v.slot
+}
+
+// This public class method determines whether or not there is a value after the
+// current slot.
+func (v *iterator_[V]) HasNext() bool {
+	return v.slot < v.size
+}
+
+// This public class method determines whether or not there is a value before
+// the current slot.
+func (v *iterator_[V]) HasPrevious() bool {
+	return v.slot > 0
+}
+
+// This public class method moves this Iterator to the slot after the last
+// value.
+func (v *iterator_[V]) ToEnd() {
+	v.slot = v.size
 }
 
 // This public class method moves this Iterator to the specified slot between
@@ -99,42 +139,4 @@ func (v *iterator_[V]) ToSlot(slot int) {
 // value.
 func (v *iterator_[V]) ToStart() {
 	v.slot = 0
-}
-
-// This public class method moves this Iterator to the slot after the last
-// value.
-func (v *iterator_[V]) ToEnd() {
-	v.slot = v.size
-}
-
-// This public class method determines whether or not there is a value before
-// the current slot.
-func (v *iterator_[V]) HasPrevious() bool {
-	return v.slot > 0
-}
-
-// This public class method retrieves the value before the current slot.
-func (v *iterator_[V]) GetPrevious() V {
-	var result V
-	if v.slot > 0 {
-		result = v.values[v.slot-1] // convert to ZERO based indexing
-		v.slot = v.slot - 1
-	}
-	return result
-}
-
-// This public class method determines whether or not there is a value after the
-// current slot.
-func (v *iterator_[V]) HasNext() bool {
-	return v.slot < v.size
-}
-
-// This public class method retrieves the value after the current slot.
-func (v *iterator_[V]) GetNext() V {
-	var result V
-	if v.slot < v.size {
-		v.slot = v.slot + 1
-		result = v.values[v.slot-1] // convert to ZERO based indexing
-	}
-	return result
 }

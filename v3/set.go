@@ -138,25 +138,6 @@ type set_[V Value] struct {
 	rank   RankingFunction
 }
 
-// Sequential Interface
-
-// This public class method determines whether or not this array is empty.
-func (v *set_[V]) IsEmpty() bool {
-	return v.values.IsEmpty()
-}
-
-// This public class method returns the number of values contained in this
-// array.
-func (v *set_[V]) GetSize() int {
-	return v.values.GetSize()
-}
-
-// This public class method returns all the values in this array. The values
-// retrieved are in the same order as they are in the array.
-func (v *set_[V]) AsArray() []V {
-	return v.values.AsArray()
-}
-
 // Accessible Interface
 
 // This public class method generates for this Set an iterator that can be
@@ -176,6 +157,58 @@ func (v *set_[V]) GetValue(index int) V {
 // index through the last index (inclusive).
 func (v *set_[V]) GetValues(first int, last int) Sequential[V] {
 	return v.values.GetValues(first, last)
+}
+
+// Flexible Interface
+
+// This public class method returns the ranker function for this Set.
+func (v *set_[V]) GetRanker() RankingFunction {
+	return v.rank
+}
+
+// This public class method adds the specified value to this Set if it is not
+// already a member of the Set.
+func (v *set_[V]) AddValue(value V) {
+	var slot, found = v.search(value)
+	if !found {
+		// The value is not already a member, so add it.
+		v.values.InsertValue(slot, value)
+	}
+}
+
+// This public class method adds the specified values to this Set if they are
+// not already members of the Set.
+func (v *set_[V]) AddValues(values Sequential[V]) {
+	var iterator = values.GetIterator()
+	for iterator.HasNext() {
+		var value = iterator.GetNext()
+		v.AddValue(value)
+	}
+}
+
+// This public class method removes the specified value from this Set. It
+// returns true if the value was in the Set and false otherwise.
+func (v *set_[V]) RemoveValue(value V) {
+	var index, found = v.search(value)
+	if found {
+		// The value is a member, so remove it.
+		v.values.RemoveValue(index)
+	}
+}
+
+// This public class method removes the specified values from this Set. It
+// returns the number of values that were removed.
+func (v *set_[V]) RemoveValues(values Sequential[V]) {
+	var iterator = values.GetIterator()
+	for iterator.HasNext() {
+		var value = iterator.GetNext()
+		v.RemoveValue(value)
+	}
+}
+
+// This public class method removes all values from this Set.
+func (v *set_[V]) RemoveAll() {
+	v.values.RemoveAll()
 }
 
 // Searchable Interface
@@ -232,56 +265,23 @@ func (v *set_[V]) ContainsAll(values Sequential[V]) bool {
 	return true
 }
 
-// Flexible Interface
+// Sequential Interface
 
-// This public class method returns the ranker function for this Set.
-func (v *set_[V]) GetRanker() RankingFunction {
-	return v.rank
+// This public class method determines whether or not this array is empty.
+func (v *set_[V]) IsEmpty() bool {
+	return v.values.IsEmpty()
 }
 
-// This public class method adds the specified value to this Set if it is not
-// already a member of the Set.
-func (v *set_[V]) AddValue(value V) {
-	var slot, found = v.search(value)
-	if !found {
-		// The value is not already a member, so add it.
-		v.values.InsertValue(slot, value)
-	}
+// This public class method returns the number of values contained in this
+// array.
+func (v *set_[V]) GetSize() int {
+	return v.values.GetSize()
 }
 
-// This public class method adds the specified values to this Set if they are
-// not already members of the Set.
-func (v *set_[V]) AddValues(values Sequential[V]) {
-	var iterator = values.GetIterator()
-	for iterator.HasNext() {
-		var value = iterator.GetNext()
-		v.AddValue(value)
-	}
-}
-
-// This public class method removes the specified value from this Set. It
-// returns true if the value was in the Set and false otherwise.
-func (v *set_[V]) RemoveValue(value V) {
-	var index, found = v.search(value)
-	if found {
-		// The value is a member, so remove it.
-		v.values.RemoveValue(index)
-	}
-}
-
-// This public class method removes the specified values from this Set. It
-// returns the number of values that were removed.
-func (v *set_[V]) RemoveValues(values Sequential[V]) {
-	var iterator = values.GetIterator()
-	for iterator.HasNext() {
-		var value = iterator.GetNext()
-		v.RemoveValue(value)
-	}
-}
-
-// This public class method removes all values from this Set.
-func (v *set_[V]) RemoveAll() {
-	v.values.RemoveAll()
+// This public class method returns all the values in this array. The values
+// retrieved are in the same order as they are in the array.
+func (v *set_[V]) AsArray() []V {
+	return v.values.AsArray()
 }
 
 // Private Interface

@@ -88,42 +88,6 @@ func (c *mapClass_[K, V]) FromMap(associations map[K]V) MapLike[K, V] {
 //   - V is any type of entity.
 type map_[K comparable, V Value] map[K]V
 
-// Sequential Interface
-
-// This public class method determines whether or not this Map is empty.
-func (v map_[K, V]) IsEmpty() bool {
-	return len(v) == 0
-}
-
-// This public class method returns the number of values contained in this Map.
-func (v map_[K, V]) GetSize() int {
-	return len(v)
-}
-
-// This public class method returns all the associations that are in this Map.
-// The associations retrieved are in the same order as they are in the Map.
-func (v map_[K, V]) AsArray() []Binding[K, V] {
-	var length = len(v)
-	var result = make([]Binding[K, V], length)
-	var index = 0
-	for key, value := range v {
-		var Association = Association[K, V]()
-		var association = Association.FromPair(key, value)
-		result[index] = association
-		index++
-	}
-	return result
-}
-
-// This public class method generates for this Map an iterator that can be used
-// to traverse its associations.
-func (v map_[K, V]) GetIterator() Ratcheted[Binding[K, V]] {
-	var Array = Array[Binding[K, V]]()
-	var array = Array.FromArray(v.AsArray())
-	var iterator = array.GetIterator()
-	return iterator
-}
-
 // Associative Interface
 
 // This public class method returns the keys for this Map.
@@ -136,6 +100,13 @@ func (v map_[K, V]) GetKeys() Sequential[K] {
 		keys.AppendValue(association.GetKey())
 	}
 	return keys
+}
+
+// This public class method returns the value that is associated with the
+// specified key in this Map.
+func (v map_[K, V]) GetValue(key K) V {
+	var value = v[key]
+	return value
 }
 
 // This public class method returns the values associated with the specified
@@ -152,17 +123,14 @@ func (v map_[K, V]) GetValues(keys Sequential[K]) Sequential[V] {
 	return values
 }
 
-// This public class method returns the value that is associated with the
-// specified key in this Map.
-func (v map_[K, V]) GetValue(key K) V {
-	var value = v[key]
-	return value
-}
-
-// This public class method sets the value associated with the specified key to
-// the specified value.
-func (v map_[K, V]) SetValue(key K, value V) {
-	v[key] = value
+// This public class method removes all associations from this Map.
+func (v map_[K, V]) RemoveAll() {
+	var keys = v.GetKeys()
+	var iterator = keys.GetIterator()
+	for iterator.HasNext() {
+		var key = iterator.GetNext()
+		delete(v, key)
+	}
 }
 
 // This public class method removes the association associated with the
@@ -188,14 +156,46 @@ func (v map_[K, V]) RemoveValues(keys Sequential[K]) Sequential[V] {
 	return values
 }
 
-// This public class method removes all associations from this Map.
-func (v map_[K, V]) RemoveAll() {
-	var keys = v.GetKeys()
-	var iterator = keys.GetIterator()
-	for iterator.HasNext() {
-		var key = iterator.GetNext()
-		delete(v, key)
+// This public class method sets the value associated with the specified key to
+// the specified value.
+func (v map_[K, V]) SetValue(key K, value V) {
+	v[key] = value
+}
+
+// Sequential Interface
+
+// This public class method returns all the associations that are in this Map.
+// The associations retrieved are in the same order as they are in the Map.
+func (v map_[K, V]) AsArray() []Binding[K, V] {
+	var length = len(v)
+	var result = make([]Binding[K, V], length)
+	var index = 0
+	for key, value := range v {
+		var Association = Association[K, V]()
+		var association = Association.FromPair(key, value)
+		result[index] = association
+		index++
 	}
+	return result
+}
+
+// This public class method generates for this Map an iterator that can be used
+// to traverse its associations.
+func (v map_[K, V]) GetIterator() Ratcheted[Binding[K, V]] {
+	var Array = Array[Binding[K, V]]()
+	var array = Array.FromArray(v.AsArray())
+	var iterator = array.GetIterator()
+	return iterator
+}
+
+// This public class method returns the number of values contained in this Map.
+func (v map_[K, V]) GetSize() int {
+	return len(v)
+}
+
+// This public class method determines whether or not this Map is empty.
+func (v map_[K, V]) IsEmpty() bool {
+	return len(v) == 0
 }
 
 // Private Interface

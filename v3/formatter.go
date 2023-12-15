@@ -51,7 +51,7 @@ func (c *formatterClass_) DefaultDepth() int {
 // CLASS CONSTRUCTORS
 
 // This public class constructor creates a new Formatter with the default
-// maximum traversal depth.
+// traversal depth which is 8.
 func (c *formatterClass_) WithDefaultDepth() FormatterLike {
 	var formatter = &formatter_{
 		maximumDepth: c.defaultDepth,
@@ -60,13 +60,13 @@ func (c *formatterClass_) WithDefaultDepth() FormatterLike {
 }
 
 // This public class constructor creates a new Formatter with the specified
-// maximum traversal depth.
-func (c *formatterClass_) WithMaximumDepth(maximumDepth int) FormatterLike {
-	if maximumDepth < 1 || maximumDepth > c.defaultDepth {
-		maximumDepth = c.defaultDepth
+// traversal depth.
+func (c *formatterClass_) WithSpecificDepth(depth int) FormatterLike {
+	if depth < 0 || depth > c.defaultDepth {
+		depth = c.defaultDepth
 	}
 	var formatter = &formatter_{
-		maximumDepth: maximumDepth,
+		maximumDepth: depth,
 	}
 	return formatter
 }
@@ -98,8 +98,8 @@ func (c *formatterClass_) FormatCollection(collection Collection) string {
 // implement the formatter-like abstract type.
 type formatter_ struct {
 	depth        int
-	maximumDepth int
 	indentation  int
+	maximumDepth int
 	result       sts.Builder
 }
 
@@ -216,23 +216,21 @@ func (v *formatter_) formatValue(value any) {
 // of values to the state of the Formatter.
 func (v *formatter_) formatArray(array ref.Value) {
 	var size = array.Len()
-	switch size {
-	case 0:
+	switch {
+	case v.depth+1 > v.maximumDepth:
+		// Truncate the recursion.
+		v.appendString("...")
+	case size == 0:
 		v.appendString(" ")
-	case 1:
+	case size == 1:
 		var value = array.Index(0)
 		v.formatValue(value.Interface())
 	default:
 		v.depth++
-		if v.depth > v.maximumDepth {
-			// Truncate the recursion.
-			v.appendString("...")
-		} else {
-			for i := 0; i < size; i++ {
-				v.appendNewline()
-				var value = array.Index(i)
-				v.formatValue(value.Interface())
-			}
+		for i := 0; i < size; i++ {
+			v.appendNewline()
+			var value = array.Index(i)
+			v.formatValue(value.Interface())
 		}
 		v.depth--
 		v.appendNewline()
@@ -244,10 +242,13 @@ func (v *formatter_) formatArray(array ref.Value) {
 func (v *formatter_) formatMap(map_ ref.Value) {
 	var keys = map_.MapKeys()
 	var size = len(keys)
-	switch size {
-	case 0:
+	switch {
+	case v.depth+1 > v.maximumDepth:
+		// Truncate the recursion.
+		v.appendString("...")
+	case size == 0:
 		v.appendString(":")
-	case 1:
+	case size == 1:
 		var key = keys[0]
 		var value = map_.MapIndex(key)
 		v.formatValue(key.Interface())
@@ -255,18 +256,13 @@ func (v *formatter_) formatMap(map_ ref.Value) {
 		v.formatValue(value.Interface())
 	default:
 		v.depth++
-		if v.depth > v.maximumDepth {
-			// Truncate the recursion.
-			v.appendString("...")
-		} else {
-			for i := 0; i < size; i++ {
-				v.appendNewline()
-				var key = keys[i]
-				var value = map_.MapIndex(key)
-				v.formatValue(key.Interface())
-				v.appendString(": ")
-				v.formatValue(value.Interface())
-			}
+		for i := 0; i < size; i++ {
+			v.appendNewline()
+			var key = keys[i]
+			var value = map_.MapIndex(key)
+			v.formatValue(key.Interface())
+			v.appendString(": ")
+			v.formatValue(value.Interface())
 		}
 		v.depth--
 		v.appendNewline()
@@ -347,28 +343,26 @@ func (v *formatter_) formatAssociation(association ref.Value) {
 // associations to the result.
 func (v *formatter_) formatSequence(sequence ref.Value) {
 	var iterator = sequence.MethodByName("GetIterator").Call([]ref.Value{})[0]
-	var size = sequence.MethodByName("GetSize").Call([]ref.Value{})[0]
-	switch size.Interface() {
-	case 0:
+	var size = sequence.MethodByName("GetSize").Call([]ref.Value{})[0].Interface()
+	switch {
+	case v.depth+1 > v.maximumDepth:
+		// Truncate the recursion.
+		v.appendString("...")
+	case size == 0:
 		if sequence.MethodByName("GetKeys").IsValid() {
 			v.appendString(":") // This is an empty sequence of associations.
 		} else {
 			v.appendString(" ") // This is an empty sequence of values.
 		}
-	case 1:
+	case size == 1:
 		var value = iterator.MethodByName("GetNext").Call([]ref.Value{})[0]
 		v.formatValue(value.Interface())
 	default:
 		v.depth++
-		if v.depth > v.maximumDepth {
-			// Truncate the recursion.
-			v.appendString("...")
-		} else {
-			for iterator.MethodByName("HasNext").Call([]ref.Value{})[0].Interface().(bool) {
-				v.appendNewline()
-				var value = iterator.MethodByName("GetNext").Call([]ref.Value{})[0]
-				v.formatValue(value.Interface())
-			}
+		for iterator.MethodByName("HasNext").Call([]ref.Value{})[0].Interface().(bool) {
+			v.appendNewline()
+			var value = iterator.MethodByName("GetNext").Call([]ref.Value{})[0]
+			v.formatValue(value.Interface())
 		}
 		v.depth--
 		v.appendNewline()

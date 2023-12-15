@@ -163,7 +163,7 @@ func BadCompare(first col.Value, second col.Value) bool {
 
 func TestListsWithComparer(t *tes.T) {
 	var List = col.List[int]()
-	var list = List.FromComparer(BadCompare)
+	var list = List.WithComparer(BadCompare)
 	list.AppendValue(1)
 	list.AppendValue(2)
 	list.AppendValue(3)

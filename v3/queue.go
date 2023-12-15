@@ -268,43 +268,6 @@ type queue_[V Value] struct {
 	mutex     syn.Mutex
 }
 
-// Sequential Interface
-
-// This public class method determines whether or not this Queue is empty.
-func (v *queue_[V]) IsEmpty() bool {
-	v.mutex.Lock()
-	var result = len(v.available) == 0
-	v.mutex.Unlock()
-	return result
-}
-
-// This public class method returns the number of values contained in this
-// Queue.
-func (v *queue_[V]) GetSize() int {
-	v.mutex.Lock()
-	var size = len(v.available)
-	v.mutex.Unlock()
-	return size
-}
-
-// This public class method returns all the values in this Queue. The values
-// retrieved are in the same order as they are in the Queue.
-func (v *queue_[V]) AsArray() []V {
-	v.mutex.Lock()
-	var array = v.values.AsArray()
-	v.mutex.Unlock()
-	return array
-}
-
-// This public class method generates for this Queue an iterator that can be
-// used to traverse its values.
-func (v *queue_[V]) GetIterator() Ratcheted[V] {
-	v.mutex.Lock()
-	var iterator = v.values.GetIterator()
-	v.mutex.Unlock()
-	return iterator
-}
-
 // FIFO Interface
 
 // This public class method retrieves the capacity of this Queue.
@@ -345,6 +308,43 @@ func (v *queue_[V]) CloseQueue() {
 	v.mutex.Lock()
 	close(v.available) // No more values can be placed on the Queue.
 	v.mutex.Unlock()
+}
+
+// Sequential Interface
+
+// This public class method determines whether or not this Queue is empty.
+func (v *queue_[V]) IsEmpty() bool {
+	v.mutex.Lock()
+	var result = len(v.available) == 0
+	v.mutex.Unlock()
+	return result
+}
+
+// This public class method returns the number of values contained in this
+// Queue.
+func (v *queue_[V]) GetSize() int {
+	v.mutex.Lock()
+	var size = len(v.available)
+	v.mutex.Unlock()
+	return size
+}
+
+// This public class method returns all the values in this Queue. The values
+// retrieved are in the same order as they are in the Queue.
+func (v *queue_[V]) AsArray() []V {
+	v.mutex.Lock()
+	var array = v.values.AsArray()
+	v.mutex.Unlock()
+	return array
+}
+
+// This public class method generates for this Queue an iterator that can be
+// used to traverse its values.
+func (v *queue_[V]) GetIterator() Ratcheted[V] {
+	v.mutex.Lock()
+	var iterator = v.values.GetIterator()
+	v.mutex.Unlock()
+	return iterator
 }
 
 // Private Interface

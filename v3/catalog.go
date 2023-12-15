@@ -73,6 +73,21 @@ func (c *catalogClass_[K, V]) FromSequence(sequence Sequential[Binding[K, V]]) C
 
 // CLASS FUNCTIONS
 
+// This public class function returns a new Catalog containing only the
+// associations that are in the specified Catalog that have the specified keys.
+// The associations in the resulting Catalog will be in the same order as the
+// specified keys.
+func (c *catalogClass_[K, V]) Extract(catalog CatalogLike[K, V], keys Sequential[K]) CatalogLike[K, V] {
+	var result = c.Empty()
+	var iterator = keys.GetIterator()
+	for iterator.HasNext() {
+		var key = iterator.GetNext()
+		var value = catalog.GetValue(key)
+		result.SetValue(key, value)
+	}
+	return result
+}
+
 // This public class function returns a new Catalog containing all of the
 // associations that are in the specified catalogs in the order that they appear
 // in each Catalog.  If a key is present in both catalogs, the value of the key
@@ -87,21 +102,6 @@ func (c *catalogClass_[K, V]) Merge(first, second CatalogLike[K, V]) CatalogLike
 		catalog.SetValue(key, value)
 	}
 	return catalog
-}
-
-// This public class function returns a new Catalog containing only the
-// associations that are in the specified Catalog that have the specified keys.
-// The associations in the resulting Catalog will be in the same order as the
-// specified keys.
-func (c *catalogClass_[K, V]) Extract(catalog CatalogLike[K, V], keys Sequential[K]) CatalogLike[K, V] {
-	var result = c.Empty()
-	var iterator = keys.GetIterator()
-	for iterator.HasNext() {
-		var key = iterator.GetNext()
-		var value = catalog.GetValue(key)
-		result.SetValue(key, value)
-	}
-	return result
 }
 
 // CLASS TYPE
@@ -119,32 +119,6 @@ type catalog_[K Key, V Value] struct {
 	keys         map[Key]Binding[K, V]
 }
 
-// Sequential Interface
-
-// This public class method determines whether or not this Catalog is empty.
-func (v *catalog_[K, V]) IsEmpty() bool {
-	return v.associations.IsEmpty()
-}
-
-// This public class method returns the number of associations contained in this
-// Catalog.
-func (v *catalog_[K, V]) GetSize() int {
-	return v.associations.GetSize()
-}
-
-// This public class method returns all the associations in this Catalog. The
-// associations
-// retrieved are in the same order as they are in the Catalog.
-func (v *catalog_[K, V]) AsArray() []Binding[K, V] {
-	return v.associations.AsArray()
-}
-
-// This public class method generates for this Catalog an iterator that can be
-// used to traverse its associations.
-func (v *catalog_[K, V]) GetIterator() Ratcheted[Binding[K, V]] {
-	return v.associations.GetIterator()
-}
-
 // Associative Interface
 
 // This public class method returns the keys for this Catalog.
@@ -157,6 +131,18 @@ func (v *catalog_[K, V]) GetKeys() Sequential[K] {
 		keys.AppendValue(association.GetKey())
 	}
 	return keys
+}
+
+// This public class method returns the value that is associated with the
+// specified key in this Catalog.
+func (v *catalog_[K, V]) GetValue(key K) V {
+	var value V // Set the return value to its zero value.
+	var association, exists = v.keys[key]
+	if exists {
+		// Extract the value.
+		value = association.GetValue()
+	}
+	return value
 }
 
 // This public class method returns the values associated with the specified
@@ -173,32 +159,10 @@ func (v *catalog_[K, V]) GetValues(keys Sequential[K]) Sequential[V] {
 	return values
 }
 
-// This public class method returns the value that is associated with the
-// specified key in this Catalog.
-func (v *catalog_[K, V]) GetValue(key K) V {
-	var value V // Set the return value to its zero value.
-	var association, exists = v.keys[key]
-	if exists {
-		// Extract the value.
-		value = association.GetValue()
-	}
-	return value
-}
-
-// This public class method sets the value associated with the specified key to
-// the specified value.
-func (v *catalog_[K, V]) SetValue(key K, value V) {
-	var association, exists = v.keys[key]
-	if exists {
-		// Set the value of an existing association.
-		association.SetValue(value)
-	} else {
-		// Add a new association.
-		var Association = Association[K, V]()
-		association = Association.FromPair(key, value)
-		v.associations.AppendValue(association)
-		v.keys[key] = association
-	}
+// This public class method removes all associations from this Catalog.
+func (v *catalog_[K, V]) RemoveAll() {
+	v.keys = map[Key]Binding[K, V]{}
+	v.associations.RemoveAll()
 }
 
 // This public class method removes the association associated with the
@@ -229,25 +193,49 @@ func (v *catalog_[K, V]) RemoveValues(keys Sequential[K]) Sequential[V] {
 	return values
 }
 
-// This public class method removes all associations from this Catalog.
-func (v *catalog_[K, V]) RemoveAll() {
-	v.keys = map[Key]Binding[K, V]{}
-	v.associations.RemoveAll()
+// This public class method sets the value associated with the specified key to
+// the specified value.
+func (v *catalog_[K, V]) SetValue(key K, value V) {
+	var association, exists = v.keys[key]
+	if exists {
+		// Set the value of an existing association.
+		association.SetValue(value)
+	} else {
+		// Add a new association.
+		var Association = Association[K, V]()
+		association = Association.FromPair(key, value)
+		v.associations.AppendValue(association)
+		v.keys[key] = association
+	}
+}
+
+// Sequential Interface
+
+// This public class method returns all the associations in this Catalog. The
+// associations
+// retrieved are in the same order as they are in the Catalog.
+func (v *catalog_[K, V]) AsArray() []Binding[K, V] {
+	return v.associations.AsArray()
+}
+
+// This public class method generates for this Catalog an iterator that can be
+// used to traverse its associations.
+func (v *catalog_[K, V]) GetIterator() Ratcheted[Binding[K, V]] {
+	return v.associations.GetIterator()
+}
+
+// This public class method returns the number of associations contained in this
+// Catalog.
+func (v *catalog_[K, V]) GetSize() int {
+	return v.associations.GetSize()
+}
+
+// This public class method determines whether or not this Catalog is empty.
+func (v *catalog_[K, V]) IsEmpty() bool {
+	return v.associations.IsEmpty()
 }
 
 // Sortable Interface
-
-// This public class method sorts this Catalog using the canonical rank function
-// to compare the keys.
-func (v *catalog_[K, V]) SortValues() {
-	v.associations.SortValues()
-}
-
-// This public class method sorts this Catalog using the specified ranking
-// function to compare the keys.
-func (v *catalog_[K, V]) SortValuesWithRanker(ranking RankingFunction) {
-	v.associations.SortValuesWithRanker(ranking)
-}
 
 // This public class method reverses the order of all associations in this
 // Catalog.
@@ -259,6 +247,18 @@ func (v *catalog_[K, V]) ReverseValues() {
 // associations in this Catalog.
 func (v *catalog_[K, V]) ShuffleValues() {
 	v.associations.ShuffleValues()
+}
+
+// This public class method sorts this Catalog using the canonical rank function
+// to compare the keys.
+func (v *catalog_[K, V]) SortValues() {
+	v.associations.SortValues()
+}
+
+// This public class method sorts this Catalog using the specified ranking
+// function to compare the keys.
+func (v *catalog_[K, V]) SortValuesWithRanker(ranking RankingFunction) {
+	v.associations.SortValuesWithRanker(ranking)
 }
 
 // Private Interface

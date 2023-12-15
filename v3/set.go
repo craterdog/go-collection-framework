@@ -49,23 +49,14 @@ func Set[V Value]() *setClass_[V] {
 // CLASS CONSTRUCTORS
 
 // This public class constructor creates a new empty Set.
-// The Set uses the natural ranking function to order its values.
+// The Set uses the default ranking function to order its values.
 func (c *setClass_[V]) Empty() SetLike[V] {
 	var set = c.WithRanker(Collator().RankValues)
 	return set
 }
 
-// This public class constructor creates a new empty Set.
-// The Set uses the specified ranking function to order its values.
-func (c *setClass_[V]) WithRanker(ranker RankingFunction) SetLike[V] {
-	var List = List[V]()
-	var values = List.Empty()
-	var set = &set_[V]{values, ranker}
-	return set
-}
-
 // This public class constructor creates a new Set from the specified sequence.
-// The Set uses the natural ranking function to order its values.
+// The Set uses the default ranking function to order its values.
 func (c *setClass_[V]) FromSequence(sequence Sequential[V]) SetLike[V] {
 	var set = c.FromSequenceWithRanker(sequence, Collator().RankValues)
 	return set
@@ -73,12 +64,26 @@ func (c *setClass_[V]) FromSequence(sequence Sequential[V]) SetLike[V] {
 
 // This public class constructor creates a new Set from the specified sequence.
 // The Set uses the specified ranking function to order its values.
-func (c *setClass_[V]) FromSequenceWithRanker(sequence Sequential[V], ranker RankingFunction) SetLike[V] {
+func (c *setClass_[V]) FromSequenceWithRanker(
+	sequence Sequential[V],
+	ranker RankingFunction,
+) SetLike[V] {
 	var set = c.WithRanker(ranker)
 	var iterator = sequence.GetIterator()
 	for iterator.HasNext() {
 		var value = iterator.GetNext()
 		set.AddValue(value)
+	}
+	return set
+}
+
+// This public class constructor creates a new empty Set.
+// The Set uses the specified ranking function to order its values.
+func (c *setClass_[V]) WithRanker(ranker RankingFunction) SetLike[V] {
+	var values = List[V]().Empty()
+	var set = &set_[V]{
+		ranker,
+		values,
 	}
 	return set
 }
@@ -99,19 +104,19 @@ func (c *setClass_[V]) And(first, second SetLike[V]) SetLike[V] {
 	return result
 }
 
-// This public class function returns the logical material non-implication of
-// the specified sets.
-func (c *setClass_[V]) Sans(first, second SetLike[V]) SetLike[V] {
-	var result = c.FromSequenceWithRanker(first, first.GetRanker())
-	result.RemoveValues(second)
-	return result
-}
-
 // This public class function returns the logical disjunction of the specified
 // sets.
 func (c *setClass_[V]) Or(first, second SetLike[V]) SetLike[V] {
 	var result = c.FromSequenceWithRanker(first, first.GetRanker())
 	result.AddValues(second)
+	return result
+}
+
+// This public class function returns the logical material non-implication of
+// the specified sets.
+func (c *setClass_[V]) Sans(first, second SetLike[V]) SetLike[V] {
+	var result = c.FromSequenceWithRanker(first, first.GetRanker())
+	result.RemoveValues(second)
 	return result
 }
 
@@ -134,18 +139,11 @@ func (c *setClass_[V]) Xor(first, second SetLike[V]) SetLike[V] {
 // This type is parameterized as follows:
 //   - V is any type of value.
 type set_[V Value] struct {
-	values ListLike[V]
 	rank   RankingFunction
+	values ListLike[V]
 }
 
 // Accessible Interface
-
-// This public class method generates for this Set an iterator that can be
-// used to traverse its values.
-func (v *set_[V]) GetIterator() Ratcheted[V] {
-	var iterator = v.values.GetIterator()
-	return iterator
-}
 
 // This public class method retrieves from this array the value that is
 // associated with the specified index.
@@ -161,15 +159,10 @@ func (v *set_[V]) GetValues(first int, last int) Sequential[V] {
 
 // Flexible Interface
 
-// This public class method returns the ranker function for this Set.
-func (v *set_[V]) GetRanker() RankingFunction {
-	return v.rank
-}
-
 // This public class method adds the specified value to this Set if it is not
 // already a member of the Set.
 func (v *set_[V]) AddValue(value V) {
-	var slot, found = v.search(value)
+	var slot, found = v.indexOf(value)
 	if !found {
 		// The value is not already a member, so add it.
 		v.values.InsertValue(slot, value)
@@ -186,10 +179,20 @@ func (v *set_[V]) AddValues(values Sequential[V]) {
 	}
 }
 
+// This public class method returns the ranker function for this Set.
+func (v *set_[V]) GetRanker() RankingFunction {
+	return v.rank
+}
+
+// This public class method removes all values from this Set.
+func (v *set_[V]) RemoveAll() {
+	v.values.RemoveAll()
+}
+
 // This public class method removes the specified value from this Set. It
 // returns true if the value was in the Set and false otherwise.
 func (v *set_[V]) RemoveValue(value V) {
-	var index, found = v.search(value)
+	var index, found = v.indexOf(value)
 	if found {
 		// The value is a member, so remove it.
 		v.values.RemoveValue(index)
@@ -206,33 +209,21 @@ func (v *set_[V]) RemoveValues(values Sequential[V]) {
 	}
 }
 
-// This public class method removes all values from this Set.
-func (v *set_[V]) RemoveAll() {
-	v.values.RemoveAll()
-}
-
 // Searchable Interface
 
-// This public class method returns the comparing function for this Set.
-func (v *set_[V]) GetComparer() ComparingFunction {
-	return v.values.GetComparer()
-}
-
-// This public class method returns the index of the FIRST occurrence of the
-// specified value in this set, or zero if this Set does not contain the value.
-func (v *set_[V]) GetIndex(value V) int {
-	var index, found = v.search(value)
-	if !found {
-		return 0
+// This public class method determines whether or not this Set contains ALL of
+// the specified values.
+func (v *set_[V]) ContainsAll(values Sequential[V]) bool {
+	var iterator = values.GetIterator()
+	for iterator.HasNext() {
+		var value = iterator.GetNext()
+		if !v.ContainsValue(value) {
+			// This Set is missing at least one of the values.
+			return false
+		}
 	}
-	return index
-}
-
-// This public class method determines whether or not this Set contains the
-// specified value.
-func (v *set_[V]) ContainsValue(value V) bool {
-	var _, found = v.search(value)
-	return found
+	// This Set does contains all of the values.
+	return true
 }
 
 // This public class method determines whether or not this Set contains ANY of
@@ -250,26 +241,41 @@ func (v *set_[V]) ContainsAny(values Sequential[V]) bool {
 	return false
 }
 
-// This public class method determines whether or not this Set contains ALL of
-// the specified values.
-func (v *set_[V]) ContainsAll(values Sequential[V]) bool {
-	var iterator = values.GetIterator()
-	for iterator.HasNext() {
-		var value = iterator.GetNext()
-		if !v.ContainsValue(value) {
-			// This Set is missing at least one of the values.
-			return false
-		}
+// This public class method determines whether or not this Set contains the
+// specified value.
+func (v *set_[V]) ContainsValue(value V) bool {
+	var _, found = v.indexOf(value)
+	return found
+}
+
+// This public class method returns the comparing function for this Set.
+func (v *set_[V]) GetComparer() ComparingFunction {
+	return v.values.GetComparer()
+}
+
+// This public class method returns the index of the FIRST occurrence of the
+// specified value in this set, or zero if this Set does not contain the value.
+func (v *set_[V]) GetIndex(value V) int {
+	var index, found = v.indexOf(value)
+	if !found {
+		return 0
 	}
-	// This Set does contains all of the values.
-	return true
+	return index
 }
 
 // Sequential Interface
 
-// This public class method determines whether or not this array is empty.
-func (v *set_[V]) IsEmpty() bool {
-	return v.values.IsEmpty()
+// This public class method returns all the values in this array. The values
+// retrieved are in the same order as they are in the array.
+func (v *set_[V]) AsArray() []V {
+	return v.values.AsArray()
+}
+
+// This public class method generates for this Set an iterator that can be
+// used to traverse its values.
+func (v *set_[V]) GetIterator() Ratcheted[V] {
+	var iterator = v.values.GetIterator()
+	return iterator
 }
 
 // This public class method returns the number of values contained in this
@@ -278,10 +284,9 @@ func (v *set_[V]) GetSize() int {
 	return v.values.GetSize()
 }
 
-// This public class method returns all the values in this array. The values
-// retrieved are in the same order as they are in the array.
-func (v *set_[V]) AsArray() []V {
-	return v.values.AsArray()
+// This public class method determines whether or not this array is empty.
+func (v *set_[V]) IsEmpty() bool {
+	return v.values.IsEmpty()
 }
 
 // Private Interface
@@ -294,12 +299,12 @@ func (v *set_[V]) String() string {
 
 // This private class method performs a binary search of the Set for the
 // specified value. It returns two results:
-//   - index: The index of the value, or if not found, the index of the value
-//     before which it could be inserted in the underlying list.
+//   - index: The index of the value, or if not found, the slot in which it
+//     could be inserted in the underlying list.
 //   - found: A boolean stating whether or not the value was found.
 //
 // The algorithm performs a true O[log(n)] worst case search.
-func (v *set_[V]) search(value V) (index int, found bool) {
+func (v *set_[V]) indexOf(value V) (index int, found bool) {
 	// We use iteration instead of recursion for better performance.
 	//    start        first      middle       last          end
 	//    |-------------||----------||----------||-------------|

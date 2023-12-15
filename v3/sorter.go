@@ -21,7 +21,7 @@ import (
 // This private type defines the namespace structure associated with the
 // constants, constructors and functions for the Sorter class namespace.
 type sorterClass_[V Value] struct {
-	naturalRanker RankingFunction
+	defaultRanker RankingFunction
 }
 
 // This private constant defines a map to hold all the singleton references to
@@ -41,7 +41,7 @@ func Sorter[V Value]() *sorterClass_[V] {
 	default:
 		// Create a new bound class type.
 		class = &sorterClass_[V]{
-			naturalRanker: Collator().RankValues,
+			defaultRanker: Collator().RankValues,
 		}
 		sorterClassSingletons[key] = class
 	}
@@ -50,25 +50,25 @@ func Sorter[V Value]() *sorterClass_[V] {
 
 // CLASS CONSTANTS
 
-// This public class constant represents the natural ranking function.
-func (c *sorterClass_[V]) NaturalRanker() RankingFunction {
-	return c.naturalRanker
+// This public class constant represents the default ranking function.
+func (c *sorterClass_[V]) DefaultRanker() RankingFunction {
+	return c.defaultRanker
 }
 
 // CLASS CONSTRUCTORS
 
 // This public class constructor creates a new Sorter that can be used to sort
 // an array using the specified ranking function.
-func (c *sorterClass_[V]) WithNaturalRanker() SorterLike[V] {
+func (c *sorterClass_[V]) WithDefaultRanker() SorterLike[V] {
 	var sorter = &sorter_[V]{
-		rank: c.naturalRanker,
+		rank: c.defaultRanker,
 	}
 	return sorter
 }
 
 // This public class constructor creates a new Sorter that can be used to sort
 // an array using the specified ranking function.
-func (c *sorterClass_[V]) WithRanker(ranker RankingFunction) SorterLike[V] {
+func (c *sorterClass_[V]) WithSpecifiedRanker(ranker RankingFunction) SorterLike[V] {
 	var sorter = &sorter_[V]{
 		rank: ranker,
 	}
@@ -80,21 +80,21 @@ func (c *sorterClass_[V]) WithRanker(ranker RankingFunction) SorterLike[V] {
 // This public class function reverses the order of the values in the specified
 // array.
 func (c *sorterClass_[V]) ReverseValues(array []V) {
-	var v = c.WithNaturalRanker()
+	var v = c.WithDefaultRanker()
 	v.ReverseValues(array)
 }
 
 // This public class function randomly shuffles the values in the specified
 // array.
 func (c *sorterClass_[V]) ShuffleValues(array []V) {
-	var v = c.WithNaturalRanker()
+	var v = c.WithDefaultRanker()
 	v.ShuffleValues(array)
 }
 
 // This public class function sorts the values in the specified array using the
 // specified ranking function.
 func (c *sorterClass_[V]) SortValues(array []V, ranker RankingFunction) {
-	var v = c.WithRanker(ranker)
+	var v = c.WithSpecifiedRanker(ranker)
 	v.SortValues(array)
 }
 

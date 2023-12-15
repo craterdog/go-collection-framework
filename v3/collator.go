@@ -73,14 +73,14 @@ func (c *collatorClass_) WithSpecifiedDepth(depth int) CollatorLike {
 // CLASS FUNCTIONS
 
 // This public class function determines whether or not the specified values are
-// equal using their natural comparison criteria.
+// equal using their default comparison criteria.
 func (c *collatorClass_) CompareValues(first Value, second Value) bool {
 	var v = c.WithDefaultDepth()
 	return v.CompareValues(first, second)
 }
 
 // This public class function returns the ranking for the specified values based
-// on their natural ordering:
+// on their default ordering:
 //   - -1: first < second
 //   - 0: first = second
 //   - 1: first > second
@@ -108,7 +108,7 @@ func (v *collator_) CompareValues(first Value, second Value) bool {
 	return v.compareValues(ref.ValueOf(first), ref.ValueOf(second))
 }
 
-// This public class method ranks the specified values using their natural ordering.
+// This public class method ranks the specified values using their default ordering.
 func (v *collator_) RankValues(first Value, second Value) int {
 	return v.rankValues(ref.ValueOf(first), ref.ValueOf(second))
 }

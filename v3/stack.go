@@ -48,8 +48,8 @@ func Stack[V Value]() *stackClass_[V] {
 
 // CLASS CONSTANTS
 
-// This public class constant represents the default maximum capacity for a
-// Stack.
+// This public class constant represents the default capacity for a Stack which
+// is 16.
 func (c *stackClass_[V]) DefaultCapacity() int {
 	return c.defaultCapacity
 }
@@ -63,27 +63,29 @@ func (c *stackClass_[V]) Empty() StackLike[V] {
 	return stack
 }
 
-// This public class constructor creates a new empty Stack with the specified
-// capacity.
-func (c *stackClass_[V]) WithCapacity(capacity int) StackLike[V] {
-	var List = List[V]()
-	var values = List.Empty()
-	if capacity < 1 {
-		capacity = c.defaultCapacity
-	}
-	var stack = &stack_[V]{values, capacity}
-	return stack
-}
-
 // This public class constructor creates a new Stack from the specified
 // sequence. The Stack uses the default capacity.
 func (c *stackClass_[V]) FromSequence(sequence Sequential[V]) StackLike[V] {
 	var stack = c.Empty()
 	var iterator = sequence.GetIterator()
-	iterator.ToEnd()
+	iterator.ToEnd() // Add the values in reverse order since it is a LIFO.
 	for iterator.HasPrevious() {
 		var value = iterator.GetPrevious()
 		stack.AddValue(value)
+	}
+	return stack
+}
+
+// This public class constructor creates a new empty Stack with the specified
+// capacity.
+func (c *stackClass_[V]) WithCapacity(capacity int) StackLike[V] {
+	var values = List[V]().Empty()
+	if capacity < 1 {
+		capacity = c.defaultCapacity
+	}
+	var stack = &stack_[V]{
+		capacity,
+		values,
 	}
 	return stack
 }
@@ -99,16 +101,11 @@ func (c *stackClass_[V]) FromSequence(sequence Sequential[V]) StackLike[V] {
 // This type is parameterized as follows:
 //   - V is any type of value.
 type stack_[V Value] struct {
-	values   ListLike[V]
 	capacity int
+	values   ListLike[V]
 }
 
 // LIFO Interface
-
-// This public class method retrieves the capacity of this Stack.
-func (v *stack_[V]) GetCapacity() int {
-	return v.capacity
-}
 
 // This public class method adds the specified value to the top of this Stack.
 func (v *stack_[V]) AddValue(value V) {
@@ -122,12 +119,22 @@ func (v *stack_[V]) AddValue(value V) {
 	v.values.InsertValue(0, value)
 }
 
+// This public class method retrieves the capacity of this Stack.
+func (v *stack_[V]) GetCapacity() int {
+	return v.capacity
+}
+
 // This public class method retrieves from this Stack the value that is on top of it.
 func (v *stack_[V]) GetTop() V {
 	if v.values.IsEmpty() {
 		panic("Attempted to retrieve the top of an empty Stack!")
 	}
 	return v.values.GetValue(1)
+}
+
+// This public class method removes all values from this Stack.
+func (v *stack_[V]) RemoveAll() {
+	v.values.RemoveAll()
 }
 
 // This public class method removes from this Stack the value that is on top of it.
@@ -138,23 +145,7 @@ func (v *stack_[V]) RemoveTop() V {
 	return v.values.RemoveValue(1)
 }
 
-// This public class method removes all values from this Stack.
-func (v *stack_[V]) RemoveAll() {
-	v.values.RemoveAll()
-}
-
 // Sequential Interface
-
-// This public class method determines whether or not this Stack is empty.
-func (v *stack_[V]) IsEmpty() bool {
-	return v.values.IsEmpty()
-}
-
-// This public class method returns the number of values contained in this
-// Stack.
-func (v *stack_[V]) GetSize() int {
-	return v.values.GetSize()
-}
 
 // This public class method returns all the values in this Stack. The values
 // retrieved are in the same order as they are in the Stack.
@@ -166,6 +157,17 @@ func (v *stack_[V]) AsArray() []V {
 // used to traverse its values.
 func (v *stack_[V]) GetIterator() Ratcheted[V] {
 	return v.values.GetIterator()
+}
+
+// This public class method returns the number of values contained in this
+// Stack.
+func (v *stack_[V]) GetSize() int {
+	return v.values.GetSize()
+}
+
+// This public class method determines whether or not this Stack is empty.
+func (v *stack_[V]) IsEmpty() bool {
+	return v.values.IsEmpty()
 }
 
 // Private Interface

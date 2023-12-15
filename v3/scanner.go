@@ -150,9 +150,9 @@ func (c *scannerClass_) FromSource(
 	tokens chan TokenLike,
 ) ScannerLike {
 	var scanner = &scanner_{
-		source:   source,
 		line:     1,
 		position: 1,
+		source:   source,
 		tokens:   tokens,
 	}
 	go scanner.scanTokens() // Start scanning tokens in the background.
@@ -245,68 +245,15 @@ func (c *scannerClass_) MatchUnsigned(string_ string) []string {
 //
 // Runes can be one to eight bytes long.
 type scanner_ struct {
-	source    []byte
-	firstByte int // The zero based index of the first possible byte in the next token.
-	nextByte  int // The zero based index of the next possible byte in the next token.
+	firstByte int // A zero based index of the first possible byte in the next token.
 	line      int // The line number in the source string of the next rune.
-	position  int // The position in the current line of the first rune in the next token.
+	nextByte  int // A zero based index of the next possible byte in the next token.
+	position  int // The position in the current line of the next token.
+	source    []byte
 	tokens    chan TokenLike
 }
 
 // Private Interface
-
-// This private class method continues scanning tokens from the source array
-// until an error occurs or the end of file is reached. It then closes the token
-// channel.
-func (v *scanner_) scanTokens() {
-	for v.scanToken() {
-	}
-	close(v.tokens)
-}
-
-// This private class method attempts to scan any token starting with the next
-// rune in the source array. It checks for each type of token as the cases for
-// the switch statement. If that token type is found, this method returns true
-// and skips the rest of the cases.  If no valid token is found, or a TypeEOF is
-// found this method returns false.
-func (v *scanner_) scanToken() bool {
-	v.skipSpaces()
-	switch {
-	case v.foundBoolean():
-	case v.foundComplex():
-	case v.foundContext():
-	case v.foundDelimiter():
-	case v.foundEOF():
-		// We are at the end of the source array.
-		return false
-	case v.foundEOL():
-	case v.foundFloat():
-	case v.foundNil():
-	case v.foundRune():
-	case v.foundString():
-	case v.foundUnsigned():
-	case v.foundInteger(): // Must be after all other numeric types.
-	case v.foundError(): // Must be last.
-		// No valid token was found.
-		return false
-	}
-	return true
-}
-
-// This private class method scans through any spaces in the source array and
-// sets the next byte index to the next non-space rune.
-func (v *scanner_) skipSpaces() {
-	if v.nextByte < len(v.source) {
-		for {
-			if v.source[v.nextByte] != ' ' {
-				break
-			}
-			v.nextByte++
-			v.position++
-		}
-		v.firstByte = v.nextByte
-	}
-}
 
 // This private class method adds a token of the specified type with the current
 // Scanner information to the token channel. It then resets the first byte index
@@ -333,7 +280,7 @@ func (v *scanner_) emitToken(tokenType string) string {
 			tokenValue = "<VTAB>"
 		}
 	}
-	var token = Token().FromContext(tokenType, tokenValue, v.line, v.position)
+	var token = Token().FromContext(v.line, v.position, tokenType, tokenValue)
 	//fmt.Println(token)
 	v.tokens <- token
 	v.firstByte = v.nextByte
@@ -395,16 +342,6 @@ func (v *scanner_) foundDelimiter() bool {
 	return false
 }
 
-// This private class method adds an error token with the current Scanner
-// information to the token channel. It always returns true.
-func (v *scanner_) foundError() bool {
-	var bytes = v.source[v.nextByte:]
-	var _, width = utf.DecodeRune(bytes)
-	v.nextByte += width
-	v.emitToken(Token().TypeError())
-	return true
-}
-
 // This private class method adds an EOF token with the current Scanner
 // information to the token channel. It returns true if an EOF marker was found.
 func (v *scanner_) foundEOF() bool {
@@ -436,6 +373,16 @@ func (v *scanner_) foundEOL() bool {
 	v.emitToken(Token().TypeEOL())
 	v.line++
 	v.position = 1
+	return true
+}
+
+// This private class method adds an error token with the current Scanner
+// information to the token channel. It always returns true.
+func (v *scanner_) foundError() bool {
+	var bytes = v.source[v.nextByte:]
+	var _, width = utf.DecodeRune(bytes)
+	v.nextByte += width
+	v.emitToken(Token().TypeError())
 	return true
 }
 
@@ -519,4 +466,57 @@ func (v *scanner_) foundUnsigned() bool {
 		return true
 	}
 	return false
+}
+
+// This private class method attempts to scan any token starting with the next
+// rune in the source array. It checks for each type of token as the cases for
+// the switch statement. If that token type is found, this method returns true
+// and skips the rest of the cases.  If no valid token is found, or a TypeEOF is
+// found this method returns false.
+func (v *scanner_) scanToken() bool {
+	v.skipSpaces()
+	switch {
+	case v.foundBoolean():
+	case v.foundComplex():
+	case v.foundContext():
+	case v.foundDelimiter():
+	case v.foundEOF():
+		// We are at the end of the source array.
+		return false
+	case v.foundEOL():
+	case v.foundFloat():
+	case v.foundNil():
+	case v.foundRune():
+	case v.foundString():
+	case v.foundUnsigned():
+	case v.foundInteger(): // Must be after all other numeric types.
+	case v.foundError(): // Must be last.
+		// No valid token was found.
+		return false
+	}
+	return true
+}
+
+// This private class method continues scanning tokens from the source array
+// until an error occurs or the end of file is reached. It then closes the token
+// channel.
+func (v *scanner_) scanTokens() {
+	for v.scanToken() {
+	}
+	close(v.tokens)
+}
+
+// This private class method scans through any spaces in the source array and
+// sets the next byte index to the next non-space rune.
+func (v *scanner_) skipSpaces() {
+	if v.nextByte < len(v.source) {
+		for {
+			if v.source[v.nextByte] != ' ' {
+				break
+			}
+			v.nextByte++
+			v.position++
+		}
+		v.firstByte = v.nextByte
+	}
 }

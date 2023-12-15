@@ -139,7 +139,7 @@ func (v array_[V]) ShuffleValues() {
 	Sorter.ShuffleValues(v)
 }
 
-// This public class method sorts the values in this list using the natural
+// This public class method sorts the values in this list using the default
 // ranking function.
 func (v array_[V]) SortValues() {
 	v.SortValuesWithRanker(Collator().RankValues)

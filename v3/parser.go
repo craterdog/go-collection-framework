@@ -49,8 +49,8 @@ func (c *parserClass_) FromSource(source []byte) ParserLike {
 	var tokens = make(chan TokenLike, c.channelSize)
 	Scanner().FromSource(source, tokens) // Starts scanning in a separate go routine.
 	var parser = &parser_{
-		source: source,
 		next:   Stack[TokenLike]().WithCapacity(c.stackSize),
+		source: source,
 		tokens: tokens,
 	}
 	return parser
@@ -76,8 +76,8 @@ func (c *parserClass_) ParseCollection(source []byte) Collection {
 // attributes that can only be accessed and manipulated using methods that
 // implement the parser-like abstract type.
 type parser_ struct {
-	source []byte
 	next   StackLike[TokenLike] // A stack of the retrieved tokens still to be read.
+	source []byte               // The source bytes to be parsed.
 	tokens chan TokenLike       // A queue of unread tokens coming from the scanner.
 }
 
@@ -109,32 +109,6 @@ func (v *parser_) ParseCollection() Collection {
 
 // Private Interface
 
-// This private class method attempts to read the next token from the token
-// stream and return it.
-func (v *parser_) nextToken() TokenLike {
-	var next TokenLike
-	if v.next.IsEmpty() {
-		var token, ok = <-v.tokens
-		if !ok {
-			panic("The token channel terminated without an EOF or error token.")
-		}
-		next = token
-		if next.GetType() == Token().TypeError() {
-			var message = v.formatError(next)
-			panic(message)
-		}
-	} else {
-		next = v.next.RemoveTop()
-	}
-	return next
-}
-
-// This private class method puts back the current token onto the token stream
-// so that it can be retrieved by another parsing method.
-func (v *parser_) putBack(token TokenLike) {
-	v.next.AddValue(token)
-}
-
 // This private class method returns an error message containing the context for
 // a parsing error.
 func (v *parser_) formatError(token TokenLike) string {
@@ -162,6 +136,36 @@ func (v *parser_) formatError(token TokenLike) string {
 	message += "\033[0m\n"
 
 	return message
+}
+
+// This private class method is useful when creating Scanner and Parser error
+// messages.
+func (v *parser_) generateGrammar(expected string, symbols ...string) string {
+	var message = "Was expecting '" + expected + "' from:\n"
+	for _, symbol := range symbols {
+		message += fmt.Sprintf("  \033[32m%v: \033[33m%v\033[0m\n\n", symbol, grammar[symbol])
+	}
+	return message
+}
+
+// This private class method attempts to read the next token from the token
+// stream and return it.
+func (v *parser_) nextToken() TokenLike {
+	var next TokenLike
+	if v.next.IsEmpty() {
+		var token, ok = <-v.tokens
+		if !ok {
+			panic("The token channel terminated without an EOF or error token.")
+		}
+		next = token
+		if next.GetType() == Token().TypeError() {
+			var message = v.formatError(next)
+			panic(message)
+		}
+	} else {
+		next = v.next.RemoveTop()
+	}
+	return next
 }
 
 // This private class method attempts to parse an association between a key and
@@ -196,6 +200,49 @@ func (v *parser_) parseAssociation() (AssociationLike[Key, Value], TokenLike, bo
 	}
 	association = Association[Key, Value]().FromPair(key, value)
 	return association, token, true
+}
+
+// This private class method attempts to parse a sequence of associations. It
+// returns the sequence of associations and whether or not the sequence of
+// associations was successfully parsed.
+func (v *parser_) parseAssociations() (Sequential[Binding[Key, Value]], TokenLike, bool) {
+	var ok bool
+	var token TokenLike
+	var associations Sequential[Binding[Key, Value]]
+	_, token, ok = v.parseDelimiter(":")
+	if ok {
+		// The associations is empty.
+		associations = Catalog[Key, Value]().Empty()
+		return associations, token, true
+	}
+	_, token, ok = v.parseEOL()
+	if ok {
+		associations, _, ok = v.parseMultilineAssociations()
+		if !ok {
+			v.putBack(token) // Put back the EOL character.
+			return associations, token, false
+		}
+	} else {
+		associations, token, ok = v.parseInlineAssociations()
+		if !ok {
+			return associations, token, false
+		}
+	}
+	return associations, token, true
+}
+
+// This private class method attempts to parse a boolean primitive. It returns
+// the boolean primitive and whether or not the boolean primitive was
+// successfully parsed.
+func (v *parser_) parseBoolean() (bool, TokenLike, bool) {
+	var boolean bool
+	var token = v.nextToken()
+	if token.GetType() != Token().TypeBoolean() {
+		v.putBack(token)
+		return boolean, token, false
+	}
+	boolean, _ = stc.ParseBool(token.GetValue())
+	return boolean, token, true
 }
 
 // This private class method attempts to parse a collection of values. It
@@ -290,6 +337,32 @@ func (v *parser_) parseCollection() (Collection, TokenLike, bool) {
 	return collection, token, true
 }
 
+// This private class method attempts to parse a complex number primitive. It
+// returns the complex number primitive and whether or not the complex number
+// primitive was successfully parsed.
+func (v *parser_) parseComplex() (complex128, TokenLike, bool) {
+	var complex_ complex128
+	var token = v.nextToken()
+	if token.GetType() != Token().TypeComplex() {
+		v.putBack(token)
+		return complex_, token, false
+	}
+	complex_, _ = stc.ParseComplex(token.GetValue(), 128)
+	return complex_, token, true
+}
+
+// This private class method attempts to parse the type of a collection. It
+// returns the type string and whether or not the type string was successfully
+// parsed.
+func (v *parser_) parseContext() (string, TokenLike, bool) {
+	var token = v.nextToken()
+	if token.GetType() != Token().TypeContext() {
+		v.putBack(token)
+		return "", token, false
+	}
+	return token.GetValue(), token, true
+}
+
 // This private class method attempts to parse the specified delimiter. It
 // returns the token and whether or not the delimiter was found.
 func (v *parser_) parseDelimiter(delimiter string) (string, TokenLike, bool) {
@@ -321,6 +394,20 @@ func (v *parser_) parseEOL() (TokenLike, TokenLike, bool) {
 		return token, token, false
 	}
 	return token, token, true
+}
+
+// This private class method attempts to parse a floating point primitive. It
+// returns the floating point primitive and whether or not the floating point
+// primitive was successfully parsed.
+func (v *parser_) parseFloat() (float64, TokenLike, bool) {
+	var float float64
+	var token = v.nextToken()
+	if token.GetType() != Token().TypeFloat() {
+		v.putBack(token)
+		return float, token, false
+	}
+	float, _ = stc.ParseFloat(token.GetValue(), 64)
+	return float, token, true
 }
 
 // This private class method attempts to parse a sequence containing inline
@@ -393,33 +480,18 @@ func (v *parser_) parseInlineValues() (Sequential[Value], TokenLike, bool) {
 	}
 }
 
-// This private class method attempts to parse a sequence of associations. It
-// returns the sequence of associations and whether or not the sequence of
-// associations was successfully parsed.
-func (v *parser_) parseAssociations() (Sequential[Binding[Key, Value]], TokenLike, bool) {
-	var ok bool
-	var token TokenLike
-	var associations Sequential[Binding[Key, Value]]
-	_, token, ok = v.parseDelimiter(":")
-	if ok {
-		// The associations is empty.
-		associations = Catalog[Key, Value]().Empty()
-		return associations, token, true
+// This private class method attempts to parse a integer primitive. It returns
+// the integer primitive and whether or not the integer primitive was
+// successfully parsed.
+func (v *parser_) parseInteger() (int64, TokenLike, bool) {
+	var integer int64
+	var token = v.nextToken()
+	if token.GetType() != Token().TypeInteger() {
+		v.putBack(token)
+		return integer, token, false
 	}
-	_, token, ok = v.parseEOL()
-	if ok {
-		associations, _, ok = v.parseMultilineAssociations()
-		if !ok {
-			v.putBack(token) // Put back the EOL character.
-			return associations, token, false
-		}
-	} else {
-		associations, token, ok = v.parseInlineAssociations()
-		if !ok {
-			return associations, token, false
-		}
-	}
-	return associations, token, true
+	integer, _ = stc.ParseInt(token.GetValue(), 10, 64)
+	return integer, token, true
 }
 
 // This private class method attempts to parse a sequence containing multi-line
@@ -515,18 +587,15 @@ func (v *parser_) parseMultilineValues() (Sequential[Value], TokenLike, bool) {
 	}
 }
 
-// This private class method attempts to parse a component entity. It returns
-// the component entity and whether or not the component entity was successfully
-// parsed.
-func (v *parser_) parseValue() (Value, TokenLike, bool) {
-	var ok bool
-	var token TokenLike
-	var value Value
-	value, token, ok = v.parsePrimitive()
-	if !ok {
-		value, token, ok = v.parseCollection()
+// This private class method attempts to parse a nil primitive. It returns the
+// nil primitive and whether or not the nil primitive was successfully parsed.
+func (v *parser_) parseNil() (Value, TokenLike, bool) {
+	var token = v.nextToken()
+	if token.GetType() != Token().TypeNil() {
+		v.putBack(token)
+		return nil, token, false
 	}
-	return value, token, ok
+	return nil, token, true
 }
 
 // This private class method attempts to parse a primitive. It returns the
@@ -562,115 +631,6 @@ func (v *parser_) parsePrimitive() (Primitive, TokenLike, bool) {
 		primitive = nil
 	}
 	return primitive, token, ok
-}
-
-// This private class method attempts to parse a sequence of values. It returns
-// the sequence of values and whether or not the sequence of values was
-// successfully parsed.
-func (v *parser_) parseValues() (Sequential[Value], TokenLike, bool) {
-	var ok bool
-	var token TokenLike
-	var values Sequential[Value]
-	_, token, ok = v.parseDelimiter("]")
-	if ok {
-		// The values is empty.
-		v.putBack(token) // Put back the "]" character.
-		values = List[Value]().Empty()
-		return values, token, true
-	}
-	_, token, ok = v.parseEOL()
-	if ok {
-		values, _, ok = v.parseMultilineValues()
-		if !ok {
-			v.putBack(token) // Put back the EOL character.
-			return values, token, false
-		}
-	} else {
-		values, token, ok = v.parseInlineValues()
-		if !ok {
-			return values, token, false
-		}
-	}
-	return values, token, true
-}
-
-// This private class method attempts to parse a boolean primitive. It returns
-// the boolean primitive and whether or not the boolean primitive was
-// successfully parsed.
-func (v *parser_) parseBoolean() (bool, TokenLike, bool) {
-	var boolean bool
-	var token = v.nextToken()
-	if token.GetType() != Token().TypeBoolean() {
-		v.putBack(token)
-		return boolean, token, false
-	}
-	boolean, _ = stc.ParseBool(token.GetValue())
-	return boolean, token, true
-}
-
-// This private class method attempts to parse a complex number primitive. It
-// returns the complex number primitive and whether or not the complex number
-// primitive was successfully parsed.
-func (v *parser_) parseComplex() (complex128, TokenLike, bool) {
-	var complex_ complex128
-	var token = v.nextToken()
-	if token.GetType() != Token().TypeComplex() {
-		v.putBack(token)
-		return complex_, token, false
-	}
-	complex_, _ = stc.ParseComplex(token.GetValue(), 128)
-	return complex_, token, true
-}
-
-// This private class method attempts to parse the type of a collection. It
-// returns the type string and whether or not the type string was successfully
-// parsed.
-func (v *parser_) parseContext() (string, TokenLike, bool) {
-	var token = v.nextToken()
-	if token.GetType() != Token().TypeContext() {
-		v.putBack(token)
-		return "", token, false
-	}
-	return token.GetValue(), token, true
-}
-
-// This private class method attempts to parse a floating point primitive. It
-// returns the floating point primitive and whether or not the floating point
-// primitive was successfully parsed.
-func (v *parser_) parseFloat() (float64, TokenLike, bool) {
-	var float float64
-	var token = v.nextToken()
-	if token.GetType() != Token().TypeFloat() {
-		v.putBack(token)
-		return float, token, false
-	}
-	float, _ = stc.ParseFloat(token.GetValue(), 64)
-	return float, token, true
-}
-
-// This private class method attempts to parse a integer primitive. It returns
-// the integer primitive and whether or not the integer primitive was
-// successfully parsed.
-func (v *parser_) parseInteger() (int64, TokenLike, bool) {
-	var integer int64
-	var token = v.nextToken()
-	if token.GetType() != Token().TypeInteger() {
-		v.putBack(token)
-		return integer, token, false
-	}
-	integer, _ = stc.ParseInt(token.GetValue(), 10, 64)
-	return integer, token, true
-}
-
-// This private class method attempts to parse a nil primitive. It returns the
-// nil primitive and whether or not the nil primitive was successfully parsed.
-func (v *parser_) parseNil() (Value, TokenLike, bool) {
-	var token = v.nextToken()
-	if token.GetType() != Token().TypeNil() {
-		v.putBack(token)
-		return nil, token, false
-	}
-	return nil, token, true
 }
 
 // This private class method attempts to parse a rune. It returns the rune and
@@ -725,14 +685,54 @@ func (v *parser_) parseUnsigned() (uint64, TokenLike, bool) {
 	return unsigned, token, true
 }
 
-// This private class method is useful when creating Scanner and Parser error
-// messages.
-func (v *parser_) generateGrammar(expected string, symbols ...string) string {
-	var message = "Was expecting '" + expected + "' from:\n"
-	for _, symbol := range symbols {
-		message += fmt.Sprintf("  \033[32m%v: \033[33m%v\033[0m\n\n", symbol, grammar[symbol])
+// This private class method attempts to parse a component entity. It returns
+// the component entity and whether or not the component entity was successfully
+// parsed.
+func (v *parser_) parseValue() (Value, TokenLike, bool) {
+	var ok bool
+	var token TokenLike
+	var value Value
+	value, token, ok = v.parsePrimitive()
+	if !ok {
+		value, token, ok = v.parseCollection()
 	}
-	return message
+	return value, token, ok
+}
+
+// This private class method attempts to parse a sequence of values. It returns
+// the sequence of values and whether or not the sequence of values was
+// successfully parsed.
+func (v *parser_) parseValues() (Sequential[Value], TokenLike, bool) {
+	var ok bool
+	var token TokenLike
+	var values Sequential[Value]
+	_, token, ok = v.parseDelimiter("]")
+	if ok {
+		// The values is empty.
+		v.putBack(token) // Put back the "]" character.
+		values = List[Value]().Empty()
+		return values, token, true
+	}
+	_, token, ok = v.parseEOL()
+	if ok {
+		values, _, ok = v.parseMultilineValues()
+		if !ok {
+			v.putBack(token) // Put back the EOL character.
+			return values, token, false
+		}
+	} else {
+		values, token, ok = v.parseInlineValues()
+		if !ok {
+			return values, token, false
+		}
+	}
+	return values, token, true
+}
+
+// This private class method puts back the current token onto the token stream
+// so that it can be retrieved by another parsing method.
+func (v *parser_) putBack(token TokenLike) {
+	v.next.AddValue(token)
 }
 
 // This map captures the syntax rules for collections of Go primitives.

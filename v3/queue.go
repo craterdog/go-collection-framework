@@ -58,9 +58,21 @@ func (c *queueClass_[V]) DefaultCapacity() int {
 // CLASS CONSTRUCTORS
 
 // This public class constructor creates a new empty Queue with the default
-// capacity.
+// capacity which is 16.
 func (c *queueClass_[V]) Empty() QueueLike[V] {
 	var queue = c.WithCapacity(c.defaultCapacity)
+	return queue
+}
+
+// This public class constructor creates a new Queue from the specified
+// sequence. The Queue uses the default capacity which is 16.
+func (c *queueClass_[V]) FromSequence(sequence Sequential[V]) QueueLike[V] {
+	var queue = c.Empty()
+	var iterator = sequence.GetIterator()
+	for iterator.HasNext() {
+		var value = iterator.GetNext()
+		queue.AddValue(value)
+	}
 	return queue
 }
 
@@ -76,18 +88,6 @@ func (c *queueClass_[V]) WithCapacity(capacity int) QueueLike[V] {
 	var queue = &queue_[V]{
 		available: available,
 		values:    values,
-	}
-	return queue
-}
-
-// This public class constructor creates a new Queue from the specified
-// sequence. The Queue uses the default capacity.
-func (c *queueClass_[V]) FromSequence(sequence Sequential[V]) QueueLike[V] {
-	var queue = c.WithCapacity(c.defaultCapacity)
-	var iterator = sequence.GetIterator()
-	for iterator.HasNext() {
-		var value = iterator.GetNext()
-		queue.AddValue(value)
 	}
 	return queue
 }
@@ -148,6 +148,49 @@ func (c *queueClass_[V]) Fork(wg *syn.WaitGroup, input FIFO[V], size int) Sequen
 	return outputs
 }
 
+// This public class function connects the outputs of the specified sequence of
+// input queues with a new output Queue returns the new output Queue. Each value
+// removed from each input Queue will automatically be added to the output
+// Queue. This pattern is useful when the results of the processing with a
+// Split() function need to be consolidated into a single Queue.
+func (c *queueClass_[V]) Join(wg *syn.WaitGroup, inputs Sequential[FIFO[V]]) FIFO[V] {
+	// Validate the arguments.
+	if inputs == nil || inputs.IsEmpty() {
+		panic("The number of input queues for a join must be at least one.")
+	}
+
+	// Create the new output Queue.
+	var iterator = inputs.GetIterator()
+	var capacity = iterator.GetNext().GetCapacity()
+	var output = c.WithCapacity(capacity)
+
+	// Connect up the input queues to the output Queue.
+	wg.Add(1)
+	go func() {
+		// Make sure the wait group is decremented on termination.
+		defer wg.Done()
+
+		// Take turns reading from each input Queue and writing to the output Queue.
+		iterator.ToStart()
+		for {
+			var input = iterator.GetNext()
+			var value, ok = input.RemoveHead() // Will block when empty.
+			if !ok {
+				break // The input Queue has been closed.
+			}
+			output.AddValue(value) // Will block when full.
+			if !iterator.HasNext() {
+				iterator.ToStart()
+			}
+		}
+
+		// Close the output Queue.
+		output.CloseQueue()
+	}()
+
+	return output
+}
+
 // This public class function connects the output of the specified input Queue
 // with the number of output queues specified by the size parameter and returns
 // a sequence of the new output queues. Each value added to the input Queue will
@@ -203,49 +246,6 @@ func (c *queueClass_[V]) Split(wg *syn.WaitGroup, input FIFO[V], size int) Seque
 	return outputs
 }
 
-// This public class function connects the outputs of the specified sequence of
-// input queues with a new output Queue returns the new output Queue. Each value
-// removed from each input Queue will automatically be added to the output
-// Queue. This pattern is useful when the results of the processing with a
-// Split() function need to be consolidated into a single Queue.
-func (c *queueClass_[V]) Join(wg *syn.WaitGroup, inputs Sequential[FIFO[V]]) FIFO[V] {
-	// Validate the arguments.
-	if inputs == nil || inputs.IsEmpty() {
-		panic("The number of input queues for a join must be at least one.")
-	}
-
-	// Create the new output Queue.
-	var iterator = inputs.GetIterator()
-	var capacity = iterator.GetNext().GetCapacity()
-	var output = c.WithCapacity(capacity)
-
-	// Connect up the input queues to the output Queue.
-	wg.Add(1)
-	go func() {
-		// Make sure the wait group is decremented on termination.
-		defer wg.Done()
-
-		// Take turns reading from each input Queue and writing to the output Queue.
-		iterator.ToStart()
-		for {
-			var input = iterator.GetNext()
-			var value, ok = input.RemoveHead() // Will block when empty.
-			if !ok {
-				break // The input Queue has been closed.
-			}
-			output.AddValue(value) // Will block when full.
-			if !iterator.HasNext() {
-				iterator.ToStart()
-			}
-		}
-
-		// Close the output Queue.
-		output.CloseQueue()
-	}()
-
-	return output
-}
-
 // CLASS TYPE
 
 // Encapsulated Type
@@ -264,16 +264,11 @@ func (c *queueClass_[V]) Join(wg *syn.WaitGroup, inputs Sequential[FIFO[V]]) FIF
 // by the "AsArray()" method.
 type queue_[V Value] struct {
 	available chan bool
-	values    ListLike[V]
 	mutex     syn.Mutex
+	values    ListLike[V]
 }
 
 // FIFO Interface
-
-// This public class method retrieves the capacity of this Queue.
-func (v *queue_[V]) GetCapacity() int {
-	return cap(v.available) // The channel capacity is static.
-}
 
 // This public class method adds the specified value to the end of this Queue.
 func (v *queue_[V]) AddValue(value V) {
@@ -281,6 +276,19 @@ func (v *queue_[V]) AddValue(value V) {
 	v.values.AppendValue(value)
 	v.mutex.Unlock()
 	v.available <- true // The Queue will block if at capacity.
+}
+
+// This public class method closes the Queue so no more values can be placed on
+// it.
+func (v *queue_[V]) CloseQueue() {
+	v.mutex.Lock()
+	close(v.available) // No more values can be placed on the Queue.
+	v.mutex.Unlock()
+}
+
+// This public class method retrieves the capacity of this Queue.
+func (v *queue_[V]) GetCapacity() int {
+	return cap(v.available) // The channel capacity is static.
 }
 
 // This public class method removes from this Queue the value that is at the
@@ -302,32 +310,7 @@ func (v *queue_[V]) RemoveHead() (V, bool) {
 	return head, ok
 }
 
-// This public class method closes the Queue so no more values can be placed on
-// it.
-func (v *queue_[V]) CloseQueue() {
-	v.mutex.Lock()
-	close(v.available) // No more values can be placed on the Queue.
-	v.mutex.Unlock()
-}
-
 // Sequential Interface
-
-// This public class method determines whether or not this Queue is empty.
-func (v *queue_[V]) IsEmpty() bool {
-	v.mutex.Lock()
-	var result = len(v.available) == 0
-	v.mutex.Unlock()
-	return result
-}
-
-// This public class method returns the number of values contained in this
-// Queue.
-func (v *queue_[V]) GetSize() int {
-	v.mutex.Lock()
-	var size = len(v.available)
-	v.mutex.Unlock()
-	return size
-}
 
 // This public class method returns all the values in this Queue. The values
 // retrieved are in the same order as they are in the Queue.
@@ -345,6 +328,23 @@ func (v *queue_[V]) GetIterator() Ratcheted[V] {
 	var iterator = v.values.GetIterator()
 	v.mutex.Unlock()
 	return iterator
+}
+
+// This public class method returns the number of values contained in this
+// Queue.
+func (v *queue_[V]) GetSize() int {
+	v.mutex.Lock()
+	var size = len(v.available)
+	v.mutex.Unlock()
+	return size
+}
+
+// This public class method determines whether or not this Queue is empty.
+func (v *queue_[V]) IsEmpty() bool {
+	v.mutex.Lock()
+	var result = len(v.available) == 0
+	v.mutex.Unlock()
+	return result
 }
 
 // Private Interface

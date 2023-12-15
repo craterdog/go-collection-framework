@@ -19,13 +19,13 @@ import (
 // This private type defines the namespace structure associated with the
 // constants, constructors and functions for the Token class namespace.
 type tokenClass_ struct {
-	typeError     string
 	typeBoolean   string
 	typeComplex   string
 	typeContext   string
 	typeDelimiter string
 	typeEOF       string
 	typeEOL       string
+	typeError     string
 	typeFloat     string
 	typeInteger   string
 	typeNil       string
@@ -37,13 +37,13 @@ type tokenClass_ struct {
 // This private constant defines the singleton reference to the Token
 // class namespace.  It also initializes any class constants as needed.
 var tokenClassSingleton = &tokenClass_{
-	typeError:     "Error",
 	typeBoolean:   "Boolean",
 	typeComplex:   "Complex",
 	typeContext:   "Context",
 	typeDelimiter: "Delimiter",
 	typeEOF:       "EOF",
 	typeEOL:       "EOL",
+	typeError:     "Error",
 	typeFloat:     "Float",
 	typeInteger:   "Integer",
 	typeNil:       "Nil",
@@ -59,11 +59,6 @@ func Token() *tokenClass_ {
 }
 
 // CLASS CONSTANTS
-
-// This public class constant represents an error Token type.
-func (c *tokenClass_) TypeError() string {
-	return c.typeError
-}
 
 // This public class constant represents a boolean Token type.
 func (c *tokenClass_) TypeBoolean() string {
@@ -93,6 +88,11 @@ func (c *tokenClass_) TypeEOF() string {
 // This public class constant represents an end-of-line Token type.
 func (c *tokenClass_) TypeEOL() string {
 	return c.typeEOL
+}
+
+// This public class constant represents an error Token type.
+func (c *tokenClass_) TypeError() string {
+	return c.typeError
 }
 
 // This public class constant represents a float Token type.
@@ -130,16 +130,16 @@ func (c *tokenClass_) TypeUnsigned() string {
 // This public class constructor creates a new Token from the specified
 // lexical context.
 func (c *tokenClass_) FromContext(
-	tokenType string,
-	tokenValue string,
 	line int,
 	position int,
+	tokenType string,
+	tokenValue string,
 ) TokenLike {
 	var token = &token_{
-		tokenType:  tokenType,
-		tokenValue: tokenValue,
 		line:       line,
 		position:   position,
+		tokenType:  tokenType,
+		tokenValue: tokenValue,
 	}
 	return token
 }
@@ -152,23 +152,13 @@ func (c *tokenClass_) FromContext(
 // attributes that can only be accessed and manipulated using methods that
 // implement the token-like abstract type.  A Token captures lexical context.
 type token_ struct {
-	tokenType  string
-	tokenValue string
 	line       int // The line number of the Token in the lexical context.
 	position   int // The position in the line of the first rune of the Token.
+	tokenType  string
+	tokenValue string
 }
 
 // Contextual Interface
-
-// This public class method returns the type of this Token.
-func (v *token_) GetType() string {
-	return v.tokenType
-}
-
-// This public class method returns the value of this Token.
-func (v *token_) GetValue() string {
-	return v.tokenValue
-}
 
 // This public class method returns the line number of this Token.
 func (v *token_) GetLine() int {
@@ -178,6 +168,16 @@ func (v *token_) GetLine() int {
 // This public class method returns the position of this Token in the line.
 func (v *token_) GetPosition() int {
 	return v.position
+}
+
+// This public class method returns the type of this Token.
+func (v *token_) GetType() string {
+	return v.tokenType
+}
+
+// This public class method returns the value of this Token.
+func (v *token_) GetValue() string {
+	return v.tokenValue
 }
 
 // Private Interface

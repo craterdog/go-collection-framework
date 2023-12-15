@@ -49,7 +49,7 @@ func List[V Value]() *listClass_[V] {
 // CLASS CONSTRUCTORS
 
 // This public class constructor creates a new empty List.
-// The List uses the natural comparing function.
+// The List uses the default comparing function.
 func (c *listClass_[V]) Empty() ListLike[V] {
 	var compare = Collator().CompareValues
 	var list = c.WithComparer(compare)
@@ -57,7 +57,7 @@ func (c *listClass_[V]) Empty() ListLike[V] {
 }
 
 // This public class constructor creates a new List from the specified sequence.
-// The List uses the natural compare function.
+// The List uses the default compare function.
 func (c *listClass_[V]) FromSequence(sequence Sequential[V]) ListLike[V] {
 	var list = c.Empty()
 	var iterator = sequence.GetIterator()
@@ -404,7 +404,7 @@ func (v *list_[V]) ShuffleValues() {
 	v.values.ShuffleValues()
 }
 
-// This public class method sorts the values in this List using the natural
+// This public class method sorts the values in this List using the default
 // ranking function.
 func (v *list_[V]) SortValues() {
 	v.values.SortValues()

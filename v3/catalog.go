@@ -51,8 +51,7 @@ func Catalog[K Key, V Value]() *catalogClass_[K, V] {
 // This public class constructor creates a new empty Catalog.
 func (c *catalogClass_[K, V]) Empty() CatalogLike[K, V] {
 	var keys = map[Key]Binding[K, V]{}
-	var List = List[Binding[K, V]]()
-	var associations = List.Empty()
+	var associations = List[Binding[K, V]]().Empty()
 	var catalog = &catalog_[K, V]{associations, keys}
 	return catalog
 }
@@ -123,8 +122,7 @@ type catalog_[K Key, V Value] struct {
 
 // This public class method returns the keys for this Catalog.
 func (v *catalog_[K, V]) GetKeys() Sequential[K] {
-	var List = List[K]()
-	var keys = List.Empty()
+	var keys = List[K]().Empty()
 	var iterator = v.associations.GetIterator()
 	for iterator.HasNext() {
 		var association = iterator.GetNext()
@@ -149,8 +147,7 @@ func (v *catalog_[K, V]) GetValue(key K) V {
 // keys for this Catalog. The values are returned in the same order as the keys
 // in the Catalog.
 func (v *catalog_[K, V]) GetValues(keys Sequential[K]) Sequential[V] {
-	var List = List[V]()
-	var values = List.Empty()
+	var values = List[V]().Empty()
 	var iterator = keys.GetIterator()
 	for iterator.HasNext() {
 		var key = iterator.GetNext()
@@ -182,8 +179,7 @@ func (v *catalog_[K, V]) RemoveValue(key K) V {
 // This public class method removes the associations associated with the
 // specified keys from the Catalog and returns the removed values.
 func (v *catalog_[K, V]) RemoveValues(keys Sequential[K]) Sequential[V] {
-	var List = List[V]()
-	var values = List.Empty()
+	var values = List[V]().Empty()
 	var Iterator = Iterator[K]()
 	var iterator = Iterator.FromSequence(keys)
 	for iterator.HasNext() {

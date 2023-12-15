@@ -92,8 +92,7 @@ type map_[K comparable, V Value] map[K]V
 
 // This public class method returns the keys for this Map.
 func (v map_[K, V]) GetKeys() Sequential[K] {
-	var List = List[K]()
-	var keys = List.Empty()
+	var keys = List[K]().Empty()
 	var iterator = v.GetIterator()
 	for iterator.HasNext() {
 		var association = iterator.GetNext()
@@ -113,8 +112,7 @@ func (v map_[K, V]) GetValue(key K) V {
 // keys for this Map. The values are returned in the same order as the keys in
 // the Map.
 func (v map_[K, V]) GetValues(keys Sequential[K]) Sequential[V] {
-	var List = List[V]()
-	var values = List.Empty()
+	var values = List[V]().Empty()
 	var iterator = keys.GetIterator()
 	for iterator.HasNext() {
 		var key = iterator.GetNext()
@@ -146,8 +144,7 @@ func (v map_[K, V]) RemoveValue(key K) V {
 // This public class method removes the associations associated with the
 // specified keys from the Map and returns the removed values.
 func (v map_[K, V]) RemoveValues(keys Sequential[K]) Sequential[V] {
-	var List = List[V]()
-	var values = List.Empty()
+	var values = List[V]().Empty()
 	var iterator = keys.GetIterator()
 	for iterator.HasNext() {
 		var key = iterator.GetNext()

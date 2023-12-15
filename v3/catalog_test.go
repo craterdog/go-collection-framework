@@ -53,7 +53,7 @@ func TestCatalogsWithStringsAndIntegers(t *tes.T) {
 	})
 	var catalog3 = Catalog.FromSequence(m)
 	catalog2.SortValues()
-	catalog3.SortValues()
+	catalog3.SortValuesWithRanker(col.Collator().RankValues)
 	ass.True(t, col.Collator().CompareValues(catalog2, catalog3))
 	iterator = catalog.GetIterator()
 	ass.True(t, iterator.HasNext())

@@ -44,7 +44,7 @@ func Formatter() *formatterClass_ {
 // This public class constant represents the default depth of a collection
 // at which the Formatter gives up and inserts "...".  This handles cycles
 // in a sensible and efficient manner.
-func (c *formatterClass_) GetDefaultDepth() int {
+func (c *formatterClass_) DefaultDepth() int {
 	return c.defaultDepth
 }
 

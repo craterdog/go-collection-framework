@@ -50,6 +50,36 @@ type Fuz struct {
 	Bar string
 }
 
+func TestConstants(t *tes.T) {
+	ass.Equal(t, 16, col.Collator().DefaultDepth())
+}
+
+func TestCompareMaximumDepth(t *tes.T) {
+	var collator = col.Collator().WithMaximumDepth(1)
+	var array = col.Array[any]().FromArray([]any{"foo", []int{1,2,3}})
+	defer func() {
+		if e := recover(); e != nil {
+			ass.Equal(t, "The maximum recursion depth was exceeded: 1", e)
+		} else {
+			ass.Fail(t, "Test should result in recovered panic.")
+		}
+	}()
+	_ = collator.CompareValues(array, array)
+}
+
+func TestRankMaximumDepth(t *tes.T) {
+	var collator = col.Collator().WithMaximumDepth(1)
+	var array = col.Array[any]().FromArray([]any{"foo", []int{1,2,3}})
+	defer func() {
+		if e := recover(); e != nil {
+			ass.Equal(t, "The maximum recursion depth was exceeded: 1", e)
+		} else {
+			ass.Fail(t, "Test should result in recovered panic.")
+		}
+	}()
+	_ = collator.RankValues(array, array)
+}
+
 func TestComparison(t *tes.T) {
 	var Collator = col.Collator()
 

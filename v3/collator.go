@@ -43,7 +43,7 @@ func Collator() *collatorClass_ {
 // This public class constant represents the default depth of a collection
 // at which the Collator gives up trying to collate.  This handles cycles
 // in a sensible and efficient manner.
-func (c *collatorClass_) GetDefaultDepth() int {
+func (c *collatorClass_) DefaultDepth() int {
 	return c.defaultDepth
 }
 
@@ -533,11 +533,11 @@ func (v *collator_) rankComplex(first, second complex128) int {
 // values.
 func (v *collator_) rankStrings(first, second string) int {
 	if first < second {
-		// The first string comes before the second string lexigraphically.
+		// The first string comes before the second string alphabetically.
 		return -1
 	}
 	if first > second {
-		// The first string comes after the second string lexigraphically.
+		// The first string comes after the second string alphabetically.
 		return 1
 	}
 	// The two strings are the same.

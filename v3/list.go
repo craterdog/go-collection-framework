@@ -113,13 +113,13 @@ type list_[V Value] struct {
 
 // This public class method retrieves from this array the value that is
 // associated with the specified index.
-func (v list_[V]) GetValue(index int) V {
+func (v *list_[V]) GetValue(index int) V {
 	return v.values.GetValue(index)
 }
 
 // This public class method retrieves from this array all values from the first
 // index through the last index (inclusive).
-func (v list_[V]) GetValues(first int, last int) Sequential[V] {
+func (v *list_[V]) GetValues(first int, last int) Sequential[V] {
 	return v.values.GetValues(first, last)
 }
 
@@ -371,48 +371,48 @@ func (v *list_[V]) GetIndex(value V) int {
 
 // This public class method returns all the values in this array. The values
 // retrieved are in the same order as they are in the array.
-func (v list_[V]) AsArray() []V {
+func (v *list_[V]) AsArray() []V {
 	return v.values.AsArray()
 }
 
 // This public class method generates for this array an iterator that can be
 // used to traverse its values.
-func (v list_[V]) GetIterator() Ratcheted[V] {
+func (v *list_[V]) GetIterator() Ratcheted[V] {
 	return v.values.GetIterator()
 }
 
 // This public class method returns the number of values contained in this
 // array.
-func (v list_[V]) GetSize() int {
+func (v *list_[V]) GetSize() int {
 	return v.values.GetSize()
 }
 
 // This public class method determines whether or not this array is empty.
-func (v list_[V]) IsEmpty() bool {
+func (v *list_[V]) IsEmpty() bool {
 	return v.values.IsEmpty()
 }
 
 // Sortable Interface
 
 // This public class method reverses the order of all values in this List.
-func (v list_[V]) ReverseValues() {
+func (v *list_[V]) ReverseValues() {
 	v.values.ReverseValues()
 }
 
 // This public class method pseudo-randomly shuffles the values in this List.
-func (v list_[V]) ShuffleValues() {
+func (v *list_[V]) ShuffleValues() {
 	v.values.ShuffleValues()
 }
 
 // This public class method sorts the values in this List using the natural
 // ranking function.
-func (v list_[V]) SortValues() {
+func (v *list_[V]) SortValues() {
 	v.values.SortValues()
 }
 
 // This public class method sorts the values in this List using the specified
 // ranking function.
-func (v list_[V]) SortValuesWithRanker(ranker RankingFunction) {
+func (v *list_[V]) SortValuesWithRanker(ranker RankingFunction) {
 	v.values.SortValuesWithRanker(ranker)
 }
 
@@ -420,13 +420,13 @@ func (v list_[V]) SortValuesWithRanker(ranker RankingFunction) {
 
 // This public class method sets the value in this array that is associated
 // with the specified index to be the specified value.
-func (v list_[V]) SetValue(index int, value V) {
+func (v *list_[V]) SetValue(index int, value V) {
 	v.values.SetValue(index, value)
 }
 
 // This public class method sets the values in this array starting with the
 // specified index to the specified values.
-func (v list_[V]) SetValues(index int, values Sequential[V]) {
+func (v *list_[V]) SetValues(index int, values Sequential[V]) {
 	v.values.SetValues(index, values)
 }
 

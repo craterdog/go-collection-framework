@@ -20,14 +20,19 @@ following collection classes based on those interfaces:
   - Set (an ordered set)
   - Stack (LIFO)
 
+For detailed documentation on this package refer to the wiki:
+
+	https://github.com/craterdog/go-collection-framework/wiki
+
+This package follows the Crater Dog Technologies™ Go Coding Conventions posted
+here:
+
+	https://github.com/craterdog/go-coding-conventions/wiki
+
 Additional implementations of these collection classes can be defined and used
 seamlessly since the interface definitions only depend on other interfaces and
 native types; and the class implementations only depend on interfaces, not on
 each other.
-
-For detailed documentation on this package refer to the wiki:
-
-	https://github.com/craterdog/go-collection-framework/wiki
 */
 package collections
 

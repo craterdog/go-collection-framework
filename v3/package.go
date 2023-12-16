@@ -9,16 +9,16 @@
  *******************************************************************************/
 
 /*
-This package defines a set of simple, pragmatic interfaces for collections of
-sequential values. It also provides efficient and compact implementations of the
-following collection classes based on those interfaces:
-  - Array (native Go array)
+This package defines a set of simple, pragmatic abstract types and interfaces
+for collections of sequential values. It also provides efficient and compact
+implementations of the following collection classes based on these abstractions:
+  - Array (extended Go array)
   - Catalog (a sortable map)
   - List (a sortable list)
-  - Map (native Go map)
+  - Map (extended Go map)
   - Queue (a blocking FIFO)
   - Set (an ordered set)
-  - Stack (LIFO)
+  - Stack (a LIFO)
 
 For detailed documentation on this package refer to the wiki:
 
@@ -69,9 +69,10 @@ type ComparingFunction func(first Value, second Value) bool
 // This function type defines the signature for any function that can determine
 // the relative ordering of two specified values. The result must be one of
 // the following:
-//   - -1: The first value is less than the second value.
-//   - 0: The first value is equal to the second value.
-//   - 1: The first value is more than the second value.
+//
+//	-1: The first value is less than the second value.
+//	 0: The first value is equal to the second value.
+//	 1: The first value is more than the second value.
 type RankingFunction func(first Value, second Value) int
 
 // This function type defines the signature for any function that can sort an

@@ -162,7 +162,7 @@ func (v *set_[V]) GetValues(first int, last int) Sequential[V] {
 // This public class method adds the specified value to this Set if it is not
 // already a member of the Set.
 func (v *set_[V]) AddValue(value V) {
-	var slot, found = v.indexOf(value)
+	var slot, found = v.findIndex(value)
 	if !found {
 		// The value is not already a member, so add it.
 		v.values.InsertValue(slot, value)
@@ -192,7 +192,7 @@ func (v *set_[V]) RemoveAll() {
 // This public class method removes the specified value from this Set. It
 // returns true if the value was in the Set and false otherwise.
 func (v *set_[V]) RemoveValue(value V) {
-	var index, found = v.indexOf(value)
+	var index, found = v.findIndex(value)
 	if found {
 		// The value is a member, so remove it.
 		v.values.RemoveValue(index)
@@ -244,7 +244,7 @@ func (v *set_[V]) ContainsAny(values Sequential[V]) bool {
 // This public class method determines whether or not this Set contains the
 // specified value.
 func (v *set_[V]) ContainsValue(value V) bool {
-	var _, found = v.indexOf(value)
+	var _, found = v.findIndex(value)
 	return found
 }
 
@@ -256,7 +256,7 @@ func (v *set_[V]) GetComparer() ComparingFunction {
 // This public class method returns the index of the FIRST occurrence of the
 // specified value in this set, or zero if this Set does not contain the value.
 func (v *set_[V]) GetIndex(value V) int {
-	var index, found = v.indexOf(value)
+	var index, found = v.findIndex(value)
 	if !found {
 		return 0
 	}
@@ -298,7 +298,7 @@ func (v *set_[V]) IsEmpty() bool {
 //   - found: A boolean stating whether or not the value was found.
 //
 // The algorithm performs a true O[log(n)] worst case search.
-func (v *set_[V]) indexOf(value V) (index int, found bool) {
+func (v *set_[V]) findIndex(value V) (index int, found bool) {
 	// We use iteration instead of recursion for better performance.
 	//    start        first      middle       last          end
 	//    |-------------||----------||----------||-------------|

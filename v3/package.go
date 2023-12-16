@@ -24,8 +24,8 @@ For detailed documentation on this package refer to the wiki:
 
 	https://github.com/craterdog/go-collection-framework/wiki
 
-This package follows the Crater Dog Technologies™ Go Coding Conventions posted
-here:
+This package follows the Crater Dog Technologies™ Go Coding Conventions
+posted here:
 
 	https://github.com/craterdog/go-coding-conventions/wiki
 

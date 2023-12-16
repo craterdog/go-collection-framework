@@ -81,15 +81,15 @@ type array_[V Value] []V
 // This public class method retrieves from this Array the value that is
 // associated with the specified index.
 func (v array_[V]) GetValue(index int) V {
-	index = v.goIndex(index)
+	index = v.toZeroBased(index)
 	return v[index]
 }
 
 // This public class method retrieves from this Array all values from the first
 // index through the last index (inclusive).
 func (v array_[V]) GetValues(first int, last int) Sequential[V] {
-	first = v.goIndex(first)
-	last = v.goIndex(last)
+	first = v.toZeroBased(first)
+	last = v.toZeroBased(last)
 	var sequence = v[first : last+1]
 	var array = Array[V]().FromArray(sequence) // This copies the underlying array.
 	return array
@@ -159,7 +159,7 @@ func (v array_[V]) SortValuesWithRanker(ranker RankingFunction) {
 // This public class method sets the value in this Array that is associated
 // with the specified index to be the specified value.
 func (v array_[V]) SetValue(index int, value V) {
-	index = v.goIndex(index)
+	index = v.toZeroBased(index)
 	v[index] = value
 }
 
@@ -168,8 +168,8 @@ func (v array_[V]) SetValue(index int, value V) {
 func (v array_[V]) SetValues(index int, values Sequential[V]) {
 	// The full index range must be in bounds.
 	var size = values.GetSize()
-	var first = v.goIndex(index)
-	var last = v.goIndex(index+size-1) + 1
+	var first = v.toZeroBased(index)
+	var last = v.toZeroBased(index+size-1) + 1
 	copy(v[first:last], values.AsArray())
 }
 
@@ -180,13 +180,14 @@ func (v array_[V]) String() string {
 	return Formatter().FormatCollection(v)
 }
 
-// This private class method normalizes an index into this Array to match the
-// Go (zero based) indexing. The following transformation is performed:
+// This private class method normalizes a relative ordinal-based index into this
+// Array to match the Go (zero-based) indexing. The following transformation is
+// performed:
 //
 //	[-size..-1] and [1..size] => [0..size)
 //
-// Notice that the specified index cannot be zero since zero is not an ORDINAL.
-func (v array_[V]) goIndex(index int) int {
+// Notice that the specified index cannot be zero since zero is NOT an ordinal.
+func (v array_[V]) toZeroBased(index int) int {
 	var size = v.GetSize()
 	switch {
 	case size == 0:

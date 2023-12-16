@@ -126,7 +126,7 @@ func (v *sorter_[V]) ReverseValues(array []V) {
 func (v *sorter_[V]) ShuffleValues(array []V) {
 	var size = len(array)
 	for i := 0; i < size; i++ {
-		var r = v.randomIndex(size)
+		var r = v.randomizeIndex(size)
 		array[i], array[r] = array[r], array[i]
 	}
 }
@@ -221,7 +221,7 @@ func (v *sorter_[V]) mergeArrays(left []V, right []V, merged []V) {
 
 // This private class method generates a cryptographically secure random index
 // in the range [0..size).
-func (v *sorter_[V]) randomIndex(size int) int {
+func (v *sorter_[V]) randomizeIndex(size int) int {
 	var random, err = ran.Int(ran.Reader, big.NewInt(int64(size)))
 	if err != nil {
 		// There was an issue with the underlying OS so time to...

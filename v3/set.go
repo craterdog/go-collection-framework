@@ -291,12 +291,6 @@ func (v *set_[V]) IsEmpty() bool {
 
 // Private Interface
 
-// This public class method is used by Go to generate a canonical string for
-// the Set.
-func (v *set_[V]) String() string {
-	return Formatter().FormatCollection(v)
-}
-
 // This private class method performs a binary search of the Set for the
 // specified value. It returns two results:
 //   - index: The index of the value, or if not found, the slot in which it
@@ -336,4 +330,10 @@ func (v *set_[V]) indexOf(value V) (index int, found bool) {
 	// would be inserted. NOTE: Since the value was not found, the indexes are
 	// inverted: last < first (i.e. last = first - 1).
 	return last, false
+}
+
+// This public class method is used by Go to generate a canonical string for
+// the Set.
+func (v *set_[V]) String() string {
+	return Formatter().FormatCollection(v)
 }

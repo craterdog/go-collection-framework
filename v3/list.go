@@ -255,7 +255,7 @@ func (v *list_[V]) RemoveValue(index int) V {
 	var array = Array.WithSize(size)
 
 	// Copy the remaining values into the new array.
-	var counter = v.normalized(index)
+	var counter = v.toNormalized(index)
 	index = 0
 	var iterator = v.GetIterator()
 	for iterator.HasNext() {
@@ -279,8 +279,8 @@ func (v *list_[V]) RemoveValue(index int) V {
 func (v *list_[V]) RemoveValues(first int, last int) Sequential[V] {
 
 	// Create two smaller arrays.
-	first = v.normalized(first)
-	last = v.normalized(last)
+	first = v.toNormalized(first)
+	last = v.toNormalized(last)
 	var delta = last - first + 1
 	var size = v.GetSize() - delta
 	var Array = Array[V]()
@@ -441,7 +441,7 @@ func (v *list_[V]) String() string {
 // This private class method normalizes the specified index.  The following
 // transformation is performed:
 // [-size..-1] and [1..size] => [1..size]
-func (v *list_[V]) normalized(index int) int {
+func (v *list_[V]) toNormalized(index int) int {
 	var size = v.GetSize()
 	switch {
 	case size == 0:

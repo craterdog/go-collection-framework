@@ -115,20 +115,6 @@ func (v *collator_) RankValues(first Value, second Value) int {
 
 // Private Interface
 
-// This private class method removes the generics from the type string for the
-// specified type and converts an empty interface into type "any".
-func (v *collator_) baseTypeName(t ref.Type) string {
-	var result = t.String()
-	var index = sts.Index(result, "[")
-	if index > -1 {
-		result = result[:index]
-	}
-	if result == "interface {}" {
-		result = "any"
-	}
-	return result
-}
-
 // This private class method determines whether or not the specified arrays have
 // the same value.
 func (v *collator_) compareArrays(first ref.Value, second ref.Value) bool {
@@ -236,8 +222,8 @@ func (v *collator_) compareValues(first ref.Value, second ref.Value) bool {
 	}
 
 	// At this point, neither of the values are invalid.
-	var firstType = v.baseTypeName(first.Type())
-	var secondType = v.baseTypeName(second.Type())
+	var firstType = v.getType(first.Type())
+	var secondType = v.getType(second.Type())
 	if firstType != secondType && firstType != "any" && secondType != "any" {
 		// The values have different types.
 		return false
@@ -310,6 +296,20 @@ func (v *collator_) compareValues(first ref.Value, second ref.Value) bool {
 			second.Type(),
 			second.Kind()))
 	}
+}
+
+// This private class method removes the generics from the type string for the
+// specified type and converts an empty interface into type "any".
+func (v *collator_) getType(type_ ref.Type) string {
+	var result = type_.String()
+	var index = sts.Index(result, "[")
+	if index > -1 {
+		result = result[:index]
+	}
+	if result == "interface {}" {
+		result = "any"
+	}
+	return result
 }
 
 // This private class method returns the ranking order of the specified arrays
@@ -636,8 +636,8 @@ func (v *collator_) rankValues(first ref.Value, second ref.Value) int {
 	}
 
 	// At this point, neither of the values are nil.
-	var firstType = v.baseTypeName(first.Type())
-	var secondType = v.baseTypeName(second.Type())
+	var firstType = v.getType(first.Type())
+	var secondType = v.getType(second.Type())
 	if firstType != secondType && firstType != "any" && secondType != "any" {
 		// The values have different types.
 		return v.RankValues(firstType, secondType)

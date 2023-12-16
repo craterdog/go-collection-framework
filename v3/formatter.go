@@ -123,13 +123,6 @@ func (v *formatter_) FormatCollection(collection Collection) string {
 
 // Private Interface
 
-// This private class method returns the canonically formatted string result.
-func (v *formatter_) getResult() string {
-	var result = v.result.String()
-	v.result.Reset()
-	return result
-}
-
 // This private class method appends the specified string to the result.
 func (v *formatter_) appendString(s string) {
 	v.result.WriteString(s)
@@ -373,7 +366,7 @@ func (v *formatter_) formatSequence(sequence ref.Value) {
 // values to the result. It uses recursion to format each value.
 func (v *formatter_) formatCollection(collection ref.Value) {
 	v.appendString("[")
-	var type_ = v.extractType(collection)
+	var type_ = v.getType(collection)
 	switch collection.Kind() {
 	case ref.Array, ref.Slice:
 		v.formatArray(collection)
@@ -392,10 +385,17 @@ func (v *formatter_) formatCollection(collection ref.Value) {
 	v.appendString("](" + type_ + ")")
 }
 
+// This private class method returns the canonically formatted string result.
+func (v *formatter_) getResult() string {
+	var result = v.result.String()
+	v.result.Reset()
+	return result
+}
+
 // This private class method extracts the type name string from the full
 // reflected type.  NOTE: This hack is necessary since Go does not handle type
 // switches with generics very well.
-func (v *formatter_) extractType(collection ref.Value) string {
+func (v *formatter_) getType(collection ref.Value) string {
 	var type_ = collection.Type().String()
 	switch {
 	case sts.HasPrefix(type_, "[]"):

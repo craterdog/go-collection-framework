@@ -1,6 +1,6 @@
 <img src="https://craterdog.com/images/CraterDog.png" width="50%">
 
-## Go Collection Framework (v2)
+## Go Collection Framework (v3)
 
 ### Overview
 This project provides a Go based framework containing generic interfaces and
@@ -10,14 +10,14 @@ replace the use of the native Go array, slice and map types.
 ### Quick Links
 For more information on this project click on the following links:
  * [project documentation](https://github.com/craterdog/go-collection-framework/wiki)
- * [coding conventions](https://github.com/craterdog/go-collection-framework/wiki/conventions)
+ * [coding conventions](https://github.com/craterdog/go-coding-conventions/wiki)
  * [release notes](https://github.com/craterdog/go-collection-framework/wiki/releases)
 
 ### Getting Started
 To include the Go packages for this module use the following import statement:
 ```go
 import (
-	col "github.com/craterdog/go-collection-framework/v2"
+	col "github.com/craterdog/go-collection-framework/v3"
 )
 ```
 

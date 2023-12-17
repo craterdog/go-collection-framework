@@ -40,4 +40,4 @@ Therefore, the `AddValues()` method was removed from both the `FIFO` and `LIFO`
 interface definitions. The queue and stack types were updated to not implement
 that method.
 
-<H5 align="center"> Copyright © 2009 - 2023  Crater Dog Technologies™. All rights reserved. </H5>
+<H5 align="center"> Copyright © 2009 - 2024  Crater Dog Technologies™. All rights reserved. </H5>

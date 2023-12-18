@@ -112,7 +112,7 @@ func (v *parser_) ParseCollection() Collection {
 // This private class method returns an error message containing the context for
 // a parsing error.
 func (v *parser_) formatError(token TokenLike) string {
-	var message = fmt.Sprintf("An unexpected token was received by the parser_: %v\n", token)
+	var message = fmt.Sprintf("An unexpected token was received by the parser: %v\n", token)
 	var line = token.GetLine()
 	var lines = sts.Split(string(v.source), EOL)
 
@@ -303,7 +303,7 @@ func (v *parser_) parseCollection() (Collection, TokenLike, bool) {
 	case Sequential[Value]:
 		switch context {
 		case "array":
-			collection = Array[Value]().FromArray(sequence.AsArray())
+			collection = sequence.AsArray()
 		case "Array":
 			collection = Array[Value]().FromArray(sequence.AsArray())
 		case "List":
@@ -319,7 +319,15 @@ func (v *parser_) parseCollection() (Collection, TokenLike, bool) {
 	case Sequential[Binding[Key, Value]]:
 		switch context {
 		case "map":
-			collection = Map[Key, Value]().FromArray(sequence.AsArray())
+			var map_ = map[Key]Value{}
+			var iterator = sequence.GetIterator()
+			for iterator.HasNext() {
+				var association = iterator.GetNext()
+				var key = association.GetKey()
+				var value = association.GetValue()
+				map_[key] = value
+			}
+			collection = map_
 		case "Map":
 			collection = Map[Key, Value]().FromArray(sequence.AsArray())
 		case "Catalog":

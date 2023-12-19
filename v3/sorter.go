@@ -79,23 +79,23 @@ func (c *sorterClass_[V]) WithSpecifiedRanker(ranker RankingFunction) SorterLike
 
 // This public class function reverses the order of the values in the specified
 // array.
-func (c *sorterClass_[V]) ReverseValues(array []V) {
+func (c *sorterClass_[V]) ReverseValues(values []V) {
 	var v = c.WithDefaultRanker()
-	v.ReverseValues(array)
+	v.ReverseValues(values)
 }
 
 // This public class function randomly shuffles the values in the specified
 // array.
-func (c *sorterClass_[V]) ShuffleValues(array []V) {
+func (c *sorterClass_[V]) ShuffleValues(values []V) {
 	var v = c.WithDefaultRanker()
-	v.ShuffleValues(array)
+	v.ShuffleValues(values)
 }
 
 // This public class function sorts the values in the specified array using the
 // specified ranking function.
-func (c *sorterClass_[V]) SortValues(array []V, ranker RankingFunction) {
+func (c *sorterClass_[V]) SortValues(values []V, ranker RankingFunction) {
 	var v = c.WithSpecifiedRanker(ranker)
-	v.SortValues(array)
+	v.SortValues(values)
 }
 
 // CLASS TYPE
@@ -113,21 +113,21 @@ type sorter_[V Value] struct {
 
 // This public class method reverses the order of the values in the specified
 // array in place.
-func (v *sorter_[V]) ReverseValues(array []V) {
-	var length = len(array)
+func (v *sorter_[V]) ReverseValues(values []V) {
+	var length = len(values)
 	var half = length / 2 // Rounds down to the nearest integer.
 	for index := 0; index < half; index++ {
-		array[index], array[length-index-1] = array[length-index-1], array[index]
+		values[index], values[length-index-1] = values[length-index-1], values[index]
 	}
 }
 
 // This public class method randomly shuffles the values in the specified array
 // in place.
-func (v *sorter_[V]) ShuffleValues(array []V) {
-	var size = len(array)
+func (v *sorter_[V]) ShuffleValues(values []V) {
+	var size = len(values)
 	for i := 0; i < size; i++ {
 		var r = v.randomizeIndex(size)
-		array[i], array[r] = array[r], array[i]
+		values[i], values[r] = values[r], values[i]
 	}
 }
 
@@ -139,11 +139,11 @@ func (v *sorter_[V]) ShuffleValues(array []V) {
 // This iterative approach saves on memory allocation by swapping between two
 // arrays of the same size rather than allocating new arrays for each sub-array.
 // This results in stable O[nlog(n)] time and O[n] space performance.
-func (v *sorter_[V]) SortValues(array []V) {
+func (v *sorter_[V]) SortValues(values []V) {
 	// Create a buffer array.
-	var length = len(array)
+	var length = len(values)
 	var buffer = make([]V, length)
-	copy(buffer, array) // Make a copy of the original unsorted array.
+	copy(buffer, values) // Make a copy of the original unsorted array.
 
 	// Iterate through sub-array widths of 2, 4, 8, ... length.
 	for width := 1; width < length; width *= 2 {
@@ -167,15 +167,15 @@ func (v *sorter_[V]) SortValues(array []V) {
 			v.mergeArrays(
 				buffer[left:middle],
 				buffer[middle:right],
-				array[left:right])
+				values[left:right])
 		}
 
 		// Swap the two arrays.
-		buffer, array = array, buffer
+		buffer, values = values, buffer
 	}
 
 	// Synchronize the two arrays.
-	copy(array, buffer) // Both arrays are now sorted.
+	copy(values, buffer) // Both arrays are now sorted.
 }
 
 // Private Interface

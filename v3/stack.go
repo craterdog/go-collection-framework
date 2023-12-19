@@ -64,10 +64,10 @@ func (c *stackClass_[V]) Empty() StackLike[V] {
 }
 
 // This public class constructor creates a new Stack from the specified
-// sequence. The Stack uses the default capacity.
-func (c *stackClass_[V]) FromSequence(sequence Sequential[V]) StackLike[V] {
+// sequence of values. The Stack uses the default capacity.
+func (c *stackClass_[V]) FromSequence(values Sequential[V]) StackLike[V] {
 	var stack = c.Empty()
-	var iterator = sequence.GetIterator()
+	var iterator = values.GetIterator()
 	iterator.ToEnd() // Add the values in reverse order since it is a LIFO.
 	for iterator.HasPrevious() {
 		var value = iterator.GetPrevious()

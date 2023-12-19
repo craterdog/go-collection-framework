@@ -48,13 +48,13 @@ func Array[V Value]() *arrayClass_[V] {
 
 // CLASS CONSTRUCTORS
 
-// This public class constructor creates a new Array from the specified
-// Go array of values.
-func (c *arrayClass_[V]) FromArray(array []V) ArrayLike[V] {
-	var length = len(array)
-	var duplicate = make([]V, length)
-	copy(duplicate, array)
-	return array_[V](duplicate)
+// This public class constructor creates a new Array from the specified Go array
+// of values.
+func (c *arrayClass_[V]) FromArray(values []V) ArrayLike[V] {
+	var length = len(values)
+	var array = make([]V, length)
+	copy(array, values)
+	return array_[V](array)
 }
 
 // This public class constructor creates a new Array of the specified size.

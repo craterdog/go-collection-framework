@@ -56,6 +56,14 @@ func (c *listClass_[V]) Empty() ListLike[V] {
 	return list
 }
 
+// This public class constructor creates a new List from the specified Go array
+// of values.
+func (c *listClass_[V]) FromArray(values []V) ListLike[V] {
+	var array = Array[V]().FromArray(values)
+	var list = c.FromSequence(array)
+	return list
+}
+
 // This public class constructor creates a new List from the specified sequence
 // of values.  The List uses the default compare function.
 func (c *listClass_[V]) FromSequence(values Sequential[V]) ListLike[V] {

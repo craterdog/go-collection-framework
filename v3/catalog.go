@@ -56,9 +56,21 @@ func (c *catalogClass_[K, V]) Empty() CatalogLike[K, V] {
 	return catalog
 }
 
+// This public class constructor creates a new Catalog from the specified Go
+// array of values.
+func (c *catalogClass_[K, V]) FromArray(
+	associations []Binding[K, V],
+) CatalogLike[K, V] {
+	var array = Array[Binding[K, V]]().FromArray(associations)
+	var catalog = c.FromSequence(array)
+	return catalog
+}
+
 // This public class constructor creates a new Catalog from the specified
 // sequence of associations.
-func (c *catalogClass_[K, V]) FromSequence(associations Sequential[Binding[K, V]]) CatalogLike[K, V] {
+func (c *catalogClass_[K, V]) FromSequence(
+	associations Sequential[Binding[K, V]],
+) CatalogLike[K, V] {
 	var catalog = c.Empty()
 	var iterator = associations.GetIterator()
 	for iterator.HasNext() {
@@ -76,7 +88,10 @@ func (c *catalogClass_[K, V]) FromSequence(associations Sequential[Binding[K, V]
 // associations that are in the specified Catalog that have the specified keys.
 // The associations in the resulting Catalog will be in the same order as the
 // specified keys.
-func (c *catalogClass_[K, V]) Extract(catalog CatalogLike[K, V], keys Sequential[K]) CatalogLike[K, V] {
+func (c *catalogClass_[K, V]) Extract(
+	catalog CatalogLike[K, V],
+	keys Sequential[K],
+) CatalogLike[K, V] {
 	var result = c.Empty()
 	var iterator = keys.GetIterator()
 	for iterator.HasNext() {
@@ -91,7 +106,10 @@ func (c *catalogClass_[K, V]) Extract(catalog CatalogLike[K, V], keys Sequential
 // associations that are in the specified catalogs in the order that they appear
 // in each Catalog.  If a key is present in both catalogs, the value of the key
 // from the second Catalog takes precedence.
-func (c *catalogClass_[K, V]) Merge(first, second CatalogLike[K, V]) CatalogLike[K, V] {
+func (c *catalogClass_[K, V]) Merge(
+	first CatalogLike[K, V],
+	second CatalogLike[K, V],
+) CatalogLike[K, V] {
 	var catalog = c.FromSequence(first)
 	var iterator = second.GetIterator()
 	for iterator.HasNext() {

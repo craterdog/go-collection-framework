@@ -55,6 +55,14 @@ func (c *setClass_[V]) Empty() SetLike[V] {
 	return set
 }
 
+// This public class constructor creates a new Set from the specified Go array
+// of values.
+func (c *setClass_[V]) FromArray(values []V) SetLike[V] {
+	var array = Array[V]().FromArray(values)
+	var set = c.FromSequence(array)
+	return set
+}
+
 // This public class constructor creates a new Set from the specified sequence
 // of values.  The Set uses the default ranking function to order its values.
 func (c *setClass_[V]) FromSequence(values Sequential[V]) SetLike[V] {

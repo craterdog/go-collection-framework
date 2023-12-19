@@ -63,6 +63,14 @@ func (c *stackClass_[V]) Empty() StackLike[V] {
 	return stack
 }
 
+// This public class constructor creates a new Stack from the specified Go array
+// of values.
+func (c *stackClass_[V]) FromArray(values []V) StackLike[V] {
+	var array = Array[V]().FromArray(values)
+	var stack = c.FromSequence(array)
+	return stack
+}
+
 // This public class constructor creates a new Stack from the specified
 // sequence of values. The Stack uses the default capacity.
 func (c *stackClass_[V]) FromSequence(values Sequential[V]) StackLike[V] {

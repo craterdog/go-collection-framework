@@ -64,6 +64,14 @@ func (c *queueClass_[V]) Empty() QueueLike[V] {
 	return queue
 }
 
+// This public class constructor creates a new Queue from the specified Go array
+// of values.
+func (c *queueClass_[V]) FromArray(values []V) QueueLike[V] {
+	var array = Array[V]().FromArray(values)
+	var queue = c.FromSequence(array)
+	return queue
+}
+
 // This public class constructor creates a new Queue from the specified
 // sequence of values. The Queue uses the default capacity which is 16.
 func (c *queueClass_[V]) FromSequence(values Sequential[V]) QueueLike[V] {

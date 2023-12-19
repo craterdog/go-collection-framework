@@ -121,6 +121,12 @@ func TestCatalogsWithExtract(t *tes.T) {
 	catalog3.SetValue(association1.GetKey(), association1.GetValue())
 	catalog3.SetValue(association3.GetKey(), association3.GetValue())
 	ass.True(t, col.Collator().CompareValues(catalog2, catalog3))
+	var catalog4 = Catalog.FromArray([]col.Binding[string, int]{
+		association1,
+		association2,
+		association3,
+	})
+	ass.True(t, col.Collator().CompareValues(catalog1, catalog4))
 }
 
 func TestCatalogsWithEmptyCatalogs(t *tes.T) {

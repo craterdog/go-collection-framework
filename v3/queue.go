@@ -65,10 +65,10 @@ func (c *queueClass_[V]) Empty() QueueLike[V] {
 }
 
 // This public class constructor creates a new Queue from the specified
-// sequence. The Queue uses the default capacity which is 16.
-func (c *queueClass_[V]) FromSequence(sequence Sequential[V]) QueueLike[V] {
+// sequence of values. The Queue uses the default capacity which is 16.
+func (c *queueClass_[V]) FromSequence(values Sequential[V]) QueueLike[V] {
 	var queue = c.Empty()
-	var iterator = sequence.GetIterator()
+	var iterator = values.GetIterator()
 	for iterator.HasNext() {
 		var value = iterator.GetNext()
 		queue.AddValue(value)

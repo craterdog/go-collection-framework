@@ -56,11 +56,11 @@ func (c *listClass_[V]) Empty() ListLike[V] {
 	return list
 }
 
-// This public class constructor creates a new List from the specified sequence.
-// The List uses the default compare function.
-func (c *listClass_[V]) FromSequence(sequence Sequential[V]) ListLike[V] {
+// This public class constructor creates a new List from the specified sequence
+// of values.  The List uses the default compare function.
+func (c *listClass_[V]) FromSequence(values Sequential[V]) ListLike[V] {
 	var list = c.Empty()
-	var iterator = sequence.GetIterator()
+	var iterator = values.GetIterator()
 	for iterator.HasNext() {
 		var value = iterator.GetNext()
 		list.AppendValue(value)

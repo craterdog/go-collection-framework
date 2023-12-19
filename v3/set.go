@@ -55,21 +55,21 @@ func (c *setClass_[V]) Empty() SetLike[V] {
 	return set
 }
 
-// This public class constructor creates a new Set from the specified sequence.
-// The Set uses the default ranking function to order its values.
-func (c *setClass_[V]) FromSequence(sequence Sequential[V]) SetLike[V] {
-	var set = c.FromSequenceWithRanker(sequence, Collator().RankValues)
+// This public class constructor creates a new Set from the specified sequence
+// of values.  The Set uses the default ranking function to order its values.
+func (c *setClass_[V]) FromSequence(values Sequential[V]) SetLike[V] {
+	var set = c.FromSequenceWithRanker(values, Collator().RankValues)
 	return set
 }
 
-// This public class constructor creates a new Set from the specified sequence.
-// The Set uses the specified ranking function to order its values.
+// This public class constructor creates a new Set from the specified sequence
+// of values.  The Set uses the specified ranking function to order its values.
 func (c *setClass_[V]) FromSequenceWithRanker(
-	sequence Sequential[V],
+	values Sequential[V],
 	ranker RankingFunction,
 ) SetLike[V] {
 	var set = c.WithRanker(ranker)
-	var iterator = sequence.GetIterator()
+	var iterator = values.GetIterator()
 	for iterator.HasNext() {
 		var value = iterator.GetNext()
 		set.AddValue(value)

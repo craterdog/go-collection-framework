@@ -58,9 +58,9 @@ func (c *catalogClass_[K, V]) Empty() CatalogLike[K, V] {
 
 // This public class constructor creates a new Catalog from the specified
 // sequence of associations.
-func (c *catalogClass_[K, V]) FromSequence(sequence Sequential[Binding[K, V]]) CatalogLike[K, V] {
+func (c *catalogClass_[K, V]) FromSequence(associations Sequential[Binding[K, V]]) CatalogLike[K, V] {
 	var catalog = c.Empty()
-	var iterator = sequence.GetIterator()
+	var iterator = associations.GetIterator()
 	for iterator.HasNext() {
 		var association = iterator.GetNext()
 		var key = association.GetKey()

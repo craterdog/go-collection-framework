@@ -49,8 +49,8 @@ func Iterator[V Value]() *iteratorClass_[V] {
 // CLASS CONSTRUCTORS
 
 // This public class constructor creates a new Iterator from the specified
-// sequence value.  The Iterator that can be used to traverse the values in the
-// specified sequence.
+// sequence of values.  The Iterator that can be used to traverse the values in
+// the specified sequence.
 func (c *iteratorClass_[V]) FromSequence(sequence Sequential[V]) IteratorLike[V] {
 	var values = sequence.AsArray() // The returned array is immutable.
 	var size = len(values)

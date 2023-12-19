@@ -77,7 +77,7 @@ type RankingFunction func(first Value, second Value) int
 
 // This function type defines the signature for any function that can sort an
 // array of values using a ranking function.
-type SortingFunction[V Value] func(array []V, ranker RankingFunction)
+type SortingFunction[V Value] func(values []V, ranker RankingFunction)
 
 // PACKAGE CONSTANTS
 
@@ -225,9 +225,9 @@ type Ratcheted[V Value] interface {
 	GetSlot() int
 	HasNext() bool
 	HasPrevious() bool
+	ToEnd()
 	ToSlot(slot int)
 	ToStart()
-	ToEnd()
 }
 
 // This abstract interface defines the set of method signatures that must be
@@ -263,9 +263,9 @@ type Sortable[V Value] interface {
 // supported by all systematic agents that can shuffle or sort an array of
 // values.
 type Systematic[V Value] interface {
-	ReverseValues(array []V)
-	ShuffleValues(array []V)
-	SortValues(array []V)
+	ReverseValues(values []V)
+	ShuffleValues(values []V)
+	SortValues(values []V)
 }
 
 // This abstract interface defines the set of method signatures that must be

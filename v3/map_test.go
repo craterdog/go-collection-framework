@@ -16,6 +16,11 @@ import (
 	tes "testing"
 )
 
+func TestMapConstructor(t *tes.T) {
+	var _ = col.Map[rune, int64]().FromString("[:](Map)\n")
+	var _ = col.Map[rune, int64]().FromString("['a': 1, 'b': 2, 'c': 3](Map)\n")
+}
+
 func TestEmptyMaps(t *tes.T) {
 	var Map = col.Map[string, int]()
 	var m = Map.FromMap(map[string]int{})

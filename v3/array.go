@@ -57,6 +57,24 @@ func (c *arrayClass_[V]) FromArray(values []V) ArrayLike[V] {
 	return array_[V](array)
 }
 
+// This public class constructor creates a new Array from the specified string
+// containing the CDCN definition for the Array.
+func (c *arrayClass_[V]) FromString(source string) ArrayLike[V] {
+	// First we parse it as a collection of any type value.
+	var collection = Parser().ParseCollection([]byte(source)).(Sequential[Value])
+
+	// Then we convert it to an Array of type V.
+	var array = c.WithSize(collection.GetSize())
+	var index int
+	var iterator = collection.GetIterator()
+	for iterator.HasNext() {
+		index++
+		var value = iterator.GetNext().(V)
+		array.SetValue(index, value)
+	}
+	return array
+}
+
 // This public class constructor creates a new Array of the specified size.
 func (c *arrayClass_[V]) WithSize(size int) ArrayLike[V] {
 	var array = make([]V, size) // All values initialized to zero.

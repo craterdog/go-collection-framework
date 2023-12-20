@@ -82,6 +82,24 @@ func (c *catalogClass_[K, V]) FromSequence(
 	return catalog
 }
 
+// This public class constructor creates a new Catalog from the specified string
+// containing the CDCN definition for the Catalog.
+func (c *catalogClass_[K, V]) FromString(source string) CatalogLike[K, V] {
+	// First we parse it as a collection of any type value.
+	var collection = Parser().ParseCollection([]byte(source)).(Sequential[Binding[Key, Value]])
+
+	// Then we convert it to a Catalog of type Binding[K, V].
+	var catalog = c.Empty()
+	var iterator = collection.GetIterator()
+	for iterator.HasNext() {
+		var association = iterator.GetNext()
+		var key = association.GetKey().(K)
+		var value = association.GetValue().(V)
+		catalog.SetValue(key, value)
+	}
+	return catalog
+}
+
 // CLASS FUNCTIONS
 
 // This public class function returns a new Catalog containing only the

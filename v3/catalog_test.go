@@ -16,6 +16,11 @@ import (
 	tes "testing"
 )
 
+func TestCatalogConstructor(t *tes.T) {
+	var _ = col.Catalog[rune, int64]().FromString("[:](Catalog)\n")
+	var _ = col.Catalog[rune, int64]().FromString("['a': 1, 'b': 2, 'c': 3](Catalog)\n")
+}
+
 func TestCatalogsWithStringsAndIntegers(t *tes.T) {
 	var Array = col.Array[string]()
 	var keys = Array.FromArray([]string{"foo", "bar"})

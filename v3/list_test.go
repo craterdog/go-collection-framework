@@ -16,6 +16,11 @@ import (
 	tes "testing"
 )
 
+func TestListConstructor(t *tes.T) {
+	var _ = col.List[int64]().FromString("[ ](List)\n")
+	var _ = col.List[int64]().FromString("[1, 2, 3](List)\n")
+}
+
 func TestListsWithStrings(t *tes.T) {
 	var Collator = col.Collator()
 	var Array = col.Array[string]()

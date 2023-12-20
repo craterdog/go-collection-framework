@@ -84,6 +84,22 @@ func (c *queueClass_[V]) FromSequence(values Sequential[V]) QueueLike[V] {
 	return queue
 }
 
+// This public class constructor creates a new Queue from the specified string
+// containing the CDCN definition for the Queue.
+func (c *queueClass_[V]) FromString(source string) QueueLike[V] {
+	// First we parse it as a collection of any type value.
+	var collection = Parser().ParseCollection([]byte(source)).(Sequential[Value])
+
+	// Then we convert it to a Queue of type V.
+	var queue = c.Empty()
+	var iterator = collection.GetIterator()
+	for iterator.HasNext() {
+		var value = iterator.GetNext().(V)
+		queue.AddValue(value)
+	}
+	return queue
+}
+
 // This public class constructor creates a new empty Queue with the specified
 // capacity.
 func (c *queueClass_[V]) WithCapacity(capacity int) QueueLike[V] {

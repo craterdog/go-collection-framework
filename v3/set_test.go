@@ -16,6 +16,11 @@ import (
 	tes "testing"
 )
 
+func TestSetConstructor(t *tes.T) {
+	var _ = col.Set[int64]().FromString("[ ](Set)\n")
+	var _ = col.Set[int64]().FromString("[1, 2, 3](Set)\n")
+}
+
 func TestSetConstructors(t *tes.T) {
 	var Set = col.Set[int]()
 	var set1 = Set.FromArray([]int{1, 2, 3})

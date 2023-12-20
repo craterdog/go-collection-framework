@@ -76,10 +76,26 @@ func (c *listClass_[V]) FromSequence(values Sequential[V]) ListLike[V] {
 	return list
 }
 
+// This public class constructor creates a new List from the specified string
+// containing the CDCN definition for the List.
+func (c *listClass_[V]) FromString(source string) ListLike[V] {
+	// First we parse it as a collection of any type value.
+	var collection = Parser().ParseCollection([]byte(source)).(Sequential[Value])
+
+	// Then we convert it to a List of type V.
+	var list = c.Empty()
+	var iterator = collection.GetIterator()
+	for iterator.HasNext() {
+		var value = iterator.GetNext().(V)
+		list.AppendValue(value)
+	}
+	return list
+}
+
 // This public class constructor creates a new empty List that uses the
 // specified comparing function.
 func (c *listClass_[V]) WithComparer(compare ComparingFunction) ListLike[V] {
-	var Array = Array[V]() // Retrieve the array namespace.
+	var Array = Array[V]() // Retrieve the List namespace.
 	var values = Array.WithSize(0)
 	var list = &list_[V]{
 		compare: compare,
@@ -119,13 +135,13 @@ type list_[V Value] struct {
 
 // Accessible Interface
 
-// This public class method retrieves from this array the value that is
+// This public class method retrieves from this List the value that is
 // associated with the specified index.
 func (v *list_[V]) GetValue(index int) V {
 	return v.values.GetValue(index)
 }
 
-// This public class method retrieves from this array all values from the first
+// This public class method retrieves from this List all values from the first
 // index through the last index (inclusive).
 func (v *list_[V]) GetValues(first int, last int) Sequential[V] {
 	return v.values.GetValues(first, last)

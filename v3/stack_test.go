@@ -16,6 +16,11 @@ import (
 	tes "testing"
 )
 
+func TestStackConstructor(t *tes.T) {
+	var _ = col.Stack[int64]().FromString("[ ](Stack)\n")
+	var _ = col.Stack[int64]().FromString("[1, 2, 3](Stack)\n")
+}
+
 func TestStackConstructors(t *tes.T) {
 	var Stack = col.Stack[int]()
 	var stack1 = Stack.FromArray([]int{1, 2, 3})

@@ -84,6 +84,22 @@ func (c *stackClass_[V]) FromSequence(values Sequential[V]) StackLike[V] {
 	return stack
 }
 
+// This public class constructor creates a new Stack from the specified string
+// containing the CDCN definition for the Stack.
+func (c *stackClass_[V]) FromString(source string) StackLike[V] {
+	// First we parse it as a collection of any type value.
+	var collection = Parser().ParseCollection([]byte(source)).(Sequential[Value])
+
+	// Then we convert it to a Stack of type V.
+	var stack = c.Empty()
+	var iterator = collection.GetIterator()
+	for iterator.HasNext() {
+		var value = iterator.GetNext().(V)
+		stack.AddValue(value)
+	}
+	return stack
+}
+
 // This public class constructor creates a new empty Stack with the specified
 // capacity.
 func (c *stackClass_[V]) WithCapacity(capacity int) StackLike[V] {

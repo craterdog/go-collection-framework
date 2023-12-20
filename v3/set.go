@@ -55,6 +55,14 @@ func (c *setClass_[V]) Empty() SetLike[V] {
 	return set
 }
 
+// This public class constructor creates a new Set from the specified Go array
+// of values.
+func (c *setClass_[V]) FromArray(values []V) SetLike[V] {
+	var array = Array[V]().FromArray(values)
+	var set = c.FromSequence(array)
+	return set
+}
+
 // This public class constructor creates a new Set from the specified sequence
 // of values.  The Set uses the default ranking function to order its values.
 func (c *setClass_[V]) FromSequence(values Sequential[V]) SetLike[V] {
@@ -72,6 +80,22 @@ func (c *setClass_[V]) FromSequenceWithRanker(
 	var iterator = values.GetIterator()
 	for iterator.HasNext() {
 		var value = iterator.GetNext()
+		set.AddValue(value)
+	}
+	return set
+}
+
+// This public class constructor creates a new Set from the specified string
+// containing the CDCN definition for the Set.
+func (c *setClass_[V]) FromString(source string) SetLike[V] {
+	// First we parse it as a collection of any type value.
+	var collection = Parser().ParseCollection([]byte(source)).(Sequential[Value])
+
+	// Then we convert it to a Set of type V.
+	var set = c.Empty()
+	var iterator = collection.GetIterator()
+	for iterator.HasNext() {
+		var value = iterator.GetNext().(V)
 		set.AddValue(value)
 	}
 	return set
@@ -145,13 +169,13 @@ type set_[V Value] struct {
 
 // Accessible Interface
 
-// This public class method retrieves from this array the value that is
+// This public class method retrieves from this Set the value that is
 // associated with the specified index.
 func (v *set_[V]) GetValue(index int) V {
 	return v.values.GetValue(index)
 }
 
-// This public class method retrieves from this array all values from the first
+// This public class method retrieves from this Set all values from the first
 // index through the last index (inclusive).
 func (v *set_[V]) GetValues(first int, last int) Sequential[V] {
 	return v.values.GetValues(first, last)
@@ -265,8 +289,8 @@ func (v *set_[V]) GetIndex(value V) int {
 
 // Sequential Interface
 
-// This public class method returns all the values in this array. The values
-// retrieved are in the same order as they are in the array.
+// This public class method returns all the values in this Set. The values
+// retrieved are in the same order as they are in the Set.
 func (v *set_[V]) AsArray() []V {
 	return v.values.AsArray()
 }
@@ -279,12 +303,12 @@ func (v *set_[V]) GetIterator() Ratcheted[V] {
 }
 
 // This public class method returns the number of values contained in this
-// array.
+// Set.
 func (v *set_[V]) GetSize() int {
 	return v.values.GetSize()
 }
 
-// This public class method determines whether or not this array is empty.
+// This public class method determines whether or not this Set is empty.
 func (v *set_[V]) IsEmpty() bool {
 	return v.values.IsEmpty()
 }

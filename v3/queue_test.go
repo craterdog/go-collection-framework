@@ -17,6 +17,18 @@ import (
 	tes "testing"
 )
 
+func TestQueueConstructor(t *tes.T) {
+	var _ = col.Queue[int64]().FromString("[ ](Queue)\n")
+	var _ = col.Queue[int64]().FromString("[1, 2, 3](Queue)\n")
+}
+
+func TestQueueConstructors(t *tes.T) {
+	var Queue = col.Queue[int]()
+	var queue1 = Queue.FromArray([]int{1, 2, 3})
+	var queue2 = Queue.FromSequence(queue1)
+	ass.Equal(t, queue1.AsArray(), queue2.AsArray())
+}
+
 func TestQueueWithConcurrency(t *tes.T) {
 	// Create a wait group for synchronization.
 	var wg = new(syn.WaitGroup)

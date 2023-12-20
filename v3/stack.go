@@ -63,6 +63,14 @@ func (c *stackClass_[V]) Empty() StackLike[V] {
 	return stack
 }
 
+// This public class constructor creates a new Stack from the specified Go array
+// of values.
+func (c *stackClass_[V]) FromArray(values []V) StackLike[V] {
+	var array = Array[V]().FromArray(values)
+	var stack = c.FromSequence(array)
+	return stack
+}
+
 // This public class constructor creates a new Stack from the specified
 // sequence of values. The Stack uses the default capacity.
 func (c *stackClass_[V]) FromSequence(values Sequential[V]) StackLike[V] {
@@ -71,6 +79,22 @@ func (c *stackClass_[V]) FromSequence(values Sequential[V]) StackLike[V] {
 	iterator.ToEnd() // Add the values in reverse order since it is a LIFO.
 	for iterator.HasPrevious() {
 		var value = iterator.GetPrevious()
+		stack.AddValue(value)
+	}
+	return stack
+}
+
+// This public class constructor creates a new Stack from the specified string
+// containing the CDCN definition for the Stack.
+func (c *stackClass_[V]) FromString(source string) StackLike[V] {
+	// First we parse it as a collection of any type value.
+	var collection = Parser().ParseCollection([]byte(source)).(Sequential[Value])
+
+	// Then we convert it to a Stack of type V.
+	var stack = c.Empty()
+	var iterator = collection.GetIterator()
+	for iterator.HasNext() {
+		var value = iterator.GetNext().(V)
 		stack.AddValue(value)
 	}
 	return stack

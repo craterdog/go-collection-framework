@@ -64,6 +64,14 @@ func (c *queueClass_[V]) Empty() QueueLike[V] {
 	return queue
 }
 
+// This public class constructor creates a new Queue from the specified Go array
+// of values.
+func (c *queueClass_[V]) FromArray(values []V) QueueLike[V] {
+	var array = Array[V]().FromArray(values)
+	var queue = c.FromSequence(array)
+	return queue
+}
+
 // This public class constructor creates a new Queue from the specified
 // sequence of values. The Queue uses the default capacity which is 16.
 func (c *queueClass_[V]) FromSequence(values Sequential[V]) QueueLike[V] {
@@ -71,6 +79,22 @@ func (c *queueClass_[V]) FromSequence(values Sequential[V]) QueueLike[V] {
 	var iterator = values.GetIterator()
 	for iterator.HasNext() {
 		var value = iterator.GetNext()
+		queue.AddValue(value)
+	}
+	return queue
+}
+
+// This public class constructor creates a new Queue from the specified string
+// containing the CDCN definition for the Queue.
+func (c *queueClass_[V]) FromString(source string) QueueLike[V] {
+	// First we parse it as a collection of any type value.
+	var collection = Parser().ParseCollection([]byte(source)).(Sequential[Value])
+
+	// Then we convert it to a Queue of type V.
+	var queue = c.Empty()
+	var iterator = collection.GetIterator()
+	for iterator.HasNext() {
+		var value = iterator.GetNext().(V)
 		queue.AddValue(value)
 	}
 	return queue

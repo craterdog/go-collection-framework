@@ -16,6 +16,11 @@ import (
 	tes "testing"
 )
 
+func TestListConstructor(t *tes.T) {
+	var _ = col.List[int64]().FromString("[ ](List)\n")
+	var _ = col.List[int64]().FromString("[1, 2, 3](List)\n")
+}
+
 func TestListsWithStrings(t *tes.T) {
 	var Collator = col.Collator()
 	var Array = col.Array[string]()
@@ -53,6 +58,7 @@ func TestListsWithStrings(t *tes.T) {
 	list.AppendValues(barbaz)                     //       ["foo", "bar", "baz"]
 	ass.Equal(t, 3, list.GetSize())               //       ["foo", "bar", "baz"]
 	ass.Equal(t, "foo", string(list.GetValue(1))) //       ["foo", "bar", "baz"]
+	ass.True(t, Collator.CompareValues(List.FromArray(list.AsArray()), list))
 	ass.Equal(t, barbaz.AsArray(), list.GetValues(2, 3).AsArray())
 	ass.Equal(t, foo.AsArray(), list.GetValues(1, 1).AsArray())
 	var list2 = List.FromSequence(list)

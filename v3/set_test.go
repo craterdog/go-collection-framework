@@ -16,6 +16,18 @@ import (
 	tes "testing"
 )
 
+func TestSetConstructor(t *tes.T) {
+	var _ = col.Set[int64]().FromString("[ ](Set)\n")
+	var _ = col.Set[int64]().FromString("[1, 2, 3](Set)\n")
+}
+
+func TestSetConstructors(t *tes.T) {
+	var Set = col.Set[int]()
+	var set1 = Set.FromArray([]int{1, 2, 3})
+	var set2 = Set.FromSequence(set1)
+	ass.Equal(t, set1.AsArray(), set2.AsArray())
+}
+
 func TestSetsWithStrings(t *tes.T) {
 	var Collator = col.Collator()
 	var Array = col.Array[string]()

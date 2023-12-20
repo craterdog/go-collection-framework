@@ -16,6 +16,18 @@ import (
 	tes "testing"
 )
 
+func TestStackConstructor(t *tes.T) {
+	var _ = col.Stack[int64]().FromString("[ ](Stack)\n")
+	var _ = col.Stack[int64]().FromString("[1, 2, 3](Stack)\n")
+}
+
+func TestStackConstructors(t *tes.T) {
+	var Stack = col.Stack[int]()
+	var stack1 = Stack.FromArray([]int{1, 2, 3})
+	var stack2 = Stack.FromSequence(stack1)
+	ass.Equal(t, stack1.AsArray(), stack2.AsArray())
+}
+
 func TestStackWithSmallCapacity(t *tes.T) {
 	var Stack = col.Stack[int]()
 	var stack = Stack.WithCapacity(1)

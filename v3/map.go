@@ -52,6 +52,11 @@ func Map[K comparable, V Value]() *mapClass_[K, V] {
 
 // CLASS CONSTRUCTORS
 
+// This public class constructor creates a new empty Map.
+func (c *mapClass_[K, V]) Empty() MapLike[K, V] {
+	return map_[K, V](map[K]V{})
+}
+
 // This public class constructor creates a new Map from the specified
 // Go array of associations.
 func (c *mapClass_[K, V]) FromArray(associations []Binding[K, V]) MapLike[K, V] {
@@ -74,6 +79,24 @@ func (c *mapClass_[K, V]) FromMap(associations map[K]V) MapLike[K, V] {
 		duplicate[key] = value
 	}
 	return map_[K, V](duplicate)
+}
+
+// This public class constructor creates a new Map from the specified string
+// containing the CDCN definition for the Map.
+func (c *mapClass_[K, V]) FromString(source string) MapLike[K, V] {
+	// First we parse it as a collection of any type value.
+	var collection = Parser().ParseCollection([]byte(source)).(Sequential[Binding[Key, Value]])
+
+	// Then we convert it to a Map of type Binding[K, V].
+	var map_ = c.Empty()
+	var iterator = collection.GetIterator()
+	for iterator.HasNext() {
+		var association = iterator.GetNext()
+		var key = association.GetKey().(K)
+		var value = association.GetValue().(V)
+		map_.SetValue(key, value)
+	}
+	return map_
 }
 
 // CLASS TYPE

@@ -18,7 +18,9 @@ import (
 
 // This private type defines the namespace structure associated with the
 // constants, constructors and functions for the Catalog class namespace.
-type catalogClass_[K Key, V Value] struct {
+// NOTE: the Go language requires the key type here support the "comparable"
+// interface so we must narrow it down from "any".
+type catalogClass_[K comparable, V Value] struct {
 	// This class defines no constants.
 }
 
@@ -28,7 +30,9 @@ var catalogClassSingletons = map[string]any{}
 
 // This public function returns the singleton reference to a type specific
 // Catalog class namespace.  It also initializes any class constants as needed.
-func Catalog[K Key, V Value]() *catalogClass_[K, V] {
+// NOTE: the Go language requires the key type here support the "comparable"
+// interface so we must narrow it down from "any".
+func Catalog[K comparable, V Value]() *catalogClass_[K, V] {
 	var class *catalogClass_[K, V]
 	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
 	var value = catalogClassSingletons[key]
@@ -63,6 +67,18 @@ func (c *catalogClass_[K, V]) FromArray(
 ) CatalogLike[K, V] {
 	var array = Array[Binding[K, V]]().FromArray(associations)
 	var catalog = c.FromSequence(array)
+	return catalog
+}
+
+// This public class constructor creates a new Catalog from the specified
+// Go map of associations.
+func (c *catalogClass_[K, V]) FromMap(
+	associations map[K]V,
+) CatalogLike[K, V] {
+	var catalog = c.Empty()
+	for key, value := range associations {
+		catalog.SetValue(key, value)
+	}
 	return catalog
 }
 

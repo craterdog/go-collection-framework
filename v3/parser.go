@@ -174,7 +174,7 @@ func (v *parser_) nextToken() TokenLike {
 func (v *parser_) parseAssociation() (AssociationLike[Key, Value], TokenLike, bool) {
 	var ok bool
 	var token TokenLike
-	var key Primitive
+	var key Key
 	var value Value
 	var association AssociationLike[Key, Value]
 	key, token, ok = v.parsePrimitive()

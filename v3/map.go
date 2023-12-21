@@ -60,8 +60,8 @@ func (c *mapClass_[K, V]) Empty() MapLike[K, V] {
 // This public class constructor creates a new Map from the specified
 // Go array of associations.
 func (c *mapClass_[K, V]) FromArray(associations []Binding[K, V]) MapLike[K, V] {
-	var length = len(associations)
-	var duplicate = make(map[K]V, length)
+	var size = len(associations)
+	var duplicate = make(map[K]V, size)
 	for _, association := range associations {
 		var key = association.GetKey()
 		var value = association.GetValue()
@@ -73,9 +73,26 @@ func (c *mapClass_[K, V]) FromArray(associations []Binding[K, V]) MapLike[K, V] 
 // This public class constructor creates a new Map from the specified
 // Go map of associations.
 func (c *mapClass_[K, V]) FromMap(associations map[K]V) MapLike[K, V] {
-	var length = len(associations)
-	var duplicate = make(map[K]V, length)
+	var size = len(associations)
+	var duplicate = make(map[K]V, size)
 	for key, value := range associations {
+		duplicate[key] = value
+	}
+	return map_[K, V](duplicate)
+}
+
+// This public class constructor creates a new Map from the specified sequence
+// of associations.
+func (c *mapClass_[K, V]) FromSequence(
+	associations Sequential[Binding[K, V]],
+) MapLike[K, V] {
+	var size = associations.GetSize()
+	var iterator = associations.GetIterator()
+	var duplicate = make(map[K]V, size)
+	for index := 0; index < size; index++ {
+		var association = iterator.GetNext()
+		var key = association.GetKey()
+		var value = association.GetValue()
 		duplicate[key] = value
 	}
 	return map_[K, V](duplicate)
@@ -187,8 +204,8 @@ func (v map_[K, V]) SetValue(key K, value V) {
 // This public class method returns all the associations that are in this Map.
 // The associations retrieved are in the same order as they are in the Map.
 func (v map_[K, V]) AsArray() []Binding[K, V] {
-	var length = len(v)
-	var result = make([]Binding[K, V], length)
+	var size = len(v)
+	var result = make([]Binding[K, V], size)
 	var index = 0
 	for key, value := range v {
 		var Association = Association[K, V]()

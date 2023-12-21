@@ -51,9 +51,22 @@ func Array[V Value]() *arrayClass_[V] {
 // This public class constructor creates a new Array from the specified Go array
 // of values.
 func (c *arrayClass_[V]) FromArray(values []V) ArrayLike[V] {
-	var length = len(values)
-	var array = make([]V, length)
+	var size = len(values)
+	var array = make([]V, size)
 	copy(array, values)
+	return array_[V](array)
+}
+
+// This public class constructor creates a new Array from the specified sequence
+// of values.
+func (c *arrayClass_[V]) FromSequence(values Sequential[V]) ArrayLike[V] {
+	var size = values.GetSize()
+	var iterator = values.GetIterator()
+	var array = make([]V, size)
+	for index := 0; index < size; index++ {
+		var value = iterator.GetNext()
+		array[index] = value
+	}
 	return array_[V](array)
 }
 

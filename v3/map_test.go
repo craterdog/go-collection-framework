@@ -19,14 +19,11 @@ import (
 func TestMapConstructors(t *tes.T) {
 	var Map = col.Map[rune, int64]()
 	var _ = Map.FromArray([]col.Binding[rune, int64]{})
+	var _ = Map.FromMap(map[rune]int64{})
+	var sequence = Map.FromMap(map[rune]int64{'a': 1, 'b': 2, 'c': 3})
+	var _ = Map.FromSequence(sequence)
 	var _ = Map.FromString("[:](Map)\n")
 	var _ = Map.FromString("['a': 1, 'b': 2, 'c': 3](Map)\n")
-	var _ = Map.FromMap(map[rune]int64{})
-	var _ = Map.FromMap(map[rune]int64{
-		'a': 1,
-		'b': 2,
-		'c': 3,
-	})
 }
 
 func TestEmptyMaps(t *tes.T) {

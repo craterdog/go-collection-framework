@@ -16,9 +16,12 @@ import (
 	tes "testing"
 )
 
-func TestArrayConstructor(t *tes.T) {
-	var _ = col.Array[int64]().FromString("[ ](Array)\n")
-	var _ = col.Array[int64]().FromString("[1, 2, 3](Array)\n")
+func TestArrayConstructors(t *tes.T) {
+	var Array = col.Array[int64]()
+	var sequence = Array.FromArray([]int64{1, 2, 3})
+	var _ = Array.FromSequence(sequence)
+	var _ = Array.FromString("[ ](Array)\n")
+	var _ = Array.FromString("[1, 2, 3](Array)\n")
 }
 
 func TestEmptyArray(t *tes.T) {

@@ -16,9 +16,17 @@ import (
 	tes "testing"
 )
 
-func TestCatalogConstructor(t *tes.T) {
-	var _ = col.Catalog[rune, int64]().FromString("[:](Catalog)\n")
-	var _ = col.Catalog[rune, int64]().FromString("['a': 1, 'b': 2, 'c': 3](Catalog)\n")
+func TestCatalogConstructors(t *tes.T) {
+	var Catalog = col.Catalog[rune, int64]()
+	var _ = Catalog.FromArray([]col.Binding[rune, int64]{})
+	var _ = Catalog.FromString("[:](Catalog)\n")
+	var _ = Catalog.FromString("['a': 1, 'b': 2, 'c': 3](Catalog)\n")
+	var _ = Catalog.FromMap(map[rune]int64{})
+	var _ = Catalog.FromMap(map[rune]int64{
+		'a': 1,
+		'b': 2,
+		'c': 3,
+	})
 }
 
 func TestCatalogsWithStringsAndIntegers(t *tes.T) {

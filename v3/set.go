@@ -16,22 +16,22 @@ import (
 
 // CLASS NAMESPACE
 
-// This private type defines the namespace structure associated with the
-// constants, constructors and functions for the Set class namespace.
+// Private Class Namespace Type
+
 type setClass_[V Value] struct {
 	// This class defines no constants.
 }
 
-// This private constant defines a map to hold all the singleton references to
-// the type specific Set class namespaces.
-var setClassSingletons = map[string]any{}
+// Private Namespace Reference(s)
 
-// This public function returns the singleton reference to a type specific
-// Set class namespace.  It also initializes any class constants as needed.
-func Set[V Value]() *setClass_[V] {
+var setClass = map[string]any{}
+
+// Public Namespace Access
+
+func Set[V Value]() SetClassLike[V] {
 	var class *setClass_[V]
 	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
-	var value = setClassSingletons[key]
+	var value = setClass[key]
 	switch actual := value.(type) {
 	case *setClass_[V]:
 		// This bound class type already exists.
@@ -41,37 +41,31 @@ func Set[V Value]() *setClass_[V] {
 		class = &setClass_[V]{
 			// This class defines no constants.
 		}
-		setClassSingletons[key] = class
+		setClass[key] = class
 	}
 	return class
 }
 
-// CLASS CONSTRUCTORS
+// Public Class Constructors
 
-// This public class constructor creates a new empty Set.
-// The Set uses the default ranking function to order its values.
 func (c *setClass_[V]) Empty() SetLike[V] {
-	var set = c.WithRanker(Collator().RankValues)
+	var ranker = Collator().Default().RankValues
+	var set = c.WithRanker(ranker)
 	return set
 }
 
-// This public class constructor creates a new Set from the specified Go array
-// of values.
 func (c *setClass_[V]) FromArray(values []V) SetLike[V] {
 	var array = Array[V]().FromArray(values)
 	var set = c.FromSequence(array)
 	return set
 }
 
-// This public class constructor creates a new Set from the specified sequence
-// of values.  The Set uses the default ranking function to order its values.
 func (c *setClass_[V]) FromSequence(values Sequential[V]) SetLike[V] {
-	var set = c.FromSequenceWithRanker(values, Collator().RankValues)
+	var ranker = Collator().Default().RankValues
+	var set = c.FromSequenceWithRanker(values, ranker)
 	return set
 }
 
-// This public class constructor creates a new Set from the specified sequence
-// of values.  The Set uses the specified ranking function to order its values.
 func (c *setClass_[V]) FromSequenceWithRanker(
 	values Sequential[V],
 	ranker RankingFunction,
@@ -85,13 +79,11 @@ func (c *setClass_[V]) FromSequenceWithRanker(
 	return set
 }
 
-// This public class constructor creates a new Set from the specified string
-// containing the CDCN definition for the Set.
-func (c *setClass_[V]) FromString(source string) SetLike[V] {
+func (c *setClass_[V]) FromString(values string) SetLike[V] {
 	// First we parse it as a collection of any type value.
-	var collection = Parser().ParseCollection([]byte(source)).(Sequential[Value])
+	var collection = CDCN().Default().ParseCollection(values).(Sequential[Value])
 
-	// Then we convert it to a Set of type V.
+	// Then we convert it to a set of type V.
 	var set = c.Empty()
 	var iterator = collection.GetIterator()
 	for iterator.HasNext() {
@@ -101,8 +93,6 @@ func (c *setClass_[V]) FromString(source string) SetLike[V] {
 	return set
 }
 
-// This public class constructor creates a new empty Set.
-// The Set uses the specified ranking function to order its values.
 func (c *setClass_[V]) WithRanker(ranker RankingFunction) SetLike[V] {
 	var values = List[V]().Empty()
 	var set = &set_[V]{
@@ -112,7 +102,7 @@ func (c *setClass_[V]) WithRanker(ranker RankingFunction) SetLike[V] {
 	return set
 }
 
-// CLASS FUNCTIONS
+// Public Class Functions
 
 // This public class function returns the logical conjunction of the specified
 // sets.
@@ -153,15 +143,8 @@ func (c *setClass_[V]) Xor(first, second SetLike[V]) SetLike[V] {
 
 // CLASS TYPE
 
-// Encapsulated Type
+// Private Class Type Definition
 
-// This private class type encapsulates a Go structure containing private
-// attributes that can only be accessed and manipulated using methods that
-// implement the set-like abstract type.  This type maintains a Set of values.
-// The Set uses ORDINAL based indexing rather than ZERO based indexing (see
-// the description of what this means in the Sequential interface definition).
-// This type is parameterized as follows:
-//   - V is any type of value.
 type set_[V Value] struct {
 	rank   RankingFunction
 	values ListLike[V]
@@ -169,22 +152,16 @@ type set_[V Value] struct {
 
 // Accessible Interface
 
-// This public class method retrieves from this Set the value that is
-// associated with the specified index.
 func (v *set_[V]) GetValue(index int) V {
 	return v.values.GetValue(index)
 }
 
-// This public class method retrieves from this Set all values from the first
-// index through the last index (inclusive).
 func (v *set_[V]) GetValues(first int, last int) Sequential[V] {
 	return v.values.GetValues(first, last)
 }
 
 // Flexible Interface
 
-// This public class method adds the specified value to this Set if it is not
-// already a member of the Set.
 func (v *set_[V]) AddValue(value V) {
 	var slot, found = v.findIndex(value)
 	if !found {
@@ -193,8 +170,6 @@ func (v *set_[V]) AddValue(value V) {
 	}
 }
 
-// This public class method adds the specified values to this Set if they are
-// not already members of the Set.
 func (v *set_[V]) AddValues(values Sequential[V]) {
 	var iterator = values.GetIterator()
 	for iterator.HasNext() {
@@ -203,18 +178,14 @@ func (v *set_[V]) AddValues(values Sequential[V]) {
 	}
 }
 
-// This public class method returns the ranker function for this Set.
 func (v *set_[V]) GetRanker() RankingFunction {
 	return v.rank
 }
 
-// This public class method removes all values from this Set.
 func (v *set_[V]) RemoveAll() {
 	v.values.RemoveAll()
 }
 
-// This public class method removes the specified value from this Set. It
-// returns true if the value was in the Set and false otherwise.
 func (v *set_[V]) RemoveValue(value V) {
 	var index, found = v.findIndex(value)
 	if found {
@@ -223,8 +194,6 @@ func (v *set_[V]) RemoveValue(value V) {
 	}
 }
 
-// This public class method removes the specified values from this Set. It
-// returns the number of values that were removed.
 func (v *set_[V]) RemoveValues(values Sequential[V]) {
 	var iterator = values.GetIterator()
 	for iterator.HasNext() {
@@ -235,50 +204,41 @@ func (v *set_[V]) RemoveValues(values Sequential[V]) {
 
 // Searchable Interface
 
-// This public class method determines whether or not this Set contains ALL of
-// the specified values.
 func (v *set_[V]) ContainsAll(values Sequential[V]) bool {
 	var iterator = values.GetIterator()
 	for iterator.HasNext() {
 		var value = iterator.GetNext()
 		if !v.ContainsValue(value) {
-			// This Set is missing at least one of the values.
+			// This set is missing at least one of the values.
 			return false
 		}
 	}
-	// This Set does contains all of the values.
+	// This set does contains all of the values.
 	return true
 }
 
-// This public class method determines whether or not this Set contains ANY of
-// the specified values.
 func (v *set_[V]) ContainsAny(values Sequential[V]) bool {
 	var iterator = values.GetIterator()
 	for iterator.HasNext() {
 		var value = iterator.GetNext()
 		if v.ContainsValue(value) {
-			// This Set contains at least one of the values.
+			// This set contains at least one of the values.
 			return true
 		}
 	}
-	// This Set does not contain any of the values.
+	// This set does not contain any of the values.
 	return false
 }
 
-// This public class method determines whether or not this Set contains the
-// specified value.
 func (v *set_[V]) ContainsValue(value V) bool {
 	var _, found = v.findIndex(value)
 	return found
 }
 
-// This public class method returns the comparing function for this Set.
 func (v *set_[V]) GetComparer() ComparingFunction {
 	return v.values.GetComparer()
 }
 
-// This public class method returns the index of the FIRST occurrence of the
-// specified value in this set, or zero if this Set does not contain the value.
 func (v *set_[V]) GetIndex(value V) int {
 	var index, found = v.findIndex(value)
 	if !found {
@@ -289,33 +249,26 @@ func (v *set_[V]) GetIndex(value V) int {
 
 // Sequential Interface
 
-// This public class method returns all the values in this Set. The values
-// retrieved are in the same order as they are in the Set.
 func (v *set_[V]) AsArray() []V {
 	return v.values.AsArray()
 }
 
-// This public class method generates for this Set an iterator that can be
-// used to traverse its values.
 func (v *set_[V]) GetIterator() Ratcheted[V] {
 	var iterator = v.values.GetIterator()
 	return iterator
 }
 
-// This public class method returns the number of values contained in this
-// Set.
 func (v *set_[V]) GetSize() int {
 	return v.values.GetSize()
 }
 
-// This public class method determines whether or not this Set is empty.
 func (v *set_[V]) IsEmpty() bool {
 	return v.values.IsEmpty()
 }
 
 // Private Interface
 
-// This private class method performs a binary search of the Set for the
+// This private class method performs a binary search of the set for the
 // specified value. It returns two results:
 //   - index: The index of the value, or if not found, the slot in which it
 //     could be inserted in the underlying list.
@@ -357,7 +310,7 @@ func (v *set_[V]) findIndex(value V) (index int, found bool) {
 }
 
 // This public class method is used by Go to generate a canonical string for
-// the Set.
+// the set.
 func (v *set_[V]) String() string {
-	return Formatter().FormatCollection(v)
+	return CDCN().Default().FormatCollection(v)
 }

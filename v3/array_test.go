@@ -20,8 +20,8 @@ func TestArrayConstructors(t *tes.T) {
 	var Array = col.Array[int64]()
 	var sequence = Array.FromArray([]int64{1, 2, 3})
 	var _ = Array.FromSequence(sequence)
-	var _ = Array.FromString("[ ](Array)\n")
-	var _ = Array.FromString("[1, 2, 3](Array)\n")
+	var _ = Array.FromString("[ ](Array)")
+	var _ = Array.FromString("[1, 2, 3](Array)")
 }
 
 func TestEmptyArray(t *tes.T) {
@@ -87,7 +87,7 @@ func TestArrayWithStrings(t *tes.T) {
 	ass.Equal(t, foobar, array.GetValues(1, 2))
 	array.SetValue(2, "bax")
 	array.ShuffleValues()
-	array.SortValuesWithRanker(col.Collator().RankValues)
+	array.SortValuesWithRanker(col.Collator().Default().RankValues)
 	ass.Equal(t, []string{"bax", "baz", "foo"}, array.AsArray())
 	array.SetValues(2, foobar)
 	ass.Equal(t, []string{"bax", "foo", "bar"}, array.AsArray())

@@ -16,22 +16,22 @@ import (
 
 // CLASS NAMESPACE
 
-// This private type defines the namespace structure associated with the
-// constants, constructors and functions for the Array class namespace.
+// Private Class Namespace Type
+
 type arrayClass_[V Value] struct {
 	// This class defines no constants.
 }
 
-// This private constant defines a map to hold all the singleton references to
-// the type specific Array namespaces.
-var arrayClassSingletons = map[string]any{}
+// Private Namespace Reference(s)
 
-// This public function returns the singleton reference to a type specific
-// Array class namespace.  It also initializes any class constants as needed.
-func Array[V Value]() *arrayClass_[V] {
+var arrayClass = map[string]any{}
+
+// Public Namespace Access
+
+func Array[V Value]() ArrayClassLike[V] {
 	var class *arrayClass_[V]
 	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
-	var value = arrayClassSingletons[key]
+	var value = arrayClass[key]
 	switch actual := value.(type) {
 	case *arrayClass_[V]:
 		// This bound class type already exists.
@@ -41,15 +41,13 @@ func Array[V Value]() *arrayClass_[V] {
 		class = &arrayClass_[V]{
 			// This class defines no constants.
 		}
-		arrayClassSingletons[key] = class
+		arrayClass[key] = class
 	}
 	return class
 }
 
-// CLASS CONSTRUCTORS
+// Public Class Constructors
 
-// This public class constructor creates a new Array from the specified Go array
-// of values.
 func (c *arrayClass_[V]) FromArray(values []V) ArrayLike[V] {
 	var size = len(values)
 	var array = make([]V, size)
@@ -57,8 +55,6 @@ func (c *arrayClass_[V]) FromArray(values []V) ArrayLike[V] {
 	return array_[V](array)
 }
 
-// This public class constructor creates a new Array from the specified sequence
-// of values.
 func (c *arrayClass_[V]) FromSequence(values Sequential[V]) ArrayLike[V] {
 	var size = values.GetSize()
 	var iterator = values.GetIterator()
@@ -70,11 +66,9 @@ func (c *arrayClass_[V]) FromSequence(values Sequential[V]) ArrayLike[V] {
 	return array_[V](array)
 }
 
-// This public class constructor creates a new Array from the specified string
-// containing the CDCN definition for the Array.
-func (c *arrayClass_[V]) FromString(source string) ArrayLike[V] {
+func (c *arrayClass_[V]) FromString(values string) ArrayLike[V] {
 	// First we parse it as a collection of any type value.
-	var collection = Parser().ParseCollection([]byte(source)).(Sequential[Value])
+	var collection = CDCN().Default().ParseCollection(values).(Sequential[Value])
 
 	// Then we convert it to an Array of type V.
 	var array = c.WithSize(collection.GetSize())
@@ -88,7 +82,6 @@ func (c *arrayClass_[V]) FromString(source string) ArrayLike[V] {
 	return array
 }
 
-// This public class constructor creates a new Array of the specified size.
 func (c *arrayClass_[V]) WithSize(size int) ArrayLike[V] {
 	var array = make([]V, size) // All values initialized to zero.
 	return array_[V](array)
@@ -96,40 +89,27 @@ func (c *arrayClass_[V]) WithSize(size int) ArrayLike[V] {
 
 // CLASS TYPE
 
-// Extended Type
+// Private Class Type Definition
 
-// This private class type extends the primitive Go array data type and defines
-// the methods that implement the array-like abstract type.  Each value is
-// associated with an implicit positive integer index. The Array uses ORDINAL
-// based indexing rather than ZERO based indexing (see the description of what
-// this means in the Sequential interface definition).
-// This type is parameterized as follows:
-//   - V is any type of value.
 type array_[V Value] []V
 
 // Accessible Interface
 
-// This public class method retrieves from this Array the value that is
-// associated with the specified index.
 func (v array_[V]) GetValue(index int) V {
 	index = v.toZeroBased(index)
 	return v[index]
 }
 
-// This public class method retrieves from this Array all values from the first
-// index through the last index (inclusive).
 func (v array_[V]) GetValues(first int, last int) Sequential[V] {
 	first = v.toZeroBased(first)
 	last = v.toZeroBased(last)
 	var sequence = v[first : last+1]
-	var array = Array[V]().FromArray(sequence) // This copies the underlying array.
+	var array = Array[V]().FromArray(sequence) // This copies the underlying Go array.
 	return array
 }
 
 // Sequential Interface
 
-// This public class method returns all the values in this Array. The values
-// retrieved are in the same order as they are in the Array.
 func (v array_[V]) AsArray() []V {
 	var length = len(v)
 	var array = make([]V, length)
@@ -137,65 +117,51 @@ func (v array_[V]) AsArray() []V {
 	return array
 }
 
-// This public class method generates for this Array an iterator that can be
-// used to traverse its values.
 func (v array_[V]) GetIterator() Ratcheted[V] {
 	var Iterator = Iterator[V]()
 	var iterator = Iterator.FromSequence(v)
 	return iterator
 }
 
-// This public class method returns the number of values contained in this
-// Array.
 func (v array_[V]) GetSize() int {
 	return len(v)
 }
 
-// This public class method determines whether or not this Array is empty.
 func (v array_[V]) IsEmpty() bool {
 	return len(v) == 0
 }
 
 // Sortable Interface
 
-// This public class method reverses the order of all values in this list.
 func (v array_[V]) ReverseValues() {
-	var Sorter = Sorter[V]()
+	var Sorter = Sorter[V]().Default()
 	Sorter.ReverseValues(v)
 }
 
-// This public class method pseudo-randomly shuffles the values in this list.
 func (v array_[V]) ShuffleValues() {
-	var Sorter = Sorter[V]()
+	var Sorter = Sorter[V]().Default()
 	Sorter.ShuffleValues(v)
 }
 
-// This public class method sorts the values in this list using the default
-// ranking function.
 func (v array_[V]) SortValues() {
-	v.SortValuesWithRanker(Collator().RankValues)
+	var ranker = Collator().Default().RankValues
+	v.SortValuesWithRanker(ranker)
 }
 
-// This public class method sorts the values in this list using the specified
-// ranking function.
 func (v array_[V]) SortValuesWithRanker(ranker RankingFunction) {
 	if v.GetSize() > 1 {
-		var Sorter = Sorter[V]()
-		Sorter.SortValues(v, ranker)
+		var Sorter = Sorter[V]().WithRanker(ranker)
+		Sorter.SortValues(v)
 	}
 }
 
 // Updatable Interface
 
-// This public class method sets the value in this Array that is associated
-// with the specified index to be the specified value.
 func (v array_[V]) SetValue(index int, value V) {
 	index = v.toZeroBased(index)
 	v[index] = value
 }
 
-// This public class method sets the values in this Array starting with the
-// specified index to the specified values.
 func (v array_[V]) SetValues(index int, values Sequential[V]) {
 	// The full index range must be in bounds.
 	var size = values.GetSize()
@@ -208,11 +174,11 @@ func (v array_[V]) SetValues(index int, values Sequential[V]) {
 
 // This public class method is used by Go to generate a string from an Array.
 func (v array_[V]) String() string {
-	return Formatter().FormatCollection(v)
+	return CDCN().Default().FormatCollection(v)
 }
 
-// This private class method normalizes a relative ordinal-based index into this
-// Array to match the Go (zero-based) indexing. The following transformation is
+// This private class method normalizes a relative ORDINAL-based index into this
+// Array to match the Go (ZERO-based) indexing. The following transformation is
 // performed:
 //
 //	[-size..-1] and [1..size] => [0..size)

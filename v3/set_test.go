@@ -17,8 +17,8 @@ import (
 )
 
 func TestSetConstructor(t *tes.T) {
-	var _ = col.Set[int64]().FromString("[ ](Set)\n")
-	var _ = col.Set[int64]().FromString("[1, 2, 3](Set)\n")
+	var _ = col.Set[int64]().FromString("[ ](Set)")
+	var _ = col.Set[int64]().FromString("[1, 2, 3](Set)")
 }
 
 func TestSetConstructors(t *tes.T) {
@@ -29,7 +29,7 @@ func TestSetConstructors(t *tes.T) {
 }
 
 func TestSetsWithStrings(t *tes.T) {
-	var Collator = col.Collator()
+	var Collator = col.Collator().Default()
 	var Array = col.Array[string]()
 	var empty = []string{}
 	var bazbar = Array.FromArray([]string{"baz", "bar"})
@@ -147,7 +147,7 @@ func TestSetsWithSets(t *tes.T) {
 }
 
 func TestSetsWithAnd(t *tes.T) {
-	var Collator = col.Collator()
+	var Collator = col.Collator().Default()
 	var Array = col.Array[int]()
 	var array1 = Array.FromArray([]int{3, 1, 2})
 	var array2 = Array.FromArray([]int{3, 2, 4})
@@ -164,7 +164,7 @@ func TestSetsWithAnd(t *tes.T) {
 }
 
 func TestSetsWithSans(t *tes.T) {
-	var Collator = col.Collator()
+	var Collator = col.Collator().Default()
 	var Array = col.Array[int]()
 	var array1 = Array.FromArray([]int{3, 1, 2})
 	var array2 = Array.FromArray([]int{3, 2, 4})
@@ -181,7 +181,7 @@ func TestSetsWithSans(t *tes.T) {
 }
 
 func TestSetsWithOr(t *tes.T) {
-	var Collator = col.Collator()
+	var Collator = col.Collator().Default()
 	var Array = col.Array[int]()
 	var array1 = Array.FromArray([]int{3, 1, 5})
 	var array2 = Array.FromArray([]int{6, 2, 4})
@@ -200,7 +200,7 @@ func TestSetsWithOr(t *tes.T) {
 }
 
 func TestSetsWithXor(t *tes.T) {
-	var Collator = col.Collator()
+	var Collator = col.Collator().Default()
 	var Array = col.Array[int]()
 	var array1 = Array.FromArray([]int{2, 3, 1, 5})
 	var array2 = Array.FromArray([]int{6, 2, 5, 4})
@@ -217,7 +217,7 @@ func TestSetsWithXor(t *tes.T) {
 }
 
 func TestSetsWithEmptySets(t *tes.T) {
-	var Collator = col.Collator()
+	var Collator = col.Collator().Default()
 	var Set = col.Set[int]()
 	var set1 = Set.Empty()
 	var set2 = Set.Empty()

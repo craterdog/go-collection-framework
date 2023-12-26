@@ -16,186 +16,162 @@ import (
 
 // CLASS NAMESPACE
 
-// This private type defines the namespace structure associated with the
-// constants, constructors and functions for the Token class namespace.
+// Private Class Namespace Type
+
 type tokenClass_ struct {
-	typeBoolean   string
-	typeComplex   string
-	typeContext   string
-	typeDelimiter string
-	typeEOF       string
-	typeEOL       string
-	typeError     string
-	typeFloat     string
-	typeInteger   string
-	typeNil       string
-	typeRune      string
-	typeString    string
-	typeUnsigned  string
+	boolean_   string
+	complex_   string
+	delimiter_ string
+	eof_       string
+	eol_       string
+	error_     string
+	float_     string
+	integer_   string
+	nil_       string
+	rune_      string
+	string_    string
+	type_      string
+	unsigned_  string
 }
 
-// This private constant defines the singleton reference to the Token
-// class namespace.  It also initializes any class constants as needed.
-var tokenClassSingleton = &tokenClass_{
-	typeBoolean:   "Boolean",
-	typeComplex:   "Complex",
-	typeContext:   "Context",
-	typeDelimiter: "Delimiter",
-	typeEOF:       "EOF",
-	typeEOL:       "EOL",
-	typeError:     "Error",
-	typeFloat:     "Float",
-	typeInteger:   "Integer",
-	typeNil:       "Nil",
-	typeRune:      "Rune",
-	typeString:    "String",
-	typeUnsigned:  "Unsigned",
+// Private Namespace Reference(s)
+
+var tokenClass = &tokenClass_{
+	boolean_:   "Boolean",
+	complex_:   "Complex",
+	delimiter_: "Delimiter",
+	eof_:       "EOF",
+	eol_:       "EOL",
+	error_:     "Error",
+	float_:     "Float",
+	integer_:   "Integer",
+	nil_:       "Nil",
+	rune_:      "Rune",
+	string_:    "String",
+	type_:      "Type",
+	unsigned_:  "Unsigned",
 }
 
-// This public function returns the singleton reference to the Token
-// class namespace.
+// Public Namespace Access
+
 func Token() *tokenClass_ {
-	return tokenClassSingleton
+	return tokenClass
 }
 
-// CLASS CONSTANTS
+// Public Class Constants
 
-// This public class constant represents a boolean Token type.
-func (c *tokenClass_) TypeBoolean() string {
-	return c.typeBoolean
+func (c *tokenClass_) GetBoolean() string {
+	return c.boolean_
 }
 
-// This public class constant represents a complex Token type.
-func (c *tokenClass_) TypeComplex() string {
-	return c.typeComplex
+func (c *tokenClass_) GetComplex() string {
+	return c.complex_
 }
 
-// This public class constant represents a context Token type.
-func (c *tokenClass_) TypeContext() string {
-	return c.typeContext
+func (c *tokenClass_) GetDelimiter() string {
+	return c.delimiter_
 }
 
-// This public class constant represents a delimiter Token type.
-func (c *tokenClass_) TypeDelimiter() string {
-	return c.typeDelimiter
+func (c *tokenClass_) GetEOF() string {
+	return c.eof_
 }
 
-// This public class constant represents an end-of-file Token type.
-func (c *tokenClass_) TypeEOF() string {
-	return c.typeEOF
+func (c *tokenClass_) GetEOL() string {
+	return c.eol_
 }
 
-// This public class constant represents an end-of-line Token type.
-func (c *tokenClass_) TypeEOL() string {
-	return c.typeEOL
+func (c *tokenClass_) GetError() string {
+	return c.error_
 }
 
-// This public class constant represents an error Token type.
-func (c *tokenClass_) TypeError() string {
-	return c.typeError
+func (c *tokenClass_) GetFloat() string {
+	return c.float_
 }
 
-// This public class constant represents a float Token type.
-func (c *tokenClass_) TypeFloat() string {
-	return c.typeFloat
+func (c *tokenClass_) GetInteger() string {
+	return c.integer_
 }
 
-// This public class constant represents an integer Token type.
-func (c *tokenClass_) TypeInteger() string {
-	return c.typeInteger
+func (c *tokenClass_) GetNil() string {
+	return c.nil_
 }
 
-// This public class constant represents a nil Token type.
-func (c *tokenClass_) TypeNil() string {
-	return c.typeNil
+func (c *tokenClass_) GetRune() string {
+	return c.rune_
 }
 
-// This public class constant represents a rune Token type.
-func (c *tokenClass_) TypeRune() string {
-	return c.typeRune
+func (c *tokenClass_) GetString() string {
+	return c.string_
 }
 
-// This public class constant represents a string Token type.
-func (c *tokenClass_) TypeString() string {
-	return c.typeString
+func (c *tokenClass_) GetType() string {
+	return c.type_
 }
 
-// This public class constant represents an unsigned Token type.
-func (c *tokenClass_) TypeUnsigned() string {
-	return c.typeUnsigned
+func (c *tokenClass_) GetUnsigned() string {
+	return c.unsigned_
 }
 
-// CLASS CONSTRUCTORS
+// Public Class Constructors
 
-// This public class constructor creates a new Token from the specified
-// lexical context.
 func (c *tokenClass_) FromContext(
 	line int,
 	position int,
 	tokenType string,
 	tokenValue string,
-) TokenLike {
+) *token_ {
 	var token = &token_{
-		line:       line,
-		position:   position,
-		tokenType:  tokenType,
-		tokenValue: tokenValue,
+		line_:     line,
+		position_: position,
+		type_:     tokenType,
+		value_:    tokenValue,
 	}
 	return token
 }
 
 // CLASS TYPE
 
-// Encapsulated Type
+// Private Class Type Definition
 
-// This private class type encapsulates a Go structure containing private
-// attributes that can only be accessed and manipulated using methods that
-// implement the token-like abstract type.  A Token captures lexical context.
 type token_ struct {
-	line       int // The line number of the Token in the lexical context.
-	position   int // The position in the line of the first rune of the Token.
-	tokenType  string
-	tokenValue string
-}
-
-// Contextual Interface
-
-// This public class method returns the line number of this Token.
-func (v *token_) GetLine() int {
-	return v.line
-}
-
-// This public class method returns the position of this Token in the line.
-func (v *token_) GetPosition() int {
-	return v.position
-}
-
-// This public class method returns the type of this Token.
-func (v *token_) GetType() string {
-	return v.tokenType
-}
-
-// This public class method returns the value of this Token.
-func (v *token_) GetValue() string {
-	return v.tokenValue
+	line_     int // The line number of the token in the lexical context.
+	position_ int // The position in the line of the first rune of the token.
+	type_     string
+	value_    string
 }
 
 // Private Interface
 
-// This public class method returns the canonical string version of this Token.
+func (v *token_) GetLine() int {
+	return v.line_
+}
+
+func (v *token_) GetPosition() int {
+	return v.position_
+}
+
+func (v *token_) GetType() string {
+	return v.type_
+}
+
+func (v *token_) GetValue() string {
+	return v.value_
+}
+
+// This public class method returns the canonical string version of this token.
 func (v *token_) String() string {
 	var s string
 	switch {
-	case v.tokenType == Token().typeEOF:
+	case v.type_ == Token().eof_:
 		s = "<EOF>"
-	case v.tokenType == Token().typeEOL:
+	case v.type_ == Token().eol_:
 		s = "<EOL>"
-	case len(v.tokenValue) > 60:
-		s = fmt.Sprintf("%.60q...", v.tokenValue)
+	case len(v.value_) > 60:
+		s = fmt.Sprintf("%.60q...", v.value_)
 	default:
-		s = fmt.Sprintf("%q", v.tokenValue)
+		s = fmt.Sprintf("%q", v.value_)
 	}
 	return fmt.Sprintf(
 		"Token [type: %s, line: %d, position: %d]: %s",
-		v.tokenType, v.line, v.position, s)
+		v.type_, v.line_, v.position_, s)
 }

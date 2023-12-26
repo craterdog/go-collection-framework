@@ -17,8 +17,8 @@ import (
 )
 
 func TestStackConstructor(t *tes.T) {
-	var _ = col.Stack[int64]().FromString("[ ](Stack)\n")
-	var _ = col.Stack[int64]().FromString("[1, 2, 3](Stack)\n")
+	var _ = col.Stack[int64]().FromString("[ ](Stack)")
+	var _ = col.Stack[int64]().FromString("[1, 2, 3](Stack)")
 }
 
 func TestStackConstructors(t *tes.T) {
@@ -34,7 +34,7 @@ func TestStackWithSmallCapacity(t *tes.T) {
 	stack.AddValue(1)
 	defer func() {
 		if e := recover(); e != nil {
-			ass.Equal(t, "Attempted to add a value onto a Stack that has reached its capacity: 1\nvalue: 2\nstack: [1](Stack)\n\n", e)
+			ass.Equal(t, "Attempted to add a value onto a stack that has reached its capacity: 1\nvalue: 2\nstack: [1](Stack)\n", e)
 		} else {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
@@ -47,7 +47,7 @@ func TestEmptyStackRetrieval(t *tes.T) {
 	var stack = Stack.Empty()
 	defer func() {
 		if e := recover(); e != nil {
-			ass.Equal(t, "Attempted to retrieve the top of an empty Stack!", e)
+			ass.Equal(t, "Attempted to retrieve the top of an empty stack!", e)
 		} else {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
@@ -60,7 +60,7 @@ func TestEmptyStackRemoval(t *tes.T) {
 	var stack = Stack.Empty()
 	defer func() {
 		if e := recover(); e != nil {
-			ass.Equal(t, "Attempted to remove the top of an empty Stack!", e)
+			ass.Equal(t, "Attempted to remove the top of an empty stack!", e)
 		} else {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}

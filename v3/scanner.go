@@ -11,318 +11,258 @@
 package collections
 
 import (
+	//fmt "fmt"
 	reg "regexp"
-	sts "strings"
-	utf "unicode/utf8"
 )
 
 // CLASS NAMESPACE
 
-// This private type defines the namespace structure associated with the
-// constants, constructors and functions for the Scanner class namespace.
+// Private Class Namespace Type
+
 type scannerClass_ struct {
 	booleanMatcher   *reg.Regexp
 	complexMatcher   *reg.Regexp
-	contextMatcher   *reg.Regexp
 	delimiterMatcher *reg.Regexp
+	eolMatcher       *reg.Regexp
 	floatMatcher     *reg.Regexp
 	integerMatcher   *reg.Regexp
 	nilMatcher       *reg.Regexp
 	runeMatcher      *reg.Regexp
+	spaceMatcher     *reg.Regexp
 	stringMatcher    *reg.Regexp
+	typeMatcher      *reg.Regexp
 	unsignedMatcher  *reg.Regexp
 }
 
-// These private constants define regular expression sub-patterns.
-const (
-	base10    = `[0-9]`
-	base16    = `[0-9a-f]`
-	boolean   = `false|true`
-	complex_  = `\((` + float + `)` + sign + `(` + float + `)i\)`
-	context   = `[Aa]rray|Catalog|List|[Mm]ap|Queue|Set|Stack`
-	delimiter = `\[|\]|\(|\)|:|,`
-	eol       = `\n`
-	escape    = `\\(?:(?:` + unicode + `)|[abfnrtv'"\\])`
-	exponent  = `[eE]` + sign + ordinal
-	float     = sign + `?(?:` + scalar + `)(?:` + exponent + `)?`
-	fraction  = `\.` + base10 + `+`
-	integer   = zero + `|` + sign + `?` + ordinal
-	nil_      = `nil`
-	ordinal   = `[1-9][0-9]*`
-	rune_     = `'(` + escape + `|[^'` + eol + `])'`
-	scalar    = `(?:` + zero + `|` + ordinal + `)` + fraction
-	sign      = `[+-]`
-	string_   = `"(` + escape + `|[^"` + eol + `])*"`
-	unicode   = `u` + base16 + `{4}|U` + base16 + `{8}`
-	unsigned  = `0x` + base16 + `+`
-	zero      = `0`
-)
+// Private Namespace Reference(s)
 
-// This private constant defines the singleton reference to the Scanner
-// class namespace.  It also initializes any class constants as needed.
-var scannerClassSingleton = &scannerClass_{
-	booleanMatcher:   reg.MustCompile(`^(?:` + boolean + `)`),
+var scannerClass = &scannerClass_{
+	booleanMatcher:   reg.MustCompile(`^(?:` + boolean_ + `)`),
 	complexMatcher:   reg.MustCompile(`^(?:` + complex_ + `)`),
-	contextMatcher:   reg.MustCompile(`^(?:` + context + `)`),
-	delimiterMatcher: reg.MustCompile(`^(?:` + delimiter + `)`),
-	floatMatcher:     reg.MustCompile(`^(?:` + float + `)`),
-	integerMatcher:   reg.MustCompile(`^(?:` + integer + `)`),
+	delimiterMatcher: reg.MustCompile(`^(?:` + delimiter_ + `)`),
+	eolMatcher:       reg.MustCompile(`^(?:` + eol_ + `)`),
+	floatMatcher:     reg.MustCompile(`^(?:` + float_ + `)`),
+	integerMatcher:   reg.MustCompile(`^(?:` + integer_ + `)`),
 	nilMatcher:       reg.MustCompile(`^(?:` + nil_ + `)`),
 	runeMatcher:      reg.MustCompile(`^(?:` + rune_ + `)`),
+	spaceMatcher:     reg.MustCompile(`^(?:` + space_ + `)`),
 	stringMatcher:    reg.MustCompile(`^(?:` + string_ + `)`),
-	unsignedMatcher:  reg.MustCompile(`^(?:` + unsigned + `)`),
+	typeMatcher:      reg.MustCompile(`^(?:` + type_ + `)`),
+	unsignedMatcher:  reg.MustCompile(`^(?:` + unsigned_ + `)`),
 }
 
-// This public function returns the singleton reference to the Scanner
-// class namespace.
+// Public Namespace Access
+
 func Scanner() *scannerClass_ {
-	return scannerClassSingleton
+	return scannerClass
 }
 
-// CLASS CONSTANTS
+// Public Class Constants
 
-// This public class constant represents a regular expression that can be used
-// to match strings containing boolean values.
-func (c *scannerClass_) BooleanMatcher() *reg.Regexp {
+func (c *scannerClass_) GetBooleanMatcher() *reg.Regexp {
 	return c.booleanMatcher
 }
 
-// This public class constant represents a regular expression that can be used
-// to match strings containing complex values.
-func (c *scannerClass_) ComplexMatcher() *reg.Regexp {
+func (c *scannerClass_) GetComplexMatcher() *reg.Regexp {
 	return c.complexMatcher
 }
 
-// This public class constant represents a regular expression that can be used
-// to match strings containing context values.
-func (c *scannerClass_) ContextMatcher() *reg.Regexp {
-	return c.contextMatcher
-}
-
-// This public class constant represents a regular expression that can be used
-// to match strings containing delimiter values.
-func (c *scannerClass_) DelimiterMatcher() *reg.Regexp {
+func (c *scannerClass_) GetDelimiterMatcher() *reg.Regexp {
 	return c.delimiterMatcher
 }
 
-// This public class constant represents a regular expression that can be used
-// to match strings containing float values.
-func (c *scannerClass_) FloatMatcher() *reg.Regexp {
+func (c *scannerClass_) GetEOLMatcher() *reg.Regexp {
+	return c.eolMatcher
+}
+
+func (c *scannerClass_) GetFloatMatcher() *reg.Regexp {
 	return c.floatMatcher
 }
 
-// This public class constant represents a regular expression that can be used
-// to match strings containing integer values.
-func (c *scannerClass_) IntegerMatcher() *reg.Regexp {
+func (c *scannerClass_) GetIntegerMatcher() *reg.Regexp {
 	return c.integerMatcher
 }
 
-// This public class constant represents a regular expression that can be used
-// to match strings containing nil values.
-func (c *scannerClass_) NilMatcher() *reg.Regexp {
+func (c *scannerClass_) GetNilMatcher() *reg.Regexp {
 	return c.nilMatcher
 }
 
-// This public class constant represents a regular expression that can be used
-// to match strings containing rune values.
-func (c *scannerClass_) RuneMatcher() *reg.Regexp {
+func (c *scannerClass_) GetRuneMatcher() *reg.Regexp {
 	return c.runeMatcher
 }
 
-// This public class constant represents a regular expression that can be used
-// to match strings containing string values.
-func (c *scannerClass_) StringMatcher() *reg.Regexp {
+func (c *scannerClass_) GetStringMatcher() *reg.Regexp {
 	return c.stringMatcher
 }
 
-// This public class constant represents a regular expression that can be used
-// to match strings containing unsigned values.
-func (c *scannerClass_) UnsignedMatcher() *reg.Regexp {
+func (c *scannerClass_) GetTypeMatcher() *reg.Regexp {
+	return c.typeMatcher
+}
+
+func (c *scannerClass_) GetUnsignedMatcher() *reg.Regexp {
 	return c.unsignedMatcher
 }
 
-// CLASS CONSTRUCTORS
+// Public Class Constructors
 
-// This public class constructor creates a new Scanner from the specified
-// source bytes.
 func (c *scannerClass_) FromSource(
-	source []byte,
-	tokens chan TokenLike,
-) ScannerLike {
+	source string,
+	tokens chan *token_,
+) *scanner_ {
 	var scanner = &scanner_{
 		line:     1,
 		position: 1,
-		source:   source,
+		runes:    []rune(source),
 		tokens:   tokens,
 	}
 	go scanner.scanTokens() // Start scanning tokens in the background.
 	return scanner
 }
 
-// CLASS FUNCTIONS
+// Public Class Functions
 
-// This public class function returns, for the specified string, an array of the
-// matching subgroups for a Go boolean primitive. The first string in the array
-// is the entire matched string.
-func (c *scannerClass_) MatchBoolean(string_ string) []string {
-	return c.booleanMatcher.FindStringSubmatch(string_)
+// This public class function returns, for the specified text, a Go array of
+// the matching subgroups for a Go boolean primitive. The first string in the Go
+// array is the entire matched string.
+func (c *scannerClass_) MatchBoolean(text string) []string {
+	return c.booleanMatcher.FindStringSubmatch(text)
 }
 
-// This public class function returns, for the specified string, an array of the
-// matching subgroups for a Go complex primitive. The first string in the array
-// is the entire matched string.
-func (c *scannerClass_) MatchComplex(string_ string) []string {
-	return c.complexMatcher.FindStringSubmatch(string_)
+// This public class function returns, for the specified text, a Go array of
+// the matching subgroups for a Go complex primitive. The first string in the Go
+// array is the entire matched string.
+func (c *scannerClass_) MatchComplex(text string) []string {
+	return c.complexMatcher.FindStringSubmatch(text)
 }
 
-// This public class function returns, for the specified string, an array of the
-// matching subgroups for a collection context. The first string in the array
-// is the entire matched string.
-func (c *scannerClass_) MatchContext(string_ string) []string {
-	return c.contextMatcher.FindStringSubmatch(string_)
+// This public class function returns, for the specified text, a Go array of
+// the matching subgroups for a delimiter.
+func (c *scannerClass_) MatchDelimiter(text string) []string {
+	return c.delimiterMatcher.FindStringSubmatch(text)
 }
 
-// This public class function returns, for the specified string, an array of the
-// matching subgroups for a delimiter.
-func (c *scannerClass_) MatchDelimiter(string_ string) []string {
-	return c.delimiterMatcher.FindStringSubmatch(string_)
+// This public class function returns, for the specified text, a Go array of
+// the matching subgroups for an end-of-line (EOL).
+func (c *scannerClass_) MatchEOL(text string) []string {
+	return c.eolMatcher.FindStringSubmatch(text)
 }
 
-// This public class function returns, for the specified string, an array of the
-// matching subgroups for a Go float primitive. The first string in the array
-// is the entire matched string.
-func (c *scannerClass_) MatchFloat(string_ string) []string {
-	return c.floatMatcher.FindStringSubmatch(string_)
+// This public class function returns, for the specified text, a Go array of
+// the matching subgroups for a Go float primitive. The first string in the Go
+// array is the entire matched string.
+func (c *scannerClass_) MatchFloat(text string) []string {
+	return c.floatMatcher.FindStringSubmatch(text)
 }
 
-// This public class function returns, for the specified string, an array of the
-// matching subgroups for a Go integer primitive. The first string in the array
-// is the entire matched string.
-func (c *scannerClass_) MatchInteger(string_ string) []string {
-	return c.integerMatcher.FindStringSubmatch(string_)
+// This public class function returns, for the specified text, a Go array of
+// the matching subgroups for a Go integer primitive. The first string in the Go
+// array is the entire matched string.
+func (c *scannerClass_) MatchInteger(text string) []string {
+	return c.integerMatcher.FindStringSubmatch(text)
 }
 
-// This public class function returns, for the specified string, an array of the
-// matching subgroups for a Go nil primitive. The first string in the array
-// is the entire matched string.
-func (c *scannerClass_) MatchNil(string_ string) []string {
-	return c.nilMatcher.FindStringSubmatch(string_)
+// This public class function returns, for the specified text, a Go array of
+// the matching subgroups for a Go nil primitive. The first string in the Go
+// array is the entire matched string.
+func (c *scannerClass_) MatchNil(text string) []string {
+	return c.nilMatcher.FindStringSubmatch(text)
 }
 
-// This public class function returns, for the specified string, an array of the
-// matching subgroups for a Go rune primitive. The first string in the array
-// is the entire matched string.
-func (c *scannerClass_) MatchRune(string_ string) []string {
-	return c.runeMatcher.FindStringSubmatch(string_)
+// This public class function returns, for the specified text, a Go array of
+// the matching subgroups for a Go rune primitive. The first string in the Go
+// array is the entire matched string.
+func (c *scannerClass_) MatchRune(text string) []string {
+	return c.runeMatcher.FindStringSubmatch(text)
 }
 
-// This public class function returns, for the specified string, an array of the
-// matching subgroups for a Go string primitive. The first string in the array
-// is the entire matched string.
-func (c *scannerClass_) MatchString(string_ string) []string {
-	return c.stringMatcher.FindStringSubmatch(string_)
+// This public class function returns, for the specified text, a Go array of
+// the matching subgroups for a Go string primitive. The first string in the Go
+// array is the entire matched string.
+func (c *scannerClass_) MatchString(text string) []string {
+	return c.stringMatcher.FindStringSubmatch(text)
 }
 
-// This public class function returns, for the specified string, an array of the
-// matching subgroups for a Go unsigned primitive. The first string in the array
-// is the entire matched string.
-func (c *scannerClass_) MatchUnsigned(string_ string) []string {
-	return c.unsignedMatcher.FindStringSubmatch(string_)
+// This public class function returns, for the specified text, a Go array of
+// the matching subgroups for a collection type. The first string in the Go
+// array is the entire matched string.
+func (c *scannerClass_) MatchType(text string) []string {
+	return c.typeMatcher.FindStringSubmatch(text)
+}
+
+// This public class function returns, for the specified text, a Go array of
+// the matching subgroups for a Go unsigned primitive. The first string in the
+// Go array is the entire matched string.
+func (c *scannerClass_) MatchUnsigned(text string) []string {
+	return c.unsignedMatcher.FindStringSubmatch(text)
 }
 
 // CLASS TYPE
 
-// Encapsulated Type
+// Private Class Type Definition
 
-// This private class type encapsulates a Go structure containing private
-// attributes that can only be accessed and manipulated using methods that
-// implement the scanner-like abstract type.
-//
-// The source bytes can be viewed like this:
-//
-//	| byte 0 | byte 1 | byte 2 | byte 3 | byte 4 | byte 5 | ... | byte N-1 |
-//	| rune 0 |      rune 1     |      rune 2     | rune 3 | ... | rune R-1 |
-//
-// Runes can be one to eight bytes long.
 type scanner_ struct {
-	firstByte int // A zero based index of the first possible byte in the next token.
-	line      int // The line number in the source string of the next rune.
-	nextByte  int // A zero based index of the next possible byte in the next token.
-	position  int // The position in the current line of the next token.
-	source    []byte
-	tokens    chan TokenLike
+	first    int // A zero based index of the first possible rune in the next token.
+	line     int // The line number in the source text of the next rune.
+	next     int // A zero based index of the next possible rune in the next token.
+	position int // The position in the current line of the next rune.
+	runes    []rune
+	tokens   chan *token_
 }
 
 // Private Interface
 
 // This private class method adds a token of the specified type with the current
-// Scanner information to the token channel. It then resets the first byte index
-// to the next byte index position. It returns the token type of the type added
+// scanner information to the token channel. It then resets the first rune index
+// to the next rune index position. It returns the token type of the type added
 // to the channel.
 func (v *scanner_) emitToken(tokenType string) string {
-	var tokenValue = string(v.source[v.firstByte:v.nextByte])
-	if tokenType == Token().TypeEOF() {
-		tokenValue = "<EOF>"
-	}
-	if tokenType == Token().TypeError() {
-		switch tokenValue {
-		case "\a":
-			tokenValue = "<BELL>"
-		case "\b":
-			tokenValue = "<BKSP>"
-		case "\t":
-			tokenValue = "<TAB>"
-		case "\f":
-			tokenValue = "<FF>"
-		case "\r":
-			tokenValue = "<CR>"
-		case "\v":
-			tokenValue = "<VTAB>"
-		}
+	var tokenValue = string(v.runes[v.first:v.next])
+	switch tokenValue {
+	case "\a":
+		tokenValue = "<BELL>"
+	case "\b":
+		tokenValue = "<BKSP>"
+	case "\t":
+		tokenValue = "<TAB>"
+	case "\f":
+		tokenValue = "<FF>"
+	case "\n":
+		tokenValue = "<EOL>"
+	case "\r":
+		tokenValue = "<CR>"
+	case "\v":
+		tokenValue = "<VTAB>"
 	}
 	var token = Token().FromContext(v.line, v.position, tokenType, tokenValue)
-	//fmt.Println(token)
+	//fmt.Println(token) // Uncomment when debugging.
 	v.tokens <- token
-	v.firstByte = v.nextByte
-	v.position += sts.Count(tokenValue, "") - 1 // Add the number of runes in the token.
+	v.position += v.next - v.first
+	v.first = v.next
 	return tokenType
 }
 
 // This private class method adds a boolean token with the current Scanner
 // information to the token channel. It returns true if a boolean token was found.
 func (v *scanner_) foundBoolean() bool {
-	var string_ = string(v.source[v.nextByte:])
-	var matches = Scanner().MatchBoolean(string_)
+	var text = string(v.runes[v.next:])
+	var matches = scannerClass.booleanMatcher.FindStringSubmatch(text)
 	if len(matches) > 0 {
-		v.nextByte += len(matches[0])
-		v.emitToken(Token().TypeBoolean())
+		v.next += len([]rune(matches[0]))
+		v.emitToken(Token().GetBoolean())
 		return true
 	}
 	return false
 }
 
 // This private class method adds a complex number token with the current
-// Scanner information to the token channel. It returns true if a complex number
+// scanner information to the token channel. It returns true if a complex number
 // token was found.
 func (v *scanner_) foundComplex() bool {
-	var string_ = string(v.source[v.nextByte:])
-	var matches = Scanner().MatchComplex(string_)
+	var text = string(v.runes[v.next:])
+	var matches = scannerClass.complexMatcher.FindStringSubmatch(text)
 	if len(matches) > 0 {
-		v.nextByte += len(matches[0])
-		v.emitToken(Token().TypeComplex())
-		return true
-	}
-	return false
-}
-
-// This private class method adds a context token with the current Scanner
-// information to the token channel. It returns true if a type token was found.
-func (v *scanner_) foundContext() bool {
-	var string_ = string(v.source[v.nextByte:])
-	var matches = Scanner().MatchContext(string_)
-	if len(matches) > 0 {
-		v.nextByte += len(matches[0])
-		v.emitToken(Token().TypeContext())
+		v.next += len([]rune(matches[0]))
+		v.emitToken(Token().GetComplex())
 		return true
 	}
 	return false
@@ -332,69 +272,47 @@ func (v *scanner_) foundContext() bool {
 // information to the token channel. It returns true if a delimiter token was
 // found.
 func (v *scanner_) foundDelimiter() bool {
-	var string_ = string(v.source[v.nextByte:])
-	var matches = Scanner().MatchDelimiter(string_)
+	var text = string(v.runes[v.next:])
+	var matches = scannerClass.delimiterMatcher.FindStringSubmatch(text)
 	if len(matches) > 0 {
-		v.nextByte += len(matches[0])
-		v.emitToken(Token().TypeDelimiter())
+		v.next += len([]rune(matches[0]))
+		v.emitToken(Token().GetDelimiter())
 		return true
 	}
 	return false
 }
 
-// This private class method adds an EOF token with the current Scanner
-// information to the token channel. It returns true if an EOF marker was found.
-func (v *scanner_) foundEOF() bool {
-	// The last byte in a POSIX standard file must be an EOL character.
-	var string_ = string(v.source[v.nextByte:])
-	if !sts.HasPrefix(string_, EOL) {
-		return false
-	}
-	v.nextByte++
-	v.line++
-	// Now make sure there are no more bytes.
-	if v.nextByte != len(v.source) {
-		v.nextByte--
-		v.line--
-		return false
-	}
-	v.emitToken(Token().TypeEOF())
-	return true
-}
-
 // This private class method adds an EOL token with the current Scanner
 // information to the token channel. It returns true if an EOL token was found.
 func (v *scanner_) foundEOL() bool {
-	var string_ = string(v.source[v.nextByte:])
-	if !sts.HasPrefix(string_, EOL) {
-		return false
+	var text = string(v.runes[v.next:])
+	var matches = scannerClass.eolMatcher.FindStringSubmatch(text)
+	if len(matches) > 0 {
+		v.next += len([]rune(matches[0]))
+		v.emitToken(Token().GetEOL())
+		v.line++
+		v.position = 1
+		return true
 	}
-	v.nextByte++
-	v.emitToken(Token().TypeEOL())
-	v.line++
-	v.position = 1
-	return true
+	return false
 }
 
 // This private class method adds an error token with the current Scanner
 // information to the token channel. It always returns true.
-func (v *scanner_) foundError() bool {
-	var bytes = v.source[v.nextByte:]
-	var _, width = utf.DecodeRune(bytes)
-	v.nextByte += width
-	v.emitToken(Token().TypeError())
-	return true
+func (v *scanner_) foundError() {
+	v.next++
+	v.emitToken(Token().GetError())
 }
 
 // This private class method adds a floating point token with the current
-// Scanner information to the token channel. It returns true if a floating point
+// scanner information to the token channel. It returns true if a floating point
 // token was found.
 func (v *scanner_) foundFloat() bool {
-	var string_ = string(v.source[v.nextByte:])
-	var matches = Scanner().MatchFloat(string_)
+	var text = string(v.runes[v.next:])
+	var matches = scannerClass.floatMatcher.FindStringSubmatch(text)
 	if len(matches) > 0 {
-		v.nextByte += len(matches[0])
-		v.emitToken(Token().TypeFloat())
+		v.next += len([]rune(matches[0]))
+		v.emitToken(Token().GetFloat())
 		return true
 	}
 	return false
@@ -404,11 +322,11 @@ func (v *scanner_) foundFloat() bool {
 // information to the token channel. It returns true if a integer token was
 // found.
 func (v *scanner_) foundInteger() bool {
-	var string_ = string(v.source[v.nextByte:])
-	var matches = Scanner().MatchInteger(string_)
+	var text = string(v.runes[v.next:])
+	var matches = scannerClass.integerMatcher.FindStringSubmatch(text)
 	if len(matches) > 0 {
-		v.nextByte += len(matches[0])
-		v.emitToken(Token().TypeInteger())
+		v.next += len([]rune(matches[0]))
+		v.emitToken(Token().GetInteger())
 		return true
 	}
 	return false
@@ -417,11 +335,11 @@ func (v *scanner_) foundInteger() bool {
 // This private class method adds a nil token with the current Scanner
 // information to the token channel. It returns true if a nil token was found.
 func (v *scanner_) foundNil() bool {
-	var string_ = string(v.source[v.nextByte:])
-	var matches = Scanner().MatchNil(string_)
+	var text = string(v.runes[v.next:])
+	var matches = scannerClass.nilMatcher.FindStringSubmatch(text)
 	if len(matches) > 0 {
-		v.nextByte += len(matches[0])
-		v.emitToken(Token().TypeNil())
+		v.next += len([]rune(matches[0]))
+		v.emitToken(Token().GetNil())
 		return true
 	}
 	return false
@@ -430,11 +348,26 @@ func (v *scanner_) foundNil() bool {
 // This private class method adds a rune token with the current Scanner
 // information to the token channel. It returns true if a rune token was found.
 func (v *scanner_) foundRune() bool {
-	var string_ = string(v.source[v.nextByte:])
-	var matches = Scanner().MatchRune(string_)
+	var text = string(v.runes[v.next:])
+	var matches = scannerClass.runeMatcher.FindStringSubmatch(text)
 	if len(matches) > 0 {
-		v.nextByte += len(matches[0])
-		v.emitToken(Token().TypeRune())
+		v.next += len([]rune(matches[0]))
+		v.emitToken(Token().GetRune())
+		return true
+	}
+	return false
+}
+
+// This private class method moves the scanner past any spaces in the source
+// runes.  It does not add any tokens to the token channel.  It returns true if
+// a string token was found.
+func (v *scanner_) foundSpace() bool {
+	var text = string(v.runes[v.next:])
+	var matches = scannerClass.spaceMatcher.FindStringSubmatch(text)
+	if len(matches) > 0 {
+		v.next += len([]rune(matches[0]))
+		v.position += v.next - v.first
+		v.first = v.next
 		return true
 	}
 	return false
@@ -444,79 +377,102 @@ func (v *scanner_) foundRune() bool {
 // information to the token channel. It returns true if a string token was
 // found.
 func (v *scanner_) foundString() bool {
-	var string_ = string(v.source[v.nextByte:])
-	var matches = Scanner().MatchString(string_)
+	var text = string(v.runes[v.next:])
+	var matches = scannerClass.stringMatcher.FindStringSubmatch(text)
 	if len(matches) > 0 {
-		v.nextByte += len(matches[0])
-		v.emitToken(Token().TypeString())
+		v.next += len([]rune(matches[0]))
+		v.emitToken(Token().GetString())
+		return true
+	}
+	return false
+}
+
+// This private class method adds a collection type token with the current
+// scanner information to the token channel. It returns true if a collection
+// type token was found.
+func (v *scanner_) foundType() bool {
+	var text = string(v.runes[v.next:])
+	var matches = scannerClass.typeMatcher.FindStringSubmatch(text)
+	if len(matches) > 0 {
+		v.next += len([]rune(matches[0]))
+		v.emitToken(Token().GetType())
 		return true
 	}
 	return false
 }
 
 // This private class method adds an unsigned integer token with the current
-// Scanner information to the token channel. It returns true if an unsigned
+// scanner information to the token channel. It returns true if an unsigned
 // integer token was found.
 func (v *scanner_) foundUnsigned() bool {
-	var string_ = string(v.source[v.nextByte:])
-	var matches = Scanner().MatchUnsigned(string_)
+	var text = string(v.runes[v.next:])
+	var matches = scannerClass.unsignedMatcher.FindStringSubmatch(text)
 	if len(matches) > 0 {
-		v.nextByte += len(matches[0])
-		v.emitToken(Token().TypeUnsigned())
+		v.next += len([]rune(matches[0]))
+		v.emitToken(Token().GetUnsigned())
 		return true
 	}
 	return false
 }
 
-// This private class method attempts to scan any token starting with the next
-// rune in the source array. It checks for each type of token as the cases for
-// the switch statement. If that token type is found, this method returns true
-// and skips the rest of the cases.  If no valid token is found, or a TypeEOF is
-// found this method returns false.
-func (v *scanner_) scanToken() bool {
-	v.skipSpaces()
-	switch {
-	case v.foundBoolean():
-	case v.foundComplex():
-	case v.foundContext():
-	case v.foundDelimiter():
-	case v.foundEOF():
-		// We are at the end of the source array.
-		return false
-	case v.foundEOL():
-	case v.foundFloat():
-	case v.foundNil():
-	case v.foundRune():
-	case v.foundString():
-	case v.foundUnsigned():
-	case v.foundInteger(): // Must be after all other numeric types.
-	case v.foundError(): // Must be last.
-		// No valid token was found.
-		return false
-	}
-	return true
-}
-
-// This private class method continues scanning tokens from the source array
-// until an error occurs or the end of file is reached. It then closes the token
-// channel.
+// This private class method continues scanning tokens from the source text
+// until the of the source text is reached.  It attempts to scan each token
+// type until a matching token is found.  That token is then added to the token
+// channel to be read by the parser.  If no valid token type is found an error
+// token is added to the channel.  Once an error is encountered, or the end of
+// the source text is reached, an end-of-file (EOF) token is added to the
+// token channel and the channel is closed.
 func (v *scanner_) scanTokens() {
-	for v.scanToken() {
+loop:
+	for v.next < len(v.runes) {
+		switch {
+		case v.foundSpace(): // Remove any whitespace.
+		case v.foundBoolean():
+		case v.foundComplex():
+		case v.foundDelimiter():
+		case v.foundEOL():
+		case v.foundFloat():
+		case v.foundNil():
+		case v.foundRune():
+		case v.foundString():
+		case v.foundType():
+		case v.foundUnsigned():
+		case v.foundInteger(): // Must be after the other numeric types.
+		default:
+			v.foundError()
+			break loop
+		}
 	}
+	v.emitToken(Token().GetEOF())
 	close(v.tokens)
 }
 
-// This private class method scans through any spaces in the source array and
-// sets the next byte index to the next non-space rune.
-func (v *scanner_) skipSpaces() {
-	if v.nextByte < len(v.source) {
-		for {
-			if v.source[v.nextByte] != ' ' {
-				break
-			}
-			v.nextByte++
-			v.position++
-		}
-		v.firstByte = v.nextByte
-	}
-}
+// These private constants define the regular expression sub-patterns that make
+// up all token types.  Unfortunately there is no way to make them private to
+// the scanner class namespace since they must be TRUE Go constants to be
+// initialized in this way.  We add an underscore to lessen the chance of a name
+// collision with other private Go class constants.
+const (
+	base10_    = `[0-9]`
+	base16_    = `[0-9a-f]`
+	boolean_   = `false|true`
+	complex_   = `\((` + float_ + `)` + sign_ + `(` + float_ + `)i\)`
+	delimiter_ = `\[|\]|\(|\)|:|,`
+	eol_       = `\n`
+	escape_    = `\\(?:(?:` + unicode_ + `)|[abfnrtv'"\\])`
+	exponent_  = `[eE]` + sign_ + ordinal_
+	float_     = sign_ + `?(?:` + scalar_ + `)(?:` + exponent_ + `)?`
+	fraction_  = `\.` + base10_ + `+`
+	integer_   = zero_ + `|` + sign_ + `?` + ordinal_
+	nil_       = `nil`
+	ordinal_   = `[1-9][0-9]*`
+	rune_      = `'(` + escape_ + `|[^'` + eol_ + `])'`
+	scalar_    = `(?:` + zero_ + `|` + ordinal_ + `)` + fraction_
+	sign_      = `[+-]`
+	space_     = `[ ]+`
+	string_    = `"(` + escape_ + `|[^"` + eol_ + `])*"`
+	type_      = `[Aa]rray|Catalog|List|[Mm]ap|Queue|Set|Stack`
+	unicode_   = `x` + base16_ + `{2}|u` + base16_ + `{4}|U` + base16_ + `{8}`
+	unsigned_  = `0x` + base16_ + `+`
+	zero_      = `0`
+)

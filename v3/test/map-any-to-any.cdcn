@@ -1,0 +1,19 @@
+[
+    0: 42
+    '\x00': '☺'
+    (0.0+0.0i): (1.0+1.0i)
+    "map": [
+        "two": 2
+        "three": 3
+        "one": 1
+    ](map)
+    "": "Hello World!"
+    0x0: 0xa
+    "array": [
+        1
+        2
+        3
+    ](array)
+    false: true
+    0.0: 0.125
+](Map)

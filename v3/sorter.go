@@ -18,22 +18,22 @@ import (
 
 // CLASS NAMESPACE
 
-// This private type defines the namespace structure associated with the
-// constants, constructors and functions for the Sorter class namespace.
+// Private Class Namespace Type
+
 type sorterClass_[V Value] struct {
 	defaultRanker RankingFunction
 }
 
-// This private constant defines a map to hold all the singleton references to
-// the type specific Sorter class namespaces.
-var sorterClassSingletons = map[string]any{}
+// Private Namespace Reference(s)
 
-// This public function returns the singleton reference to a type specific
-// Sorter class namespace.  It also initializes any class constants as needed.
+var sorterClass = map[string]any{}
+
+// Public Namespace Access
+
 func Sorter[V Value]() *sorterClass_[V] {
 	var class *sorterClass_[V]
 	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
-	var value = sorterClassSingletons[key]
+	var value = sorterClass[key]
 	switch actual := value.(type) {
 	case *sorterClass_[V]:
 		// This bound class type already exists.
@@ -41,79 +41,47 @@ func Sorter[V Value]() *sorterClass_[V] {
 	default:
 		// Create a new bound class type.
 		class = &sorterClass_[V]{
-			defaultRanker: Collator().RankValues,
+			defaultRanker: Collator().Default().RankValues,
 		}
-		sorterClassSingletons[key] = class
+		sorterClass[key] = class
 	}
 	return class
 }
 
-// CLASS CONSTANTS
+// Public Class Constants
 
-// This public class constant represents the default ranking function.
-func (c *sorterClass_[V]) DefaultRanker() RankingFunction {
+func (c *sorterClass_[V]) GetDefaultRanker() RankingFunction {
 	return c.defaultRanker
 }
 
-// CLASS CONSTRUCTORS
+// Public Class Constructors
 
-// This public class constructor creates a new Sorter that can be used to sort
-// an array using the specified ranking function.
-func (c *sorterClass_[V]) WithDefaultRanker() SorterLike[V] {
+func (c *sorterClass_[V]) Default() *sorter_[V] {
 	var sorter = &sorter_[V]{
 		rank: c.defaultRanker,
 	}
 	return sorter
 }
 
-// This public class constructor creates a new Sorter that can be used to sort
-// an array using the specified ranking function.
-func (c *sorterClass_[V]) WithSpecifiedRanker(ranker RankingFunction) SorterLike[V] {
+func (c *sorterClass_[V]) WithRanker(ranker RankingFunction) *sorter_[V] {
 	var sorter = &sorter_[V]{
 		rank: ranker,
 	}
 	return sorter
 }
 
-// CLASS FUNCTIONS
-
-// This public class function reverses the order of the values in the specified
-// array.
-func (c *sorterClass_[V]) ReverseValues(values []V) {
-	var v = c.WithDefaultRanker()
-	v.ReverseValues(values)
-}
-
-// This public class function randomly shuffles the values in the specified
-// array.
-func (c *sorterClass_[V]) ShuffleValues(values []V) {
-	var v = c.WithDefaultRanker()
-	v.ShuffleValues(values)
-}
-
-// This public class function sorts the values in the specified array using the
-// specified ranking function.
-func (c *sorterClass_[V]) SortValues(values []V, ranker RankingFunction) {
-	var v = c.WithSpecifiedRanker(ranker)
-	v.SortValues(values)
-}
-
 // CLASS TYPE
 
-// Encapsulated Type
+// Private Class Type Definition
 
-// This private class type encapsulates a Go structure containing private
-// attributes that can only be accessed and manipulated using methods that
-// implement the sorter-like abstract type.
 type sorter_[V Value] struct {
 	rank RankingFunction
 }
 
 // Systematic Interface
 
-// This public class method reverses the order of the values in the specified
-// array in place.
 func (v *sorter_[V]) ReverseValues(values []V) {
+	// Reverse the values in place using Go's multi-assignment capability.
 	var length = len(values)
 	var half = length / 2 // Rounds down to the nearest integer.
 	for index := 0; index < half; index++ {
@@ -121,9 +89,8 @@ func (v *sorter_[V]) ReverseValues(values []V) {
 	}
 }
 
-// This public class method randomly shuffles the values in the specified array
-// in place.
 func (v *sorter_[V]) ShuffleValues(values []V) {
+	// Shuffle the values in place using random index exchanges.
 	var size = len(values)
 	for i := 0; i < size; i++ {
 		var r = v.randomizeIndex(size)
@@ -131,24 +98,32 @@ func (v *sorter_[V]) ShuffleValues(values []V) {
 	}
 }
 
-// This public class method sorts the values in the specified array in place
+func (v *sorter_[V]) SortValues(values []V) {
+	// Sort the values in place using a merge sort.
+	v.sortValues(values)
+}
+
+// Private Interface
+
+// This private class method sorts the values in the specified Go array in place
 // using an iterative merge sort along with the ranking function associated with
-// this Sorter.  The algorithm is documented here:
+// this sorter.  The algorithm is documented here:
 //   - https://en.wikipedia.org/wiki/Merge_sort#Bottom-up_implementation
 //
 // This iterative approach saves on memory allocation by swapping between two
-// arrays of the same size rather than allocating new arrays for each sub-array.
-// This results in stable O[nlog(n)] time and O[n] space performance.
-func (v *sorter_[V]) SortValues(values []V) {
-	// Create a buffer array.
+// Go arrays of the same size rather than allocating new Go arrays for each
+// sub-array.  This results in stable O[nlog(n)] time and O[n] space
+// performance.
+func (v *sorter_[V]) sortValues(values []V) {
+	// Create a buffer Go array.
 	var length = len(values)
 	var buffer = make([]V, length)
-	copy(buffer, values) // Make a copy of the original unsorted array.
+	copy(buffer, values) // Make a copy of the original unsorted Go array.
 
 	// Iterate through sub-array widths of 2, 4, 8, ... length.
 	for width := 1; width < length; width *= 2 {
 
-		// Split the buffer array into two arrays.
+		// Split the buffer Go array into two Go arrays.
 		for left := 0; left < length; left += width * 2 {
 
 			// Find the middle (it must be less than length).
@@ -170,15 +145,13 @@ func (v *sorter_[V]) SortValues(values []V) {
 				values[left:right])
 		}
 
-		// Swap the two arrays.
+		// Swap the two Go arrays.
 		buffer, values = values, buffer
 	}
 
-	// Synchronize the two arrays.
-	copy(values, buffer) // Both arrays are now sorted.
+	// Synchronize the two Go arrays.
+	copy(values, buffer) // Both Go arrays are now sorted.
 }
-
-// Private Interface
 
 // This private class method is used for the merging part of the merge sort
 // algorithm.
@@ -190,13 +163,13 @@ func (v *sorter_[V]) mergeArrays(left []V, right []V, merged []V) {
 	var mergedIndex = 0
 	var mergedLength = len(merged)
 
-	// Work our way through filling the entire merged array.
+	// Work our way through filling the entire merged Go array.
 	for mergedIndex < mergedLength {
 
-		// Check to see if both left and right arrays still have values.
+		// Check to see if both left and right Go arrays still have values.
 		if leftIndex < leftLength && rightIndex < rightLength {
 
-			// Copy the next smallest value to the merged array.
+			// Copy the next smallest value to the merged Go array.
 			if v.rank(left[leftIndex], right[rightIndex]) < 0 {
 				merged[mergedIndex] = left[leftIndex]
 				leftIndex++
@@ -206,12 +179,12 @@ func (v *sorter_[V]) mergeArrays(left []V, right []V, merged []V) {
 			}
 
 		} else if leftIndex < leftLength {
-			// Copy the rest of the left array to the merged array.
+			// Copy the rest of the left Go array to the merged Go array.
 			copy(merged[mergedIndex:], left[leftIndex:])
 			leftIndex++
 
 		} else {
-			// Copy the rest of the right array to the merged array.
+			// Copy the rest of the right Go array to the merged Go array.
 			copy(merged[mergedIndex:], right[rightIndex:])
 			rightIndex++
 		}

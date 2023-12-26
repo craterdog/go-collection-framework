@@ -11,30 +11,76 @@
 package collections_test
 
 import (
-	fmt "fmt"
 	col "github.com/craterdog/go-collection-framework/v3"
 	ass "github.com/stretchr/testify/assert"
-	osx "os"
-	sts "strings"
 	tes "testing"
 )
 
-const testDirectory = "./test/"
-
-func TestParsingRoundtrips(t *tes.T) {
-	var files, err = osx.ReadDir(testDirectory)
-	if err != nil {
-		panic("Could not find the ./test directory.")
-	}
-
-	for _, file := range files {
-		var filename = testDirectory + file.Name()
-		if sts.HasSuffix(filename, ".cdcn") {
-			fmt.Println(filename)
-			var expected, _ = osx.ReadFile(filename)
-			var value = col.Parser().ParseCollection(expected)
-			var document = col.Formatter().FormatCollection(value)
-			ass.Equal(t, string(expected), string(document))
+func TestParseBadFirst(t *tes.T) {
+	var Parser = col.Parser().CDCN()
+	var source = `bad[ ](array)
+`
+	defer func() {
+		if e := recover(); e != nil {
+			ass.Equal(
+				t,
+				"An unexpected token was received by the parser: Token [type: Error, line: 1, position: 1]: \"b\"\n\x1b[36m0001: bad[ ](array)\n \x1b[32m>>>──⌃\x1b[36m\n0002: \n\x1b[0m\n",
+				e)
+		} else {
+			ass.Fail(t, "Test should result in recovered panic.")
 		}
-	}
+	}()
+	var _ = Parser.ParseCollection(source)
+}
+
+func TestParseBadMiddle(t *tes.T) {
+	var Parser = col.Parser().CDCN()
+	var source = `[bad](array)
+`
+	defer func() {
+		if e := recover(); e != nil {
+			ass.Equal(
+				t,
+				"An unexpected token was received by the parser: Token [type: Error, line: 1, position: 2]: \"b\"\n\x1b[36m0001: [bad](array)\n \x1b[32m>>>───⌃\x1b[36m\n0002: \n\x1b[0m\n",
+				e)
+		} else {
+			ass.Fail(t, "Test should result in recovered panic.")
+		}
+	}()
+	var _ = Parser.ParseCollection(source)
+}
+
+func TestParseBadEnd(t *tes.T) {
+	var Parser = col.Parser().CDCN()
+	var source = `[ ](array)bad
+`
+	defer func() {
+		if e := recover(); e != nil {
+			ass.Equal(
+				t,
+				"An unexpected token was received by the parser: Token [type: Error, line: 1, position: 11]: \"b\"\n\x1b[36m0001: [ ](array)bad\n \x1b[32m>>>────────────⌃\x1b[36m\n0002: \n\x1b[0m\n",
+				e)
+		} else {
+			ass.Fail(t, "Test should result in recovered panic.")
+		}
+	}()
+	var _ = Parser.ParseCollection(source)
+}
+
+func TestParseExtraEOL(t *tes.T) {
+	var Parser = col.Parser().CDCN()
+	var source = `[ ](array)
+
+`
+	defer func() {
+		if e := recover(); e != nil {
+			ass.Equal(
+				t,
+				"An unexpected token was received by the parser: Token [type: EOL, line: 1, position: 11]: <EOL>\n\x1b[36m0001: [ ](array)\n \x1b[32m>>>────────────⌃\x1b[36m\n0002: \n\x1b[0m\nWas expecting 'EOF' from:\n  \x1b[32m$source: \x1b[33mcollection EOF  ! EOF is the end-of-file marker.\x1b[0m\n\n  \x1b[32m$collection: \x1b[33m\"[\" (associations | values) \"]\" context\x1b[0m\n\n",
+				e)
+		} else {
+			ass.Fail(t, "Test should result in recovered panic.")
+		}
+	}()
+	var _ = Parser.ParseCollection(source)
 }

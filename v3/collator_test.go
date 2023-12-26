@@ -51,15 +51,17 @@ type Fuz struct {
 }
 
 func TestCollatorConstants(t *tes.T) {
-	ass.Equal(t, 16, col.Collator().DefaultDepth())
+	var Collator = col.Collator()
+	ass.Equal(t, 16, Collator.GetDefaultDepth())
 }
 
-func TestCompareSpecifiedDepth(t *tes.T) {
-	var collator = col.Collator().WithSpecifiedDepth(1)
+func TestCompareDepth(t *tes.T) {
+	var Collator = col.Collator()
+	var collator = Collator.WithDepth(1)
 	var array = col.Array[any]().FromArray([]any{"foo", []int{1, 2, 3}})
 	defer func() {
 		if e := recover(); e != nil {
-			ass.Equal(t, "The maximum recursion depth was exceeded: 1", e)
+			ass.Equal(t, "The maximum traversal depth was exceeded: 1", e)
 		} else {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
@@ -67,12 +69,13 @@ func TestCompareSpecifiedDepth(t *tes.T) {
 	_ = collator.CompareValues(array, array)
 }
 
-func TestRankSpecifiedDepth(t *tes.T) {
-	var collator = col.Collator().WithSpecifiedDepth(1)
+func TestRankDepth(t *tes.T) {
+	var Collator = col.Collator()
+	var collator = Collator.WithDepth(1)
 	var array = col.Array[any]().FromArray([]any{"foo", []int{1, 2, 3}})
 	defer func() {
 		if e := recover(); e != nil {
-			ass.Equal(t, "The maximum recursion depth was exceeded: 1", e)
+			ass.Equal(t, "The maximum traversal depth was exceeded: 1", e)
 		} else {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
@@ -81,7 +84,7 @@ func TestRankSpecifiedDepth(t *tes.T) {
 }
 
 func TestComparison(t *tes.T) {
-	var Collator = col.Collator()
+	var Collator = col.Collator().Default()
 
 	// Nil
 	var ShouldBeNil any
@@ -250,7 +253,7 @@ func TestComparison(t *tes.T) {
 }
 
 func TestTildeTypes(t *tes.T) {
-	var Collator = col.Collator()
+	var Collator = col.Collator().Default()
 
 	// Boolean
 	var False = Boolean(false)
@@ -297,13 +300,13 @@ func TestTildeTypes(t *tes.T) {
 }
 
 func TestCompareRecursiveArrays(t *tes.T) {
-	var Collator = col.Collator()
+	var Collator = col.Collator().Default()
 	var Array = col.Array[any]()
 	var array = Array.FromArray([]any{0})
 	array.SetValue(1, array) // Now it is recursive.
 	defer func() {
 		if e := recover(); e != nil {
-			ass.Equal(t, "The maximum recursion depth was exceeded: 16", e)
+			ass.Equal(t, "The maximum traversal depth was exceeded: 16", e)
 		} else {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
@@ -312,13 +315,13 @@ func TestCompareRecursiveArrays(t *tes.T) {
 }
 
 func TestCompareRecursiveMaps(t *tes.T) {
-	var Collator = col.Collator()
+	var Collator = col.Collator().Default()
 	var Map = col.Map[string, any]()
 	var m = Map.FromMap(map[string]any{"first": 1})
 	m.SetValue("first", m) // Now it is recursive.
 	defer func() {
 		if e := recover(); e != nil {
-			ass.Equal(t, "The maximum recursion depth was exceeded: 16", e)
+			ass.Equal(t, "The maximum traversal depth was exceeded: 16", e)
 		} else {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
@@ -327,7 +330,7 @@ func TestCompareRecursiveMaps(t *tes.T) {
 }
 
 func TestRanking(t *tes.T) {
-	var Collator = col.Collator()
+	var Collator = col.Collator().Default()
 
 	// Nil
 	var ShouldBeNil any
@@ -531,14 +534,14 @@ func TestRanking(t *tes.T) {
 }
 
 func TestTildeArrays(t *tes.T) {
-	var Collator = col.Collator()
-	var Sorter = col.Sorter[String]()
+	var ranker = col.Collator().Default().RankValues
+	var Sorter = col.Sorter[String]().WithRanker(ranker)
 	var alpha = String("alpha")
 	var beta = String("beta")
 	var gamma = String("gamma")
 	var delta = String("delta")
 	var array = []String{alpha, beta, gamma, delta}
-	Sorter.SortValues(array, Collator.RankValues)
+	Sorter.SortValues(array)
 	ass.Equal(t, alpha, array[0])
 	ass.Equal(t, beta, array[1])
 	ass.Equal(t, delta, array[2])
@@ -546,13 +549,13 @@ func TestTildeArrays(t *tes.T) {
 }
 
 func TestRankRecursiveArrays(t *tes.T) {
-	var Collator = col.Collator()
+	var Collator = col.Collator().Default()
 	var Array = col.Array[any]()
 	var array = Array.FromArray([]any{0})
 	array.SetValue(1, array) // Now it is recursive.
 	defer func() {
 		if e := recover(); e != nil {
-			ass.Equal(t, "The maximum recursion depth was exceeded: 16", e)
+			ass.Equal(t, "The maximum traversal depth was exceeded: 16", e)
 		} else {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
@@ -561,13 +564,13 @@ func TestRankRecursiveArrays(t *tes.T) {
 }
 
 func TestRankRecursiveMaps(t *tes.T) {
-	var Collator = col.Collator()
+	var Collator = col.Collator().Default()
 	var Map = col.Map[string, any]()
 	var m = Map.FromMap(map[string]any{"first": 1})
 	m.SetValue("first", m) // Now it is recursive.
 	defer func() {
 		if e := recover(); e != nil {
-			ass.Equal(t, "The maximum recursion depth was exceeded: 16", e)
+			ass.Equal(t, "The maximum traversal depth was exceeded: 16", e)
 		} else {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}

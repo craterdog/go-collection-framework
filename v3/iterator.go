@@ -16,22 +16,22 @@ import (
 
 // CLASS NAMESPACE
 
-// This private type defines the namespace structure associated with the
-// constants, constructors and functions for the Iterator class namespace.
+// Private Class Namespace Type
+
 type iteratorClass_[V Value] struct {
 	// This class does not define any constants.
 }
 
-// This private constant defines a map to hold all the singleton references to
-// the type specific Iterator class namespaces.
-var iteratorClassSingletons = map[string]any{}
+// Private Namespace Reference(s)
 
-// This public function returns the singleton reference to a type specific
-// Iterator class namespace.  It also initializes any class constants as needed.
-func Iterator[V Value]() *iteratorClass_[V] {
+var iteratorClass = map[string]any{}
+
+// Public Namespace Access
+
+func Iterator[V Value]() IteratorClassLike[V] {
 	var class *iteratorClass_[V]
 	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
-	var value = iteratorClassSingletons[key]
+	var value = iteratorClass[key]
 	switch actual := value.(type) {
 	case *iteratorClass_[V]:
 		// This bound class type already exists.
@@ -41,18 +41,15 @@ func Iterator[V Value]() *iteratorClass_[V] {
 		class = &iteratorClass_[V]{
 			// This class does not define any constants.
 		}
-		iteratorClassSingletons[key] = class
+		iteratorClass[key] = class
 	}
 	return class
 }
 
-// CLASS CONSTRUCTORS
+// Public Class Constructors
 
-// This public class constructor creates a new Iterator from the specified
-// sequence of values.  The Iterator that can be used to traverse the values in
-// the specified sequence.
 func (c *iteratorClass_[V]) FromSequence(sequence Sequential[V]) IteratorLike[V] {
-	var values = sequence.AsArray() // The returned array is immutable.
+	var values = sequence.AsArray() // The returned Go array is immutable.
 	var size = len(values)
 	var iterator = &iterator_[V]{
 		size:   size,
@@ -63,20 +60,16 @@ func (c *iteratorClass_[V]) FromSequence(sequence Sequential[V]) IteratorLike[V]
 
 // CLASS TYPE
 
-// Encapsulated Type
+// Private Class Type Definition
 
-// This private class type encapsulates a Go structure containing private
-// attributes that can only be accessed and manipulated using methods that
-// implement the iterator-like abstract type.
 type iterator_[V Value] struct {
 	size   int // So we can safely cache the size.
 	slot   int // The initial slot is zero.
-	values []V // The array of values is immutable.
+	values []V // The Go array of values is immutable.
 }
 
 // Ratcheted Interface
 
-// This public class method retrieves the value after the current slot.
 func (v *iterator_[V]) GetNext() V {
 	var result V
 	if v.slot < v.size {
@@ -86,7 +79,6 @@ func (v *iterator_[V]) GetNext() V {
 	return result
 }
 
-// This public class method retrieves the value before the current slot.
 func (v *iterator_[V]) GetPrevious() V {
 	var result V
 	if v.slot > 0 {
@@ -96,32 +88,22 @@ func (v *iterator_[V]) GetPrevious() V {
 	return result
 }
 
-// This public class method returns the current slot between values that this
-// Iterator is currently locked into.
 func (v *iterator_[V]) GetSlot() int {
 	return v.slot
 }
 
-// This public class method determines whether or not there is a value after the
-// current slot.
 func (v *iterator_[V]) HasNext() bool {
 	return v.slot < v.size
 }
 
-// This public class method determines whether or not there is a value before
-// the current slot.
 func (v *iterator_[V]) HasPrevious() bool {
 	return v.slot > 0
 }
 
-// This public class method moves this Iterator to the slot after the last
-// value.
 func (v *iterator_[V]) ToEnd() {
 	v.slot = v.size
 }
 
-// This public class method moves this Iterator to the specified slot between
-// values.
 func (v *iterator_[V]) ToSlot(slot int) {
 	if slot > v.size {
 		slot = v.size
@@ -135,8 +117,6 @@ func (v *iterator_[V]) ToSlot(slot int) {
 	v.slot = slot
 }
 
-// This public class method moves this Iterator to the slot before the first
-// value.
 func (v *iterator_[V]) ToStart() {
 	v.slot = 0
 }

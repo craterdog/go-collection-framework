@@ -17,12 +17,12 @@ import (
 )
 
 func TestListConstructor(t *tes.T) {
-	var _ = col.List[int64]().FromString("[ ](List)\n")
-	var _ = col.List[int64]().FromString("[1, 2, 3](List)\n")
+	var _ = col.List[int64]().FromString("[ ](List)")
+	var _ = col.List[int64]().FromString("[1, 2, 3](List)")
 }
 
 func TestListsWithStrings(t *tes.T) {
-	var Collator = col.Collator()
+	var Collator = col.Collator().Default()
 	var Array = col.Array[string]()
 	var foo = Array.FromArray([]string{"foo"})
 	var bar = Array.FromArray([]string{"bar"})
@@ -184,7 +184,7 @@ func TestListsWithComparer(t *tes.T) {
 }
 
 func TestListsWithConcatenate(t *tes.T) {
-	var Collator = col.Collator()
+	var Collator = col.Collator().Default()
 	var Array = col.Array[int]()
 	var onetwothree = Array.FromArray([]int{1, 2, 3})
 	var fourfivesix = Array.FromArray([]int{4, 5, 6})
@@ -201,7 +201,7 @@ func TestListsWithConcatenate(t *tes.T) {
 }
 
 func TestListsWithEmptyLists(t *tes.T) {
-	var Collator = col.Collator()
+	var Collator = col.Collator().Default()
 	var List = col.List[int]()
 	var empty = List.Empty()
 	var list = List.Concatenate(empty, empty)

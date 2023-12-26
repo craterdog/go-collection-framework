@@ -11,32 +11,35 @@
 package collections_test
 
 import (
+	fmt "fmt"
 	col "github.com/craterdog/go-collection-framework/v3"
 	ass "github.com/stretchr/testify/assert"
+	osx "os"
+	sts "strings"
 	tes "testing"
 )
 
-func TestSortingEmpty(t *tes.T) {
-	var ranker = col.Collator().Default().RankValues
-	var Sorter = col.Sorter[any]().WithRanker(ranker)
-	var empty = []any{}
-	Sorter.SortValues(empty)
-}
+const collectionTests = "./test/"
 
-func TestSortingIntegers(t *tes.T) {
-	var ranker = col.Collator().Default().RankValues
-	var Sorter = col.Sorter[int]().WithRanker(ranker)
-	var unsorted = []int{4, 3, 1, 5, 2}
-	var sorted = []int{1, 2, 3, 4, 5}
-	Sorter.SortValues(unsorted)
-	ass.Equal(t, sorted, unsorted)
-}
-
-func TestSortingStrings(t *tes.T) {
-	var ranker = col.Collator().Default().RankValues
-	var Sorter = col.Sorter[string]().WithRanker(ranker)
-	var unsorted = []string{"alpha", "beta", "gamma", "delta"}
-	var sorted = []string{"alpha", "beta", "delta", "gamma"}
-	Sorter.SortValues(unsorted)
-	ass.Equal(t, sorted, unsorted)
+func TestCollectionRoundtrips(t *tes.T) {
+	var CDCN = col.CDCN().Default()
+	var files, err = osx.ReadDir(collectionTests)
+	if err != nil {
+		var message = fmt.Sprintf("Could not find the %s directory.", collectionTests)
+		panic(message)
+	}
+	for _, file := range files {
+		var filename = collectionTests + file.Name()
+		if sts.HasSuffix(filename, ".cdcn") {
+			fmt.Println(filename)
+			var source, _ = osx.ReadFile(filename)
+			var expected = string(source[:len(source)-1])
+			var collection = CDCN.ParseCollection(expected)
+			var actual = CDCN.FormatCollection(collection)
+			if !sts.HasPrefix(file.Name(), "map") {
+				// Skip maps since they are non-deterministic.
+				ass.Equal(t, expected, actual)
+			}
+		}
+	}
 }

@@ -19,105 +19,49 @@ import (
 
 // CLASS NAMESPACE
 
-// This private type defines the namespace structure associated with the
-// constants, constructors and functions for the Formatter class namespace.
+// Private Class Namespace Type
+
 type formatterClass_ struct {
-	defaultDepth int
-	eof          string
+	// This class defines no constants.
 }
 
-// This private constant defines the singleton reference to the Formatter
-// class namespace.  It also initializes any class constants as needed.
-var formatterClassSingleton = &formatterClass_{
-	defaultDepth: 8,
-	eof:          "\n",
+// Private Namespace Reference(s)
+
+var formatterClass = &formatterClass_{
+	// This class defines no constants.
 }
 
-// This public function returns the singleton reference to the Formatter
-// class namespace.
+// Public Namespace Access
+
 func Formatter() *formatterClass_ {
-	return formatterClassSingleton
+	return formatterClass
 }
 
-// CLASS CONSTANTS
+// Public Class Constructors
 
-// This public class constant represents the default depth of a collection
-// at which the Formatter gives up and inserts "...".  This handles cycles
-// in a sensible and efficient manner.
-func (c *formatterClass_) DefaultDepth() int {
-	return c.defaultDepth
-}
-
-// CLASS CONSTRUCTORS
-
-// This public class constructor creates a new Formatter with the default
-// traversal depth which is 8.
-func (c *formatterClass_) WithDefaultDepth() FormatterLike {
+func (c *formatterClass_) WithDepth(depth int) *formatter_ {
 	var formatter = &formatter_{
-		maximumDepth: c.defaultDepth,
+		maximum: depth,
 	}
 	return formatter
-}
-
-// This public class constructor creates a new Formatter with the specified
-// traversal depth.
-func (c *formatterClass_) WithSpecificDepth(depth int) FormatterLike {
-	if depth < 0 || depth > c.defaultDepth {
-		depth = c.defaultDepth
-	}
-	var formatter = &formatter_{
-		maximumDepth: depth,
-	}
-	return formatter
-}
-
-// CLASS FUNCTIONS
-
-// This public class function returns a string containing the canonical format
-// for the specified value.
-func (c *formatterClass_) FormatValue(value Value) string {
-	var formatter = c.WithDefaultDepth()
-	var string_ = formatter.FormatValue(value)
-	return string_
-}
-
-// This public class function returns a string containing the canonical format
-// for the specified collection including the POSIX end-of-file marker.
-func (c *formatterClass_) FormatCollection(collection Collection) string {
-	var formatter = c.WithDefaultDepth()
-	var string_ = formatter.FormatCollection(collection)
-	return string_
 }
 
 // CLASS TYPE
 
-// Encapsulated Type
+// Private Class Type Definition
 
-// This private class type encapsulates a Go structure containing private
-// attributes that can only be accessed and manipulated using methods that
-// implement the formatter-like abstract type.
 type formatter_ struct {
-	depth        int
-	indentation  int
-	maximumDepth int
-	result       sts.Builder
+	depth       int
+	indentation int
+	maximum     int
+	result      sts.Builder
 }
 
-// Canonical Interface
+// Standardized Interface
 
-// This public class method returns a string containing the canonical format
-// for the specified value.
-func (v *formatter_) FormatValue(value Value) string {
-	v.formatValue(value)
-	return v.getResult()
-}
-
-// This public class method returns a string containing the canonical format
-// for the specified collection.
 func (v *formatter_) FormatCollection(collection Collection) string {
 	var reflected = ref.ValueOf(collection)
 	v.formatCollection(reflected)
-	v.appendString(formatterClassSingleton.eof)
 	return v.getResult()
 }
 
@@ -205,12 +149,12 @@ func (v *formatter_) formatValue(value any) {
 	}
 }
 
-// This private class method adds the canonical format for the specified array
-// of values to the state of the Formatter.
+// This private class method adds the canonical format for the specified Go
+// array of values to the state of the formatter.
 func (v *formatter_) formatArray(array ref.Value) {
 	var size = array.Len()
 	switch {
-	case v.depth+1 > v.maximumDepth:
+	case v.depth == v.maximum:
 		// Truncate the recursion.
 		v.appendString("...")
 	case size == 0:
@@ -230,13 +174,13 @@ func (v *formatter_) formatArray(array ref.Value) {
 	}
 }
 
-// This private class method adds the canonical format for the specified map of
-// key-value pairs to the state of the Formatter.
+// This private class method adds the canonical format for the specified Go map
+// of key-value pairs to the state of the formatter.
 func (v *formatter_) formatMap(map_ ref.Value) {
 	var keys = map_.MapKeys()
 	var size = len(keys)
 	switch {
-	case v.depth+1 > v.maximumDepth:
+	case v.depth == v.maximum:
 		// Truncate the recursion.
 		v.appendString("...")
 	case size == 0:
@@ -338,7 +282,7 @@ func (v *formatter_) formatSequence(sequence ref.Value) {
 	var iterator = sequence.MethodByName("GetIterator").Call([]ref.Value{})[0]
 	var size = sequence.MethodByName("GetSize").Call([]ref.Value{})[0].Interface()
 	switch {
-	case v.depth+1 > v.maximumDepth:
+	case v.depth == v.maximum:
 		// Truncate the recursion.
 		v.appendString("...")
 	case size == 0:

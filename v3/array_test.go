@@ -17,7 +17,7 @@ import (
 )
 
 func TestArrayConstructors(t *tes.T) {
-	var Array = col.Array[int64]()
+	var Array = col.ArrayClass[int64]()
 	var sequence = Array.FromArray([]int64{1, 2, 3})
 	var _ = Array.FromSequence(sequence)
 	var _ = Array.FromString("[ ](Array)")
@@ -25,7 +25,7 @@ func TestArrayConstructors(t *tes.T) {
 }
 
 func TestEmptyArray(t *tes.T) {
-	var array = col.Array[string]().WithSize(0)
+	var array = col.ArrayClass[string]().WithSize(0)
 	ass.True(t, array.IsEmpty())
 	ass.Equal(t, 0, array.GetSize())
 	ass.Equal(t, []string{}, array.AsArray())
@@ -46,7 +46,7 @@ func TestEmptyArray(t *tes.T) {
 }
 
 func TestArrayWithSize(t *tes.T) {
-	var array = col.Array[string]().WithSize(3)
+	var array = col.ArrayClass[string]().WithSize(3)
 	ass.False(t, array.IsEmpty())
 	ass.Equal(t, 3, array.GetSize())
 	ass.Equal(t, []string{"", "", ""}, array.AsArray())
@@ -66,7 +66,7 @@ func TestArrayWithSize(t *tes.T) {
 }
 
 func TestArrayIndexOfZero(t *tes.T) {
-	var array = col.Array[int]().FromArray([]int{1, 2, 3})
+	var array = col.ArrayClass[int]().FromArray([]int{1, 2, 3})
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "Indices must be positive or negative ordinals, not zero.", e)
@@ -78,7 +78,8 @@ func TestArrayIndexOfZero(t *tes.T) {
 }
 
 func TestArrayWithStrings(t *tes.T) {
-	var Array = col.Array[string]()
+	var collator = col.CollatorClass().Default()
+	var Array = col.ArrayClass[string]()
 	var array = Array.FromArray([]string{"foo", "bar", "baz"})
 	var foobar = Array.FromArray([]string{"foo", "bar"})
 	ass.False(t, array.IsEmpty())
@@ -87,7 +88,7 @@ func TestArrayWithStrings(t *tes.T) {
 	ass.Equal(t, foobar, array.GetValues(1, 2))
 	array.SetValue(2, "bax")
 	array.ShuffleValues()
-	array.SortValuesWithRanker(col.Collator().Default().RankValues)
+	array.SortValuesWithRanker(collator.RankValues)
 	ass.Equal(t, []string{"bax", "baz", "foo"}, array.AsArray())
 	array.SetValues(2, foobar)
 	ass.Equal(t, []string{"bax", "foo", "bar"}, array.AsArray())
@@ -104,7 +105,7 @@ func TestArrayWithStrings(t *tes.T) {
 }
 
 func TestArrayWithIntegers(t *tes.T) {
-	var array = col.Array[int]().FromArray([]int{1, 2, 3})
+	var array = col.ArrayClass[int]().FromArray([]int{1, 2, 3})
 	for index, value := range array.AsArray() {
 		ass.Equal(t, index, array.GetValue(value)-1)
 		ass.Equal(t, index, array.GetValue(value-4)-1)

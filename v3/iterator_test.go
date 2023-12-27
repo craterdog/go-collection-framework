@@ -17,10 +17,8 @@ import (
 )
 
 func TestIteratorsWithLists(t *tes.T) {
-	var Array = col.Array[int]()
-	var array = Array.FromArray([]int{1, 2, 3, 4, 5})
-	var List = col.List[int]()
-	var list = List.FromSequence(array)
+	var array = col.ArrayClass[int]().FromArray([]int{1, 2, 3, 4, 5})
+	var list = col.ListClass[int]().FromSequence(array)
 	var iterator = list.GetIterator()
 	ass.False(t, iterator.HasPrevious())
 	ass.True(t, iterator.HasNext())

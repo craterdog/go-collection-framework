@@ -28,7 +28,7 @@ var arrayClass = map[string]any{}
 
 // Public Namespace Access
 
-func Array[V Value]() ArrayClassLike[V] {
+func ArrayClass[V Value]() ArrayClassLike[V] {
 	var class *arrayClass_[V]
 	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
 	var value = arrayClass[key]
@@ -68,7 +68,8 @@ func (c *arrayClass_[V]) FromSequence(values Sequential[V]) ArrayLike[V] {
 
 func (c *arrayClass_[V]) FromString(values string) ArrayLike[V] {
 	// First we parse it as a collection of any type value.
-	var collection = CDCN().Default().ParseCollection(values).(Sequential[Value])
+	var cdcn = CDCNClass().Default()
+	var collection = cdcn.ParseCollection(values).(Sequential[Value])
 
 	// Then we convert it to an Array of type V.
 	var array = c.WithSize(collection.GetSize())
@@ -104,7 +105,8 @@ func (v array_[V]) GetValues(first int, last int) Sequential[V] {
 	first = v.toZeroBased(first)
 	last = v.toZeroBased(last)
 	var sequence = v[first : last+1]
-	var array = Array[V]().FromArray(sequence) // This copies the underlying Go array.
+	// Copy the underlying Go array.
+	var array = ArrayClass[V]().FromArray(sequence)
 	return array
 }
 
@@ -118,8 +120,7 @@ func (v array_[V]) AsArray() []V {
 }
 
 func (v array_[V]) GetIterator() Ratcheted[V] {
-	var Iterator = Iterator[V]()
-	var iterator = Iterator.FromSequence(v)
+	var iterator = IteratorClass[V]().FromSequence(v)
 	return iterator
 }
 
@@ -134,24 +135,25 @@ func (v array_[V]) IsEmpty() bool {
 // Sortable Interface
 
 func (v array_[V]) ReverseValues() {
-	var Sorter = Sorter[V]().Default()
-	Sorter.ReverseValues(v)
+	var sorter = SorterClass[V]().Default()
+	sorter.ReverseValues(v)
 }
 
 func (v array_[V]) ShuffleValues() {
-	var Sorter = Sorter[V]().Default()
-	Sorter.ShuffleValues(v)
+	var sorter = SorterClass[V]().Default()
+	sorter.ShuffleValues(v)
 }
 
 func (v array_[V]) SortValues() {
-	var ranker = Collator().Default().RankValues
+	var collator = CollatorClass().Default()
+	var ranker = collator.RankValues
 	v.SortValuesWithRanker(ranker)
 }
 
 func (v array_[V]) SortValuesWithRanker(ranker RankingFunction) {
 	if v.GetSize() > 1 {
-		var Sorter = Sorter[V]().WithRanker(ranker)
-		Sorter.SortValues(v)
+		var sorter = SorterClass[V]().WithRanker(ranker)
+		sorter.SortValues(v)
 	}
 }
 
@@ -174,7 +176,8 @@ func (v array_[V]) SetValues(index int, values Sequential[V]) {
 
 // This public class method is used by Go to generate a string from an Array.
 func (v array_[V]) String() string {
-	return CDCN().Default().FormatCollection(v)
+	var cdcn = CDCNClass().Default()
+	return cdcn.FormatCollection(v)
 }
 
 // This private class method normalizes a relative ORDINAL-based index into this

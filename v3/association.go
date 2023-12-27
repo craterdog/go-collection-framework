@@ -28,7 +28,7 @@ var associationClass = map[string]any{}
 
 // Public Namespace Access
 
-func Association[K Key, V Value]() AssociationClassLike[K, V] {
+func AssociationClass[K Key, V Value]() AssociationClassLike[K, V] {
 	var class *associationClass_[K, V]
 	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
 	var value = associationClass[key]

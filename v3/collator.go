@@ -34,7 +34,7 @@ var collatorClass = &collatorClass_{
 
 // Public Namespace Access
 
-func Collator() *collatorClass_ {
+func CollatorClass() *collatorClass_ {
 	return collatorClass
 }
 
@@ -486,11 +486,11 @@ func (v *collator_) rankMaps(first ref.Value, second ref.Value) int {
 	}
 
 	// Extract and sort the keys for the two Go maps.
-	var Sorter = Sorter[ref.Value]().WithRanker(v.rankReflective)
+	var sorter = SorterClass[ref.Value]().WithRanker(v.rankReflective)
 	var firstKeys = first.MapKeys() // The returned keys are in random order.
-	Sorter.SortValues(firstKeys)
+	sorter.SortValues(firstKeys)
 	var secondKeys = second.MapKeys() // The returned keys are in random order.
-	Sorter.SortValues(secondKeys)
+	sorter.SortValues(secondKeys)
 
 	// Determine the smallest Go map.
 	var firstSize = len(firstKeys)

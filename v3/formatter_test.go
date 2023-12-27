@@ -17,20 +17,21 @@ import (
 )
 
 func TestFormatDepths(t *tes.T) {
-	var Formatter = col.Formatter().WithDepth(0)
-	var array = col.Array[any]().FromArray([]any{1, []any{1, 2, []any{1, 2, 3}}})
-	var s = Formatter.FormatCollection(array)
+	var Formatter = col.FormatterClass()
+	var formatter = Formatter.WithDepth(0)
+	var array = col.ArrayClass[any]().FromArray([]any{1, []any{1, 2, []any{1, 2, 3}}})
+	var s = formatter.FormatCollection(array)
 	ass.Equal(t, "[...](Array)", s)
-	Formatter = col.Formatter().WithDepth(1)
-	s = Formatter.FormatCollection(array)
+	formatter = Formatter.WithDepth(1)
+	s = formatter.FormatCollection(array)
 	ass.Equal(t, "[\n    1\n    [...](array)\n](Array)", s)
-	Formatter = col.Formatter().WithDepth(2)
-	s = Formatter.FormatCollection(array)
+	formatter = Formatter.WithDepth(2)
+	s = formatter.FormatCollection(array)
 	ass.Equal(t, "[\n    1\n    [\n        1\n        2\n        [...](array)\n    ](array)\n](Array)", s)
 }
 
 func TestFormatInvalidType(t *tes.T) {
-	var Formatter = col.Formatter().WithDepth(8)
+	var formatter = col.FormatterClass().WithDepth(8)
 	var s struct{}
 	defer func() {
 		if e := recover(); e != nil {
@@ -39,5 +40,5 @@ func TestFormatInvalidType(t *tes.T) {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
-	Formatter.FormatCollection(s) // This should panic.
+	formatter.FormatCollection(s) // This should panic.
 }

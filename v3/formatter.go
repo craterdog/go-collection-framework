@@ -33,7 +33,7 @@ var formatterClass = &formatterClass_{
 
 // Public Namespace Access
 
-func Formatter() *formatterClass_ {
+func FormatterClass() *formatterClass_ {
 	return formatterClass
 }
 

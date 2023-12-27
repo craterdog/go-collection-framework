@@ -26,7 +26,7 @@ var cdcnClass = &cdcnClass_{
 
 // Public Namespace Access
 
-func CDCN() NotationClassLike {
+func CDCNClass() NotationClassLike {
 	return cdcnClass
 }
 
@@ -48,8 +48,8 @@ func (c *cdcnClass_) WithDepth(depth int) NotationLike {
 		depth = c.defaultDepth
 	}
 	var cdcn = &cdcn_{
-		formatter: Formatter().WithDepth(depth),
-		parser:    Parser().CDCN(),
+		formatter: FormatterClass().WithDepth(depth),
+		parser:    ParserClass().CDCN(),
 	}
 	return cdcn
 }

@@ -30,7 +30,7 @@ var mapClass = map[string]any{}
 
 // Public Namespace Access
 
-func Map[K comparable, V Value]() MapClassLike[K, V] {
+func MapClass[K comparable, V Value]() MapClassLike[K, V] {
 	var class *mapClass_[K, V]
 	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
 	var value = mapClass[key]
@@ -91,7 +91,8 @@ func (c *mapClass_[K, V]) FromSequence(
 
 func (c *mapClass_[K, V]) FromString(associations string) MapLike[K, V] {
 	// First we parse it as a collection of any type value.
-	var collection = CDCN().Default().ParseCollection(associations).(Sequential[Binding[Key, Value]])
+	var cdcn = CDCNClass().Default()
+	var collection = cdcn.ParseCollection(associations).(Sequential[Binding[Key, Value]])
 
 	// Then we convert it to a Map of type Binding[K, V].
 	var map_ = c.Empty()
@@ -114,7 +115,7 @@ type map_[K comparable, V Value] map[K]V
 // Associative Interface
 
 func (v map_[K, V]) GetKeys() Sequential[K] {
-	var keys = List[K]().Empty()
+	var keys = ListClass[K]().Empty()
 	var iterator = v.GetIterator()
 	for iterator.HasNext() {
 		var association = iterator.GetNext()
@@ -129,7 +130,7 @@ func (v map_[K, V]) GetValue(key K) V {
 }
 
 func (v map_[K, V]) GetValues(keys Sequential[K]) Sequential[V] {
-	var values = List[V]().Empty()
+	var values = ListClass[V]().Empty()
 	var iterator = keys.GetIterator()
 	for iterator.HasNext() {
 		var key = iterator.GetNext()
@@ -156,7 +157,7 @@ func (v map_[K, V]) RemoveValue(key K) V {
 }
 
 func (v map_[K, V]) RemoveValues(keys Sequential[K]) Sequential[V] {
-	var values = List[V]().Empty()
+	var values = ListClass[V]().Empty()
 	var iterator = keys.GetIterator()
 	for iterator.HasNext() {
 		var key = iterator.GetNext()
@@ -176,8 +177,7 @@ func (v map_[K, V]) AsArray() []Binding[K, V] {
 	var result = make([]Binding[K, V], size)
 	var index = 0
 	for key, value := range v {
-		var Association = Association[K, V]()
-		var association = Association.FromPair(key, value)
+		var association = AssociationClass[K, V]().FromPair(key, value)
 		result[index] = association
 		index++
 	}
@@ -185,8 +185,7 @@ func (v map_[K, V]) AsArray() []Binding[K, V] {
 }
 
 func (v map_[K, V]) GetIterator() Ratcheted[Binding[K, V]] {
-	var Array = Array[Binding[K, V]]()
-	var array = Array.FromArray(v.AsArray())
+	var array = ArrayClass[Binding[K, V]]().FromArray(v.AsArray())
 	var iterator = array.GetIterator()
 	return iterator
 }
@@ -203,5 +202,6 @@ func (v map_[K, V]) IsEmpty() bool {
 
 // This public class method is used by Go to generate a string from a Map.
 func (v map_[K, V]) String() string {
-	return CDCN().Default().FormatCollection(v)
+	var cdcn = CDCNClass().Default()
+	return cdcn.FormatCollection(v)
 }

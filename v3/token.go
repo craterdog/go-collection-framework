@@ -54,7 +54,7 @@ var tokenClass = &tokenClass_{
 
 // Public Namespace Access
 
-func Token() *tokenClass_ {
+func TokenClass() *tokenClass_ {
 	return tokenClass
 }
 
@@ -162,9 +162,9 @@ func (v *token_) GetValue() string {
 func (v *token_) String() string {
 	var s string
 	switch {
-	case v.type_ == Token().eof_:
+	case v.type_ == TokenClass().eof_:
 		s = "<EOF>"
-	case v.type_ == Token().eol_:
+	case v.type_ == TokenClass().eol_:
 		s = "<EOL>"
 	case len(v.value_) > 60:
 		s = fmt.Sprintf("%.60q...", v.value_)

@@ -30,7 +30,7 @@ var sorterClass = map[string]any{}
 
 // Public Namespace Access
 
-func Sorter[V Value]() *sorterClass_[V] {
+func SorterClass[V Value]() *sorterClass_[V] {
 	var class *sorterClass_[V]
 	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
 	var value = sorterClass[key]
@@ -41,7 +41,7 @@ func Sorter[V Value]() *sorterClass_[V] {
 	default:
 		// Create a new bound class type.
 		class = &sorterClass_[V]{
-			defaultRanker: Collator().Default().RankValues,
+			defaultRanker: CollatorClass().Default().RankValues,
 		}
 		sorterClass[key] = class
 	}

@@ -29,7 +29,7 @@ var queueClass = map[string]any{}
 
 // Public Namespace Access
 
-func Queue[V Value]() QueueClassLike[V] {
+func QueueClass[V Value]() QueueClassLike[V] {
 	var class *queueClass_[V]
 	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
 	var value = queueClass[key]
@@ -61,7 +61,7 @@ func (c *queueClass_[V]) Empty() QueueLike[V] {
 }
 
 func (c *queueClass_[V]) FromArray(values []V) QueueLike[V] {
-	var array = Array[V]().FromArray(values)
+	var array = ArrayClass[V]().FromArray(values)
 	var queue = c.FromSequence(array)
 	return queue
 }
@@ -78,7 +78,8 @@ func (c *queueClass_[V]) FromSequence(values Sequential[V]) QueueLike[V] {
 
 func (c *queueClass_[V]) FromString(values string) QueueLike[V] {
 	// First we parse it as a collection of any type value.
-	var collection = CDCN().Default().ParseCollection(values).(Sequential[Value])
+	var cdcn = CDCNClass().Default()
+	var collection = cdcn.ParseCollection(values).(Sequential[Value])
 
 	// Then we convert it to a queue of type V.
 	var queue = c.Empty()
@@ -95,7 +96,7 @@ func (c *queueClass_[V]) WithCapacity(capacity int) QueueLike[V] {
 		capacity = c.defaultCapacity
 	}
 	var available = make(chan bool, capacity)
-	var values = List[V]().Empty()
+	var values = ListClass[V]().Empty()
 	var queue = &queue_[V]{
 		available: available,
 		capacity:  capacity,
@@ -124,7 +125,7 @@ func (c *queueClass_[V]) Fork(
 
 	// Create the new output queues.
 	var capacity = input.GetCapacity()
-	var outputs = List[QueueLike[V]]().Empty()
+	var outputs = ListClass[QueueLike[V]]().Empty()
 	for i := 0; i < size; i++ {
 		outputs.AppendValue(c.WithCapacity(capacity))
 	}
@@ -228,7 +229,7 @@ func (c *queueClass_[V]) Split(
 
 	// Create the new output queues.
 	var capacity = input.GetCapacity()
-	var outputs = List[QueueLike[V]]().Empty()
+	var outputs = ListClass[QueueLike[V]]().Empty()
 	for i := 0; i < size; i++ {
 		outputs.AppendValue(c.WithCapacity(capacity))
 	}
@@ -354,5 +355,6 @@ func (v *queue_[V]) IsEmpty() bool {
 // This public class method is used by Go to generate a canonical string for
 // the queue.
 func (v *queue_[V]) String() string {
-	return CDCN().Default().FormatCollection(v)
+	var cdcn = CDCNClass().Default()
+	return cdcn.FormatCollection(v)
 }

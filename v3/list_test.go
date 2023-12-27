@@ -17,13 +17,14 @@ import (
 )
 
 func TestListConstructor(t *tes.T) {
-	var _ = col.List[int64]().FromString("[ ](List)")
-	var _ = col.List[int64]().FromString("[1, 2, 3](List)")
+	var _ = col.ListClass[int64]().FromString("[ ](List)")
+	var _ = col.ListClass[int64]().FromString("[1, 2, 3](List)")
 }
 
 func TestListsWithStrings(t *tes.T) {
-	var Collator = col.Collator().Default()
-	var Array = col.Array[string]()
+	var Array = col.ArrayClass[string]()
+	var List = col.ListClass[string]()
+	var collator = col.CollatorClass().Default()
 	var foo = Array.FromArray([]string{"foo"})
 	var bar = Array.FromArray([]string{"bar"})
 	var baz = Array.FromArray([]string{"baz"})
@@ -37,7 +38,6 @@ func TestListsWithStrings(t *tes.T) {
 	var foobazbar = Array.FromArray([]string{"foo", "baz", "bar"})
 	var foobarbaz = Array.FromArray([]string{"foo", "bar", "baz"})
 	var barbazfoo = Array.FromArray([]string{"bar", "baz", "foo"})
-	var List = col.List[string]()
 	var list = List.Empty()
 	ass.True(t, list.IsEmpty())
 	ass.Equal(t, 0, list.GetSize())
@@ -58,16 +58,16 @@ func TestListsWithStrings(t *tes.T) {
 	list.AppendValues(barbaz)                     //       ["foo", "bar", "baz"]
 	ass.Equal(t, 3, list.GetSize())               //       ["foo", "bar", "baz"]
 	ass.Equal(t, "foo", string(list.GetValue(1))) //       ["foo", "bar", "baz"]
-	ass.True(t, Collator.CompareValues(List.FromArray(list.AsArray()), list))
+	ass.True(t, collator.CompareValues(List.FromArray(list.AsArray()), list))
 	ass.Equal(t, barbaz.AsArray(), list.GetValues(2, 3).AsArray())
 	ass.Equal(t, foo.AsArray(), list.GetValues(1, 1).AsArray())
 	var list2 = List.FromSequence(list)
-	ass.True(t, Collator.CompareValues(list, list2))
+	ass.True(t, collator.CompareValues(list, list2))
 	var array = Array.FromArray([]string{"foo", "bar", "baz"})
 	var list3 = List.FromSequence(array)
 	list2.SortValues()
 	list3.SortValues()
-	ass.True(t, Collator.CompareValues(list2, list3))
+	ass.True(t, collator.CompareValues(list2, list3))
 	iterator = list.GetIterator()                       // ["foo", "bar", "baz"]
 	ass.True(t, iterator.HasNext())                     // ["foo", "bar", "baz"]
 	ass.False(t, iterator.HasPrevious())                // ["foo", "bar", "baz"]
@@ -150,10 +150,8 @@ func TestListsWithStrings(t *tes.T) {
 }
 
 func TestListsWithTildes(t *tes.T) {
-	var Array = col.Array[Integer]()
-	var array = Array.FromArray([]Integer{3, 1, 4, 5, 9, 2})
-	var List = col.List[Integer]()
-	var list = List.FromSequence(array)
+	var array = col.ArrayClass[Integer]().FromArray([]Integer{3, 1, 4, 5, 9, 2})
+	var list = col.ListClass[Integer]().FromSequence(array)
 	ass.False(t, list.IsEmpty())            // [3,1,4,5,9,2]
 	ass.Equal(t, 6, list.GetSize())         // [3,1,4,5,9,2]
 	ass.Equal(t, 3, int(list.GetValue(1)))  // [3,1,4,5,9,2]
@@ -168,8 +166,7 @@ func BadCompare(first col.Value, second col.Value) bool {
 }
 
 func TestListsWithComparer(t *tes.T) {
-	var List = col.List[int]()
-	var list = List.WithComparer(BadCompare)
+	var list = col.ListClass[int]().WithComparer(BadCompare)
 	list.AppendValue(1)
 	list.AppendValue(2)
 	list.AppendValue(3)
@@ -184,12 +181,12 @@ func TestListsWithComparer(t *tes.T) {
 }
 
 func TestListsWithConcatenate(t *tes.T) {
-	var Collator = col.Collator().Default()
-	var Array = col.Array[int]()
+	var List = col.ListClass[int]()
+	var collator = col.CollatorClass().Default()
+	var Array = col.ArrayClass[int]()
 	var onetwothree = Array.FromArray([]int{1, 2, 3})
 	var fourfivesix = Array.FromArray([]int{4, 5, 6})
 	var onethrusix = Array.FromArray([]int{1, 2, 3, 4, 5, 6})
-	var List = col.List[int]()
 	var list1 = List.Empty()
 	list1.AppendValues(onetwothree)
 	var list2 = List.Empty()
@@ -197,16 +194,16 @@ func TestListsWithConcatenate(t *tes.T) {
 	var list3 = List.Concatenate(list1, list2)
 	var list4 = List.Empty()
 	list4.AppendValues(onethrusix)
-	ass.True(t, Collator.CompareValues(list3, list4))
+	ass.True(t, collator.CompareValues(list3, list4))
 }
 
 func TestListsWithEmptyLists(t *tes.T) {
-	var Collator = col.Collator().Default()
-	var List = col.List[int]()
+	var collator = col.CollatorClass().Default()
+	var List = col.ListClass[int]()
 	var empty = List.Empty()
 	var list = List.Concatenate(empty, empty)
-	ass.True(t, Collator.CompareValues(empty, empty))
-	ass.True(t, Collator.CompareValues(list, empty))
-	ass.True(t, Collator.CompareValues(empty, list))
-	ass.True(t, Collator.CompareValues(list, list))
+	ass.True(t, collator.CompareValues(empty, empty))
+	ass.True(t, collator.CompareValues(list, empty))
+	ass.True(t, collator.CompareValues(empty, list))
+	ass.True(t, collator.CompareValues(list, list))
 }

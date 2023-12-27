@@ -53,7 +53,7 @@ var scannerClass = &scannerClass_{
 
 // Public Namespace Access
 
-func Scanner() *scannerClass_ {
+func ScannerClass() *scannerClass_ {
 	return scannerClass
 }
 
@@ -233,7 +233,7 @@ func (v *scanner_) emitToken(tokenType string) string {
 	case "\v":
 		tokenValue = "<VTAB>"
 	}
-	var token = Token().FromContext(v.line, v.position, tokenType, tokenValue)
+	var token = TokenClass().FromContext(v.line, v.position, tokenType, tokenValue)
 	//fmt.Println(token) // Uncomment when debugging.
 	v.tokens <- token
 	v.position += v.next - v.first
@@ -248,7 +248,7 @@ func (v *scanner_) foundBoolean() bool {
 	var matches = scannerClass.booleanMatcher.FindStringSubmatch(text)
 	if len(matches) > 0 {
 		v.next += len([]rune(matches[0]))
-		v.emitToken(Token().GetBoolean())
+		v.emitToken(TokenClass().GetBoolean())
 		return true
 	}
 	return false
@@ -262,7 +262,7 @@ func (v *scanner_) foundComplex() bool {
 	var matches = scannerClass.complexMatcher.FindStringSubmatch(text)
 	if len(matches) > 0 {
 		v.next += len([]rune(matches[0]))
-		v.emitToken(Token().GetComplex())
+		v.emitToken(TokenClass().GetComplex())
 		return true
 	}
 	return false
@@ -276,7 +276,7 @@ func (v *scanner_) foundDelimiter() bool {
 	var matches = scannerClass.delimiterMatcher.FindStringSubmatch(text)
 	if len(matches) > 0 {
 		v.next += len([]rune(matches[0]))
-		v.emitToken(Token().GetDelimiter())
+		v.emitToken(TokenClass().GetDelimiter())
 		return true
 	}
 	return false
@@ -289,7 +289,7 @@ func (v *scanner_) foundEOL() bool {
 	var matches = scannerClass.eolMatcher.FindStringSubmatch(text)
 	if len(matches) > 0 {
 		v.next += len([]rune(matches[0]))
-		v.emitToken(Token().GetEOL())
+		v.emitToken(TokenClass().GetEOL())
 		v.line++
 		v.position = 1
 		return true
@@ -301,7 +301,7 @@ func (v *scanner_) foundEOL() bool {
 // information to the token channel. It always returns true.
 func (v *scanner_) foundError() {
 	v.next++
-	v.emitToken(Token().GetError())
+	v.emitToken(TokenClass().GetError())
 }
 
 // This private class method adds a floating point token with the current
@@ -312,7 +312,7 @@ func (v *scanner_) foundFloat() bool {
 	var matches = scannerClass.floatMatcher.FindStringSubmatch(text)
 	if len(matches) > 0 {
 		v.next += len([]rune(matches[0]))
-		v.emitToken(Token().GetFloat())
+		v.emitToken(TokenClass().GetFloat())
 		return true
 	}
 	return false
@@ -326,7 +326,7 @@ func (v *scanner_) foundInteger() bool {
 	var matches = scannerClass.integerMatcher.FindStringSubmatch(text)
 	if len(matches) > 0 {
 		v.next += len([]rune(matches[0]))
-		v.emitToken(Token().GetInteger())
+		v.emitToken(TokenClass().GetInteger())
 		return true
 	}
 	return false
@@ -339,7 +339,7 @@ func (v *scanner_) foundNil() bool {
 	var matches = scannerClass.nilMatcher.FindStringSubmatch(text)
 	if len(matches) > 0 {
 		v.next += len([]rune(matches[0]))
-		v.emitToken(Token().GetNil())
+		v.emitToken(TokenClass().GetNil())
 		return true
 	}
 	return false
@@ -352,7 +352,7 @@ func (v *scanner_) foundRune() bool {
 	var matches = scannerClass.runeMatcher.FindStringSubmatch(text)
 	if len(matches) > 0 {
 		v.next += len([]rune(matches[0]))
-		v.emitToken(Token().GetRune())
+		v.emitToken(TokenClass().GetRune())
 		return true
 	}
 	return false
@@ -381,7 +381,7 @@ func (v *scanner_) foundString() bool {
 	var matches = scannerClass.stringMatcher.FindStringSubmatch(text)
 	if len(matches) > 0 {
 		v.next += len([]rune(matches[0]))
-		v.emitToken(Token().GetString())
+		v.emitToken(TokenClass().GetString())
 		return true
 	}
 	return false
@@ -395,7 +395,7 @@ func (v *scanner_) foundType() bool {
 	var matches = scannerClass.typeMatcher.FindStringSubmatch(text)
 	if len(matches) > 0 {
 		v.next += len([]rune(matches[0]))
-		v.emitToken(Token().GetType())
+		v.emitToken(TokenClass().GetType())
 		return true
 	}
 	return false
@@ -409,7 +409,7 @@ func (v *scanner_) foundUnsigned() bool {
 	var matches = scannerClass.unsignedMatcher.FindStringSubmatch(text)
 	if len(matches) > 0 {
 		v.next += len([]rune(matches[0]))
-		v.emitToken(Token().GetUnsigned())
+		v.emitToken(TokenClass().GetUnsigned())
 		return true
 	}
 	return false
@@ -443,7 +443,7 @@ loop:
 			break loop
 		}
 	}
-	v.emitToken(Token().GetEOF())
+	v.emitToken(TokenClass().GetEOF())
 	close(v.tokens)
 }
 

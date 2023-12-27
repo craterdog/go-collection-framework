@@ -28,7 +28,7 @@ var iteratorClass = map[string]any{}
 
 // Public Namespace Access
 
-func Iterator[V Value]() IteratorClassLike[V] {
+func IteratorClass[V Value]() IteratorClassLike[V] {
 	var class *iteratorClass_[V]
 	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
 	var value = iteratorClass[key]

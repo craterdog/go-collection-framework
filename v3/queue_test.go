@@ -18,12 +18,13 @@ import (
 )
 
 func TestQueueConstructor(t *tes.T) {
-	var _ = col.Queue[int64]().FromString("[ ](Queue)")
-	var _ = col.Queue[int64]().FromString("[1, 2, 3](Queue)")
+	var Queue = col.QueueClass[int64]()
+	var _ = Queue.FromString("[ ](Queue)")
+	var _ = Queue.FromString("[1, 2, 3](Queue)")
 }
 
 func TestQueueConstructors(t *tes.T) {
-	var Queue = col.Queue[int]()
+	var Queue = col.QueueClass[int]()
 	var queue1 = Queue.FromArray([]int{1, 2, 3})
 	var queue2 = Queue.FromSequence(queue1)
 	ass.Equal(t, queue1.AsArray(), queue2.AsArray())
@@ -35,8 +36,7 @@ func TestQueueWithConcurrency(t *tes.T) {
 	defer group.Wait()
 
 	// Create a new queue with a specific capacity.
-	var Queue = col.Queue[int]()
-	var queue = Queue.WithCapacity(12)
+	var queue = col.QueueClass[int]().WithCapacity(12)
 	ass.Equal(t, 12, queue.GetCapacity())
 	ass.True(t, queue.IsEmpty())
 	ass.Equal(t, 0, queue.GetSize())
@@ -74,7 +74,7 @@ func TestQueueWithFork(t *tes.T) {
 	defer group.Wait()
 
 	// Create a new queue with a fan out of two.
-	var Queue = col.Queue[int]()
+	var Queue = col.QueueClass[int]()
 	var input = Queue.WithCapacity(3)
 	var outputs = Queue.Fork(group, input, 2)
 
@@ -110,7 +110,7 @@ func TestQueueWithInvalidFanOut(t *tes.T) {
 	defer group.Wait()
 
 	// Create a new queue with an invalid fan out.
-	var Queue = col.Queue[int]()
+	var Queue = col.QueueClass[int]()
 	var input = Queue.WithCapacity(3)
 	defer func() {
 		if e := recover(); e != nil {
@@ -128,7 +128,7 @@ func TestQueueWithSplitAndJoin(t *tes.T) {
 	defer group.Wait()
 
 	// Create a new queue with a split of five outputs and a join back to one.
-	var Queue = col.Queue[int]()
+	var Queue = col.QueueClass[int]()
 	var input = Queue.WithCapacity(3)
 	var split = Queue.Split(group, input, 5)
 	var output = Queue.Join(group, split)
@@ -160,7 +160,7 @@ func TestQueueWithInvalidSplit(t *tes.T) {
 	defer group.Wait()
 
 	// Create a new queue with an invalid fan out.
-	var Queue = col.Queue[int]()
+	var Queue = col.QueueClass[int]()
 	var input = Queue.WithCapacity(3)
 	defer func() {
 		if e := recover(); e != nil {
@@ -178,8 +178,7 @@ func TestQueueWithInvalidJoin(t *tes.T) {
 	defer group.Wait()
 
 	// Create a new queue with an invalid fan out.
-	var List = col.List[col.QueueLike[int]]()
-	var inputs = List.Empty()
+	var inputs = col.ListClass[col.QueueLike[int]]().Empty()
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "The number of input queues for a join must be at least one.", e)
@@ -187,7 +186,7 @@ func TestQueueWithInvalidJoin(t *tes.T) {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
-	var Queue = col.Queue[int]()
+	var Queue = col.QueueClass[int]()
 	Queue.Join(group, inputs) // Should panic here.
 	defer group.Done()
 }

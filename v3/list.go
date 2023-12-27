@@ -28,7 +28,7 @@ var listClass = map[string]any{}
 
 // Public Namespace Access
 
-func List[V Value]() ListClassLike[V] {
+func ListClass[V Value]() ListClassLike[V] {
 	var class *listClass_[V]
 	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
 	var value = listClass[key]
@@ -49,13 +49,14 @@ func List[V Value]() ListClassLike[V] {
 // Public Class Constructors
 
 func (c *listClass_[V]) Empty() ListLike[V] {
-	var comparer = Collator().Default().CompareValues
+	var collator = CollatorClass().Default()
+	var comparer = collator.CompareValues
 	var list = c.WithComparer(comparer)
 	return list
 }
 
 func (c *listClass_[V]) FromArray(values []V) ListLike[V] {
-	var array = Array[V]().FromArray(values)
+	var array = ArrayClass[V]().FromArray(values)
 	var list = c.FromSequence(array)
 	return list
 }
@@ -72,7 +73,8 @@ func (c *listClass_[V]) FromSequence(values Sequential[V]) ListLike[V] {
 
 func (c *listClass_[V]) FromString(values string) ListLike[V] {
 	// First we parse it as a collection of any type value.
-	var collection = CDCN().Default().ParseCollection(values).(Sequential[Value])
+	var cdcn = CDCNClass().Default()
+	var collection = cdcn.ParseCollection(values).(Sequential[Value])
 
 	// Then we convert it to a list of type V.
 	var list = c.Empty()
@@ -85,8 +87,7 @@ func (c *listClass_[V]) FromString(values string) ListLike[V] {
 }
 
 func (c *listClass_[V]) WithComparer(comparer ComparingFunction) ListLike[V] {
-	var Array = Array[V]() // Retrieve the list namespace.
-	var values = Array.WithSize(0)
+	var values = ArrayClass[V]().WithSize(0)
 	var list = &list_[V]{
 		compare: comparer,
 		values:  values,
@@ -128,12 +129,11 @@ func (v *list_[V]) GetValues(first int, last int) Sequential[V] {
 
 func (v *list_[V]) AppendValue(value V) {
 
-	// Create a new larger Array.
+	// Create a new larger array.
 	var size = v.GetSize() + 1
-	var Array = Array[V]()
-	var array = Array.WithSize(size)
+	var array = ArrayClass[V]().WithSize(size)
 
-	// Copy the existing values into the new Array.
+	// Copy the existing values into the new array.
 	var index int
 	var iterator = v.GetIterator()
 	for iterator.HasNext() {
@@ -142,22 +142,21 @@ func (v *list_[V]) AppendValue(value V) {
 		array.SetValue(index, existing)
 	}
 
-	// Append the new value to the new Array.
+	// Append the new value to the new array.
 	index++
 	array.SetValue(index, value)
 
-	// Update the internal Array.
+	// Update the internal array.
 	v.values = array
 }
 
 func (v *list_[V]) AppendValues(values Sequential[V]) {
 
-	// Create a new larger Array.
+	// Create a new larger array.
 	var size = v.GetSize() + values.GetSize()
-	var Array = Array[V]()
-	var array = Array.WithSize(size)
+	var array = ArrayClass[V]().WithSize(size)
 
-	// Copy the existing values into the new Array.
+	// Copy the existing values into the new array.
 	var index int
 	var iterator = v.GetIterator()
 	for iterator.HasNext() {
@@ -166,7 +165,7 @@ func (v *list_[V]) AppendValues(values Sequential[V]) {
 		array.SetValue(index, existing)
 	}
 
-	// Append the new values to the new Array.
+	// Append the new values to the new array.
 	iterator = values.GetIterator()
 	for iterator.HasNext() {
 		index++
@@ -174,18 +173,17 @@ func (v *list_[V]) AppendValues(values Sequential[V]) {
 		array.SetValue(index, value)
 	}
 
-	// Update the internal Array.
+	// Update the internal array.
 	v.values = array
 }
 
 func (v *list_[V]) InsertValue(slot int, value V) {
 
-	// Create a new larger Array.
+	// Create a new larger array.
 	var size = v.GetSize() + 1
-	var Array = Array[V]()
-	var array = Array.WithSize(size)
+	var array = ArrayClass[V]().WithSize(size)
 
-	// Copy the values into the new Array.
+	// Copy the values into the new array.
 	var iterator = v.GetIterator()
 	var index int
 	for index < size {
@@ -199,18 +197,17 @@ func (v *list_[V]) InsertValue(slot int, value V) {
 		}
 	}
 
-	// Update the internal Array.
+	// Update the internal array.
 	v.values = array
 }
 
 func (v *list_[V]) InsertValues(slot int, values Sequential[V]) {
 
-	// Create a new larger Array.
+	// Create a new larger array.
 	var size = v.GetSize() + values.GetSize()
-	var Array = Array[V]()
-	var array = Array.WithSize(size)
+	var array = ArrayClass[V]().WithSize(size)
 
-	// Copy the values into the new Array.
+	// Copy the values into the new array.
 	var iterator = v.GetIterator()
 	var index int
 	for index < size {
@@ -228,24 +225,22 @@ func (v *list_[V]) InsertValues(slot int, values Sequential[V]) {
 		}
 	}
 
-	// Update the internal Array.
+	// Update the internal array.
 	v.values = array
 }
 
 func (v *list_[V]) RemoveAll() {
-	var Array = Array[V]()
-	v.values = Array.WithSize(0)
+	v.values = ArrayClass[V]().WithSize(0)
 }
 
 func (v *list_[V]) RemoveValue(index int) V {
 
-	// Create a new smaller Array.
+	// Create a new smaller array.
 	var removed = v.GetValue(index)
 	var size = v.GetSize() - 1
-	var Array = Array[V]()
-	var array = Array.WithSize(size)
+	var array = ArrayClass[V]().WithSize(size)
 
-	// Copy the remaining values into the new Array.
+	// Copy the remaining values into the new array.
 	var counter = v.toNormalized(index)
 	index = 0
 	var iterator = v.GetIterator()
@@ -259,7 +254,7 @@ func (v *list_[V]) RemoveValue(index int) V {
 		array.SetValue(index, value)
 	}
 
-	// Update the internal Array.
+	// Update the internal array.
 	v.values = array
 
 	return removed
@@ -267,16 +262,16 @@ func (v *list_[V]) RemoveValue(index int) V {
 
 func (v *list_[V]) RemoveValues(first int, last int) Sequential[V] {
 
-	// Create two smaller Arrays.
+	// Create two smaller arrays.
 	first = v.toNormalized(first)
 	last = v.toNormalized(last)
 	var delta = last - first + 1
 	var size = v.GetSize() - delta
-	var Array = Array[V]()
+	var Array = ArrayClass[V]()
 	var removed = Array.WithSize(delta)
 	var array = Array.WithSize(size)
 
-	// Split the existing values into the two new Arrays.
+	// Split the existing values into the two new arrays.
 	var counter int
 	var arrayIndex int
 	var removedIndex int
@@ -293,7 +288,7 @@ func (v *list_[V]) RemoveValues(first int, last int) Sequential[V] {
 		}
 	}
 
-	// Update the internal Array.
+	// Update the internal array.
 	v.values = array
 
 	return removed
@@ -397,7 +392,8 @@ func (v *list_[V]) SetValues(index int, values Sequential[V]) {
 // This public class method is used by Go to generate a canonical string for
 // the list.
 func (v *list_[V]) String() string {
-	return CDCN().Default().FormatCollection(v)
+	var cdcn = CDCNClass().Default()
+	return cdcn.FormatCollection(v)
 }
 
 // This private class method normalizes the specified index.  The following

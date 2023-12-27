@@ -28,7 +28,7 @@ var stackClass = map[string]any{}
 
 // Public Namespace Access
 
-func Stack[V Value]() StackClassLike[V] {
+func StackClass[V Value]() StackClassLike[V] {
 	var class *stackClass_[V]
 	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
 	var value = stackClass[key]
@@ -60,7 +60,7 @@ func (c *stackClass_[V]) Empty() StackLike[V] {
 }
 
 func (c *stackClass_[V]) FromArray(values []V) StackLike[V] {
-	var array = Array[V]().FromArray(values)
+	var array = ArrayClass[V]().FromArray(values)
 	var stack = c.FromSequence(array)
 	return stack
 }
@@ -78,7 +78,8 @@ func (c *stackClass_[V]) FromSequence(values Sequential[V]) StackLike[V] {
 
 func (c *stackClass_[V]) FromString(values string) StackLike[V] {
 	// First we parse it as a collection of any type value.
-	var collection = CDCN().Default().ParseCollection(values).(Sequential[Value])
+	var cdcn = CDCNClass().Default()
+	var collection = cdcn.ParseCollection(values).(Sequential[Value])
 
 	// Then we convert it to a stack of type V.
 	var stack = c.Empty()
@@ -91,7 +92,7 @@ func (c *stackClass_[V]) FromString(values string) StackLike[V] {
 }
 
 func (c *stackClass_[V]) WithCapacity(capacity int) StackLike[V] {
-	var values = List[V]().Empty()
+	var values = ListClass[V]().Empty()
 	if capacity < 1 {
 		capacity = c.defaultCapacity
 	}
@@ -169,5 +170,6 @@ func (v *stack_[V]) IsEmpty() bool {
 // This public class method is used by Go to generate a canonical string for
 // the stack.
 func (v *stack_[V]) String() string {
-	return CDCN().Default().FormatCollection(v)
+	var cdcn = CDCNClass().Default()
+	return cdcn.FormatCollection(v)
 }

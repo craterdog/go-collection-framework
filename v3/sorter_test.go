@@ -17,26 +17,29 @@ import (
 )
 
 func TestSortingEmpty(t *tes.T) {
-	var ranker = col.Collator().Default().RankValues
-	var Sorter = col.Sorter[any]().WithRanker(ranker)
+	var collator = col.CollatorClass().Default()
+	var ranker = collator.RankValues
+	var sorter = col.SorterClass[any]().WithRanker(ranker)
 	var empty = []any{}
-	Sorter.SortValues(empty)
+	sorter.SortValues(empty)
 }
 
 func TestSortingIntegers(t *tes.T) {
-	var ranker = col.Collator().Default().RankValues
-	var Sorter = col.Sorter[int]().WithRanker(ranker)
+	var collator = col.CollatorClass().Default()
+	var ranker = collator.RankValues
+	var sorter = col.SorterClass[int]().WithRanker(ranker)
 	var unsorted = []int{4, 3, 1, 5, 2}
 	var sorted = []int{1, 2, 3, 4, 5}
-	Sorter.SortValues(unsorted)
+	sorter.SortValues(unsorted)
 	ass.Equal(t, sorted, unsorted)
 }
 
 func TestSortingStrings(t *tes.T) {
-	var ranker = col.Collator().Default().RankValues
-	var Sorter = col.Sorter[string]().WithRanker(ranker)
+	var collator = col.CollatorClass().Default()
+	var ranker = collator.RankValues
+	var sorter = col.SorterClass[string]().WithRanker(ranker)
 	var unsorted = []string{"alpha", "beta", "gamma", "delta"}
 	var sorted = []string{"alpha", "beta", "delta", "gamma"}
-	Sorter.SortValues(unsorted)
+	sorter.SortValues(unsorted)
 	ass.Equal(t, sorted, unsorted)
 }

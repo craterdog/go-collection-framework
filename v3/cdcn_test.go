@@ -22,7 +22,7 @@ import (
 const collectionTests = "./test/"
 
 func TestCollectionRoundtrips(t *tes.T) {
-	var CDCN = col.CDCN().Default()
+	var cdcn = col.CDCNClass().Default()
 	var files, err = osx.ReadDir(collectionTests)
 	if err != nil {
 		var message = fmt.Sprintf("Could not find the %s directory.", collectionTests)
@@ -34,8 +34,8 @@ func TestCollectionRoundtrips(t *tes.T) {
 			fmt.Println(filename)
 			var source, _ = osx.ReadFile(filename)
 			var expected = string(source[:len(source)-1])
-			var collection = CDCN.ParseCollection(expected)
-			var actual = CDCN.FormatCollection(collection)
+			var collection = cdcn.ParseCollection(expected)
+			var actual = cdcn.FormatCollection(collection)
 			if !sts.HasPrefix(file.Name(), "map") {
 				// Skip maps since they are non-deterministic.
 				ass.Equal(t, expected, actual)

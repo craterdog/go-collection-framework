@@ -28,7 +28,7 @@ var setClass = map[string]any{}
 
 // Public Namespace Access
 
-func Set[V Value]() SetClassLike[V] {
+func SetClass[V Value]() SetClassLike[V] {
 	var class *setClass_[V]
 	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
 	var value = setClass[key]
@@ -49,19 +49,21 @@ func Set[V Value]() SetClassLike[V] {
 // Public Class Constructors
 
 func (c *setClass_[V]) Empty() SetLike[V] {
-	var ranker = Collator().Default().RankValues
+	var collator = CollatorClass().Default()
+	var ranker = collator.RankValues
 	var set = c.WithRanker(ranker)
 	return set
 }
 
 func (c *setClass_[V]) FromArray(values []V) SetLike[V] {
-	var array = Array[V]().FromArray(values)
+	var array = ArrayClass[V]().FromArray(values)
 	var set = c.FromSequence(array)
 	return set
 }
 
 func (c *setClass_[V]) FromSequence(values Sequential[V]) SetLike[V] {
-	var ranker = Collator().Default().RankValues
+	var collator = CollatorClass().Default()
+	var ranker = collator.RankValues
 	var set = c.FromSequenceWithRanker(values, ranker)
 	return set
 }
@@ -81,7 +83,8 @@ func (c *setClass_[V]) FromSequenceWithRanker(
 
 func (c *setClass_[V]) FromString(values string) SetLike[V] {
 	// First we parse it as a collection of any type value.
-	var collection = CDCN().Default().ParseCollection(values).(Sequential[Value])
+	var cdcn = CDCNClass().Default()
+	var collection = cdcn.ParseCollection(values).(Sequential[Value])
 
 	// Then we convert it to a set of type V.
 	var set = c.Empty()
@@ -94,7 +97,7 @@ func (c *setClass_[V]) FromString(values string) SetLike[V] {
 }
 
 func (c *setClass_[V]) WithRanker(ranker RankingFunction) SetLike[V] {
-	var values = List[V]().Empty()
+	var values = ListClass[V]().Empty()
 	var set = &set_[V]{
 		ranker,
 		values,
@@ -312,5 +315,6 @@ func (v *set_[V]) findIndex(value V) (index int, found bool) {
 // This public class method is used by Go to generate a canonical string for
 // the set.
 func (v *set_[V]) String() string {
-	return CDCN().Default().FormatCollection(v)
+	var cdcn = CDCNClass().Default()
+	return cdcn.FormatCollection(v)
 }

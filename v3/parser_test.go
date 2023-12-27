@@ -17,7 +17,7 @@ import (
 )
 
 func TestParseBadFirst(t *tes.T) {
-	var Parser = col.Parser().CDCN()
+	var parser = col.ParserClass().CDCN()
 	var source = `bad[ ](array)
 `
 	defer func() {
@@ -30,11 +30,11 @@ func TestParseBadFirst(t *tes.T) {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
-	var _ = Parser.ParseCollection(source)
+	var _ = parser.ParseCollection(source)
 }
 
 func TestParseBadMiddle(t *tes.T) {
-	var Parser = col.Parser().CDCN()
+	var parser = col.ParserClass().CDCN()
 	var source = `[bad](array)
 `
 	defer func() {
@@ -47,11 +47,11 @@ func TestParseBadMiddle(t *tes.T) {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
-	var _ = Parser.ParseCollection(source)
+	var _ = parser.ParseCollection(source)
 }
 
 func TestParseBadEnd(t *tes.T) {
-	var Parser = col.Parser().CDCN()
+	var parser = col.ParserClass().CDCN()
 	var source = `[ ](array)bad
 `
 	defer func() {
@@ -64,11 +64,11 @@ func TestParseBadEnd(t *tes.T) {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
-	var _ = Parser.ParseCollection(source)
+	var _ = parser.ParseCollection(source)
 }
 
 func TestParseExtraEOL(t *tes.T) {
-	var Parser = col.Parser().CDCN()
+	var parser = col.ParserClass().CDCN()
 	var source = `[ ](array)
 
 `
@@ -82,5 +82,5 @@ func TestParseExtraEOL(t *tes.T) {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
-	var _ = Parser.ParseCollection(source)
+	var _ = parser.ParseCollection(source)
 }

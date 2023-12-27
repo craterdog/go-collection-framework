@@ -35,7 +35,7 @@ var parserClass = &parserClass_{
 
 // Public Namespace Access
 
-func Parser() *parserClass_ {
+func ParserClass() *parserClass_ {
 	return parserClass
 }
 
@@ -43,7 +43,7 @@ func Parser() *parserClass_ {
 
 func (c *parserClass_) CDCN() *parser_ {
 	var parser = &parser_{
-		next: Stack[*token_]().WithCapacity(c.stackSize),
+		next: StackClass[*token_]().WithCapacity(c.stackSize),
 	}
 	return parser
 }
@@ -64,7 +64,7 @@ func (v *parser_) ParseCollection(source string) Collection {
 	// Start a scanner running in a separate Go routine.
 	v.source = source
 	v.tokens = make(chan *token_, parserClass.channelSize)
-	Scanner().FromSource(v.source, v.tokens)
+	ScannerClass().FromSource(v.source, v.tokens)
 
 	// Parse the tokens from the scanner.
 	var collection, token, ok = v.parseCollection()
@@ -139,7 +139,7 @@ func (v *parser_) getNextToken() *token_ {
 			panic("The token channel terminated without an EOF token.")
 		}
 		next = token
-		if next.GetType() == Token().GetError() {
+		if next.GetType() == TokenClass().GetError() {
 			var message = v.formatError(next)
 			panic(message)
 		}
@@ -179,7 +179,7 @@ func (v *parser_) parseAssociation() (AssociationLike[Key, Value], *token_, bool
 			"$value")
 		panic(message)
 	}
-	association = Association[Key, Value]().FromPair(key, value)
+	association = AssociationClass[Key, Value]().FromPair(key, value)
 	return association, token, true
 }
 
@@ -193,7 +193,7 @@ func (v *parser_) parseAssociations() (Sequential[Binding[Key, Value]], *token_,
 	_, token, ok = v.parseDelimiter(":")
 	if ok {
 		// The associations is empty.
-		associations = Catalog[Key, Value]().Empty()
+		associations = CatalogClass[Key, Value]().Empty()
 		return associations, token, true
 	}
 	_, token, ok = v.parseEOL()
@@ -218,7 +218,7 @@ func (v *parser_) parseAssociations() (Sequential[Binding[Key, Value]], *token_,
 func (v *parser_) parseBoolean() (bool, *token_, bool) {
 	var boolean bool
 	var token = v.getNextToken()
-	if token.GetType() != Token().GetBoolean() {
+	if token.GetType() != TokenClass().GetBoolean() {
 		v.putBack(token)
 		return boolean, token, false
 	}
@@ -278,15 +278,15 @@ func (v *parser_) parseCollection() (Collection, *token_, bool) {
 		case "array":
 			collection = sequence.AsArray()
 		case "Array":
-			collection = Array[Value]().FromArray(sequence.AsArray())
+			collection = ArrayClass[Value]().FromArray(sequence.AsArray())
 		case "List":
-			collection = List[Value]().FromSequence(sequence)
+			collection = ListClass[Value]().FromSequence(sequence)
 		case "Queue":
-			collection = Queue[Value]().FromSequence(sequence)
+			collection = QueueClass[Value]().FromSequence(sequence)
 		case "Set":
-			collection = Set[Value]().FromSequence(sequence)
+			collection = SetClass[Value]().FromSequence(sequence)
 		case "Stack":
-			collection = Stack[Value]().FromSequence(sequence)
+			collection = StackClass[Value]().FromSequence(sequence)
 		default:
 			var message = fmt.Sprintf("Found an unknown collection type: %q", context)
 			panic(message)
@@ -304,9 +304,9 @@ func (v *parser_) parseCollection() (Collection, *token_, bool) {
 			}
 			collection = map_
 		case "Map":
-			collection = Map[Key, Value]().FromArray(sequence.AsArray())
+			collection = MapClass[Key, Value]().FromArray(sequence.AsArray())
 		case "Catalog":
-			collection = Catalog[Key, Value]().FromSequence(sequence)
+			collection = CatalogClass[Key, Value]().FromSequence(sequence)
 		default:
 			var message = fmt.Sprintf("Found an unknown collection type: %q", context)
 			panic(message)
@@ -324,7 +324,7 @@ func (v *parser_) parseCollection() (Collection, *token_, bool) {
 func (v *parser_) parseComplex() (complex128, *token_, bool) {
 	var complex_ complex128
 	var token = v.getNextToken()
-	if token.GetType() != Token().GetComplex() {
+	if token.GetType() != TokenClass().GetComplex() {
 		v.putBack(token)
 		return complex_, token, false
 	}
@@ -367,7 +367,7 @@ func (v *parser_) parseContext() (string, *token_, bool) {
 // returns the token and whether or not the delimiter was found.
 func (v *parser_) parseDelimiter(delimiter string) (string, *token_, bool) {
 	var token = v.getNextToken()
-	if token.GetType() == Token().GetEOF() || token.GetValue() != delimiter {
+	if token.GetType() == TokenClass().GetEOF() || token.GetValue() != delimiter {
 		v.putBack(token)
 		return delimiter, token, false
 	}
@@ -378,7 +378,7 @@ func (v *parser_) parseDelimiter(delimiter string) (string, *token_, bool) {
 // returns the token and whether or not an EOF token was found.
 func (v *parser_) parseEOF() (*token_, *token_, bool) {
 	var token = v.getNextToken()
-	if token.GetType() != Token().GetEOF() {
+	if token.GetType() != TokenClass().GetEOF() {
 		v.putBack(token)
 		return token, token, false
 	}
@@ -389,7 +389,7 @@ func (v *parser_) parseEOF() (*token_, *token_, bool) {
 // returns the token and whether or not an EOL token was found.
 func (v *parser_) parseEOL() (*token_, *token_, bool) {
 	var token = v.getNextToken()
-	if token.GetType() != Token().GetEOL() {
+	if token.GetType() != TokenClass().GetEOL() {
 		v.putBack(token)
 		return token, token, false
 	}
@@ -402,7 +402,7 @@ func (v *parser_) parseEOL() (*token_, *token_, bool) {
 func (v *parser_) parseFloat() (float64, *token_, bool) {
 	var float float64
 	var token = v.getNextToken()
-	if token.GetType() != Token().GetFloat() {
+	if token.GetType() != TokenClass().GetFloat() {
 		v.putBack(token)
 		return float, token, false
 	}
@@ -417,7 +417,7 @@ func (v *parser_) parseInlineAssociations() (Sequential[Binding[Key, Value]], *t
 	var ok bool
 	var token *token_
 	var association AssociationLike[Key, Value]
-	var associations = Catalog[Key, Value]().Empty()
+	var associations = CatalogClass[Key, Value]().Empty()
 	association, token, ok = v.parseAssociation()
 	if !ok {
 		// This is not an inline association.
@@ -453,7 +453,7 @@ func (v *parser_) parseInlineValues() (Sequential[Value], *token_, bool) {
 	var ok bool
 	var token *token_
 	var value Value
-	var values = List[Value]().Empty()
+	var values = ListClass[Value]().Empty()
 	value, token, ok = v.parseValue()
 	if !ok {
 		// This is not an inline value.
@@ -486,7 +486,7 @@ func (v *parser_) parseInlineValues() (Sequential[Value], *token_, bool) {
 func (v *parser_) parseInteger() (int64, *token_, bool) {
 	var integer int64
 	var token = v.getNextToken()
-	if token.GetType() != Token().GetInteger() {
+	if token.GetType() != TokenClass().GetInteger() {
 		v.putBack(token)
 		return integer, token, false
 	}
@@ -501,7 +501,7 @@ func (v *parser_) parseMultilineAssociations() (Sequential[Binding[Key, Value]],
 	var ok bool
 	var token *token_
 	var association AssociationLike[Key, Value]
-	var associations = Catalog[Key, Value]().Empty()
+	var associations = CatalogClass[Key, Value]().Empty()
 
 	association, token, ok = v.parseAssociation()
 	if !ok {
@@ -549,7 +549,7 @@ func (v *parser_) parseMultilineValues() (Sequential[Value], *token_, bool) {
 	var ok bool
 	var token *token_
 	var value Value
-	var values = List[Value]().Empty()
+	var values = ListClass[Value]().Empty()
 	value, token, ok = v.parseValue()
 	if !ok {
 		// This is not a multi-line value.
@@ -591,7 +591,7 @@ func (v *parser_) parseMultilineValues() (Sequential[Value], *token_, bool) {
 // nil primitive and whether or not the nil primitive was successfully parsed.
 func (v *parser_) parseNil() (Value, *token_, bool) {
 	var token = v.getNextToken()
-	if token.GetType() != Token().GetNil() {
+	if token.GetType() != TokenClass().GetNil() {
 		v.putBack(token)
 		return nil, token, false
 	}
@@ -639,11 +639,11 @@ func (v *parser_) parseRune() (rune, *token_, bool) {
 	var rune_ rune
 	var size int
 	var token = v.getNextToken()
-	if token.GetType() != Token().GetRune() {
+	if token.GetType() != TokenClass().GetRune() {
 		v.putBack(token)
 		return rune_, token, false
 	}
-	var matches = Scanner().MatchRune(token.GetValue())
+	var matches = ScannerClass().MatchRune(token.GetValue())
 	// We must unquote the full token string properly.
 	var s, _ = stc.Unquote(matches[0])
 	rune_, size = utf.DecodeRuneInString(s)
@@ -661,11 +661,11 @@ func (v *parser_) parseRune() (rune, *token_, bool) {
 func (v *parser_) parseString() (string, *token_, bool) {
 	var string_ string
 	var token = v.getNextToken()
-	if token.GetType() != Token().GetString() {
+	if token.GetType() != TokenClass().GetString() {
 		v.putBack(token)
 		return string_, token, false
 	}
-	var matches = Scanner().MatchString(token.GetValue())
+	var matches = ScannerClass().MatchString(token.GetValue())
 	// We must unquote the full token string properly.
 	string_, _ = stc.Unquote(matches[0])
 	return string_, token, true
@@ -677,7 +677,7 @@ func (v *parser_) parseString() (string, *token_, bool) {
 func (v *parser_) parseType() (string, *token_, bool) {
 	var type_ string
 	var token = v.getNextToken()
-	if token.GetType() != Token().GetType() {
+	if token.GetType() != TokenClass().GetType() {
 		v.putBack(token)
 		return type_, token, false
 	}
@@ -691,7 +691,7 @@ func (v *parser_) parseType() (string, *token_, bool) {
 func (v *parser_) parseUnsigned() (uint64, *token_, bool) {
 	var unsigned uint64
 	var token = v.getNextToken()
-	if token.GetType() != Token().GetUnsigned() {
+	if token.GetType() != TokenClass().GetUnsigned() {
 		v.putBack(token)
 		return unsigned, token, false
 	}
@@ -724,7 +724,7 @@ func (v *parser_) parseValues() (Sequential[Value], *token_, bool) {
 	if ok {
 		// There are no values.
 		v.putBack(token) // Put back the "]" character.
-		values = List[Value]().Empty()
+		values = ListClass[Value]().Empty()
 		return values, token, true
 	}
 	_, token, ok = v.parseEOL()

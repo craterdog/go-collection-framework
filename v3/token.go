@@ -34,7 +34,7 @@ type tokenClass_ struct {
 	unsigned_  string
 }
 
-// Private Namespace Reference(s)
+// Private Class Namespace Reference
 
 var tokenClass = &tokenClass_{
 	boolean_:   "Boolean",
@@ -52,7 +52,7 @@ var tokenClass = &tokenClass_{
 	unsigned_:  "Unsigned",
 }
 
-// Public Namespace Access
+// Public Class Namespace Access
 
 func TokenClass() *tokenClass_ {
 	return tokenClass
@@ -129,7 +129,7 @@ func (c *tokenClass_) FromContext(
 	return token
 }
 
-// CLASS TYPE
+// CLASS INSTANCES
 
 // Private Class Type Definition
 

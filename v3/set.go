@@ -22,11 +22,11 @@ type setClass_[V Value] struct {
 	// This class defines no constants.
 }
 
-// Private Namespace Reference(s)
+// Private Class Namespace References
 
 var setClass = map[string]any{}
 
-// Public Namespace Access
+// Public Class Namespace Access
 
 func SetClass[V Value]() SetClassLike[V] {
 	var class *setClass_[V]
@@ -144,7 +144,7 @@ func (c *setClass_[V]) Xor(first, second SetLike[V]) SetLike[V] {
 	return result
 }
 
-// CLASS TYPE
+// CLASS INSTANCES
 
 // Private Class Type Definition
 

@@ -22,11 +22,11 @@ type associationClass_[K Key, V Value] struct {
 	// This class has no class constants.
 }
 
-// Private Namespace Reference(s)
+// Private Class Namespace References
 
 var associationClass = map[string]any{}
 
-// Public Namespace Access
+// Public Class Namespace Access
 
 func AssociationClass[K Key, V Value]() AssociationClassLike[K, V] {
 	var class *associationClass_[K, V]
@@ -53,7 +53,7 @@ func (c *associationClass_[K, V]) FromPair(key K, value V) AssociationLike[K, V]
 	return association
 }
 
-// CLASS TYPE
+// CLASS INSTANCES
 
 // Private Class Type Definition
 

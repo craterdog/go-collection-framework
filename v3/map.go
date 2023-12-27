@@ -24,11 +24,11 @@ type mapClass_[K comparable, V Value] struct {
 	// This class defines no constants.
 }
 
-// Private Namespace Reference(s)
+// Private Class Namespace References
 
 var mapClass = map[string]any{}
 
-// Public Namespace Access
+// Public Class Namespace Access
 
 func MapClass[K comparable, V Value]() MapClassLike[K, V] {
 	var class *mapClass_[K, V]
@@ -106,7 +106,7 @@ func (c *mapClass_[K, V]) FromString(associations string) MapLike[K, V] {
 	return map_
 }
 
-// CLASS TYPE
+// CLASS INSTANCES
 
 // Private Class Type Definition
 

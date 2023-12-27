@@ -22,11 +22,11 @@ type iteratorClass_[V Value] struct {
 	// This class does not define any constants.
 }
 
-// Private Namespace Reference(s)
+// Private Class Namespace References
 
 var iteratorClass = map[string]any{}
 
-// Public Namespace Access
+// Public Class Namespace Access
 
 func IteratorClass[V Value]() IteratorClassLike[V] {
 	var class *iteratorClass_[V]
@@ -58,7 +58,7 @@ func (c *iteratorClass_[V]) FromSequence(sequence Sequential[V]) IteratorLike[V]
 	return iterator
 }
 
-// CLASS TYPE
+// CLASS INSTANCES
 
 // Private Class Type Definition
 

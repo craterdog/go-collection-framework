@@ -22,11 +22,11 @@ type stackClass_[V Value] struct {
 	defaultCapacity int
 }
 
-// Private Namespace Reference(s)
+// Private Class Namespace References
 
 var stackClass = map[string]any{}
 
-// Public Namespace Access
+// Public Class Namespace Access
 
 func StackClass[V Value]() StackClassLike[V] {
 	var class *stackClass_[V]
@@ -103,7 +103,7 @@ func (c *stackClass_[V]) WithCapacity(capacity int) StackLike[V] {
 	return stack
 }
 
-// CLASS TYPE
+// CLASS INSTANCES
 
 // Private Class Type Definition
 

@@ -25,13 +25,13 @@ type formatterClass_ struct {
 	// This class defines no constants.
 }
 
-// Private Namespace Reference(s)
+// Private Class Namespace Reference
 
 var formatterClass = &formatterClass_{
 	// This class defines no constants.
 }
 
-// Public Namespace Access
+// Public Class Namespace Access
 
 func FormatterClass() *formatterClass_ {
 	return formatterClass
@@ -46,7 +46,7 @@ func (c *formatterClass_) WithDepth(depth int) *formatter_ {
 	return formatter
 }
 
-// CLASS TYPE
+// CLASS INSTANCES
 
 // Private Class Type Definition
 

@@ -34,7 +34,7 @@ type scannerClass_ struct {
 	unsignedMatcher  *reg.Regexp
 }
 
-// Private Namespace Reference(s)
+// Private Class Namespace Reference
 
 var scannerClass = &scannerClass_{
 	booleanMatcher:   reg.MustCompile(`^(?:` + boolean_ + `)`),
@@ -51,7 +51,7 @@ var scannerClass = &scannerClass_{
 	unsignedMatcher:  reg.MustCompile(`^(?:` + unsigned_ + `)`),
 }
 
-// Public Namespace Access
+// Public Class Namespace Access
 
 func ScannerClass() *scannerClass_ {
 	return scannerClass
@@ -196,7 +196,7 @@ func (c *scannerClass_) MatchUnsigned(text string) []string {
 	return c.unsignedMatcher.FindStringSubmatch(text)
 }
 
-// CLASS TYPE
+// CLASS INSTANCES
 
 // Private Class Type Definition
 

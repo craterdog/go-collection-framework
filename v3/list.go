@@ -22,11 +22,11 @@ type listClass_[V Value] struct {
 	// This class defines no constants.
 }
 
-// Private Namespace Reference(s)
+// Private Class Namespace References
 
 var listClass = map[string]any{}
 
-// Public Namespace Access
+// Public Class Namespace Access
 
 func ListClass[V Value]() ListClassLike[V] {
 	var class *listClass_[V]
@@ -106,7 +106,7 @@ func (c *listClass_[V]) Concatenate(first, second ListLike[V]) ListLike[V] {
 	return list
 }
 
-// CLASS TYPE
+// CLASS INSTANCES
 
 // Private Class Type Definition
 

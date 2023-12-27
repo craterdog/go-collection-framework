@@ -26,14 +26,14 @@ type parserClass_ struct {
 	stackSize   int
 }
 
-// Private Namespace Reference(s)
+// Private Class Namespace Reference
 
 var parserClass = &parserClass_{
 	channelSize: 128,
 	stackSize:   4,
 }
 
-// Public Namespace Access
+// Public Class Namespace Access
 
 func ParserClass() *parserClass_ {
 	return parserClass
@@ -48,7 +48,7 @@ func (c *parserClass_) CDCN() *parser_ {
 	return parser
 }
 
-// CLASS TYPE
+// CLASS INSTANCES
 
 // Private Class Type Definition
 

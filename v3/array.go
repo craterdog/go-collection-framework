@@ -22,11 +22,11 @@ type arrayClass_[V Value] struct {
 	// This class defines no constants.
 }
 
-// Private Namespace Reference(s)
+// Private Class Namespace References
 
 var arrayClass = map[string]any{}
 
-// Public Namespace Access
+// Public Class Namespace Access
 
 func ArrayClass[V Value]() ArrayClassLike[V] {
 	var class *arrayClass_[V]
@@ -88,7 +88,7 @@ func (c *arrayClass_[V]) WithSize(size int) ArrayLike[V] {
 	return array_[V](array)
 }
 
-// CLASS TYPE
+// CLASS INSTANCES
 
 // Private Class Type Definition
 

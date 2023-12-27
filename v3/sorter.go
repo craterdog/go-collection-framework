@@ -24,11 +24,11 @@ type sorterClass_[V Value] struct {
 	defaultRanker RankingFunction
 }
 
-// Private Namespace Reference(s)
+// Private Class Namespace References
 
 var sorterClass = map[string]any{}
 
-// Public Namespace Access
+// Public Class Namespace Access
 
 func SorterClass[V Value]() *sorterClass_[V] {
 	var class *sorterClass_[V]
@@ -70,7 +70,7 @@ func (c *sorterClass_[V]) WithRanker(ranker RankingFunction) *sorter_[V] {
 	return sorter
 }
 
-// CLASS TYPE
+// CLASS INSTANCES
 
 // Private Class Type Definition
 

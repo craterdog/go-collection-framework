@@ -26,13 +26,13 @@ type collatorClass_ struct {
 	defaultDepth int
 }
 
-// Private Namespace Reference(s)
+// Private Class Namespace Reference
 
 var collatorClass = &collatorClass_{
 	defaultDepth: 16,
 }
 
-// Public Namespace Access
+// Public Class Namespace Access
 
 func CollatorClass() *collatorClass_ {
 	return collatorClass
@@ -63,7 +63,7 @@ func (c *collatorClass_) WithDepth(depth int) *collator_ {
 	return collator
 }
 
-// CLASS TYPE
+// CLASS INSTANCES
 
 // Private Class Type Definition
 

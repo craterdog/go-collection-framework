@@ -24,11 +24,11 @@ type catalogClass_[K comparable, V Value] struct {
 	// This class defines no constants.
 }
 
-// Private Namespace Reference(s)
+// Private Class Namespace References
 
 var catalogClass = map[string]any{}
 
-// Public Namespace Access
+// Public Class Namespace Access
 
 func CatalogClass[K comparable, V Value]() CatalogClassLike[K, V] {
 	var class *catalogClass_[K, V]
@@ -145,7 +145,7 @@ func (c *catalogClass_[K, V]) Merge(
 	return catalog
 }
 
-// CLASS TYPE
+// CLASS INSTANCES
 
 // Private Class Type Definition
 

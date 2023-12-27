@@ -23,11 +23,11 @@ type queueClass_[V Value] struct {
 	defaultCapacity int
 }
 
-// Private Namespace Reference(s)
+// Private Class Namespace References
 
 var queueClass = map[string]any{}
 
-// Public Namespace Access
+// Public Class Namespace Access
 
 func QueueClass[V Value]() QueueClassLike[V] {
 	var class *queueClass_[V]
@@ -268,7 +268,7 @@ func (c *queueClass_[V]) Split(
 	return outputs
 }
 
-// CLASS TYPE
+// CLASS INSTANCES
 
 // Private Class Type Definition
 

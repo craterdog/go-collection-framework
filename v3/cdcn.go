@@ -18,13 +18,13 @@ type cdcnClass_ struct {
 	defaultDepth int
 }
 
-// Private Namespace Reference(s)
+// Private Class Namespace Reference
 
 var cdcnClass = &cdcnClass_{
 	defaultDepth: 8,
 }
 
-// Public Namespace Access
+// Public Class Namespace Access
 
 func CDCNClass() NotationClassLike {
 	return cdcnClass
@@ -54,7 +54,7 @@ func (c *cdcnClass_) WithDepth(depth int) NotationLike {
 	return cdcn
 }
 
-// CLASS TYPE
+// CLASS INSTANCES
 
 // Private Class Type Definition
 

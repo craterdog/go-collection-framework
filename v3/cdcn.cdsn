@@ -1,31 +1,29 @@
-
 !>
     CRATER DOG COLLECTION NOTATION
     This document is a formal definition of Crater Dog Collection Notation™
     (CDCN) using Crater Dog Syntax Notation™ (CDSN).
 <!
 
-
 !>
     TOKEN DEFINITIONS
     The following token definitions are used by the scanner to generate the
     stream of tokens that are processed by the parser.  Each token name begins
     with an upper case letter.  Unlike with rule definitions, a token definition
-    cannot specify the name of a rule but can specify the name of another token.
-    Token definitions cannot be recursive and the scanning of tokens is not
-    greedy.  Whitespace within a token definition is not ignored.
+    cannot specify the name of a rule within its definition but it can specify
+	the name of other tokens.
 
     The following intrinsic token types are environment or language specific:
-     * ANY - any language specific character
-     * LOWER_CASE - any language specific lower case character
-     * UPPER_CASE - any language specific upper case character
-     * DIGIT - any language specific digit
-     * ESCAPE - any environment specific escape sequence
-     * CONTROL - any environment specific (non-printable) control character
-     * EOF - the environment specific end-of-file marker
+     * ANY - Any language specific character.
+     * LOWER - Any language specific lower case character.
+     * UPPER - Any language specific upper case character.
+     * DIGIT - Any language specific digit.
+     * ESCAPE - Any environment specific escape sequence.
+     * CONTROL - Any environment specific (non-printable) control character.
+     * EOL - The environment specific end-of-line character.
+     * EOF - The environment specific end-of-file marker.
 
-    Inversion within a token definition may only be applied to a token predicate
-    resulting in a single character.  Token inversions cannot be nested.
+    Token definitions cannot be recursive and the scanning of tokens is not
+    greedy.  Any spaces within a token definition are NOT ignored.
 <!
 
 $BASE10: '0'..'9'
@@ -38,8 +36,6 @@ $COMPLEX: "(" FLOAT SIGN FLOAT "i)"
 
 $DELIMITER: "[" | "]" | "(" | ")" | ":" | ","
 
-$EOL: "\n"
-
 $EXPONENT: ('e' | 'E') SIGN ORDINAL
 
 $FLOAT: SIGN? SCALAR EXPONENT?
@@ -50,7 +46,7 @@ $IGNORED: ' '
 
 $INTEGER: ZERO | SIGN? ORDINAL
 
-$LETTER: LOWER_CASE | UPPER_CASE
+$LETTER: LOWER | UPPER
 
 $NIL: "nil"
 
@@ -72,7 +68,6 @@ $UNSIGNED: "0x" BASE16+
 
 $ZERO: '0'
 
-
 !>
     RULE DEFINITIONS
     The following rules are used by the parser when parsing the stream of tokens
@@ -80,7 +75,7 @@ $ZERO: '0'
     The rule definitions may specify the names of tokens or other rules and are
     matched by the parser in the order listed.  A rule definition may also be
     directly or indirectly recursive.  The sequence of factors within in a rule
-    definition may be separated by whitespace which is ignored by the parser.
+    definition may be separated by spaces which are ignored by the parser.
 
     A predicate within a factor may also be constrained by any of the following
     cardinalities:
@@ -95,7 +90,7 @@ $ZERO: '0'
     resulting in a single token.  Rule inversions cannot be nested.
 <!
 
-$source: collection EOF  ! EOF is the end-of-file marker.
+$document: collection EOF  ! EOF is the end-of-file marker.
 
 $collection: "[" (associations | values) "]" context
 

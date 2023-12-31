@@ -116,6 +116,13 @@ type Associative[K Key, V Value] interface {
 }
 
 // This abstract interface defines the set of method signatures that must be
+// supported by all canonical notations.
+type Canonical interface {
+	FormatCollection(collection Collection) string
+	ParseCollection(collection string) Collection
+}
+
+// This abstract interface defines the set of method signatures that must be
 // supported by all sequences that allow new values to be appended, inserted
 // and removed.
 type Expandable[V Value] interface {
@@ -397,8 +404,7 @@ type NotationClassLike interface {
 // parse and format collections using a canonical notation like XML, JSON and
 // CDCN (Crater Dog Collection Notation™).
 type NotationLike interface {
-	FormatCollection(collection Collection) string
-	ParseCollection(collection string) Collection
+	Canonical
 }
 
 // This abstract type defines the set of class constants, constructors and

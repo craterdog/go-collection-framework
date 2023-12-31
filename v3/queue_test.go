@@ -59,6 +59,7 @@ func TestQueueWithConcurrency(t *tes.T) {
 				ass.Equal(t, i, value)
 			}
 		}
+		queue.RemoveAll()
 	}()
 
 	// Add some more values to the queue.

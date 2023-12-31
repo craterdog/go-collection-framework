@@ -63,8 +63,14 @@ The `Malleable[V]` interface has been renamed to `Extendable[V]` and the `AddVal
 and `AddValues()` methods renamed to `AppendValue()` and `AppendValues()` for
 clarity since they only append values to the end of a sequence.
 
+### Interfaces Added
+The following interfaces have been added to the package:
+ * `Limited[V]`
+
 ### Interfaces Removed
 The following interfaces have been removed from the package:
+ * `Discerning`
+ * `Systematic`
  * `Binding[K, V]`
  * `Ratcheted[V]`
  * `FIFO[V]`

@@ -333,6 +333,13 @@ func (v *queue_[V]) GetCapacity() int {
 	return v.capacity
 }
 
+func (v *queue_[V]) RemoveAll() {
+	v.mutex.Lock()
+	v.available = make(chan bool, v.capacity)
+	v.values = ListClass[V]().Empty()
+	v.mutex.Unlock()
+}
+
 func (v *queue_[V]) RemoveHead() (V, bool) {
 	// Default the return value to the zero value for type V.
 	var head V

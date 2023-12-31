@@ -42,18 +42,6 @@ func TestStackWithSmallCapacity(t *tes.T) {
 	stack.AddValue(2) // This should panic.
 }
 
-func TestEmptyStackRetrieval(t *tes.T) {
-	var stack = col.StackClass[int]().Empty()
-	defer func() {
-		if e := recover(); e != nil {
-			ass.Equal(t, "Attempted to retrieve the top of an empty stack!", e)
-		} else {
-			ass.Fail(t, "Test should result in recovered panic.")
-		}
-	}()
-	stack.GetTop() // This should panic.
-}
-
 func TestEmptyStackRemoval(t *tes.T) {
 	var stack = col.StackClass[int]().Empty()
 	defer func() {
@@ -75,12 +63,9 @@ func TestStacksWithStrings(t *tes.T) {
 	stack.AddValue("bar")
 	stack.AddValue("baz")
 	ass.Equal(t, 3, stack.GetSize())
-	ass.Equal(t, "baz", string(stack.GetTop()))
 	ass.Equal(t, "baz", string(stack.RemoveTop()))
 	ass.Equal(t, 2, stack.GetSize())
-	ass.Equal(t, "bar", string(stack.GetTop()))
 	ass.Equal(t, "bar", string(stack.RemoveTop()))
 	ass.Equal(t, 1, stack.GetSize())
-	ass.Equal(t, "foo", string(stack.GetTop()))
 	stack.RemoveAll()
 }

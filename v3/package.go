@@ -145,6 +145,7 @@ type Flexible[V Value] interface {
 type Limited[V Value] interface {
 	AddValue(value V)
 	GetCapacity() int
+	RemoveAll()
 }
 
 // This abstract interface defines the set of method signatures that must be
@@ -486,7 +487,5 @@ type StackClassLike[V Value] interface {
 type StackLike[V Value] interface {
 	Sequential[V]
 	Limited[V]
-	GetTop() V
-	RemoveAll()
 	RemoveTop() V
 }

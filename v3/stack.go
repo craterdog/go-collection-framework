@@ -154,13 +154,6 @@ func (v *stack_[V]) GetCapacity() int {
 	return v.capacity
 }
 
-func (v *stack_[V]) GetTop() V {
-	if v.values.IsEmpty() {
-		panic("Attempted to retrieve the top of an empty stack!")
-	}
-	return v.values.GetValue(1)
-}
-
 func (v *stack_[V]) RemoveAll() {
 	v.values.RemoveAll()
 }

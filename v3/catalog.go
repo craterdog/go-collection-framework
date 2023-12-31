@@ -51,16 +51,16 @@ func CatalogClass[K comparable, V Value]() CatalogClassLike[K, V] {
 // Public Class Constructors
 
 func (c *catalogClass_[K, V]) Empty() CatalogLike[K, V] {
-	var keys = map[K]Binding[K, V]{}
-	var associations = ListClass[Binding[K, V]]().Empty()
+	var keys = map[K]AssociationLike[K, V]{}
+	var associations = ListClass[AssociationLike[K, V]]().Empty()
 	var catalog = &catalog_[K, V]{associations, keys}
 	return catalog
 }
 
 func (c *catalogClass_[K, V]) FromArray(
-	associations []Binding[K, V],
+	associations []AssociationLike[K, V],
 ) CatalogLike[K, V] {
-	var array = ArrayClass[Binding[K, V]]().FromArray(associations)
+	var array = ArrayClass[AssociationLike[K, V]]().FromArray(associations)
 	var catalog = c.FromSequence(array)
 	return catalog
 }
@@ -76,7 +76,7 @@ func (c *catalogClass_[K, V]) FromMap(
 }
 
 func (c *catalogClass_[K, V]) FromSequence(
-	associations Sequential[Binding[K, V]],
+	associations Sequential[AssociationLike[K, V]],
 ) CatalogLike[K, V] {
 	var catalog = c.Empty()
 	var iterator = associations.GetIterator()
@@ -92,9 +92,9 @@ func (c *catalogClass_[K, V]) FromSequence(
 func (c *catalogClass_[K, V]) FromString(associations string) CatalogLike[K, V] {
 	// First we parse it as a collection of any type value.
 	var cdcn = CDCNClass().Default()
-	var collection = cdcn.ParseCollection(associations).(Sequential[Binding[Key, Value]])
+	var collection = cdcn.ParseCollection(associations).(Sequential[AssociationLike[Key, Value]])
 
-	// Then we convert it to a catalog of type Binding[K, V].
+	// Then we convert it to a catalog of type AssociationLike[K, V].
 	var catalog = c.Empty()
 	var iterator = collection.GetIterator()
 	for iterator.HasNext() {
@@ -150,8 +150,8 @@ func (c *catalogClass_[K, V]) Merge(
 // Private Class Type Definition
 
 type catalog_[K comparable, V Value] struct {
-	associations ListLike[Binding[K, V]]
-	keys         map[K]Binding[K, V]
+	associations ListLike[AssociationLike[K, V]]
+	keys         map[K]AssociationLike[K, V]
 }
 
 // Associative Interface
@@ -187,7 +187,7 @@ func (v *catalog_[K, V]) GetValues(keys Sequential[K]) Sequential[V] {
 }
 
 func (v *catalog_[K, V]) RemoveAll() {
-	v.keys = map[K]Binding[K, V]{}
+	v.keys = map[K]AssociationLike[K, V]{}
 	v.associations.RemoveAll()
 }
 
@@ -228,11 +228,11 @@ func (v *catalog_[K, V]) SetValue(key K, value V) {
 
 // Sequential Interface
 
-func (v *catalog_[K, V]) AsArray() []Binding[K, V] {
+func (v *catalog_[K, V]) AsArray() []AssociationLike[K, V] {
 	return v.associations.AsArray()
 }
 
-func (v *catalog_[K, V]) GetIterator() Ratcheted[Binding[K, V]] {
+func (v *catalog_[K, V]) GetIterator() IteratorLike[AssociationLike[K, V]] {
 	return v.associations.GetIterator()
 }
 

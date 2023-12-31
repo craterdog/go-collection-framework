@@ -63,14 +63,12 @@ type cdcn_ struct {
 	parser    *parser_
 }
 
-// Standardized Interface
+// Public Interface
 
 func (v *cdcn_) FormatCollection(collection Collection) string {
 	return v.formatter.FormatCollection(collection)
 }
 
-// Stringent Interface
-
-func (v *cdcn_) ParseCollection(source string) Collection {
-	return v.parser.ParseCollection(source)
+func (v *cdcn_) ParseCollection(collection string) Collection {
+	return v.parser.ParseCollection(collection)
 }

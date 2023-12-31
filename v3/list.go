@@ -49,9 +49,10 @@ func ListClass[V Value]() ListClassLike[V] {
 // Public Class Constructors
 
 func (c *listClass_[V]) Empty() ListLike[V] {
-	var collator = CollatorClass().Default()
-	var comparer = collator.CompareValues
-	var list = c.WithComparer(comparer)
+	var values = ArrayClass[V]().WithSize(0)
+	var list = &list_[V]{
+		values: values,
+	}
 	return list
 }
 
@@ -86,15 +87,6 @@ func (c *listClass_[V]) FromString(values string) ListLike[V] {
 	return list
 }
 
-func (c *listClass_[V]) WithComparer(comparer ComparingFunction) ListLike[V] {
-	var values = ArrayClass[V]().WithSize(0)
-	var list = &list_[V]{
-		compare: comparer,
-		values:  values,
-	}
-	return list
-}
-
 // Public Class Functions
 
 // This public class function returns the concatenation of the two specified
@@ -111,8 +103,7 @@ func (c *listClass_[V]) Concatenate(first, second ListLike[V]) ListLike[V] {
 // Private Class Type Definition
 
 type list_[V Value] struct {
-	compare ComparingFunction
-	values  ArrayLike[V]
+	values ArrayLike[V]
 }
 
 // Accessible Interface
@@ -326,13 +317,10 @@ func (v *list_[V]) ContainsValue(value V) bool {
 	return v.GetIndex(value) > 0
 }
 
-func (v *list_[V]) GetComparer() ComparingFunction {
-	return v.compare
-}
-
 func (v *list_[V]) GetIndex(value V) int {
+	var compare = CollatorClass().Default().CompareValues
 	for index, candidate := range v.AsArray() {
-		if v.compare(candidate, value) {
+		if compare(candidate, value) {
 			// Found the value.
 			return index + 1 // Convert to an ORDINAL based index.
 		}
@@ -347,7 +335,7 @@ func (v *list_[V]) AsArray() []V {
 	return v.values.AsArray()
 }
 
-func (v *list_[V]) GetIterator() Ratcheted[V] {
+func (v *list_[V]) GetIterator() IteratorLike[V] {
 	return v.values.GetIterator()
 }
 

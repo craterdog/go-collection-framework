@@ -57,7 +57,7 @@ type formatter_ struct {
 	result      sts.Builder
 }
 
-// Standardized Interface
+// Public Interface
 
 func (v *formatter_) FormatCollection(collection Collection) string {
 	var reflected = ref.ValueOf(collection)

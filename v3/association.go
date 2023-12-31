@@ -62,7 +62,7 @@ type association_[K Key, V Value] struct {
 	value V
 }
 
-// Binding Interface
+// Public Interface
 
 func (v *association_[K, V]) GetKey() K {
 	return v.key

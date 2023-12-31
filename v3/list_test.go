@@ -161,25 +161,6 @@ func TestListsWithTildes(t *tes.T) {
 	ass.Equal(t, 3, int(list.GetValue(3)))  // [1,2,3,4,5,9]
 }
 
-func BadCompare(first col.Value, second col.Value) bool {
-	panic("KaPow!")
-}
-
-func TestListsWithComparer(t *tes.T) {
-	var list = col.ListClass[int]().WithComparer(BadCompare)
-	list.AppendValue(1)
-	list.AppendValue(2)
-	list.AppendValue(3)
-	defer func() {
-		if e := recover(); e != nil {
-			ass.Equal(t, "KaPow!", e)
-		} else {
-			ass.Fail(t, "Test should result in recovered panic.")
-		}
-	}()
-	list.GetIndex(2)
-}
-
 func TestListsWithConcatenate(t *tes.T) {
 	var List = col.ListClass[int]()
 	var collator = col.CollatorClass().Default()

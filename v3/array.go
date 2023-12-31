@@ -119,7 +119,7 @@ func (v array_[V]) AsArray() []V {
 	return array
 }
 
-func (v array_[V]) GetIterator() Ratcheted[V] {
+func (v array_[V]) GetIterator() IteratorLike[V] {
 	var iterator = IteratorClass[V]().FromSequence(v)
 	return iterator
 }

@@ -18,7 +18,7 @@ import (
 
 func TestCatalogConstructors(t *tes.T) {
 	var Catalog = col.CatalogClass[rune, int64]()
-	var _ = Catalog.FromArray([]col.Binding[rune, int64]{})
+	var _ = Catalog.FromArray([]col.AssociationLike[rune, int64]{})
 	var _ = Catalog.FromString("[:](Catalog)")
 	var _ = Catalog.FromString("['a': 1, 'b': 2, 'c': 3](Catalog)")
 	var _ = Catalog.FromMap(map[rune]int64{})
@@ -41,7 +41,7 @@ func TestCatalogsWithStringsAndIntegers(t *tes.T) {
 	ass.True(t, catalog.IsEmpty())
 	ass.Equal(t, 0, catalog.GetSize())
 	ass.Equal(t, []string{}, catalog.GetKeys().AsArray())
-	ass.Equal(t, []col.Binding[string, int]{}, catalog.AsArray())
+	ass.Equal(t, []col.AssociationLike[string, int]{}, catalog.AsArray())
 	var iterator = catalog.GetIterator()
 	ass.False(t, iterator.HasNext())
 	ass.False(t, iterator.HasPrevious())
@@ -134,7 +134,7 @@ func TestCatalogsWithExtract(t *tes.T) {
 	catalog3.SetValue(association1.GetKey(), association1.GetValue())
 	catalog3.SetValue(association3.GetKey(), association3.GetValue())
 	ass.True(t, collator.CompareValues(catalog2, catalog3))
-	var catalog4 = Catalog.FromArray([]col.Binding[string, int]{
+	var catalog4 = Catalog.FromArray([]col.AssociationLike[string, int]{
 		association1,
 		association2,
 		association3,

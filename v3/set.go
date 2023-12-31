@@ -50,8 +50,7 @@ func SetClass[V Value]() SetClassLike[V] {
 
 func (c *setClass_[V]) Empty() SetLike[V] {
 	var collator = CollatorClass().Default()
-	var ranker = collator.RankValues
-	var set = c.WithRanker(ranker)
+	var set = c.WithCollator(collator)
 	return set
 }
 
@@ -63,16 +62,15 @@ func (c *setClass_[V]) FromArray(values []V) SetLike[V] {
 
 func (c *setClass_[V]) FromSequence(values Sequential[V]) SetLike[V] {
 	var collator = CollatorClass().Default()
-	var ranker = collator.RankValues
-	var set = c.FromSequenceWithRanker(values, ranker)
+	var set = c.FromSequenceWithCollator(values, collator)
 	return set
 }
 
-func (c *setClass_[V]) FromSequenceWithRanker(
+func (c *setClass_[V]) FromSequenceWithCollator(
 	values Sequential[V],
-	ranker RankingFunction,
+	collator CollatorLike,
 ) SetLike[V] {
-	var set = c.WithRanker(ranker)
+	var set = c.WithCollator(collator)
 	var iterator = values.GetIterator()
 	for iterator.HasNext() {
 		var value = iterator.GetNext()
@@ -96,10 +94,10 @@ func (c *setClass_[V]) FromString(values string) SetLike[V] {
 	return set
 }
 
-func (c *setClass_[V]) WithRanker(ranker RankingFunction) SetLike[V] {
+func (c *setClass_[V]) WithCollator(collator CollatorLike) SetLike[V] {
 	var values = ListClass[V]().Empty()
 	var set = &set_[V]{
-		ranker,
+		collator,
 		values,
 	}
 	return set
@@ -110,7 +108,7 @@ func (c *setClass_[V]) WithRanker(ranker RankingFunction) SetLike[V] {
 // This public class function returns the logical conjunction of the specified
 // sets.
 func (c *setClass_[V]) And(first, second SetLike[V]) SetLike[V] {
-	var result = c.WithRanker(first.GetRanker())
+	var result = c.WithCollator(first.GetCollator())
 	var iterator = first.GetIterator()
 	for iterator.HasNext() {
 		var value = iterator.GetNext()
@@ -124,7 +122,7 @@ func (c *setClass_[V]) And(first, second SetLike[V]) SetLike[V] {
 // This public class function returns the logical disjunction of the specified
 // sets.
 func (c *setClass_[V]) Or(first, second SetLike[V]) SetLike[V] {
-	var result = c.FromSequenceWithRanker(first, first.GetRanker())
+	var result = c.FromSequenceWithCollator(first, first.GetCollator())
 	result.AddValues(second)
 	return result
 }
@@ -132,7 +130,7 @@ func (c *setClass_[V]) Or(first, second SetLike[V]) SetLike[V] {
 // This public class function returns the logical material non-implication of
 // the specified sets.
 func (c *setClass_[V]) Sans(first, second SetLike[V]) SetLike[V] {
-	var result = c.FromSequenceWithRanker(first, first.GetRanker())
+	var result = c.FromSequenceWithCollator(first, first.GetCollator())
 	result.RemoveValues(second)
 	return result
 }
@@ -149,8 +147,8 @@ func (c *setClass_[V]) Xor(first, second SetLike[V]) SetLike[V] {
 // Private Class Type Definition
 
 type set_[V Value] struct {
-	rank   RankingFunction
-	values ListLike[V]
+	collator CollatorLike
+	values   ListLike[V]
 }
 
 // Accessible Interface
@@ -179,10 +177,6 @@ func (v *set_[V]) AddValues(values Sequential[V]) {
 		var value = iterator.GetNext()
 		v.AddValue(value)
 	}
-}
-
-func (v *set_[V]) GetRanker() RankingFunction {
-	return v.rank
 }
 
 func (v *set_[V]) RemoveAll() {
@@ -238,10 +232,6 @@ func (v *set_[V]) ContainsValue(value V) bool {
 	return found
 }
 
-func (v *set_[V]) GetComparer() ComparingFunction {
-	return v.values.GetComparer()
-}
-
 func (v *set_[V]) GetIndex(value V) int {
 	var index, found = v.findIndex(value)
 	if !found {
@@ -256,7 +246,7 @@ func (v *set_[V]) AsArray() []V {
 	return v.values.AsArray()
 }
 
-func (v *set_[V]) GetIterator() Ratcheted[V] {
+func (v *set_[V]) GetIterator() IteratorLike[V] {
 	var iterator = v.values.GetIterator()
 	return iterator
 }
@@ -267,6 +257,12 @@ func (v *set_[V]) GetSize() int {
 
 func (v *set_[V]) IsEmpty() bool {
 	return v.values.IsEmpty()
+}
+
+// Public Interface
+
+func (v *set_[V]) GetCollator() CollatorLike {
+	return v.collator
 }
 
 // Private Interface
@@ -290,7 +286,7 @@ func (v *set_[V]) findIndex(value V) (index int, found bool) {
 	for size > 0 {
 		var middle = first + size/2 // Rounds down to the nearest integer.
 		var candidate = v.GetValue(middle)
-		switch v.rank(value, candidate) {
+		switch v.collator.RankValues(value, candidate) {
 		case -1:
 			// The index of the value is less than the middle
 			// index so the first index stays the same.

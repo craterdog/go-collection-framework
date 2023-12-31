@@ -71,7 +71,7 @@ func (c *queueClass_[V]) FromSequence(values Sequential[V]) QueueLike[V] {
 	var iterator = values.GetIterator()
 	for iterator.HasNext() {
 		var value = iterator.GetNext()
-		queue.AddValue(value)
+		queue.AddValue(value) // This call handles the synchronization.
 	}
 	return queue
 }
@@ -86,7 +86,7 @@ func (c *queueClass_[V]) FromString(values string) QueueLike[V] {
 	var iterator = collection.GetIterator()
 	for iterator.HasNext() {
 		var value = iterator.GetNext().(V)
-		queue.AddValue(value)
+		queue.AddValue(value) // This call handles the synchronization.
 	}
 	return queue
 }
@@ -284,7 +284,37 @@ type queue_[V Value] struct {
 // instead of the availability. Currently, the underlying list is only required
 // by the "AsArray()" class method.
 
-// FIFO Interface
+// Sequential Interface
+
+func (v *queue_[V]) AsArray() []V {
+	v.mutex.Lock()
+	var array = v.values.AsArray()
+	v.mutex.Unlock()
+	return array
+}
+
+func (v *queue_[V]) GetIterator() IteratorLike[V] {
+	v.mutex.Lock()
+	var iterator = v.values.GetIterator()
+	v.mutex.Unlock()
+	return iterator
+}
+
+func (v *queue_[V]) GetSize() int {
+	v.mutex.Lock()
+	var size = len(v.available)
+	v.mutex.Unlock()
+	return size
+}
+
+func (v *queue_[V]) IsEmpty() bool {
+	v.mutex.Lock()
+	var result = len(v.available) == 0
+	v.mutex.Unlock()
+	return result
+}
+
+// Public Interface
 
 func (v *queue_[V]) AddValue(value V) {
 	v.mutex.Lock()
@@ -318,36 +348,6 @@ func (v *queue_[V]) RemoveHead() (V, bool) {
 
 	// Return the results
 	return head, ok
-}
-
-// Sequential Interface
-
-func (v *queue_[V]) AsArray() []V {
-	v.mutex.Lock()
-	var array = v.values.AsArray()
-	v.mutex.Unlock()
-	return array
-}
-
-func (v *queue_[V]) GetIterator() Ratcheted[V] {
-	v.mutex.Lock()
-	var iterator = v.values.GetIterator()
-	v.mutex.Unlock()
-	return iterator
-}
-
-func (v *queue_[V]) GetSize() int {
-	v.mutex.Lock()
-	var size = len(v.available)
-	v.mutex.Unlock()
-	return size
-}
-
-func (v *queue_[V]) IsEmpty() bool {
-	v.mutex.Lock()
-	var result = len(v.available) == 0
-	v.mutex.Unlock()
-	return result
 }
 
 // Private Interface

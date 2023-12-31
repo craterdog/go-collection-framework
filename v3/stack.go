@@ -55,23 +55,28 @@ func (c *stackClass_[V]) GetDefaultCapacity() int {
 // Public Class Constructors
 
 func (c *stackClass_[V]) Empty() StackLike[V] {
-	var stack = c.WithCapacity(c.defaultCapacity)
+	var list = ListClass[V]().Empty()
+	var stack = &stack_[V]{
+		capacity: c.defaultCapacity,
+		values:   list,
+	}
 	return stack
 }
 
 func (c *stackClass_[V]) FromArray(values []V) StackLike[V] {
-	var array = ArrayClass[V]().FromArray(values)
-	var stack = c.FromSequence(array)
+	var list = ListClass[V]().FromArray(values)
+	var stack = &stack_[V]{
+		capacity: c.defaultCapacity,
+		values:   list,
+	}
 	return stack
 }
 
 func (c *stackClass_[V]) FromSequence(values Sequential[V]) StackLike[V] {
-	var stack = c.Empty()
-	var iterator = values.GetIterator()
-	iterator.ToEnd() // Add the values in reverse order since it is a LIFO.
-	for iterator.HasPrevious() {
-		var value = iterator.GetPrevious()
-		stack.AddValue(value)
+	var list = ListClass[V]().FromSequence(values)
+	var stack = &stack_[V]{
+		capacity: c.defaultCapacity,
+		values:   list,
 	}
 	return stack
 }
@@ -81,24 +86,26 @@ func (c *stackClass_[V]) FromString(values string) StackLike[V] {
 	var cdcn = CDCNClass().Default()
 	var collection = cdcn.ParseCollection(values).(Sequential[Value])
 
-	// Then we convert it to a stack of type V.
-	var stack = c.Empty()
-	var iterator = collection.GetIterator()
-	for iterator.HasNext() {
-		var value = iterator.GetNext().(V)
-		stack.AddValue(value)
+	// Next we must convert each value explicitly to type V.
+	var anys = collection.AsArray()
+	var array = make([]V, c.defaultCapacity)
+	for index, value := range anys {
+		array[index] = value.(V)
 	}
+
+	// Then we can create the stack from the type V array.
+	var stack = c.FromArray(array)
 	return stack
 }
 
 func (c *stackClass_[V]) WithCapacity(capacity int) StackLike[V] {
-	var values = ListClass[V]().Empty()
 	if capacity < 1 {
-		capacity = c.defaultCapacity
+		panic("A stack must have a capacity greater than zero.")
 	}
+	var list = ListClass[V]().Empty()
 	var stack = &stack_[V]{
-		capacity,
-		values,
+		capacity: capacity,
+		values:   list,
 	}
 	return stack
 }
@@ -112,7 +119,25 @@ type stack_[V Value] struct {
 	values   ListLike[V]
 }
 
-// LIFO Interface
+// Sequential Interface
+
+func (v *stack_[V]) AsArray() []V {
+	return v.values.AsArray()
+}
+
+func (v *stack_[V]) GetIterator() IteratorLike[V] {
+	return v.values.GetIterator()
+}
+
+func (v *stack_[V]) GetSize() int {
+	return v.values.GetSize()
+}
+
+func (v *stack_[V]) IsEmpty() bool {
+	return v.values.IsEmpty()
+}
+
+// Public Interface
 
 func (v *stack_[V]) AddValue(value V) {
 	if v.values.GetSize() == v.capacity {
@@ -145,24 +170,6 @@ func (v *stack_[V]) RemoveTop() V {
 		panic("Attempted to remove the top of an empty stack!")
 	}
 	return v.values.RemoveValue(1)
-}
-
-// Sequential Interface
-
-func (v *stack_[V]) AsArray() []V {
-	return v.values.AsArray()
-}
-
-func (v *stack_[V]) GetIterator() Ratcheted[V] {
-	return v.values.GetIterator()
-}
-
-func (v *stack_[V]) GetSize() int {
-	return v.values.GetSize()
-}
-
-func (v *stack_[V]) IsEmpty() bool {
-	return v.values.IsEmpty()
 }
 
 // Private Interface

@@ -18,7 +18,7 @@ import (
 
 func TestMapConstructors(t *tes.T) {
 	var Map = col.MapClass[rune, int64]()
-	var _ = Map.FromArray([]col.Binding[rune, int64]{})
+	var _ = Map.FromArray([]col.AssociationLike[rune, int64]{})
 	var _ = Map.FromMap(map[rune]int64{})
 	var sequence = Map.FromMap(map[rune]int64{'a': 1, 'b': 2, 'c': 3})
 	var _ = Map.FromSequence(sequence)
@@ -31,7 +31,7 @@ func TestEmptyMaps(t *tes.T) {
 	ass.True(t, m.IsEmpty())
 	ass.Equal(t, 0, m.GetSize())
 	ass.Equal(t, []string{}, m.GetKeys().AsArray())
-	ass.Equal(t, []col.Binding[string, int]{}, m.AsArray())
+	ass.Equal(t, []col.AssociationLike[string, int]{}, m.AsArray())
 	var iterator = m.GetIterator()
 	ass.False(t, iterator.HasNext())
 	ass.False(t, iterator.HasPrevious())
@@ -46,7 +46,7 @@ func TestMapsWithStringsAndIntegers(t *tes.T) {
 	var association2 = Association.FromPair("bar", 2)
 	var association3 = Association.FromPair("baz", 3)
 	var Map = col.MapClass[string, int]()
-	var m = Map.FromArray([]col.Binding[string, int]{
+	var m = Map.FromArray([]col.AssociationLike[string, int]{
 		association1,
 		association2,
 		association3,

@@ -58,7 +58,7 @@ type parser_ struct {
 	tokens chan *token_       // A queue of unread tokens coming from the scanner.
 }
 
-// Stringent Interface
+// Public Interface
 
 func (v *parser_) ParseCollection(source string) Collection {
 	// Start a scanner running in a separate Go routine.
@@ -186,10 +186,10 @@ func (v *parser_) parseAssociation() (AssociationLike[Key, Value], *token_, bool
 // This private class method attempts to parse a sequence of associations. It
 // returns the sequence of associations and whether or not the sequence of
 // associations was successfully parsed.
-func (v *parser_) parseAssociations() (Sequential[Binding[Key, Value]], *token_, bool) {
+func (v *parser_) parseAssociations() (Sequential[AssociationLike[Key, Value]], *token_, bool) {
 	var ok bool
 	var token *token_
-	var associations Sequential[Binding[Key, Value]]
+	var associations Sequential[AssociationLike[Key, Value]]
 	_, token, ok = v.parseDelimiter(":")
 	if ok {
 		// The associations is empty.
@@ -291,7 +291,7 @@ func (v *parser_) parseCollection() (Collection, *token_, bool) {
 			var message = fmt.Sprintf("Found an unknown collection type: %q", context)
 			panic(message)
 		}
-	case Sequential[Binding[Key, Value]]:
+	case Sequential[AssociationLike[Key, Value]]:
 		switch context {
 		case "map":
 			var map_ = map[Key]Value{}
@@ -413,7 +413,7 @@ func (v *parser_) parseFloat() (float64, *token_, bool) {
 // This private class method attempts to parse a sequence containing inline
 // associations. It returns a sequence of associations and whether or not the
 // sequence of associations was successfully parsed.
-func (v *parser_) parseInlineAssociations() (Sequential[Binding[Key, Value]], *token_, bool) {
+func (v *parser_) parseInlineAssociations() (Sequential[AssociationLike[Key, Value]], *token_, bool) {
 	var ok bool
 	var token *token_
 	var association AssociationLike[Key, Value]
@@ -497,7 +497,7 @@ func (v *parser_) parseInteger() (int64, *token_, bool) {
 // This private class method attempts to parse a sequence containing multi-line
 // associations.  It returns the sequence of associations and whether or not the
 // sequence of associations was successfully parsed.
-func (v *parser_) parseMultilineAssociations() (Sequential[Binding[Key, Value]], *token_, bool) {
+func (v *parser_) parseMultilineAssociations() (Sequential[AssociationLike[Key, Value]], *token_, bool) {
 	var ok bool
 	var token *token_
 	var association AssociationLike[Key, Value]

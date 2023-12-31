@@ -31,11 +31,11 @@ number of the package must be incremented.
 
 In doing this, the following class types are no longer part of the public
 interface for the package:
- * Token
- * Scanner
- * Parser
- * Collator
- * Sorter[Value]
+ * `Formatter`
+ * `Parser`
+ * `Scanner`
+ * `Sorter[Value]`
+ * `Token`
 
 These classes are still available from the package but any dependencies on them
 are not guaranteed to be stable.
@@ -58,17 +58,16 @@ for more details on class namespaces.
 These two classes which were type extensions before are now fully encapsulated
 classes with their own namespaces just like the rest of the collection classes.
 
-### `Stringent` Interface
-This interface was added to codify the methods that must be supported by all
-lexical parsing agents.
-
-### `Standardized` Interface
-This interface was added to codify the methods that must be supported by all
-canonical formatting agents.
-
 ### `Malleable[V]` Interface Refactored and Renamed
 The `Malleable[V]` interface has been renamed to `Extendable[V]` and the `AddValue()`
 and `AddValues()` methods renamed to `AppendValue()` and `AppendValues()` for
 clarity since they only append values to the end of a sequence.
+
+### Interfaces Removed
+The following interfaces have been removed from the package:
+ * `Binding[K, V]`
+ * `Ratcheted[V]`
+ * `FIFO[V]`
+ * `LIFO[V]`
 
 <H5 align="center"> Copyright © 2009 - 2024  Crater Dog Technologies™. All rights reserved. </H5>

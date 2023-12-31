@@ -68,7 +68,7 @@ type iterator_[V Value] struct {
 	values []V // The Go array of values is immutable.
 }
 
-// Ratcheted Interface
+// Public Interface
 
 func (v *iterator_[V]) GetNext() V {
 	var result V

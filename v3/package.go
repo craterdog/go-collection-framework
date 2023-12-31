@@ -116,15 +116,6 @@ type Associative[K Key, V Value] interface {
 }
 
 // This abstract interface defines the set of method signatures that must be
-// supported by all key-value associations.  An association binds a read-only
-// key with a setable value.
-type Binding[K Key, V Value] interface {
-	GetKey() K
-	GetValue() V
-	SetValue(value V)
-}
-
-// This abstract interface defines the set of method signatures that must be
 // supported by all sequences that allow new values to be appended, inserted
 // and removed.
 type Expandable[V Value] interface {
@@ -138,63 +129,22 @@ type Expandable[V Value] interface {
 }
 
 // This abstract interface defines the set of method signatures that must be
-// supported by all sequences whose values are accessed using first-in-first-out
-// (FIFO) semantics.
-type FIFO[V Value] interface {
-	AddValue(value V)
-	CloseQueue()
-	GetCapacity() int
-	RemoveHead() (head V, ok bool)
-}
-
-// This abstract interface defines the set of method signatures that must be
 // supported by all sequences of values that allow new values to be added and
 // existing values to be removed.
 type Flexible[V Value] interface {
 	AddValue(value V)
 	AddValues(values Sequential[V])
-	GetRanker() RankingFunction
 	RemoveAll()
 	RemoveValue(value V)
 	RemoveValues(values Sequential[V])
 }
 
 // This abstract interface defines the set of method signatures that must be
-// supported by all sequences whose values are accessed using last-in-first-out
-// (LIFO) semantics.
-type LIFO[V Value] interface {
+// supported by all sequences of values that allow new values to be added and
+// limit the total number of values in the sequence.
+type Limited[V Value] interface {
 	AddValue(value V)
 	GetCapacity() int
-	GetTop() V
-	RemoveAll()
-	RemoveTop() V
-}
-
-// This abstract interface defines the set of method signatures that must be
-// supported by all ratcheted agents that are capable of moving forward and
-// backward over the values in a sequence.  It is used to implement the Gang
-// of Four (GoF) Iterator Pattern:
-//
-//	https://en.wikipedia.org/wiki/Iterator_pattern
-//
-// A ratcheted agent locks into the slots that reside between each value in the
-// sequence:
-//
-//	    [value 1] . [value 2] . [value 3] ... [value N]
-//	  ^           ^           ^                         ^
-//	slot 0      slot 1      slot 2                    slot N
-//
-// It moves from slot to slot and has access to the values (if they exist) on
-// each side of the slot.
-type Ratcheted[V Value] interface {
-	GetNext() V
-	GetPrevious() V
-	GetSlot() int
-	HasNext() bool
-	HasPrevious() bool
-	ToEnd()
-	ToSlot(slot int)
-	ToStart()
 }
 
 // This abstract interface defines the set of method signatures that must be
@@ -203,7 +153,6 @@ type Searchable[V Value] interface {
 	ContainsAll(values Sequential[V]) bool
 	ContainsAny(values Sequential[V]) bool
 	ContainsValue(value V) bool
-	GetComparer() ComparingFunction
 	GetIndex(value V) int
 }
 
@@ -211,7 +160,7 @@ type Searchable[V Value] interface {
 // supported by all sequences of values.
 type Sequential[V Value] interface {
 	AsArray() []V
-	GetIterator() Ratcheted[V]
+	GetIterator() IteratorLike[V]
 	GetSize() int
 	IsEmpty() bool
 }
@@ -224,20 +173,6 @@ type Sortable[V Value] interface {
 	ShuffleValues()
 	SortValues()
 	SortValuesWithRanker(ranker RankingFunction)
-}
-
-// This abstract interface defines the set of method signatures that must be
-// supported by all standardized agents that can format collections using a
-// standard string representation.
-type Standardized interface {
-	FormatCollection(collection Collection) string
-}
-
-// This abstract interface defines the set of method signatures that must be
-// supported by all stringent agents that can parse source text containing
-// a standard representation of collections of values.
-type Stringent interface {
-	ParseCollection(source string) Collection
 }
 
 // This abstract interface defines the set of method signatures that must be
@@ -301,16 +236,18 @@ type AssociationClassLike[K Key, V Value] interface {
 //
 // This type is used by catalog-like types to maintain their associations.
 type AssociationLike[K Key, V Value] interface {
-	Binding[K, V]
+	GetKey() K
+	GetValue() V
+	SetValue(value V)
 }
 
 // This abstract type defines the set of class constants, constructors and
 // functions that must be supported by all catalog-class-like types.
 type CatalogClassLike[K comparable, V Value] interface {
 	Empty() CatalogLike[K, V]
-	FromArray(associations []Binding[K, V]) CatalogLike[K, V]
+	FromArray(associations []AssociationLike[K, V]) CatalogLike[K, V]
 	FromMap(associations map[K]V) CatalogLike[K, V]
-	FromSequence(associations Sequential[Binding[K, V]]) CatalogLike[K, V]
+	FromSequence(associations Sequential[AssociationLike[K, V]]) CatalogLike[K, V]
 	FromString(associations string) CatalogLike[K, V]
 	Extract(catalog CatalogLike[K, V], keys Sequential[K]) CatalogLike[K, V]
 	Merge(first, second CatalogLike[K, V]) CatalogLike[K, V]
@@ -327,8 +264,24 @@ type CatalogClassLike[K comparable, V Value] interface {
 // A catalog-like type can use any association-like type key-value association.
 type CatalogLike[K Key, V Value] interface {
 	Associative[K, V]
-	Sequential[Binding[K, V]]
-	Sortable[Binding[K, V]]
+	Sequential[AssociationLike[K, V]]
+	Sortable[AssociationLike[K, V]]
+}
+
+// This abstract type defines the set of class constants, constructors and
+// functions that must be supported by all collator-class-like types.
+type CollatorClassLike interface {
+	Default() CollatorLike
+	GetDefaultDepth() int
+	WithDepth(depth int) CollatorLike
+}
+
+// This abstract type defines the set of abstract interfaces that must be
+// supported by all collator-like types.  A collator-like type is capable of
+// comparing and ranking two values the any type.
+type CollatorLike interface {
+	CompareValues(first Value, second Value) bool
+	RankValues(first Value, second Value) int
 }
 
 // This abstract type defines the set of class constants, constructors and
@@ -339,19 +292,37 @@ type IteratorClassLike[V Value] interface {
 
 // This abstract type defines the set of abstract interfaces that must be
 // supported by all iterator-like types.  An iterator-like type can be used to
-// traverse a sequence of values in either direction (forward or backward). It
-// uses a ratchet based system that locks into the SLOTS between the values in
-// the sequence. At each slot an iterator has access to the previous value and
-// next value in the sequence (assuming they exist). The slot at the start of
-// the sequence has no PREVIOUS value, and the slot at the end of the sequence
-// has no NEXT value.
+// move forward and backward over the values in a sequence.  It implements the
+// Gang of Four (GoF) Iterator Design Pattern:
+//
+//	https://en.wikipedia.org/wiki/Iterator_pattern
+//
+// A iterator agent locks into the slots that reside between each value in the
+// sequence:
+//
+//	    [value 1] . [value 2] . [value 3] ... [value N]
+//	  ^           ^           ^                         ^
+//	slot 0      slot 1      slot 2                    slot N
+//
+// It moves from slot to slot and has access to the values (if they exist) on
+// each side of the slot.  At each slot an iterator has access to the previous
+// value and next value in the sequence (assuming they exist). The slot at the
+// start of the sequence has no PREVIOUS value, and the slot at the end of the
+// sequence has no NEXT value.
 //
 // This type is parameterized as follows:
 //   - V is any type of value.
 //
 // An iterator-like type is supported by all collection types.
 type IteratorLike[V Value] interface {
-	Ratcheted[V]
+	GetNext() V
+	GetPrevious() V
+	GetSlot() int
+	HasNext() bool
+	HasPrevious() bool
+	ToEnd()
+	ToSlot(slot int)
+	ToStart()
 }
 
 // This abstract type defines the set of class constants, constructors and
@@ -361,7 +332,6 @@ type ListClassLike[V Value] interface {
 	FromArray(values []V) ListLike[V]
 	FromSequence(values Sequential[V]) ListLike[V]
 	FromString(values string) ListLike[V]
-	WithComparer(comparer ComparingFunction) ListLike[V]
 	Concatenate(first, second ListLike[V]) ListLike[V]
 }
 
@@ -376,8 +346,8 @@ type ListClassLike[V Value] interface {
 // This type is parameterized as follows:
 //   - V is any type of value.
 //
-// A comparison of the values in the sequence is done using a configurable
-// ComparerFunction.
+// All comparison and ranking of values in the sequence is done using the
+// default collator.
 type ListLike[V Value] interface {
 	Accessible[V]
 	Expandable[V]
@@ -391,9 +361,9 @@ type ListLike[V Value] interface {
 // functions that must be supported by all map-class-like types.
 type MapClassLike[K comparable, V Value] interface {
 	Empty() MapLike[K, V]
-	FromArray(associations []Binding[K, V]) MapLike[K, V]
+	FromArray(associations []AssociationLike[K, V]) MapLike[K, V]
 	FromMap(associations map[K]V) MapLike[K, V]
-	FromSequence(associations Sequential[Binding[K, V]]) MapLike[K, V]
+	FromSequence(associations Sequential[AssociationLike[K, V]]) MapLike[K, V]
 	FromString(associations string) MapLike[K, V]
 }
 
@@ -410,7 +380,7 @@ type MapClassLike[K comparable, V Value] interface {
 // A map-like type can use any association-like type key-value association.
 type MapLike[K Key, V Value] interface {
 	Associative[K, V]
-	Sequential[Binding[K, V]]
+	Sequential[AssociationLike[K, V]]
 }
 
 // This abstract type defines the set of class constants, constructors and
@@ -426,8 +396,8 @@ type NotationClassLike interface {
 // parse and format collections using a canonical notation like XML, JSON and
 // CDCN (Crater Dog Collection Notation™).
 type NotationLike interface {
-	Standardized
-	Stringent
+	FormatCollection(collection Collection) string
+	ParseCollection(collection string) Collection
 }
 
 // This abstract type defines the set of class constants, constructors and
@@ -456,8 +426,10 @@ type QueueClassLike[V Value] interface {
 // a maximum length and will block on attempts to add a value it is full.  It
 // will also block on attempts to remove a value when it is empty.
 type QueueLike[V Value] interface {
-	FIFO[V]
 	Sequential[V]
+	Limited[V]
+	CloseQueue()
+	RemoveHead() (head V, ok bool)
 }
 
 // This abstract type defines the set of class constants, constructors and
@@ -466,9 +438,9 @@ type SetClassLike[V Value] interface {
 	Empty() SetLike[V]
 	FromArray(values []V) SetLike[V]
 	FromSequence(values Sequential[V]) SetLike[V]
-	FromSequenceWithRanker(values Sequential[V], ranker RankingFunction) SetLike[V]
+	FromSequenceWithCollator(values Sequential[V], collator CollatorLike) SetLike[V]
 	FromString(values string) SetLike[V]
-	WithRanker(ranker RankingFunction) SetLike[V]
+	WithCollator(collator CollatorLike) SetLike[V]
 	And(first, second SetLike[V]) SetLike[V]
 	Or(first, second SetLike[V]) SetLike[V]
 	Sans(first, second SetLike[V]) SetLike[V]
@@ -488,6 +460,7 @@ type SetLike[V Value] interface {
 	Flexible[V]
 	Searchable[V]
 	Sequential[V]
+	GetCollator() CollatorLike
 }
 
 // This abstract type defines the set of class constants, constructors and
@@ -511,6 +484,9 @@ type StackClassLike[V Value] interface {
 // A stack-like type enforces a maximum depth and will panic if that depth is
 // exceeded.  It will also panic on attempts to remove a value when it is empty.
 type StackLike[V Value] interface {
-	LIFO[V]
 	Sequential[V]
+	Limited[V]
+	GetTop() V
+	RemoveAll()
+	RemoveTop() V
 }

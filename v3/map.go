@@ -54,7 +54,7 @@ func (c *mapClass_[K, V]) Empty() MapLike[K, V] {
 	return map_[K, V](map[K]V{})
 }
 
-func (c *mapClass_[K, V]) FromArray(associations []Binding[K, V]) MapLike[K, V] {
+func (c *mapClass_[K, V]) FromArray(associations []AssociationLike[K, V]) MapLike[K, V] {
 	var size = len(associations)
 	var duplicate = make(map[K]V, size)
 	for _, association := range associations {
@@ -75,7 +75,7 @@ func (c *mapClass_[K, V]) FromMap(associations map[K]V) MapLike[K, V] {
 }
 
 func (c *mapClass_[K, V]) FromSequence(
-	associations Sequential[Binding[K, V]],
+	associations Sequential[AssociationLike[K, V]],
 ) MapLike[K, V] {
 	var size = associations.GetSize()
 	var iterator = associations.GetIterator()
@@ -92,9 +92,9 @@ func (c *mapClass_[K, V]) FromSequence(
 func (c *mapClass_[K, V]) FromString(associations string) MapLike[K, V] {
 	// First we parse it as a collection of any type value.
 	var cdcn = CDCNClass().Default()
-	var collection = cdcn.ParseCollection(associations).(Sequential[Binding[Key, Value]])
+	var collection = cdcn.ParseCollection(associations).(Sequential[AssociationLike[Key, Value]])
 
-	// Then we convert it to a Map of type Binding[K, V].
+	// Then we convert it to a Map of type AssociationLike[K, V].
 	var map_ = c.Empty()
 	var iterator = collection.GetIterator()
 	for iterator.HasNext() {
@@ -172,9 +172,9 @@ func (v map_[K, V]) SetValue(key K, value V) {
 
 // Sequential Interface
 
-func (v map_[K, V]) AsArray() []Binding[K, V] {
+func (v map_[K, V]) AsArray() []AssociationLike[K, V] {
 	var size = len(v)
-	var result = make([]Binding[K, V], size)
+	var result = make([]AssociationLike[K, V], size)
 	var index = 0
 	for key, value := range v {
 		var association = AssociationClass[K, V]().FromPair(key, value)
@@ -184,8 +184,8 @@ func (v map_[K, V]) AsArray() []Binding[K, V] {
 	return result
 }
 
-func (v map_[K, V]) GetIterator() Ratcheted[Binding[K, V]] {
-	var array = ArrayClass[Binding[K, V]]().FromArray(v.AsArray())
+func (v map_[K, V]) GetIterator() IteratorLike[AssociationLike[K, V]] {
+	var array = ArrayClass[AssociationLike[K, V]]().FromArray(v.AsArray())
 	var iterator = array.GetIterator()
 	return iterator
 }

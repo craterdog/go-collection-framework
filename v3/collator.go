@@ -34,7 +34,7 @@ var collatorClass = &collatorClass_{
 
 // Public Class Namespace Access
 
-func CollatorClass() *collatorClass_ {
+func CollatorClass() CollatorClassLike {
 	return collatorClass
 }
 
@@ -46,14 +46,14 @@ func (c *collatorClass_) GetDefaultDepth() int {
 
 // Public Class Constructors
 
-func (c *collatorClass_) Default() *collator_ {
+func (c *collatorClass_) Default() CollatorLike {
 	var collator = &collator_{
 		maximum: c.defaultDepth,
 	}
 	return collator
 }
 
-func (c *collatorClass_) WithDepth(depth int) *collator_ {
+func (c *collatorClass_) WithDepth(depth int) CollatorLike {
 	if depth < 0 || depth > c.defaultDepth {
 		depth = c.defaultDepth
 	}
@@ -72,7 +72,7 @@ type collator_ struct {
 	maximum int
 }
 
-// Discerning Interface
+// Public Interface
 
 func (v *collator_) CompareValues(first Value, second Value) bool {
 	return v.compareValues(ref.ValueOf(first), ref.ValueOf(second))

@@ -51,10 +51,9 @@ func (c *formatterClass_) WithDepth(depth int) *formatter_ {
 // Private Class Type Definition
 
 type formatter_ struct {
-	depth       int
-	indentation int
-	maximum     int
-	result      sts.Builder
+	depth   int
+	maximum int
+	result  sts.Builder
 }
 
 // Public Interface
@@ -75,8 +74,7 @@ func (v *formatter_) appendString(s string) {
 // This private class method appends a properly indented newline to the result.
 func (v *formatter_) appendNewline() {
 	var separator = "\n"
-	var levels = v.depth + v.indentation
-	for level := 0; level < levels; level++ {
+	for level := 0; level < v.depth; level++ {
 		separator += "    "
 	}
 	v.result.WriteString(separator)

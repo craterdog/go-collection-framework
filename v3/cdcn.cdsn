@@ -10,7 +10,7 @@
     stream of tokens that are processed by the parser.  Each token name begins
     with an upper case letter.  Unlike with rule definitions, a token definition
     cannot specify the name of a rule within its definition but it can specify
-	the name of other tokens.
+    the name of other tokens.
 
     The following intrinsic token types are environment or language specific:
      * ANY - Any language specific character.
@@ -25,47 +25,26 @@
     Token definitions cannot be recursive and the scanning of tokens is not
     greedy.  Any spaces within a token definition are NOT ignored.
 <!
-
 $BASE10: '0'..'9'
-
 $BASE16: '0'..'9' | 'a'..'f'
-
 $BOOLEAN: "false" | "true"
-
 $COMPLEX: "(" FLOAT SIGN FLOAT "i)"
-
 $DELIMITER: "[" | "]" | "(" | ")" | ":" | ","
-
 $EXPONENT: ('e' | 'E') SIGN ORDINAL
-
 $FLOAT: SIGN? SCALAR EXPONENT?
-
 $FRACTION: '.' BASE10+
-
 $IGNORED: ' '
-
 $INTEGER: ZERO | SIGN? ORDINAL
-
 $LETTER: LOWER | UPPER
-
 $NIL: "nil"
-
 $ORDINAL: '1'..'9' '0'..'9'*
-
 $RUNE: "'" ~CONTROL "'"  ! Any printable character.
-
 $SCALAR: (ZERO | ORDINAL) FRACTION
-
 $SIGN: '+' | '-'
-
 $STRING: '"' (ESCAPE | ~('"' | CONTROL))* '"'
-
 $TYPE: "array" | "map" | "Array" | "Catalog" | "List" | "Map" | "Queue" | "Set" | "Stack"
-
 $UNICODE: 'x' BASE16{2} | 'u' BASE16{4} | 'U' BASE16{8}
-
 $UNSIGNED: "0x" BASE16+
-
 $ZERO: '0'
 
 !>
@@ -89,28 +68,20 @@ $ZERO: '0'
     Inversion within a rule definition may only be applied to a token predicate
     resulting in a single token.  Rule inversions cannot be nested.
 <!
-
 $document: collection EOF  ! EOF is the end-of-file marker.
-
 $collection: "[" (associations | values) "]" context
-
 $associations:
-      association ("," association)*
-    | EOL (association EOL)+
-    | ":"  ! No associations.
+    association ("," association)*
+    EOL (association EOL)+
+    ":"  ! No associations.
 
 $association: key ":" value
-
 $key: primitive
-
 $values:
-      value ("," value)*
-    | EOL (value EOL)+
-    | " "  ! No values.
+    value ("," value)*
+    EOL (value EOL)+
+    " "  ! No values.
 
 $value: collection | primitive
-
 $primitive: BOOLEAN | COMPLEX | FLOAT | INTEGER | NIL | RUNE | STRING | UNSIGNED
-
 $context: "(" TYPE ")"
-

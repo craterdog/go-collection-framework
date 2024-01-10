@@ -33,7 +33,6 @@ $DELIMITER: "[" | "]" | "(" | ")" | ":" | ","
 $EXPONENT: ('e' | 'E') SIGN ORDINAL
 $FLOAT: SIGN? SCALAR EXPONENT?
 $FRACTION: '.' BASE10+
-$IGNORED: ' '
 $INTEGER: ZERO | SIGN? ORDINAL
 $LETTER: LOWER | UPPER
 $NIL: "nil"

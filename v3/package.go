@@ -200,15 +200,6 @@ type Updatable[V Value] interface {
 
 // Abstract Types
 
-// This abstract type defines the set of class constants, constructors and
-// functions that must be supported by all array-class-like types.
-type ArrayClassLike[V Value] interface {
-	FromArray(values []V) ArrayLike[V]
-	FromSequence(values Sequential[V]) ArrayLike[V]
-	FromString(values string) ArrayLike[V]
-	WithSize(size int) ArrayLike[V]
-}
-
 // This abstract type defines the set of abstract interfaces that must be
 // supported by all array-like types.  An array-like type maintains a fixed
 // length indexed sequence of values.  Each value is associated with an implicit
@@ -222,16 +213,11 @@ type ArrayClassLike[V Value] interface {
 // This type essentially provides a higher level abstraction for the primitive
 // Go array type.
 type ArrayLike[V Value] interface {
+	// Supported Interfaces
 	Accessible[V]
 	Sequential[V]
 	Sortable[V]
 	Updatable[V]
-}
-
-// This abstract type defines the set of class constants, constructors and
-// functions that must be supported by all association-class-like types.
-type AssociationClassLike[K Key, V Value] interface {
-	FromPair(key K, value V) AssociationLike[K, V]
 }
 
 // This abstract type defines the set of abstract interfaces that must be
@@ -244,21 +230,10 @@ type AssociationClassLike[K Key, V Value] interface {
 //
 // This type is used by catalog-like types to maintain their associations.
 type AssociationLike[K Key, V Value] interface {
+	// Public Interface
 	GetKey() K
 	GetValue() V
 	SetValue(value V)
-}
-
-// This abstract type defines the set of class constants, constructors and
-// functions that must be supported by all catalog-class-like types.
-type CatalogClassLike[K comparable, V Value] interface {
-	Empty() CatalogLike[K, V]
-	FromArray(associations []AssociationLike[K, V]) CatalogLike[K, V]
-	FromMap(associations map[K]V) CatalogLike[K, V]
-	FromSequence(associations Sequential[AssociationLike[K, V]]) CatalogLike[K, V]
-	FromString(associations string) CatalogLike[K, V]
-	Extract(catalog CatalogLike[K, V], keys Sequential[K]) CatalogLike[K, V]
-	Merge(first, second CatalogLike[K, V]) CatalogLike[K, V]
 }
 
 // This abstract type defines the set of abstract interfaces that must be
@@ -271,31 +246,19 @@ type CatalogClassLike[K comparable, V Value] interface {
 //
 // A catalog-like type can use any association-like type key-value association.
 type CatalogLike[K Key, V Value] interface {
+	// Supported Interfaces
 	Associative[K, V]
 	Sequential[AssociationLike[K, V]]
 	Sortable[AssociationLike[K, V]]
-}
-
-// This abstract type defines the set of class constants, constructors and
-// functions that must be supported by all collator-class-like types.
-type CollatorClassLike interface {
-	Default() CollatorLike
-	GetDefaultDepth() int
-	WithDepth(depth int) CollatorLike
 }
 
 // This abstract type defines the set of abstract interfaces that must be
 // supported by all collator-like types.  A collator-like type is capable of
 // comparing and ranking two values the any type.
 type CollatorLike interface {
+	// Public Interface
 	CompareValues(first Value, second Value) bool
 	RankValues(first Value, second Value) int
-}
-
-// This abstract type defines the set of class constants, constructors and
-// functions that must be supported by all iterator-class-like types.
-type IteratorClassLike[V Value] interface {
-	FromSequence(sequence Sequential[V]) IteratorLike[V]
 }
 
 // This abstract type defines the set of abstract interfaces that must be
@@ -323,6 +286,7 @@ type IteratorClassLike[V Value] interface {
 //
 // An iterator-like type is supported by all collection types.
 type IteratorLike[V Value] interface {
+	// Public Interface
 	GetNext() V
 	GetPrevious() V
 	GetSlot() int
@@ -331,16 +295,6 @@ type IteratorLike[V Value] interface {
 	ToEnd()
 	ToSlot(slot int)
 	ToStart()
-}
-
-// This abstract type defines the set of class constants, constructors and
-// functions that must be supported by all list-class-like types.
-type ListClassLike[V Value] interface {
-	Empty() ListLike[V]
-	FromArray(values []V) ListLike[V]
-	FromSequence(values Sequential[V]) ListLike[V]
-	FromString(values string) ListLike[V]
-	Concatenate(first, second ListLike[V]) ListLike[V]
 }
 
 // This abstract type defines the set of abstract interfaces that must be
@@ -357,22 +311,13 @@ type ListClassLike[V Value] interface {
 // All comparison and ranking of values in the sequence is done using the
 // default collator.
 type ListLike[V Value] interface {
+	// Supported Interfaces
 	Accessible[V]
 	Expandable[V]
 	Searchable[V]
 	Sequential[V]
 	Sortable[V]
 	Updatable[V]
-}
-
-// This abstract type defines the set of class constants, constructors and
-// functions that must be supported by all map-class-like types.
-type MapClassLike[K comparable, V Value] interface {
-	Empty() MapLike[K, V]
-	FromArray(associations []AssociationLike[K, V]) MapLike[K, V]
-	FromMap(associations map[K]V) MapLike[K, V]
-	FromSequence(associations Sequential[AssociationLike[K, V]]) MapLike[K, V]
-	FromString(associations string) MapLike[K, V]
 }
 
 // This abstract type defines the set of abstract interfaces that must be
@@ -387,16 +332,9 @@ type MapClassLike[K comparable, V Value] interface {
 //
 // A map-like type can use any association-like type key-value association.
 type MapLike[K Key, V Value] interface {
+	// Supported Interfaces
 	Associative[K, V]
 	Sequential[AssociationLike[K, V]]
-}
-
-// This abstract type defines the set of class constants, constructors and
-// functions that must be supported by all notation-class-like types.
-type NotationClassLike interface {
-	Default() NotationLike
-	GetDefaultDepth() int
-	WithDepth(depth int) NotationLike
 }
 
 // This abstract type defines the set of abstract interfaces that must be
@@ -404,21 +342,8 @@ type NotationClassLike interface {
 // parse and format collections using a canonical notation like XML, JSON and
 // CDCN (Crater Dog Collection Notation™).
 type NotationLike interface {
+	// Supported Interfaces
 	Canonical
-}
-
-// This abstract type defines the set of class constants, constructors and
-// functions that must be supported by all queue-class-like types.
-type QueueClassLike[V Value] interface {
-	Empty() QueueLike[V]
-	FromArray(values []V) QueueLike[V]
-	FromSequence(values Sequential[V]) QueueLike[V]
-	FromString(values string) QueueLike[V]
-	GetDefaultCapacity() int
-	WithCapacity(capacity int) QueueLike[V]
-	Fork(group Synchronized, input QueueLike[V], size int) Sequential[QueueLike[V]]
-	Join(group Synchronized, inputs Sequential[QueueLike[V]]) QueueLike[V]
-	Split(group Synchronized, input QueueLike[V], size int) Sequential[QueueLike[V]]
 }
 
 // This abstract type defines the set of abstract interfaces that must be
@@ -433,25 +358,13 @@ type QueueClassLike[V Value] interface {
 // a maximum length and will block on attempts to add a value it is full.  It
 // will also block on attempts to remove a value when it is empty.
 type QueueLike[V Value] interface {
+	// Supported Interfaces
 	Sequential[V]
 	Limited[V]
+
+	// Public Interface
 	CloseQueue()
 	RemoveHead() (head V, ok bool)
-}
-
-// This abstract type defines the set of class constants, constructors and
-// functions that must be supported by all set-class-like types.
-type SetClassLike[V Value] interface {
-	Empty() SetLike[V]
-	FromArray(values []V) SetLike[V]
-	FromSequence(values Sequential[V]) SetLike[V]
-	FromSequenceWithCollator(values Sequential[V], collator CollatorLike) SetLike[V]
-	FromString(values string) SetLike[V]
-	WithCollator(collator CollatorLike) SetLike[V]
-	And(first, second SetLike[V]) SetLike[V]
-	Or(first, second SetLike[V]) SetLike[V]
-	Sans(first, second SetLike[V]) SetLike[V]
-	Xor(first, second SetLike[V]) SetLike[V]
 }
 
 // This abstract type defines the set of abstract interfaces that must be
@@ -463,22 +376,14 @@ type SetClassLike[V Value] interface {
 //
 // The order of the values is determined by a configurable RankingFunction.
 type SetLike[V Value] interface {
+	// Supported Interfaces
 	Accessible[V]
 	Flexible[V]
 	Searchable[V]
 	Sequential[V]
-	GetCollator() CollatorLike
-}
 
-// This abstract type defines the set of class constants, constructors and
-// functions that must be supported by all stack-class-like types.
-type StackClassLike[V Value] interface {
-	Empty() StackLike[V]
-	FromArray(values []V) StackLike[V]
-	FromSequence(values Sequential[V]) StackLike[V]
-	FromString(values string) StackLike[V]
-	GetDefaultCapacity() int
-	WithCapacity(capacity int) StackLike[V]
+	// Public Interface
+	GetCollator() CollatorLike
 }
 
 // This abstract type defines the set of abstract interfaces that must be
@@ -491,7 +396,148 @@ type StackClassLike[V Value] interface {
 // A stack-like type enforces a maximum depth and will panic if that depth is
 // exceeded.  It will also panic on attempts to remove a value when it is empty.
 type StackLike[V Value] interface {
+	// Supported Interfaces
 	Sequential[V]
 	Limited[V]
+
+	// Public Interface
 	RemoveTop() V
+}
+
+// Abstract Namespaces
+
+// This abstract namespace defines the set of class constants, constructors and
+// functions that must be supported by all array-class-like namespaces.
+type ArrayClassLike[V Value] interface {
+	// Constructors
+	FromArray(values []V) ArrayLike[V]
+	FromSequence(values Sequential[V]) ArrayLike[V]
+	FromString(values string) ArrayLike[V]
+	WithSize(size int) ArrayLike[V]
+}
+
+// This abstract namespace defines the set of class constants, constructors and
+// functions that must be supported by all association-class-like namespaces.
+type AssociationClassLike[K Key, V Value] interface {
+	// Constructors
+	FromPair(key K, value V) AssociationLike[K, V]
+}
+
+// This abstract namespace defines the set of class constants, constructors and
+// functions that must be supported by all catalog-class-like namespaces.
+type CatalogClassLike[K comparable, V Value] interface {
+	// Constructors
+	Empty() CatalogLike[K, V]
+	FromArray(associations []AssociationLike[K, V]) CatalogLike[K, V]
+	FromMap(associations map[K]V) CatalogLike[K, V]
+	FromSequence(associations Sequential[AssociationLike[K, V]]) CatalogLike[K, V]
+	FromString(associations string) CatalogLike[K, V]
+
+	// Functions
+	Extract(catalog CatalogLike[K, V], keys Sequential[K]) CatalogLike[K, V]
+	Merge(first, second CatalogLike[K, V]) CatalogLike[K, V]
+}
+
+// This abstract namespace defines the set of class constants, constructors and
+// functions that must be supported by all collator-class-like namespaces.
+type CollatorClassLike interface {
+	// Constants
+	GetDefaultDepth() int
+
+	// Constructors
+	Default() CollatorLike
+	WithDepth(depth int) CollatorLike
+}
+
+// This abstract namespace defines the set of class constants, constructors and
+// functions that must be supported by all iterator-class-like namespaces.
+type IteratorClassLike[V Value] interface {
+	// Constructors
+	FromSequence(sequence Sequential[V]) IteratorLike[V]
+}
+
+// This abstract namespace defines the set of class constants, constructors and
+// functions that must be supported by all list-class-like namespaces.
+type ListClassLike[V Value] interface {
+	// Constructors
+	Empty() ListLike[V]
+	FromArray(values []V) ListLike[V]
+	FromSequence(values Sequential[V]) ListLike[V]
+	FromString(values string) ListLike[V]
+
+	// Functions
+	Concatenate(first, second ListLike[V]) ListLike[V]
+}
+
+// This abstract namespace defines the set of class constants, constructors and
+// functions that must be supported by all map-class-like namespaces.
+type MapClassLike[K comparable, V Value] interface {
+	// Constructors
+	Empty() MapLike[K, V]
+	FromArray(associations []AssociationLike[K, V]) MapLike[K, V]
+	FromMap(associations map[K]V) MapLike[K, V]
+	FromSequence(associations Sequential[AssociationLike[K, V]]) MapLike[K, V]
+	FromString(associations string) MapLike[K, V]
+}
+
+// This abstract namespace defines the set of class constants, constructors and
+// functions that must be supported by all notation-class-like namespaces.
+type NotationClassLike interface {
+	// Constants
+	GetDefaultDepth() int
+
+	// Constructors
+	Default() NotationLike
+	WithDepth(depth int) NotationLike
+}
+
+// This abstract namespace defines the set of class constants, constructors and
+// functions that must be supported by all queue-class-like namespaces.
+type QueueClassLike[V Value] interface {
+	// Constants
+	GetDefaultCapacity() int
+
+	// Constructors
+	Empty() QueueLike[V]
+	FromArray(values []V) QueueLike[V]
+	FromSequence(values Sequential[V]) QueueLike[V]
+	FromString(values string) QueueLike[V]
+	WithCapacity(capacity int) QueueLike[V]
+
+	// Functions
+	Fork(group Synchronized, input QueueLike[V], size int) Sequential[QueueLike[V]]
+	Join(group Synchronized, inputs Sequential[QueueLike[V]]) QueueLike[V]
+	Split(group Synchronized, input QueueLike[V], size int) Sequential[QueueLike[V]]
+}
+
+// This abstract namespace defines the set of class constants, constructors and
+// functions that must be supported by all set-class-like namespaces.
+type SetClassLike[V Value] interface {
+	// Constructors
+	Empty() SetLike[V]
+	FromArray(values []V) SetLike[V]
+	FromSequence(values Sequential[V]) SetLike[V]
+	FromSequenceWithCollator(values Sequential[V], collator CollatorLike) SetLike[V]
+	FromString(values string) SetLike[V]
+	WithCollator(collator CollatorLike) SetLike[V]
+
+	// Functions
+	And(first, second SetLike[V]) SetLike[V]
+	Or(first, second SetLike[V]) SetLike[V]
+	Sans(first, second SetLike[V]) SetLike[V]
+	Xor(first, second SetLike[V]) SetLike[V]
+}
+
+// This abstract namespace defines the set of class constants, constructors and
+// functions that must be supported by all stack-class-like namespaces.
+type StackClassLike[V Value] interface {
+	// Constants
+	GetDefaultCapacity() int
+
+	// Constructors
+	Empty() StackLike[V]
+	FromArray(values []V) StackLike[V]
+	FromSequence(values Sequential[V]) StackLike[V]
+	FromString(values string) StackLike[V]
+	WithCapacity(capacity int) StackLike[V]
 }

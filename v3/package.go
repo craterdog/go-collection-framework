@@ -13,7 +13,7 @@ This package file defines the INTERFACE to this package.  Any additions to the
 types defined in this file require a MINOR version change.  Any deletions from,
 or changes to, the types defined in this file require a MAJOR version change.
 
-The package defines a set of simple, pragmatic abstract types and interfaces
+The package defines a set of simple, pragmatic abstract classes and interfaces
 for Go based collections of values. It also provide an efficient and compact
 implementation of the following collection classes based on these abstractions:
   - Array (extended Go array)
@@ -198,10 +198,10 @@ type Updatable[V Value] interface {
 	SetValues(index int, values Sequential[V])
 }
 
-// Abstract Types
+// Abstract Classes
 
-// This abstract type defines the set of abstract interfaces that must be
-// supported by all array-like types.  An array-like type maintains a fixed
+// This abstract class defines the set of abstract interfaces that must be
+// supported by all array-like classes.  An array-like type maintains a fixed
 // length indexed sequence of values.  Each value is associated with an implicit
 // positive integer index. An array-like type uses ORDINAL based indexing rather
 // than the more common—and nonsensical—ZERO based indexing scheme (see the
@@ -220,15 +220,15 @@ type ArrayLike[V Value] interface {
 	Updatable[V]
 }
 
-// This abstract type defines the set of abstract interfaces that must be
-// supported by all association-like types.  An association-like type maintains
+// This abstract class defines the set of abstract interfaces that must be
+// supported by all association-like classes.  An association-like type maintains
 // information about a key-value association.
 //
 // This type is parameterized as follows:
 //   - K is a primitive type of key.
 //   - V is any type of value.
 //
-// This type is used by catalog-like types to maintain their associations.
+// This type is used by catalog-like classes to maintain their associations.
 type AssociationLike[K Key, V Value] interface {
 	// Public Interface
 	GetKey() K
@@ -236,8 +236,8 @@ type AssociationLike[K Key, V Value] interface {
 	SetValue(value V)
 }
 
-// This abstract type defines the set of abstract interfaces that must be
-// supported by all catalog-like types.  A catalog-like type maintains a
+// This abstract class defines the set of abstract interfaces that must be
+// supported by all catalog-like classes.  A catalog-like type maintains a
 // sequence of key-value associations.
 //
 // This type is parameterized as follows:
@@ -252,8 +252,8 @@ type CatalogLike[K Key, V Value] interface {
 	Sortable[AssociationLike[K, V]]
 }
 
-// This abstract type defines the set of abstract interfaces that must be
-// supported by all collator-like types.  A collator-like type is capable of
+// This abstract class defines the set of abstract interfaces that must be
+// supported by all collator-like classes.  A collator-like type is capable of
 // comparing and ranking two values the any type.
 type CollatorLike interface {
 	// Public Interface
@@ -261,8 +261,8 @@ type CollatorLike interface {
 	RankValues(first Value, second Value) int
 }
 
-// This abstract type defines the set of abstract interfaces that must be
-// supported by all iterator-like types.  An iterator-like type can be used to
+// This abstract class defines the set of abstract interfaces that must be
+// supported by all iterator-like classes.  An iterator-like type can be used to
 // move forward and backward over the values in a sequence.  It implements the
 // Gang of Four (GoF) Iterator Design Pattern:
 //
@@ -297,8 +297,8 @@ type IteratorLike[V Value] interface {
 	ToStart()
 }
 
-// This abstract type defines the set of abstract interfaces that must be
-// supported by all list-like types.  A list-like type maintains a dynamic
+// This abstract class defines the set of abstract interfaces that must be
+// supported by all list-like classes.  A list-like type maintains a dynamic
 // sequence of values which can grow or shrink as needed.  Each value is
 // associated with an implicit positive integer index. An array-like type
 // uses ORDINAL based indexing rather than the more common—and
@@ -320,8 +320,8 @@ type ListLike[V Value] interface {
 	Updatable[V]
 }
 
-// This abstract type defines the set of abstract interfaces that must be
-// supported by all map-like types.  A map-like type extends the primitive Go
+// This abstract class defines the set of abstract interfaces that must be
+// supported by all map-like classes.  A map-like type extends the primitive Go
 // map type and maintains a sequence of key-value associations.  The order of
 // the key-value associations in a primitive Go map is random, even for two Go
 // maps containing the same key-value associations.
@@ -337,8 +337,8 @@ type MapLike[K Key, V Value] interface {
 	Sequential[AssociationLike[K, V]]
 }
 
-// This abstract type defines the set of abstract interfaces that must be
-// supported by all notation-like types.  A notation-like type can be used to
+// This abstract class defines the set of abstract interfaces that must be
+// supported by all notation-like classes.  A notation-like type can be used to
 // parse and format collections using a canonical notation like XML, JSON and
 // CDCN (Crater Dog Collection Notation™).
 type NotationLike interface {
@@ -346,8 +346,8 @@ type NotationLike interface {
 	Canonical
 }
 
-// This abstract type defines the set of abstract interfaces that must be
-// supported by all queue-like types.  A queue-like type implements FIFO
+// This abstract class defines the set of abstract interfaces that must be
+// supported by all queue-like classes.  A queue-like type implements FIFO
 // (i.e. first-in-first-out) semantics.
 //
 // This type is parameterized as follows:
@@ -367,8 +367,8 @@ type QueueLike[V Value] interface {
 	RemoveHead() (head V, ok bool)
 }
 
-// This abstract type defines the set of abstract interfaces that must be
-// supported by all set-like types.  A set-like type maintains an ordered
+// This abstract class defines the set of abstract interfaces that must be
+// supported by all set-like classes.  A set-like type maintains an ordered
 // sequence of values which can grow or shrink as needed.
 //
 // This type is parameterized as follows:
@@ -386,8 +386,8 @@ type SetLike[V Value] interface {
 	GetCollator() CollatorLike
 }
 
-// This abstract type defines the set of abstract interfaces that must be
-// supported by all stack-like types.  A stack-like type implements LIFO
+// This abstract class defines the set of abstract interfaces that must be
+// supported by all stack-like classes.  A stack-like type implements LIFO
 // (i.e. last-in-first-out) semantics.
 //
 // This type is parameterized as follows:

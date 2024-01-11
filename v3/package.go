@@ -59,7 +59,7 @@ type Key any
 // as values.
 type Value any
 
-// Function Types
+// Functional Types
 
 // This function type defines the signature for any function that can determine
 // whether or not two specified values are equal to each other.  The meaning of

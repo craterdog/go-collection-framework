@@ -8,16 +8,17 @@
  * Initiative. (See http://opensource.org/licenses/MIT)                        *
  *******************************************************************************/
 
-package collections_test
+package cdcn_test
 
 import (
 	col "github.com/craterdog/go-collection-framework/v3"
+	not "github.com/craterdog/go-collection-framework/v3/cdcn"
 	ass "github.com/stretchr/testify/assert"
 	tes "testing"
 )
 
 func TestFormatDepths(t *tes.T) {
-	var Formatter = col.FormatterClass()
+	var Formatter = not.FormatterClass()
 	var formatter = Formatter.MakeWithDepth(0)
 	var array = col.ArrayClass[any]().MakeFromArray([]any{1, []any{1, 2, []any{1, 2, 3}}})
 	var s = formatter.FormatCollection(array)
@@ -31,7 +32,7 @@ func TestFormatDepths(t *tes.T) {
 }
 
 func TestFormatInvalidType(t *tes.T) {
-	var formatter = col.FormatterClass().MakeWithDepth(8)
+	var formatter = not.FormatterClass().MakeWithDepth(8)
 	var s struct{}
 	defer func() {
 		if e := recover(); e != nil {

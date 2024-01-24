@@ -29,7 +29,7 @@ var arrayClass = map[string]any{}
 // Public Class Namespace Access
 
 func ArrayClass[V Value]() ArrayClassLike[V] {
-	var class *arrayClass_[V]
+	var class ArrayClassLike[V]
 	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
 	var value = arrayClass[key]
 	switch actual := value.(type) {
@@ -48,14 +48,14 @@ func ArrayClass[V Value]() ArrayClassLike[V] {
 
 // Public Class Constructors
 
-func (c *arrayClass_[V]) FromArray(values []V) ArrayLike[V] {
+func (c *arrayClass_[V]) MakeFromArray(values []V) ArrayLike[V] {
 	var size = len(values)
 	var array = make([]V, size)
 	copy(array, values)
 	return array_[V](array)
 }
 
-func (c *arrayClass_[V]) FromSequence(values Sequential[V]) ArrayLike[V] {
+func (c *arrayClass_[V]) MakeFromSequence(values Sequential[V]) ArrayLike[V] {
 	var size = values.GetSize()
 	var iterator = values.GetIterator()
 	var array = make([]V, size)
@@ -66,13 +66,15 @@ func (c *arrayClass_[V]) FromSequence(values Sequential[V]) ArrayLike[V] {
 	return array_[V](array)
 }
 
-func (c *arrayClass_[V]) FromString(values string) ArrayLike[V] {
+func (c *arrayClass_[V]) MakeFromSource(
+	source string,
+	notation NotationLike,
+) ArrayLike[V] {
 	// First we parse it as a collection of any type value.
-	var cdcn = CDCNClass().Default()
-	var collection = cdcn.ParseCollection(values).(Sequential[Value])
+	var collection = notation.ParseSource(source).(Sequential[Value])
 
 	// Then we convert it to an Array of type V.
-	var array = c.WithSize(collection.GetSize())
+	var array = c.MakeWithSize(collection.GetSize())
 	var index int
 	var iterator = collection.GetIterator()
 	for iterator.HasNext() {
@@ -83,7 +85,7 @@ func (c *arrayClass_[V]) FromString(values string) ArrayLike[V] {
 	return array
 }
 
-func (c *arrayClass_[V]) WithSize(size int) ArrayLike[V] {
+func (c *arrayClass_[V]) MakeWithSize(size int) ArrayLike[V] {
 	var array = make([]V, size) // All values initialized to zero.
 	return array_[V](array)
 }
@@ -106,7 +108,7 @@ func (v array_[V]) GetValues(first int, last int) Sequential[V] {
 	last = v.toZeroBased(last)
 	var sequence = v[first : last+1]
 	// Copy the underlying Go array.
-	var array = ArrayClass[V]().FromArray(sequence)
+	var array = ArrayClass[V]().MakeFromArray(sequence)
 	return array
 }
 
@@ -120,7 +122,7 @@ func (v array_[V]) AsArray() []V {
 }
 
 func (v array_[V]) GetIterator() IteratorLike[V] {
-	var iterator = IteratorClass[V]().FromSequence(v)
+	var iterator = IteratorClass[V]().Make(v)
 	return iterator
 }
 
@@ -135,26 +137,33 @@ func (v array_[V]) IsEmpty() bool {
 // Sortable Interface
 
 func (v array_[V]) ReverseValues() {
-	var sorter = SorterClass[V]().Default()
+	var sorter = SorterClass[V]().Make()
 	sorter.ReverseValues(v)
 }
 
 func (v array_[V]) ShuffleValues() {
-	var sorter = SorterClass[V]().Default()
+	var sorter = SorterClass[V]().Make()
 	sorter.ShuffleValues(v)
 }
 
 func (v array_[V]) SortValues() {
-	var collator = CollatorClass().Default()
+	var collator = CollatorClass().Make()
 	var ranker = collator.RankValues
 	v.SortValuesWithRanker(ranker)
 }
 
 func (v array_[V]) SortValuesWithRanker(ranker RankingFunction) {
 	if v.GetSize() > 1 {
-		var sorter = SorterClass[V]().WithRanker(ranker)
+		var sorter = SorterClass[V]().MakeWithRanker(ranker)
 		sorter.SortValues(v)
 	}
+}
+
+// Stringer Interface
+
+func (v array_[V]) String() string {
+	var formatter = FormatterClass().Make()
+	return formatter.FormatCollection(v)
 }
 
 // Updatable Interface
@@ -173,12 +182,6 @@ func (v array_[V]) SetValues(index int, values Sequential[V]) {
 }
 
 // Private Interface
-
-// This public class method is used by Go to generate a string from an Array.
-func (v array_[V]) String() string {
-	var cdcn = CDCNClass().Default()
-	return cdcn.FormatCollection(v)
-}
 
 // This private class method normalizes a relative ORDINAL-based index into this
 // Array to match the Go (ZERO-based) indexing. The following transformation is

@@ -29,7 +29,7 @@ var setClass = map[string]any{}
 // Public Class Namespace Access
 
 func SetClass[V Value]() SetClassLike[V] {
-	var class *setClass_[V]
+	var class SetClassLike[V]
 	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
 	var value = setClass[key]
 	switch actual := value.(type) {
@@ -48,29 +48,20 @@ func SetClass[V Value]() SetClassLike[V] {
 
 // Public Class Constructors
 
-func (c *setClass_[V]) Empty() SetLike[V] {
-	var collator = CollatorClass().Default()
-	var set = c.WithCollator(collator)
+func (c *setClass_[V]) Make() SetLike[V] {
+	var collator = CollatorClass().Make()
+	var set = c.MakeWithCollator(collator)
 	return set
 }
 
-func (c *setClass_[V]) FromArray(values []V) SetLike[V] {
-	var array = ArrayClass[V]().FromArray(values)
-	var set = c.FromSequence(array)
+func (c *setClass_[V]) MakeFromArray(values []V) SetLike[V] {
+	var array = ArrayClass[V]().MakeFromArray(values)
+	var set = c.MakeFromSequence(array)
 	return set
 }
 
-func (c *setClass_[V]) FromSequence(values Sequential[V]) SetLike[V] {
-	var collator = CollatorClass().Default()
-	var set = c.FromSequenceWithCollator(values, collator)
-	return set
-}
-
-func (c *setClass_[V]) FromSequenceWithCollator(
-	values Sequential[V],
-	collator CollatorLike,
-) SetLike[V] {
-	var set = c.WithCollator(collator)
+func (c *setClass_[V]) MakeFromSequence(values Sequential[V]) SetLike[V] {
+	var set = c.Make()
 	var iterator = values.GetIterator()
 	for iterator.HasNext() {
 		var value = iterator.GetNext()
@@ -79,13 +70,15 @@ func (c *setClass_[V]) FromSequenceWithCollator(
 	return set
 }
 
-func (c *setClass_[V]) FromString(values string) SetLike[V] {
+func (c *setClass_[V]) MakeFromSource(
+	source string,
+	notation NotationLike,
+) SetLike[V] {
 	// First we parse it as a collection of any type value.
-	var cdcn = CDCNClass().Default()
-	var collection = cdcn.ParseCollection(values).(Sequential[Value])
+	var collection = notation.ParseSource(source).(Sequential[Value])
 
 	// Then we convert it to a set of type V.
-	var set = c.Empty()
+	var set = c.Make()
 	var iterator = collection.GetIterator()
 	for iterator.HasNext() {
 		var value = iterator.GetNext().(V)
@@ -94,8 +87,8 @@ func (c *setClass_[V]) FromString(values string) SetLike[V] {
 	return set
 }
 
-func (c *setClass_[V]) WithCollator(collator CollatorLike) SetLike[V] {
-	var values = ListClass[V]().Empty()
+func (c *setClass_[V]) MakeWithCollator(collator CollatorLike) SetLike[V] {
+	var values = ListClass[V]().Make()
 	var set = &set_[V]{
 		collator,
 		values,
@@ -108,7 +101,7 @@ func (c *setClass_[V]) WithCollator(collator CollatorLike) SetLike[V] {
 // This public class function returns the logical conjunction of the specified
 // sets.
 func (c *setClass_[V]) And(first, second SetLike[V]) SetLike[V] {
-	var result = c.WithCollator(first.GetCollator())
+	var result = c.MakeWithCollator(first.GetCollator())
 	var iterator = first.GetIterator()
 	for iterator.HasNext() {
 		var value = iterator.GetNext()
@@ -122,7 +115,8 @@ func (c *setClass_[V]) And(first, second SetLike[V]) SetLike[V] {
 // This public class function returns the logical disjunction of the specified
 // sets.
 func (c *setClass_[V]) Or(first, second SetLike[V]) SetLike[V] {
-	var result = c.FromSequenceWithCollator(first, first.GetCollator())
+	var result = c.MakeWithCollator(first.GetCollator())
+	result.AddValues(first)
 	result.AddValues(second)
 	return result
 }
@@ -130,7 +124,8 @@ func (c *setClass_[V]) Or(first, second SetLike[V]) SetLike[V] {
 // This public class function returns the logical material non-implication of
 // the specified sets.
 func (c *setClass_[V]) Sans(first, second SetLike[V]) SetLike[V] {
-	var result = c.FromSequenceWithCollator(first, first.GetCollator())
+	var result = c.MakeWithCollator(first.GetCollator())
+	result.AddValues(first)
 	result.RemoveValues(second)
 	return result
 }
@@ -259,6 +254,13 @@ func (v *set_[V]) IsEmpty() bool {
 	return v.values.IsEmpty()
 }
 
+// Stringer Interface
+
+func (v *set_[V]) String() string {
+	var formatter = FormatterClass().Make()
+	return formatter.FormatCollection(v)
+}
+
 // Public Interface
 
 func (v *set_[V]) GetCollator() CollatorLike {
@@ -306,11 +308,4 @@ func (v *set_[V]) findIndex(value V) (index int, found bool) {
 	// would be inserted. NOTE: Since the value was not found, the indexes are
 	// inverted: last < first (i.e. last = first - 1).
 	return last, false
-}
-
-// This public class method is used by Go to generate a canonical string for
-// the set.
-func (v *set_[V]) String() string {
-	var cdcn = CDCNClass().Default()
-	return cdcn.FormatCollection(v)
 }

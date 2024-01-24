@@ -40,20 +40,20 @@ func CollatorClass() CollatorClassLike {
 
 // Public Class Constants
 
-func (c *collatorClass_) GetDefaultDepth() int {
+func (c *collatorClass_) DefaultDepth() int {
 	return c.defaultDepth
 }
 
 // Public Class Constructors
 
-func (c *collatorClass_) Default() CollatorLike {
+func (c *collatorClass_) Make() CollatorLike {
 	var collator = &collator_{
 		maximum: c.defaultDepth,
 	}
 	return collator
 }
 
-func (c *collatorClass_) WithDepth(depth int) CollatorLike {
+func (c *collatorClass_) MakeWithDepth(depth int) CollatorLike {
 	if depth < 0 || depth > c.defaultDepth {
 		depth = c.defaultDepth
 	}
@@ -486,7 +486,7 @@ func (v *collator_) rankMaps(first ref.Value, second ref.Value) int {
 	}
 
 	// Extract and sort the keys for the two Go maps.
-	var sorter = SorterClass[ref.Value]().WithRanker(v.rankReflective)
+	var sorter = SorterClass[ref.Value]().MakeWithRanker(v.rankReflective)
 	var firstKeys = first.MapKeys() // The returned keys are in random order.
 	sorter.SortValues(firstKeys)
 	var secondKeys = second.MapKeys() // The returned keys are in random order.

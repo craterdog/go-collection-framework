@@ -31,7 +31,7 @@ var mapClass = map[string]any{}
 // Public Class Namespace Access
 
 func MapClass[K comparable, V Value]() MapClassLike[K, V] {
-	var class *mapClass_[K, V]
+	var class MapClassLike[K, V]
 	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
 	var value = mapClass[key]
 	switch actual := value.(type) {
@@ -50,11 +50,11 @@ func MapClass[K comparable, V Value]() MapClassLike[K, V] {
 
 // Public Class Constructors
 
-func (c *mapClass_[K, V]) Empty() MapLike[K, V] {
+func (c *mapClass_[K, V]) Make() MapLike[K, V] {
 	return map_[K, V](map[K]V{})
 }
 
-func (c *mapClass_[K, V]) FromArray(associations []AssociationLike[K, V]) MapLike[K, V] {
+func (c *mapClass_[K, V]) MakeFromArray(associations []AssociationLike[K, V]) MapLike[K, V] {
 	var size = len(associations)
 	var duplicate = make(map[K]V, size)
 	for _, association := range associations {
@@ -65,7 +65,7 @@ func (c *mapClass_[K, V]) FromArray(associations []AssociationLike[K, V]) MapLik
 	return map_[K, V](duplicate)
 }
 
-func (c *mapClass_[K, V]) FromMap(associations map[K]V) MapLike[K, V] {
+func (c *mapClass_[K, V]) MakeFromMap(associations map[K]V) MapLike[K, V] {
 	var size = len(associations)
 	var duplicate = make(map[K]V, size)
 	for key, value := range associations {
@@ -74,7 +74,7 @@ func (c *mapClass_[K, V]) FromMap(associations map[K]V) MapLike[K, V] {
 	return map_[K, V](duplicate)
 }
 
-func (c *mapClass_[K, V]) FromSequence(
+func (c *mapClass_[K, V]) MakeFromSequence(
 	associations Sequential[AssociationLike[K, V]],
 ) MapLike[K, V] {
 	var size = associations.GetSize()
@@ -89,13 +89,15 @@ func (c *mapClass_[K, V]) FromSequence(
 	return map_[K, V](duplicate)
 }
 
-func (c *mapClass_[K, V]) FromString(associations string) MapLike[K, V] {
+func (c *mapClass_[K, V]) MakeFromSource(
+	source string,
+	notation NotationLike,
+) MapLike[K, V] {
 	// First we parse it as a collection of any type value.
-	var cdcn = CDCNClass().Default()
-	var collection = cdcn.ParseCollection(associations).(Sequential[AssociationLike[Key, Value]])
+	var collection = notation.ParseSource(source).(Sequential[AssociationLike[Key, Value]])
 
 	// Then we convert it to a Map of type AssociationLike[K, V].
-	var map_ = c.Empty()
+	var map_ = c.Make()
 	var iterator = collection.GetIterator()
 	for iterator.HasNext() {
 		var association = iterator.GetNext()
@@ -115,7 +117,7 @@ type map_[K comparable, V Value] map[K]V
 // Associative Interface
 
 func (v map_[K, V]) GetKeys() Sequential[K] {
-	var keys = ListClass[K]().Empty()
+	var keys = ListClass[K]().Make()
 	var iterator = v.GetIterator()
 	for iterator.HasNext() {
 		var association = iterator.GetNext()
@@ -130,7 +132,7 @@ func (v map_[K, V]) GetValue(key K) V {
 }
 
 func (v map_[K, V]) GetValues(keys Sequential[K]) Sequential[V] {
-	var values = ListClass[V]().Empty()
+	var values = ListClass[V]().Make()
 	var iterator = keys.GetIterator()
 	for iterator.HasNext() {
 		var key = iterator.GetNext()
@@ -157,7 +159,7 @@ func (v map_[K, V]) RemoveValue(key K) V {
 }
 
 func (v map_[K, V]) RemoveValues(keys Sequential[K]) Sequential[V] {
-	var values = ListClass[V]().Empty()
+	var values = ListClass[V]().Make()
 	var iterator = keys.GetIterator()
 	for iterator.HasNext() {
 		var key = iterator.GetNext()
@@ -177,7 +179,7 @@ func (v map_[K, V]) AsArray() []AssociationLike[K, V] {
 	var result = make([]AssociationLike[K, V], size)
 	var index = 0
 	for key, value := range v {
-		var association = AssociationClass[K, V]().FromPair(key, value)
+		var association = AssociationClass[K, V]().Make(key, value)
 		result[index] = association
 		index++
 	}
@@ -185,7 +187,7 @@ func (v map_[K, V]) AsArray() []AssociationLike[K, V] {
 }
 
 func (v map_[K, V]) GetIterator() IteratorLike[AssociationLike[K, V]] {
-	var array = ArrayClass[AssociationLike[K, V]]().FromArray(v.AsArray())
+	var array = ArrayClass[AssociationLike[K, V]]().MakeFromArray(v.AsArray())
 	var iterator = array.GetIterator()
 	return iterator
 }
@@ -198,10 +200,9 @@ func (v map_[K, V]) IsEmpty() bool {
 	return len(v) == 0
 }
 
-// Private Interface
+// Stringer Interface
 
-// This public class method is used by Go to generate a string from a Map.
 func (v map_[K, V]) String() string {
-	var cdcn = CDCNClass().Default()
-	return cdcn.FormatCollection(v)
+	var formatter = FormatterClass().Make()
+	return formatter.FormatCollection(v)
 }

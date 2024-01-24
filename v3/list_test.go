@@ -12,33 +12,35 @@ package collections_test
 
 import (
 	col "github.com/craterdog/go-collection-framework/v3"
+	not "github.com/craterdog/go-collection-framework/v3/cdcn"
 	ass "github.com/stretchr/testify/assert"
 	tes "testing"
 )
 
 func TestListConstructor(t *tes.T) {
-	var _ = col.ListClass[int64]().FromString("[ ](List)")
-	var _ = col.ListClass[int64]().FromString("[1, 2, 3](List)")
+	var notation = not.NotationClass().Make()
+	var _ = col.ListClass[int64]().MakeFromSource("[ ](List)", notation)
+	var _ = col.ListClass[int64]().MakeFromSource("[1, 2, 3](List)", notation)
 }
 
 func TestListsWithStrings(t *tes.T) {
 	var Array = col.ArrayClass[string]()
 	var List = col.ListClass[string]()
-	var collator = col.CollatorClass().Default()
-	var foo = Array.FromArray([]string{"foo"})
-	var bar = Array.FromArray([]string{"bar"})
-	var baz = Array.FromArray([]string{"baz"})
-	var foz = Array.FromArray([]string{"foz"})
-	var barbaz = Array.FromArray([]string{"bar", "baz"})
-	var bazbaz = Array.FromArray([]string{"baz", "baz"})
-	var foobar = Array.FromArray([]string{"foo", "bar"})
-	var baxbaz = Array.FromArray([]string{"bax", "baz"})
-	var baxbez = Array.FromArray([]string{"bax", "bez"})
-	var barfoobax = Array.FromArray([]string{"bar", "foo", "bax"})
-	var foobazbar = Array.FromArray([]string{"foo", "baz", "bar"})
-	var foobarbaz = Array.FromArray([]string{"foo", "bar", "baz"})
-	var barbazfoo = Array.FromArray([]string{"bar", "baz", "foo"})
-	var list = List.Empty()
+	var collator = col.CollatorClass().Make()
+	var foo = Array.MakeFromArray([]string{"foo"})
+	var bar = Array.MakeFromArray([]string{"bar"})
+	var baz = Array.MakeFromArray([]string{"baz"})
+	var foz = Array.MakeFromArray([]string{"foz"})
+	var barbaz = Array.MakeFromArray([]string{"bar", "baz"})
+	var bazbaz = Array.MakeFromArray([]string{"baz", "baz"})
+	var foobar = Array.MakeFromArray([]string{"foo", "bar"})
+	var baxbaz = Array.MakeFromArray([]string{"bax", "baz"})
+	var baxbez = Array.MakeFromArray([]string{"bax", "bez"})
+	var barfoobax = Array.MakeFromArray([]string{"bar", "foo", "bax"})
+	var foobazbar = Array.MakeFromArray([]string{"foo", "baz", "bar"})
+	var foobarbaz = Array.MakeFromArray([]string{"foo", "bar", "baz"})
+	var barbazfoo = Array.MakeFromArray([]string{"bar", "baz", "foo"})
+	var list = List.Make()
 	ass.True(t, list.IsEmpty())
 	ass.Equal(t, 0, list.GetSize())
 	ass.False(t, list.ContainsValue("bax"))
@@ -58,13 +60,13 @@ func TestListsWithStrings(t *tes.T) {
 	list.AppendValues(barbaz)                     //       ["foo", "bar", "baz"]
 	ass.Equal(t, 3, list.GetSize())               //       ["foo", "bar", "baz"]
 	ass.Equal(t, "foo", string(list.GetValue(1))) //       ["foo", "bar", "baz"]
-	ass.True(t, collator.CompareValues(List.FromArray(list.AsArray()), list))
+	ass.True(t, collator.CompareValues(List.MakeFromArray(list.AsArray()), list))
 	ass.Equal(t, barbaz.AsArray(), list.GetValues(2, 3).AsArray())
 	ass.Equal(t, foo.AsArray(), list.GetValues(1, 1).AsArray())
-	var list2 = List.FromSequence(list)
+	var list2 = List.MakeFromSequence(list)
 	ass.True(t, collator.CompareValues(list, list2))
-	var array = Array.FromArray([]string{"foo", "bar", "baz"})
-	var list3 = List.FromSequence(array)
+	var array = Array.MakeFromArray([]string{"foo", "bar", "baz"})
+	var list3 = List.MakeFromSequence(array)
 	list2.SortValues()
 	list3.SortValues()
 	ass.True(t, collator.CompareValues(list2, list3))
@@ -150,8 +152,8 @@ func TestListsWithStrings(t *tes.T) {
 }
 
 func TestListsWithTildes(t *tes.T) {
-	var array = col.ArrayClass[Integer]().FromArray([]Integer{3, 1, 4, 5, 9, 2})
-	var list = col.ListClass[Integer]().FromSequence(array)
+	var array = col.ArrayClass[Integer]().MakeFromArray([]Integer{3, 1, 4, 5, 9, 2})
+	var list = col.ListClass[Integer]().MakeFromSequence(array)
 	ass.False(t, list.IsEmpty())            // [3,1,4,5,9,2]
 	ass.Equal(t, 6, list.GetSize())         // [3,1,4,5,9,2]
 	ass.Equal(t, 3, int(list.GetValue(1)))  // [3,1,4,5,9,2]
@@ -163,25 +165,25 @@ func TestListsWithTildes(t *tes.T) {
 
 func TestListsWithConcatenate(t *tes.T) {
 	var List = col.ListClass[int]()
-	var collator = col.CollatorClass().Default()
+	var collator = col.CollatorClass().Make()
 	var Array = col.ArrayClass[int]()
-	var onetwothree = Array.FromArray([]int{1, 2, 3})
-	var fourfivesix = Array.FromArray([]int{4, 5, 6})
-	var onethrusix = Array.FromArray([]int{1, 2, 3, 4, 5, 6})
-	var list1 = List.Empty()
+	var onetwothree = Array.MakeFromArray([]int{1, 2, 3})
+	var fourfivesix = Array.MakeFromArray([]int{4, 5, 6})
+	var onethrusix = Array.MakeFromArray([]int{1, 2, 3, 4, 5, 6})
+	var list1 = List.Make()
 	list1.AppendValues(onetwothree)
-	var list2 = List.Empty()
+	var list2 = List.Make()
 	list2.AppendValues(fourfivesix)
 	var list3 = List.Concatenate(list1, list2)
-	var list4 = List.Empty()
+	var list4 = List.Make()
 	list4.AppendValues(onethrusix)
 	ass.True(t, collator.CompareValues(list3, list4))
 }
 
 func TestListsWithEmptyLists(t *tes.T) {
-	var collator = col.CollatorClass().Default()
+	var collator = col.CollatorClass().Make()
 	var List = col.ListClass[int]()
-	var empty = List.Empty()
+	var empty = List.Make()
 	var list = List.Concatenate(empty, empty)
 	ass.True(t, collator.CompareValues(empty, empty))
 	ass.True(t, collator.CompareValues(list, empty))

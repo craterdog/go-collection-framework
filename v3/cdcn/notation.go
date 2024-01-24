@@ -8,67 +8,71 @@
  * Initiative. (See http://opensource.org/licenses/MIT)                        *
  *******************************************************************************/
 
-package collections
+package cdcn
+
+import (
+	col "github.com/craterdog/go-collection-framework/v3"
+)
 
 // CLASS NAMESPACE
 
 // Private Class Namespace Type
 
-type cdcnClass_ struct {
+type notationClass_ struct {
 	defaultDepth int
 }
 
 // Private Class Namespace Reference
 
-var cdcnClass = &cdcnClass_{
+var notationClass = &notationClass_{
 	defaultDepth: 8,
 }
 
 // Public Class Namespace Access
 
-func CDCNClass() NotationClassLike {
-	return cdcnClass
+func NotationClass() col.NotationClassLike {
+	return notationClass
 }
 
 // Public Class Constants
 
-func (c *cdcnClass_) GetDefaultDepth() int {
+func (c *notationClass_) DefaultDepth() int {
 	return c.defaultDepth
 }
 
 // Public Class Constructors
 
-func (c *cdcnClass_) Default() NotationLike {
-	var cdcn = c.WithDepth(c.defaultDepth)
-	return cdcn
+func (c *notationClass_) Make() col.NotationLike {
+	var notation = c.MakeWithDepth(c.defaultDepth)
+	return notation
 }
 
-func (c *cdcnClass_) WithDepth(depth int) NotationLike {
+func (c *notationClass_) MakeWithDepth(depth int) col.NotationLike {
 	if depth < 0 || depth > c.defaultDepth {
 		depth = c.defaultDepth
 	}
-	var cdcn = &cdcn_{
-		formatter: FormatterClass().WithDepth(depth),
-		parser:    ParserClass().CDCN(),
+	var notation = &notation_{
+		formatter: FormatterClass().MakeWithDepth(depth),
+		parser:    ParserClass().Make(),
 	}
-	return cdcn
+	return notation
 }
 
 // CLASS INSTANCES
 
 // Private Class Type Definition
 
-type cdcn_ struct {
-	formatter *formatter_
-	parser    *parser_
+type notation_ struct {
+	formatter col.FormatterLike
+	parser    col.ParserLike
 }
 
 // Public Interface
 
-func (v *cdcn_) FormatCollection(collection Collection) string {
+func (v *notation_) FormatCollection(collection col.Collection) string {
 	return v.formatter.FormatCollection(collection)
 }
 
-func (v *cdcn_) ParseCollection(collection string) Collection {
-	return v.parser.ParseCollection(collection)
+func (v *notation_) ParseSource(source string) col.Collection {
+	return v.parser.ParseSource(source)
 }

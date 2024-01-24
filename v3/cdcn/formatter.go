@@ -8,18 +8,22 @@
  * Initiative. (See http://opensource.org/licenses/MIT)                        *
  *******************************************************************************/
 
-package collections_test
+package cdcn
 
 import (
 	col "github.com/craterdog/go-collection-framework/v3"
-	ass "github.com/stretchr/testify/assert"
-	tes "testing"
 )
 
-func TestAssociations(t *tes.T) {
-	var association = col.AssociationClass[string, int]().Make("foo", 1)
-	ass.Equal(t, "foo", association.GetKey())
-	ass.Equal(t, 1, association.GetValue())
-	association.SetValue(2)
-	ass.Equal(t, 2, association.GetValue())
+// CLASS NAMESPACE
+
+// Public Class Namespace Access
+
+/*
+FormatterClass defines an implementation of a formatter-like class that uses
+Crater Dog Collection Notation™ (CDCN) for formatting collections.  Since the
+go-collection-framework uses the same formatting notation this class simply
+delegates to the collection framework's formatter class.
+*/
+func FormatterClass() col.FormatterClassLike {
+	return col.FormatterClass()
 }

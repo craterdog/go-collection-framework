@@ -30,8 +30,8 @@ var sorterClass = map[string]any{}
 
 // Public Class Namespace Access
 
-func SorterClass[V Value]() *sorterClass_[V] {
-	var class *sorterClass_[V]
+func SorterClass[V Value]() SorterClassLike[V] {
+	var class SorterClassLike[V]
 	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
 	var value = sorterClass[key]
 	switch actual := value.(type) {
@@ -41,7 +41,7 @@ func SorterClass[V Value]() *sorterClass_[V] {
 	default:
 		// Create a new bound class type.
 		class = &sorterClass_[V]{
-			defaultRanker: CollatorClass().Default().RankValues,
+			defaultRanker: CollatorClass().Make().RankValues,
 		}
 		sorterClass[key] = class
 	}
@@ -50,20 +50,20 @@ func SorterClass[V Value]() *sorterClass_[V] {
 
 // Public Class Constants
 
-func (c *sorterClass_[V]) GetDefaultRanker() RankingFunction {
+func (c *sorterClass_[V]) DefaultRanker() RankingFunction {
 	return c.defaultRanker
 }
 
 // Public Class Constructors
 
-func (c *sorterClass_[V]) Default() *sorter_[V] {
+func (c *sorterClass_[V]) Make() SorterLike[V] {
 	var sorter = &sorter_[V]{
 		rank: c.defaultRanker,
 	}
 	return sorter
 }
 
-func (c *sorterClass_[V]) WithRanker(ranker RankingFunction) *sorter_[V] {
+func (c *sorterClass_[V]) MakeWithRanker(ranker RankingFunction) SorterLike[V] {
 	var sorter = &sorter_[V]{
 		rank: ranker,
 	}
@@ -101,6 +101,12 @@ func (v *sorter_[V]) ShuffleValues(values []V) {
 func (v *sorter_[V]) SortValues(values []V) {
 	// Sort the values in place using a merge sort.
 	v.sortValues(values)
+}
+
+// Public Interface
+
+func (v *sorter_[V]) GetRanker() RankingFunction {
+	return v.rank
 }
 
 // Private Interface

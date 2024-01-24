@@ -12,17 +12,19 @@ package collections_test
 
 import (
 	col "github.com/craterdog/go-collection-framework/v3"
+	not "github.com/craterdog/go-collection-framework/v3/cdcn"
 	ass "github.com/stretchr/testify/assert"
 	tes "testing"
 )
 
 func TestCatalogConstructors(t *tes.T) {
+	var notation = not.NotationClass().Make()
 	var Catalog = col.CatalogClass[rune, int64]()
-	var _ = Catalog.FromArray([]col.AssociationLike[rune, int64]{})
-	var _ = Catalog.FromString("[:](Catalog)")
-	var _ = Catalog.FromString("['a': 1, 'b': 2, 'c': 3](Catalog)")
-	var _ = Catalog.FromMap(map[rune]int64{})
-	var _ = Catalog.FromMap(map[rune]int64{
+	var _ = Catalog.MakeFromArray([]col.AssociationLike[rune, int64]{})
+	var _ = Catalog.MakeFromSource("[:](Catalog)", notation)
+	var _ = Catalog.MakeFromSource("['a': 1, 'b': 2, 'c': 3](Catalog)", notation)
+	var _ = Catalog.MakeFromMap(map[rune]int64{})
+	var _ = Catalog.MakeFromMap(map[rune]int64{
 		'a': 1,
 		'b': 2,
 		'c': 3,
@@ -30,14 +32,14 @@ func TestCatalogConstructors(t *tes.T) {
 }
 
 func TestCatalogsWithStringsAndIntegers(t *tes.T) {
-	var collator = col.CollatorClass().Default()
-	var keys = col.ArrayClass[string]().FromArray([]string{"foo", "bar"})
+	var collator = col.CollatorClass().Make()
+	var keys = col.ArrayClass[string]().MakeFromArray([]string{"foo", "bar"})
 	var Association = col.AssociationClass[string, int]()
-	var association1 = Association.FromPair("foo", 1)
-	var association2 = Association.FromPair("bar", 2)
-	var association3 = Association.FromPair("baz", 3)
+	var association1 = Association.Make("foo", 1)
+	var association2 = Association.Make("bar", 2)
+	var association3 = Association.Make("baz", 3)
 	var Catalog = col.CatalogClass[string, int]()
-	var catalog = Catalog.Empty()
+	var catalog = Catalog.Make()
 	ass.True(t, catalog.IsEmpty())
 	ass.Equal(t, 0, catalog.GetSize())
 	ass.Equal(t, []string{}, catalog.GetKeys().AsArray())
@@ -56,14 +58,14 @@ func TestCatalogsWithStringsAndIntegers(t *tes.T) {
 	catalog.SetValue(association2.GetKey(), association2.GetValue())
 	catalog.SetValue(association3.GetKey(), association3.GetValue())
 	ass.Equal(t, 3, catalog.GetSize())
-	var catalog2 = Catalog.FromSequence(catalog)
+	var catalog2 = Catalog.MakeFromSequence(catalog)
 	ass.True(t, collator.CompareValues(catalog, catalog2))
-	var m = col.MapClass[string, int]().FromMap(map[string]int{
+	var m = col.MapClass[string, int]().MakeFromMap(map[string]int{
 		"foo": 1,
 		"bar": 2,
 		"baz": 3,
 	})
-	var catalog3 = Catalog.FromSequence(m)
+	var catalog3 = Catalog.MakeFromSequence(m)
 	catalog2.SortValues()
 	catalog3.SortValuesWithRanker(collator.RankValues)
 	ass.True(t, collator.CompareValues(catalog2, catalog3))
@@ -97,20 +99,20 @@ func TestCatalogsWithStringsAndIntegers(t *tes.T) {
 }
 
 func TestCatalogsWithMerge(t *tes.T) {
-	var collator = col.CollatorClass().Default()
+	var collator = col.CollatorClass().Make()
 	var Association = col.AssociationClass[string, int]()
-	var association1 = Association.FromPair("foo", 1)
-	var association2 = Association.FromPair("bar", 2)
-	var association3 = Association.FromPair("baz", 3)
+	var association1 = Association.Make("foo", 1)
+	var association2 = Association.Make("bar", 2)
+	var association3 = Association.Make("baz", 3)
 	var Catalog = col.CatalogClass[string, int]()
-	var catalog1 = Catalog.Empty()
+	var catalog1 = Catalog.Make()
 	catalog1.SetValue(association1.GetKey(), association1.GetValue())
 	catalog1.SetValue(association2.GetKey(), association2.GetValue())
-	var catalog2 = Catalog.Empty()
+	var catalog2 = Catalog.Make()
 	catalog2.SetValue(association2.GetKey(), association2.GetValue())
 	catalog2.SetValue(association3.GetKey(), association3.GetValue())
 	var catalog3 = Catalog.Merge(catalog1, catalog2)
-	var catalog4 = Catalog.Empty()
+	var catalog4 = Catalog.Make()
 	catalog4.SetValue(association1.GetKey(), association1.GetValue())
 	catalog4.SetValue(association2.GetKey(), association2.GetValue())
 	catalog4.SetValue(association3.GetKey(), association3.GetValue())
@@ -118,23 +120,23 @@ func TestCatalogsWithMerge(t *tes.T) {
 }
 
 func TestCatalogsWithExtract(t *tes.T) {
-	var collator = col.CollatorClass().Default()
-	var keys = col.ArrayClass[string]().FromArray([]string{"foo", "baz"})
+	var collator = col.CollatorClass().Make()
+	var keys = col.ArrayClass[string]().MakeFromArray([]string{"foo", "baz"})
 	var Association = col.AssociationClass[string, int]()
-	var association1 = Association.FromPair("foo", 1)
-	var association2 = Association.FromPair("bar", 2)
-	var association3 = Association.FromPair("baz", 3)
+	var association1 = Association.Make("foo", 1)
+	var association2 = Association.Make("bar", 2)
+	var association3 = Association.Make("baz", 3)
 	var Catalog = col.CatalogClass[string, int]()
-	var catalog1 = Catalog.Empty()
+	var catalog1 = Catalog.Make()
 	catalog1.SetValue(association1.GetKey(), association1.GetValue())
 	catalog1.SetValue(association2.GetKey(), association2.GetValue())
 	catalog1.SetValue(association3.GetKey(), association3.GetValue())
 	var catalog2 = Catalog.Extract(catalog1, keys)
-	var catalog3 = Catalog.Empty()
+	var catalog3 = Catalog.Make()
 	catalog3.SetValue(association1.GetKey(), association1.GetValue())
 	catalog3.SetValue(association3.GetKey(), association3.GetValue())
 	ass.True(t, collator.CompareValues(catalog2, catalog3))
-	var catalog4 = Catalog.FromArray([]col.AssociationLike[string, int]{
+	var catalog4 = Catalog.MakeFromArray([]col.AssociationLike[string, int]{
 		association1,
 		association2,
 		association3,
@@ -143,11 +145,11 @@ func TestCatalogsWithExtract(t *tes.T) {
 }
 
 func TestCatalogsWithEmptyCatalogs(t *tes.T) {
-	var collator = col.CollatorClass().Default()
-	var keys = col.ArrayClass[int]().WithSize(0)
+	var collator = col.CollatorClass().Make()
+	var keys = col.ArrayClass[int]().MakeWithSize(0)
 	var Catalog = col.CatalogClass[int, string]()
-	var catalog1 = Catalog.Empty()
-	var catalog2 = Catalog.Empty()
+	var catalog1 = Catalog.Make()
+	var catalog2 = Catalog.Make()
 	var catalog3 = Catalog.Merge(catalog1, catalog2)
 	var catalog4 = Catalog.Extract(catalog1, keys)
 	ass.True(t, collator.CompareValues(catalog1, catalog2))

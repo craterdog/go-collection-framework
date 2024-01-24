@@ -29,7 +29,7 @@ var associationClass = map[string]any{}
 // Public Class Namespace Access
 
 func AssociationClass[K Key, V Value]() AssociationClassLike[K, V] {
-	var class *associationClass_[K, V]
+	var class AssociationClassLike[K, V]
 	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
 	var value = associationClass[key]
 	switch actual := value.(type) {
@@ -48,7 +48,7 @@ func AssociationClass[K Key, V Value]() AssociationClassLike[K, V] {
 
 // Public Class Constructors
 
-func (c *associationClass_[K, V]) FromPair(key K, value V) AssociationLike[K, V] {
+func (c *associationClass_[K, V]) Make(key K, value V) AssociationLike[K, V] {
 	var association = &association_[K, V]{key, value}
 	return association
 }

@@ -52,12 +52,12 @@ type Fuz struct {
 
 func TestCollatorConstants(t *tes.T) {
 	var Collator = col.CollatorClass()
-	ass.Equal(t, 16, Collator.GetDefaultDepth())
+	ass.Equal(t, 16, Collator.DefaultDepth())
 }
 
 func TestCompareDepth(t *tes.T) {
-	var collator = col.CollatorClass().WithDepth(1)
-	var array = col.ArrayClass[any]().FromArray([]any{"foo", []int{1, 2, 3}})
+	var collator = col.CollatorClass().MakeWithDepth(1)
+	var array = col.ArrayClass[any]().MakeFromArray([]any{"foo", []int{1, 2, 3}})
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "The maximum traversal depth was exceeded: 1", e)
@@ -69,8 +69,8 @@ func TestCompareDepth(t *tes.T) {
 }
 
 func TestRankDepth(t *tes.T) {
-	var collator = col.CollatorClass().WithDepth(1)
-	var array = col.ArrayClass[any]().FromArray([]any{"foo", []int{1, 2, 3}})
+	var collator = col.CollatorClass().MakeWithDepth(1)
+	var array = col.ArrayClass[any]().MakeFromArray([]any{"foo", []int{1, 2, 3}})
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "The maximum traversal depth was exceeded: 1", e)
@@ -82,7 +82,7 @@ func TestRankDepth(t *tes.T) {
 }
 
 func TestComparison(t *tes.T) {
-	var collator = col.CollatorClass().Default()
+	var collator = col.CollatorClass().Make()
 
 	// Nil
 	var ShouldBeNil any
@@ -251,7 +251,7 @@ func TestComparison(t *tes.T) {
 }
 
 func TestTildeTypes(t *tes.T) {
-	var collator = col.CollatorClass().Default()
+	var collator = col.CollatorClass().Make()
 
 	// Boolean
 	var False = Boolean(false)
@@ -298,8 +298,8 @@ func TestTildeTypes(t *tes.T) {
 }
 
 func TestCompareRecursiveArrays(t *tes.T) {
-	var collator = col.CollatorClass().Default()
-	var array = col.ArrayClass[any]().FromArray([]any{0})
+	var collator = col.CollatorClass().Make()
+	var array = col.ArrayClass[any]().MakeFromArray([]any{0})
 	array.SetValue(1, array) // Now it is recursive.
 	defer func() {
 		if e := recover(); e != nil {
@@ -312,8 +312,8 @@ func TestCompareRecursiveArrays(t *tes.T) {
 }
 
 func TestCompareRecursiveMaps(t *tes.T) {
-	var collator = col.CollatorClass().Default()
-	var m = col.MapClass[string, any]().FromMap(map[string]any{"first": 1})
+	var collator = col.CollatorClass().Make()
+	var m = col.MapClass[string, any]().MakeFromMap(map[string]any{"first": 1})
 	m.SetValue("first", m) // Now it is recursive.
 	defer func() {
 		if e := recover(); e != nil {
@@ -326,7 +326,7 @@ func TestCompareRecursiveMaps(t *tes.T) {
 }
 
 func TestRanking(t *tes.T) {
-	var collator = col.CollatorClass().Default()
+	var collator = col.CollatorClass().Make()
 
 	// Nil
 	var ShouldBeNil any
@@ -530,9 +530,9 @@ func TestRanking(t *tes.T) {
 }
 
 func TestTildeArrays(t *tes.T) {
-	var collator = col.CollatorClass().Default()
+	var collator = col.CollatorClass().Make()
 	var ranker = collator.RankValues
-	var sorter = col.SorterClass[String]().WithRanker(ranker)
+	var sorter = col.SorterClass[String]().MakeWithRanker(ranker)
 	var alpha = String("alpha")
 	var beta = String("beta")
 	var gamma = String("gamma")
@@ -546,8 +546,8 @@ func TestTildeArrays(t *tes.T) {
 }
 
 func TestRankRecursiveArrays(t *tes.T) {
-	var collator = col.CollatorClass().Default()
-	var array = col.ArrayClass[any]().FromArray([]any{0})
+	var collator = col.CollatorClass().Make()
+	var array = col.ArrayClass[any]().MakeFromArray([]any{0})
 	array.SetValue(1, array) // Now it is recursive.
 	defer func() {
 		if e := recover(); e != nil {
@@ -560,8 +560,8 @@ func TestRankRecursiveArrays(t *tes.T) {
 }
 
 func TestRankRecursiveMaps(t *tes.T) {
-	var collator = col.CollatorClass().Default()
-	var m = col.MapClass[string, any]().FromMap(map[string]any{"first": 1})
+	var collator = col.CollatorClass().Make()
+	var m = col.MapClass[string, any]().MakeFromMap(map[string]any{"first": 1})
 	m.SetValue("first", m) // Now it is recursive.
 	defer func() {
 		if e := recover(); e != nil {

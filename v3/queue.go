@@ -30,7 +30,7 @@ var queueClass = map[string]any{}
 // Public Class Namespace Access
 
 func QueueClass[V Value]() QueueClassLike[V] {
-	var class *queueClass_[V]
+	var class QueueClassLike[V]
 	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
 	var value = queueClass[key]
 	switch actual := value.(type) {
@@ -49,25 +49,25 @@ func QueueClass[V Value]() QueueClassLike[V] {
 
 // Public Class Constants
 
-func (c *queueClass_[V]) GetDefaultCapacity() int {
+func (c *queueClass_[V]) DefaultCapacity() int {
 	return c.defaultCapacity
 }
 
 // Public Class Constructors
 
-func (c *queueClass_[V]) Empty() QueueLike[V] {
-	var queue = c.WithCapacity(c.defaultCapacity)
+func (c *queueClass_[V]) Make() QueueLike[V] {
+	var queue = c.MakeWithCapacity(c.defaultCapacity)
 	return queue
 }
 
-func (c *queueClass_[V]) FromArray(values []V) QueueLike[V] {
-	var array = ArrayClass[V]().FromArray(values)
-	var queue = c.FromSequence(array)
+func (c *queueClass_[V]) MakeFromArray(values []V) QueueLike[V] {
+	var array = ArrayClass[V]().MakeFromArray(values)
+	var queue = c.MakeFromSequence(array)
 	return queue
 }
 
-func (c *queueClass_[V]) FromSequence(values Sequential[V]) QueueLike[V] {
-	var queue = c.Empty()
+func (c *queueClass_[V]) MakeFromSequence(values Sequential[V]) QueueLike[V] {
+	var queue = c.Make()
 	var iterator = values.GetIterator()
 	for iterator.HasNext() {
 		var value = iterator.GetNext()
@@ -76,13 +76,15 @@ func (c *queueClass_[V]) FromSequence(values Sequential[V]) QueueLike[V] {
 	return queue
 }
 
-func (c *queueClass_[V]) FromString(values string) QueueLike[V] {
+func (c *queueClass_[V]) MakeFromSource(
+	source string,
+	notation NotationLike,
+) QueueLike[V] {
 	// First we parse it as a collection of any type value.
-	var cdcn = CDCNClass().Default()
-	var collection = cdcn.ParseCollection(values).(Sequential[Value])
+	var collection = notation.ParseSource(source).(Sequential[Value])
 
 	// Then we convert it to a queue of type V.
-	var queue = c.Empty()
+	var queue = c.Make()
 	var iterator = collection.GetIterator()
 	for iterator.HasNext() {
 		var value = iterator.GetNext().(V)
@@ -91,12 +93,12 @@ func (c *queueClass_[V]) FromString(values string) QueueLike[V] {
 	return queue
 }
 
-func (c *queueClass_[V]) WithCapacity(capacity int) QueueLike[V] {
+func (c *queueClass_[V]) MakeWithCapacity(capacity int) QueueLike[V] {
 	if capacity < 1 {
 		capacity = c.defaultCapacity
 	}
 	var available = make(chan bool, capacity)
-	var values = ListClass[V]().Empty()
+	var values = ListClass[V]().Make()
 	var queue = &queue_[V]{
 		available: available,
 		capacity:  capacity,
@@ -125,9 +127,9 @@ func (c *queueClass_[V]) Fork(
 
 	// Create the new output queues.
 	var capacity = input.GetCapacity()
-	var outputs = ListClass[QueueLike[V]]().Empty()
+	var outputs = ListClass[QueueLike[V]]().Make()
 	for i := 0; i < size; i++ {
-		outputs.AppendValue(c.WithCapacity(capacity))
+		outputs.AppendValue(c.MakeWithCapacity(capacity))
 	}
 
 	// Connect up the input queue to the output queues in a separate go-routine.
@@ -181,7 +183,7 @@ func (c *queueClass_[V]) Join(
 	// Create the new output queue.
 	var iterator = inputs.GetIterator()
 	var capacity = iterator.GetNext().GetCapacity()
-	var output = c.WithCapacity(capacity)
+	var output = c.MakeWithCapacity(capacity)
 
 	// Connect up the input queues to the output queue.
 	group.Add(1)
@@ -229,9 +231,9 @@ func (c *queueClass_[V]) Split(
 
 	// Create the new output queues.
 	var capacity = input.GetCapacity()
-	var outputs = ListClass[QueueLike[V]]().Empty()
+	var outputs = ListClass[QueueLike[V]]().Make()
 	for i := 0; i < size; i++ {
-		outputs.AppendValue(c.WithCapacity(capacity))
+		outputs.AppendValue(c.MakeWithCapacity(capacity))
 	}
 
 	// Connect up the input queue to the output queues.
@@ -284,6 +286,26 @@ type queue_[V Value] struct {
 // instead of the availability. Currently, the underlying list is only required
 // by the "AsArray()" class method.
 
+// Limited Interface
+
+func (v *queue_[V]) AddValue(value V) {
+	v.mutex.Lock()
+	v.values.AppendValue(value)
+	v.mutex.Unlock()
+	v.available <- true // The queue will block if at capacity.
+}
+
+func (v *queue_[V]) GetCapacity() int {
+	return v.capacity
+}
+
+func (v *queue_[V]) RemoveAll() {
+	v.mutex.Lock()
+	v.available = make(chan bool, v.capacity)
+	v.values = ListClass[V]().Make()
+	v.mutex.Unlock()
+}
+
 // Sequential Interface
 
 func (v *queue_[V]) AsArray() []V {
@@ -314,29 +336,18 @@ func (v *queue_[V]) IsEmpty() bool {
 	return result
 }
 
-// Public Interface
+// Stringer Interface
 
-func (v *queue_[V]) AddValue(value V) {
-	v.mutex.Lock()
-	v.values.AppendValue(value)
-	v.mutex.Unlock()
-	v.available <- true // The queue will block if at capacity.
+func (v *queue_[V]) String() string {
+	var formatter = FormatterClass().Make()
+	return formatter.FormatCollection(v)
 }
+
+// Public Interface
 
 func (v *queue_[V]) CloseQueue() {
 	v.mutex.Lock()
 	close(v.available) // No more values can be placed on the queue.
-	v.mutex.Unlock()
-}
-
-func (v *queue_[V]) GetCapacity() int {
-	return v.capacity
-}
-
-func (v *queue_[V]) RemoveAll() {
-	v.mutex.Lock()
-	v.available = make(chan bool, v.capacity)
-	v.values = ListClass[V]().Empty()
 	v.mutex.Unlock()
 }
 
@@ -355,13 +366,4 @@ func (v *queue_[V]) RemoveHead() (V, bool) {
 
 	// Return the results
 	return head, ok
-}
-
-// Private Interface
-
-// This public class method is used by Go to generate a canonical string for
-// the queue.
-func (v *queue_[V]) String() string {
-	var cdcn = CDCNClass().Default()
-	return cdcn.FormatCollection(v)
 }

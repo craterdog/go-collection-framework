@@ -29,7 +29,7 @@ var stackClass = map[string]any{}
 // Public Class Namespace Access
 
 func StackClass[V Value]() StackClassLike[V] {
-	var class *stackClass_[V]
+	var class StackClassLike[V]
 	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
 	var value = stackClass[key]
 	switch actual := value.(type) {
@@ -48,14 +48,14 @@ func StackClass[V Value]() StackClassLike[V] {
 
 // Public Class Constants
 
-func (c *stackClass_[V]) GetDefaultCapacity() int {
+func (c *stackClass_[V]) DefaultCapacity() int {
 	return c.defaultCapacity
 }
 
 // Public Class Constructors
 
-func (c *stackClass_[V]) Empty() StackLike[V] {
-	var list = ListClass[V]().Empty()
+func (c *stackClass_[V]) Make() StackLike[V] {
+	var list = ListClass[V]().Make()
 	var stack = &stack_[V]{
 		capacity: c.defaultCapacity,
 		values:   list,
@@ -63,8 +63,8 @@ func (c *stackClass_[V]) Empty() StackLike[V] {
 	return stack
 }
 
-func (c *stackClass_[V]) FromArray(values []V) StackLike[V] {
-	var list = ListClass[V]().FromArray(values)
+func (c *stackClass_[V]) MakeFromArray(values []V) StackLike[V] {
+	var list = ListClass[V]().MakeFromArray(values)
 	var stack = &stack_[V]{
 		capacity: c.defaultCapacity,
 		values:   list,
@@ -72,8 +72,8 @@ func (c *stackClass_[V]) FromArray(values []V) StackLike[V] {
 	return stack
 }
 
-func (c *stackClass_[V]) FromSequence(values Sequential[V]) StackLike[V] {
-	var list = ListClass[V]().FromSequence(values)
+func (c *stackClass_[V]) MakeFromSequence(values Sequential[V]) StackLike[V] {
+	var list = ListClass[V]().MakeFromSequence(values)
 	var stack = &stack_[V]{
 		capacity: c.defaultCapacity,
 		values:   list,
@@ -81,10 +81,12 @@ func (c *stackClass_[V]) FromSequence(values Sequential[V]) StackLike[V] {
 	return stack
 }
 
-func (c *stackClass_[V]) FromString(values string) StackLike[V] {
+func (c *stackClass_[V]) MakeFromSource(
+	source string,
+	notation NotationLike,
+) StackLike[V] {
 	// First we parse it as a collection of any type value.
-	var cdcn = CDCNClass().Default()
-	var collection = cdcn.ParseCollection(values).(Sequential[Value])
+	var collection = notation.ParseSource(source).(Sequential[Value])
 
 	// Next we must convert each value explicitly to type V.
 	var anys = collection.AsArray()
@@ -94,15 +96,15 @@ func (c *stackClass_[V]) FromString(values string) StackLike[V] {
 	}
 
 	// Then we can create the stack from the type V array.
-	var stack = c.FromArray(array)
+	var stack = c.MakeFromArray(array)
 	return stack
 }
 
-func (c *stackClass_[V]) WithCapacity(capacity int) StackLike[V] {
+func (c *stackClass_[V]) MakeWithCapacity(capacity int) StackLike[V] {
 	if capacity < 1 {
 		panic("A stack must have a capacity greater than zero.")
 	}
-	var list = ListClass[V]().Empty()
+	var list = ListClass[V]().Make()
 	var stack = &stack_[V]{
 		capacity: capacity,
 		values:   list,
@@ -119,25 +121,7 @@ type stack_[V Value] struct {
 	values   ListLike[V]
 }
 
-// Sequential Interface
-
-func (v *stack_[V]) AsArray() []V {
-	return v.values.AsArray()
-}
-
-func (v *stack_[V]) GetIterator() IteratorLike[V] {
-	return v.values.GetIterator()
-}
-
-func (v *stack_[V]) GetSize() int {
-	return v.values.GetSize()
-}
-
-func (v *stack_[V]) IsEmpty() bool {
-	return v.values.IsEmpty()
-}
-
-// Public Interface
+// Limited Interface
 
 func (v *stack_[V]) AddValue(value V) {
 	if v.values.GetSize() == v.capacity {
@@ -158,18 +142,36 @@ func (v *stack_[V]) RemoveAll() {
 	v.values.RemoveAll()
 }
 
+// Sequential Interface
+
+func (v *stack_[V]) AsArray() []V {
+	return v.values.AsArray()
+}
+
+func (v *stack_[V]) GetIterator() IteratorLike[V] {
+	return v.values.GetIterator()
+}
+
+func (v *stack_[V]) GetSize() int {
+	return v.values.GetSize()
+}
+
+func (v *stack_[V]) IsEmpty() bool {
+	return v.values.IsEmpty()
+}
+
+// Stringer Interface
+
+func (v *stack_[V]) String() string {
+	var formatter = FormatterClass().Make()
+	return formatter.FormatCollection(v)
+}
+
+// Public Interface
+
 func (v *stack_[V]) RemoveTop() V {
 	if v.values.IsEmpty() {
 		panic("Attempted to remove the top of an empty stack!")
 	}
 	return v.values.RemoveValue(1)
-}
-
-// Private Interface
-
-// This public class method is used by Go to generate a canonical string for
-// the stack.
-func (v *stack_[V]) String() string {
-	var cdcn = CDCNClass().Default()
-	return cdcn.FormatCollection(v)
 }

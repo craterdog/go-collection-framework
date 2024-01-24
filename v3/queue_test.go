@@ -12,21 +12,23 @@ package collections_test
 
 import (
 	col "github.com/craterdog/go-collection-framework/v3"
+	not "github.com/craterdog/go-collection-framework/v3/cdcn"
 	ass "github.com/stretchr/testify/assert"
 	syn "sync"
 	tes "testing"
 )
 
 func TestQueueConstructor(t *tes.T) {
+	var notation = not.NotationClass().Make()
 	var Queue = col.QueueClass[int64]()
-	var _ = Queue.FromString("[ ](Queue)")
-	var _ = Queue.FromString("[1, 2, 3](Queue)")
+	var _ = Queue.MakeFromSource("[ ](Queue)", notation)
+	var _ = Queue.MakeFromSource("[1, 2, 3](Queue)", notation)
 }
 
 func TestQueueConstructors(t *tes.T) {
 	var Queue = col.QueueClass[int]()
-	var queue1 = Queue.FromArray([]int{1, 2, 3})
-	var queue2 = Queue.FromSequence(queue1)
+	var queue1 = Queue.MakeFromArray([]int{1, 2, 3})
+	var queue2 = Queue.MakeFromSequence(queue1)
 	ass.Equal(t, queue1.AsArray(), queue2.AsArray())
 }
 
@@ -36,7 +38,7 @@ func TestQueueWithConcurrency(t *tes.T) {
 	defer group.Wait()
 
 	// Create a new queue with a specific capacity.
-	var queue = col.QueueClass[int]().WithCapacity(12)
+	var queue = col.QueueClass[int]().MakeWithCapacity(12)
 	ass.Equal(t, 12, queue.GetCapacity())
 	ass.True(t, queue.IsEmpty())
 	ass.Equal(t, 0, queue.GetSize())
@@ -76,7 +78,7 @@ func TestQueueWithFork(t *tes.T) {
 
 	// Create a new queue with a fan out of two.
 	var Queue = col.QueueClass[int]()
-	var input = Queue.WithCapacity(3)
+	var input = Queue.MakeWithCapacity(3)
 	var outputs = Queue.Fork(group, input, 2)
 
 	// Remove values from the output queues in the background.
@@ -112,7 +114,7 @@ func TestQueueWithInvalidFanOut(t *tes.T) {
 
 	// Create a new queue with an invalid fan out.
 	var Queue = col.QueueClass[int]()
-	var input = Queue.WithCapacity(3)
+	var input = Queue.MakeWithCapacity(3)
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "The fan out size for a queue must be greater than one.", e)
@@ -130,7 +132,7 @@ func TestQueueWithSplitAndJoin(t *tes.T) {
 
 	// Create a new queue with a split of five outputs and a join back to one.
 	var Queue = col.QueueClass[int]()
-	var input = Queue.WithCapacity(3)
+	var input = Queue.MakeWithCapacity(3)
 	var split = Queue.Split(group, input, 5)
 	var output = Queue.Join(group, split)
 
@@ -162,7 +164,7 @@ func TestQueueWithInvalidSplit(t *tes.T) {
 
 	// Create a new queue with an invalid fan out.
 	var Queue = col.QueueClass[int]()
-	var input = Queue.WithCapacity(3)
+	var input = Queue.MakeWithCapacity(3)
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "The size of the split must be greater than one.", e)
@@ -179,7 +181,7 @@ func TestQueueWithInvalidJoin(t *tes.T) {
 	defer group.Wait()
 
 	// Create a new queue with an invalid fan out.
-	var inputs = col.ListClass[col.QueueLike[int]]().Empty()
+	var inputs = col.ListClass[col.QueueLike[int]]().Make()
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "The number of input queues for a join must be at least one.", e)

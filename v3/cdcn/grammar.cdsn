@@ -58,7 +58,7 @@ $SIGN: '+' | '-'
 
 $STRING: '"' (ESCAPE | ~('"' | CONTROL))* '"'
 
-$TYPE: "array" | "map" | "Array" | "Catalog" | "List" | "Map" | "Queue" | "Set" | "Stack"
+$CONTEXT: "array" | "Array" | "Catalog" | "List" | "map" | "Map" | "Queue" | "Set" | "Stack"
 
 $UNICODE: 'x' BASE16{2} | 'u' BASE16{4} | 'U' BASE16{8}
 
@@ -88,9 +88,9 @@ $ZERO: '0'
     resulting in a single token.  Rule inversions cannot be nested.
 <!
 
-$document: collection EOF  ! EOF is the end-of-file marker.
+$source: collection EOF  ! Terminated with an end-of-file marker.
 
-$collection: "[" (associations | values) "]" context
+$collection: "[" (associations | values) "]" "(" CONTEXT ")"
 
 $associations:
     association ("," association)*
@@ -111,6 +111,4 @@ $values:
 $value: collection | primitive
 
 $primitive: BOOLEAN | COMPLEX | FLOAT | INTEGER | NIL | RUNE | STRING | UNSIGNED
-
-$context: "(" TYPE ")"
 

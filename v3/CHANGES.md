@@ -7,15 +7,17 @@ areas:
     class and caused potential namespace collisions.
  1. The `Array[V]` and `Map[K, V]` types extended the `[]V` and `map[K]V` Go
     data types but were public with no constructors to constrain the possible
-	values created.
+    values created.
  1. The `Token` type exposed its attributes in a way that could not be
     protected.
  1. The private constants were defined at the package level—the only place
     possible in Go—even though each constant was associated with a specific
-	class.
+    class.
  1. Since Go does not allow any non-primitive data type constants, variables
     were used to represent these constants without the ability to make them
-	read-only.
+    read-only.
+ 1. The project structure was not conducive to adding support for additional
+    notational types like XML and JSON.
 
 The functionality of each of the classes in the collection framework worked well
 and was not changed in any significant ways.  That said, the following changes
@@ -29,23 +31,10 @@ file, the _minor_ version number of the package must be incremented.  If an
 existing abstract interface or type is changed or deleted, the _major_ version
 number of the package must be incremented.
 
-In doing this, the following class types are no longer part of the public
-interface for the package:
- * `Formatter`
- * `Parser`
- * `Scanner`
- * `Sorter[Value]`
- * `Token`
-
-These classes are still available from the package but any dependencies on them
-are not guaranteed to be stable.
-
-### Added CDCN Notation Class
-Various notations are possible for importing and exporting collections including
-XML, JSON and CDCN (Crater Dog Collection Notation™).  The package currently
-only provides a class that implements the latter.  But the exported abstract
-interfaces and types would allow classes to be implemented that support the
-other two formats mentioned above.
+### Added Notation Sub-package Structure
+The CDCN (Crater Dog Collection Notation™) functionality was moved into its own
+sub-package.  This will allow support for additional notations like XML and
+JSON to be added later in their own sub-packages.
 
 ### Class Level Namespaces for Each Class
 Each exported class defined in the collection framework now has an associated
@@ -70,7 +59,6 @@ The following interfaces have been added to the package:
 ### Interfaces Removed
 The following interfaces have been removed from the package:
  * `Discerning`
- * `Systematic`
  * `Binding[K, V]`
  * `Ratcheted[V]`
  * `FIFO[V]`

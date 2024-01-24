@@ -12,22 +12,24 @@ package collections_test
 
 import (
 	col "github.com/craterdog/go-collection-framework/v3"
+	not "github.com/craterdog/go-collection-framework/v3/cdcn"
 	ass "github.com/stretchr/testify/assert"
 	tes "testing"
 )
 
 func TestMapConstructors(t *tes.T) {
+	var notation = not.NotationClass().Make()
 	var Map = col.MapClass[rune, int64]()
-	var _ = Map.FromArray([]col.AssociationLike[rune, int64]{})
-	var _ = Map.FromMap(map[rune]int64{})
-	var sequence = Map.FromMap(map[rune]int64{'a': 1, 'b': 2, 'c': 3})
-	var _ = Map.FromSequence(sequence)
-	var _ = Map.FromString("[:](Map)")
-	var _ = Map.FromString("['a': 1, 'b': 2, 'c': 3](Map)")
+	var _ = Map.MakeFromArray([]col.AssociationLike[rune, int64]{})
+	var _ = Map.MakeFromMap(map[rune]int64{})
+	var sequence = Map.MakeFromMap(map[rune]int64{'a': 1, 'b': 2, 'c': 3})
+	var _ = Map.MakeFromSequence(sequence)
+	var _ = Map.MakeFromSource("[:](Map)", notation)
+	var _ = Map.MakeFromSource("['a': 1, 'b': 2, 'c': 3](Map)", notation)
 }
 
 func TestEmptyMaps(t *tes.T) {
-	var m = col.MapClass[string, int]().FromMap(map[string]int{})
+	var m = col.MapClass[string, int]().MakeFromMap(map[string]int{})
 	ass.True(t, m.IsEmpty())
 	ass.Equal(t, 0, m.GetSize())
 	ass.Equal(t, []string{}, m.GetKeys().AsArray())
@@ -42,11 +44,11 @@ func TestEmptyMaps(t *tes.T) {
 
 func TestMapsWithStringsAndIntegers(t *tes.T) {
 	var Association = col.AssociationClass[string, int]()
-	var association1 = Association.FromPair("foo", 1)
-	var association2 = Association.FromPair("bar", 2)
-	var association3 = Association.FromPair("baz", 3)
+	var association1 = Association.Make("foo", 1)
+	var association2 = Association.Make("bar", 2)
+	var association3 = Association.Make("baz", 3)
 	var Map = col.MapClass[string, int]()
-	var m = Map.FromArray([]col.AssociationLike[string, int]{
+	var m = Map.MakeFromArray([]col.AssociationLike[string, int]{
 		association1,
 		association2,
 		association3,
@@ -54,7 +56,7 @@ func TestMapsWithStringsAndIntegers(t *tes.T) {
 	ass.Equal(t, 1, int(m.GetValue("foo")))
 	ass.Equal(t, 2, int(m.GetValue("bar")))
 	ass.Equal(t, 3, int(m.GetValue("baz")))
-	m = Map.FromMap(map[string]int{})
+	m = Map.MakeFromMap(map[string]int{})
 	m.SetValue(association1.GetKey(), association1.GetValue())
 	ass.False(t, m.IsEmpty())
 	ass.Equal(t, 1, m.GetSize())
@@ -63,7 +65,7 @@ func TestMapsWithStringsAndIntegers(t *tes.T) {
 	ass.Equal(t, 3, m.GetSize())
 	ass.Equal(t, 3, int(m.GetValue("baz")))
 	m.SetValue("bar", 5)
-	var keys = col.ArrayClass[string]().FromArray([]string{"foo", "bar"})
+	var keys = col.ArrayClass[string]().MakeFromArray([]string{"foo", "bar"})
 	ass.Equal(t, []int{1, 5}, m.GetValues(keys).AsArray())
 	ass.Equal(t, []int{1, 5}, m.RemoveValues(keys).AsArray())
 	ass.Equal(t, 1, m.GetSize())

@@ -12,20 +12,22 @@ package collections_test
 
 import (
 	col "github.com/craterdog/go-collection-framework/v3"
+	not "github.com/craterdog/go-collection-framework/v3/cdcn"
 	ass "github.com/stretchr/testify/assert"
 	tes "testing"
 )
 
 func TestArrayConstructors(t *tes.T) {
+	var notation = not.NotationClass().Make()
 	var Array = col.ArrayClass[int64]()
-	var sequence = Array.FromArray([]int64{1, 2, 3})
-	var _ = Array.FromSequence(sequence)
-	var _ = Array.FromString("[ ](Array)")
-	var _ = Array.FromString("[1, 2, 3](Array)")
+	var sequence = Array.MakeFromArray([]int64{1, 2, 3})
+	var _ = Array.MakeFromSequence(sequence)
+	var _ = Array.MakeFromSource("[ ](Array)", notation)
+	var _ = Array.MakeFromSource("[1, 2, 3](Array)", notation)
 }
 
 func TestEmptyArray(t *tes.T) {
-	var array = col.ArrayClass[string]().WithSize(0)
+	var array = col.ArrayClass[string]().MakeWithSize(0)
 	ass.True(t, array.IsEmpty())
 	ass.Equal(t, 0, array.GetSize())
 	ass.Equal(t, []string{}, array.AsArray())
@@ -46,7 +48,7 @@ func TestEmptyArray(t *tes.T) {
 }
 
 func TestArrayWithSize(t *tes.T) {
-	var array = col.ArrayClass[string]().WithSize(3)
+	var array = col.ArrayClass[string]().MakeWithSize(3)
 	ass.False(t, array.IsEmpty())
 	ass.Equal(t, 3, array.GetSize())
 	ass.Equal(t, []string{"", "", ""}, array.AsArray())
@@ -66,7 +68,7 @@ func TestArrayWithSize(t *tes.T) {
 }
 
 func TestArrayIndexOfZero(t *tes.T) {
-	var array = col.ArrayClass[int]().FromArray([]int{1, 2, 3})
+	var array = col.ArrayClass[int]().MakeFromArray([]int{1, 2, 3})
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "Indices must be positive or negative ordinals, not zero.", e)
@@ -78,10 +80,10 @@ func TestArrayIndexOfZero(t *tes.T) {
 }
 
 func TestArrayWithStrings(t *tes.T) {
-	var collator = col.CollatorClass().Default()
+	var collator = col.CollatorClass().Make()
 	var Array = col.ArrayClass[string]()
-	var array = Array.FromArray([]string{"foo", "bar", "baz"})
-	var foobar = Array.FromArray([]string{"foo", "bar"})
+	var array = Array.MakeFromArray([]string{"foo", "bar", "baz"})
+	var foobar = Array.MakeFromArray([]string{"foo", "bar"})
 	ass.False(t, array.IsEmpty())
 	ass.Equal(t, 3, array.GetSize())
 	ass.Equal(t, "foo", array.GetValue(1))
@@ -105,7 +107,7 @@ func TestArrayWithStrings(t *tes.T) {
 }
 
 func TestArrayWithIntegers(t *tes.T) {
-	var array = col.ArrayClass[int]().FromArray([]int{1, 2, 3})
+	var array = col.ArrayClass[int]().MakeFromArray([]int{1, 2, 3})
 	for index, value := range array.AsArray() {
 		ass.Equal(t, index, array.GetValue(value)-1)
 		ass.Equal(t, index, array.GetValue(value-4)-1)

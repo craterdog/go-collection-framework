@@ -8,11 +8,11 @@
  * Initiative. (See http://opensource.org/licenses/MIT)                        *
  *******************************************************************************/
 
-package collections_test
+package cdcn_test
 
 import (
 	fmt "fmt"
-	col "github.com/craterdog/go-collection-framework/v3"
+	not "github.com/craterdog/go-collection-framework/v3/cdcn"
 	ass "github.com/stretchr/testify/assert"
 	osx "os"
 	sts "strings"
@@ -22,7 +22,7 @@ import (
 const collectionTests = "./test/"
 
 func TestCollectionRoundtrips(t *tes.T) {
-	var cdcn = col.CDCNClass().Default()
+	var cdcn = not.NotationClass().Make()
 	var files, err = osx.ReadDir(collectionTests)
 	if err != nil {
 		var message = fmt.Sprintf("Could not find the %s directory.", collectionTests)
@@ -34,7 +34,7 @@ func TestCollectionRoundtrips(t *tes.T) {
 			fmt.Println(filename)
 			var source, _ = osx.ReadFile(filename)
 			var expected = string(source[:len(source)-1])
-			var collection = cdcn.ParseCollection(expected)
+			var collection = cdcn.ParseSource(expected)
 			var actual = cdcn.FormatCollection(collection)
 			if !sts.HasPrefix(file.Name(), "map") {
 				// Skip maps since they are non-deterministic.

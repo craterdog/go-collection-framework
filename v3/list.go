@@ -29,7 +29,7 @@ var listClass = map[string]any{}
 // Public Class Namespace Access
 
 func ListClass[V Value]() ListClassLike[V] {
-	var class *listClass_[V]
+	var class ListClassLike[V]
 	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
 	var value = listClass[key]
 	switch actual := value.(type) {
@@ -48,22 +48,22 @@ func ListClass[V Value]() ListClassLike[V] {
 
 // Public Class Constructors
 
-func (c *listClass_[V]) Empty() ListLike[V] {
-	var values = ArrayClass[V]().WithSize(0)
+func (c *listClass_[V]) Make() ListLike[V] {
+	var values = ArrayClass[V]().MakeWithSize(0)
 	var list = &list_[V]{
 		values: values,
 	}
 	return list
 }
 
-func (c *listClass_[V]) FromArray(values []V) ListLike[V] {
-	var array = ArrayClass[V]().FromArray(values)
-	var list = c.FromSequence(array)
+func (c *listClass_[V]) MakeFromArray(values []V) ListLike[V] {
+	var array = ArrayClass[V]().MakeFromArray(values)
+	var list = c.MakeFromSequence(array)
 	return list
 }
 
-func (c *listClass_[V]) FromSequence(values Sequential[V]) ListLike[V] {
-	var list = c.Empty()
+func (c *listClass_[V]) MakeFromSequence(values Sequential[V]) ListLike[V] {
+	var list = c.Make()
 	var iterator = values.GetIterator()
 	for iterator.HasNext() {
 		var value = iterator.GetNext()
@@ -72,13 +72,15 @@ func (c *listClass_[V]) FromSequence(values Sequential[V]) ListLike[V] {
 	return list
 }
 
-func (c *listClass_[V]) FromString(values string) ListLike[V] {
+func (c *listClass_[V]) MakeFromSource(
+	source string,
+	notation NotationLike,
+) ListLike[V] {
 	// First we parse it as a collection of any type value.
-	var cdcn = CDCNClass().Default()
-	var collection = cdcn.ParseCollection(values).(Sequential[Value])
+	var collection = notation.ParseSource(source).(Sequential[Value])
 
 	// Then we convert it to a list of type V.
-	var list = c.Empty()
+	var list = c.Make()
 	var iterator = collection.GetIterator()
 	for iterator.HasNext() {
 		var value = iterator.GetNext().(V)
@@ -92,7 +94,7 @@ func (c *listClass_[V]) FromString(values string) ListLike[V] {
 // This public class function returns the concatenation of the two specified
 // lists.
 func (c *listClass_[V]) Concatenate(first, second ListLike[V]) ListLike[V] {
-	var list = c.Empty()
+	var list = c.Make()
 	list.AppendValues(first)
 	list.AppendValues(second)
 	return list
@@ -122,7 +124,7 @@ func (v *list_[V]) AppendValue(value V) {
 
 	// Create a new larger array.
 	var size = v.GetSize() + 1
-	var array = ArrayClass[V]().WithSize(size)
+	var array = ArrayClass[V]().MakeWithSize(size)
 
 	// Copy the existing values into the new array.
 	var index int
@@ -145,7 +147,7 @@ func (v *list_[V]) AppendValues(values Sequential[V]) {
 
 	// Create a new larger array.
 	var size = v.GetSize() + values.GetSize()
-	var array = ArrayClass[V]().WithSize(size)
+	var array = ArrayClass[V]().MakeWithSize(size)
 
 	// Copy the existing values into the new array.
 	var index int
@@ -172,7 +174,7 @@ func (v *list_[V]) InsertValue(slot int, value V) {
 
 	// Create a new larger array.
 	var size = v.GetSize() + 1
-	var array = ArrayClass[V]().WithSize(size)
+	var array = ArrayClass[V]().MakeWithSize(size)
 
 	// Copy the values into the new array.
 	var iterator = v.GetIterator()
@@ -196,7 +198,7 @@ func (v *list_[V]) InsertValues(slot int, values Sequential[V]) {
 
 	// Create a new larger array.
 	var size = v.GetSize() + values.GetSize()
-	var array = ArrayClass[V]().WithSize(size)
+	var array = ArrayClass[V]().MakeWithSize(size)
 
 	// Copy the values into the new array.
 	var iterator = v.GetIterator()
@@ -221,7 +223,7 @@ func (v *list_[V]) InsertValues(slot int, values Sequential[V]) {
 }
 
 func (v *list_[V]) RemoveAll() {
-	v.values = ArrayClass[V]().WithSize(0)
+	v.values = ArrayClass[V]().MakeWithSize(0)
 }
 
 func (v *list_[V]) RemoveValue(index int) V {
@@ -229,7 +231,7 @@ func (v *list_[V]) RemoveValue(index int) V {
 	// Create a new smaller array.
 	var removed = v.GetValue(index)
 	var size = v.GetSize() - 1
-	var array = ArrayClass[V]().WithSize(size)
+	var array = ArrayClass[V]().MakeWithSize(size)
 
 	// Copy the remaining values into the new array.
 	var counter = v.toNormalized(index)
@@ -259,8 +261,8 @@ func (v *list_[V]) RemoveValues(first int, last int) Sequential[V] {
 	var delta = last - first + 1
 	var size = v.GetSize() - delta
 	var Array = ArrayClass[V]()
-	var removed = Array.WithSize(delta)
-	var array = Array.WithSize(size)
+	var removed = Array.MakeWithSize(delta)
+	var array = Array.MakeWithSize(size)
 
 	// Split the existing values into the two new arrays.
 	var counter int
@@ -318,7 +320,7 @@ func (v *list_[V]) ContainsValue(value V) bool {
 }
 
 func (v *list_[V]) GetIndex(value V) int {
-	var compare = CollatorClass().Default().CompareValues
+	var compare = CollatorClass().Make().CompareValues
 	for index, candidate := range v.AsArray() {
 		if compare(candidate, value) {
 			// Found the value.
@@ -365,6 +367,13 @@ func (v *list_[V]) SortValuesWithRanker(ranker RankingFunction) {
 	v.values.SortValuesWithRanker(ranker)
 }
 
+// Stringer Interface
+
+func (v *list_[V]) String() string {
+	var formatter = FormatterClass().Make()
+	return formatter.FormatCollection(v)
+}
+
 // Updatable Interface
 
 func (v *list_[V]) SetValue(index int, value V) {
@@ -376,13 +385,6 @@ func (v *list_[V]) SetValues(index int, values Sequential[V]) {
 }
 
 // Private Interface
-
-// This public class method is used by Go to generate a canonical string for
-// the list.
-func (v *list_[V]) String() string {
-	var cdcn = CDCNClass().Default()
-	return cdcn.FormatCollection(v)
-}
 
 // This private class method normalizes the specified index.  The following
 // transformation is performed:

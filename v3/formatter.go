@@ -22,24 +22,43 @@ import (
 // Private Class Namespace Type
 
 type formatterClass_ struct {
-	// This class defines no constants.
+	defaultDepth int
 }
 
 // Private Class Namespace Reference
 
 var formatterClass = &formatterClass_{
-	// This class defines no constants.
+	defaultDepth: 8,
 }
 
 // Public Class Namespace Access
 
-func FormatterClass() *formatterClass_ {
+/*
+FormatterClass defines an implementation of a formatter-like class that uses
+Crater Dog Collection Notation™ (CDCN) for formatting collections.  This is
+required by the Go `Stringer` interface when the `String()` method is called on
+a collection.  If not for the requirement to support the Go `Stringer` interface
+this class would be located in the `cdcn` package with the rest of the CDCN
+classes.  Instead, the `cdcn.FormatterClass` must delegate its implementation to
+this class to avoid circular dependencies.
+*/
+func FormatterClass() FormatterClassLike {
 	return formatterClass
+}
+
+// Public Class Constants
+
+func (c *formatterClass_) DefaultDepth() int {
+	return c.defaultDepth
 }
 
 // Public Class Constructors
 
-func (c *formatterClass_) WithDepth(depth int) *formatter_ {
+func (c *formatterClass_) Make() FormatterLike {
+	return c.MakeWithDepth(c.defaultDepth)
+}
+
+func (c *formatterClass_) MakeWithDepth(depth int) FormatterLike {
 	var formatter = &formatter_{
 		maximum: depth,
 	}
@@ -308,7 +327,7 @@ func (v *formatter_) formatSequence(sequence ref.Value) {
 // values to the result. It uses recursion to format each value.
 func (v *formatter_) formatCollection(collection ref.Value) {
 	v.appendString("[")
-	var type_ = v.getType(collection)
+	var type_ = v.getName(collection)
 	switch collection.Kind() {
 	case ref.Array, ref.Slice:
 		v.formatArray(collection)
@@ -337,7 +356,7 @@ func (v *formatter_) getResult() string {
 // This private class method extracts the type name string from the full
 // reflected type.  NOTE: This hack is necessary since Go does not handle type
 // switches with generics very well.
-func (v *formatter_) getType(collection ref.Value) string {
+func (v *formatter_) getName(collection ref.Value) string {
 	var type_ = collection.Type().String()
 	switch {
 	case sts.HasPrefix(type_, "[]"):

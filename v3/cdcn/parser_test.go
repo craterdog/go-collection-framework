@@ -8,16 +8,16 @@
  * Initiative. (See http://opensource.org/licenses/MIT)                        *
  *******************************************************************************/
 
-package collections_test
+package cdcn_test
 
 import (
-	col "github.com/craterdog/go-collection-framework/v3"
+	not "github.com/craterdog/go-collection-framework/v3/cdcn"
 	ass "github.com/stretchr/testify/assert"
 	tes "testing"
 )
 
 func TestParseBadFirst(t *tes.T) {
-	var parser = col.ParserClass().CDCN()
+	var parser = not.ParserClass().Make()
 	var source = `bad[ ](array)
 `
 	defer func() {
@@ -30,11 +30,11 @@ func TestParseBadFirst(t *tes.T) {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
-	var _ = parser.ParseCollection(source)
+	var _ = parser.ParseSource(source)
 }
 
 func TestParseBadMiddle(t *tes.T) {
-	var parser = col.ParserClass().CDCN()
+	var parser = not.ParserClass().Make()
 	var source = `[bad](array)
 `
 	defer func() {
@@ -47,11 +47,11 @@ func TestParseBadMiddle(t *tes.T) {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
-	var _ = parser.ParseCollection(source)
+	var _ = parser.ParseSource(source)
 }
 
 func TestParseBadEnd(t *tes.T) {
-	var parser = col.ParserClass().CDCN()
+	var parser = not.ParserClass().Make()
 	var source = `[ ](array)bad
 `
 	defer func() {
@@ -64,11 +64,11 @@ func TestParseBadEnd(t *tes.T) {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
-	var _ = parser.ParseCollection(source)
+	var _ = parser.ParseSource(source)
 }
 
 func TestParseExtraEOL(t *tes.T) {
-	var parser = col.ParserClass().CDCN()
+	var parser = not.ParserClass().Make()
 	var source = `[ ](array)
 
 `
@@ -76,11 +76,11 @@ func TestParseExtraEOL(t *tes.T) {
 		if e := recover(); e != nil {
 			ass.Equal(
 				t,
-				"An unexpected token was received by the parser: Token [type: EOL, line: 1, position: 11]: <EOL>\n\x1b[36m0001: [ ](array)\n \x1b[32m>>>────────────⌃\x1b[36m\n0002: \n\x1b[0m\nWas expecting 'EOF' from:\n  \x1b[32m$source: \x1b[33mcollection EOF  ! EOF is the end-of-file marker.\x1b[0m\n\n  \x1b[32m$collection: \x1b[33m\"[\" (associations | values) \"]\" context\x1b[0m\n\n",
+				"An unexpected token was received by the parser: Token [type: EOL, line: 1, position: 11]: \"<EOLN>\"\n\x1b[36m0001: [ ](array)\n \x1b[32m>>>────────────⌃\x1b[36m\n0002: \n\x1b[0m\nWas expecting 'EOF' from:\n  \x1b[32m$source: \x1b[33mcollection EOF  ! Terminated with an end-of-file marker.\x1b[0m\n\n  \x1b[32m$collection: \x1b[33m\"[\" (associations | values) \"]\" \"(\" CONTEXT \")\"\x1b[0m\n\n",
 				e)
 		} else {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
-	var _ = parser.ParseCollection(source)
+	var _ = parser.ParseSource(source)
 }

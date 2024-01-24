@@ -29,7 +29,7 @@ var iteratorClass = map[string]any{}
 // Public Class Namespace Access
 
 func IteratorClass[V Value]() IteratorClassLike[V] {
-	var class *iteratorClass_[V]
+	var class IteratorClassLike[V]
 	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
 	var value = iteratorClass[key]
 	switch actual := value.(type) {
@@ -48,7 +48,7 @@ func IteratorClass[V Value]() IteratorClassLike[V] {
 
 // Public Class Constructors
 
-func (c *iteratorClass_[V]) FromSequence(sequence Sequential[V]) IteratorLike[V] {
+func (c *iteratorClass_[V]) Make(sequence Sequential[V]) IteratorLike[V] {
 	var values = sequence.AsArray() // The returned Go array is immutable.
 	var size = len(values)
 	var iterator = &iterator_[V]{

@@ -31,7 +31,7 @@ var catalogClass = map[string]any{}
 // Public Class Namespace Access
 
 func CatalogClass[K comparable, V Value]() CatalogClassLike[K, V] {
-	var class *catalogClass_[K, V]
+	var class CatalogClassLike[K, V]
 	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
 	var value = catalogClass[key]
 	switch actual := value.(type) {
@@ -50,35 +50,35 @@ func CatalogClass[K comparable, V Value]() CatalogClassLike[K, V] {
 
 // Public Class Constructors
 
-func (c *catalogClass_[K, V]) Empty() CatalogLike[K, V] {
+func (c *catalogClass_[K, V]) Make() CatalogLike[K, V] {
 	var keys = map[K]AssociationLike[K, V]{}
-	var associations = ListClass[AssociationLike[K, V]]().Empty()
+	var associations = ListClass[AssociationLike[K, V]]().Make()
 	var catalog = &catalog_[K, V]{associations, keys}
 	return catalog
 }
 
-func (c *catalogClass_[K, V]) FromArray(
+func (c *catalogClass_[K, V]) MakeFromArray(
 	associations []AssociationLike[K, V],
 ) CatalogLike[K, V] {
-	var array = ArrayClass[AssociationLike[K, V]]().FromArray(associations)
-	var catalog = c.FromSequence(array)
+	var array = ArrayClass[AssociationLike[K, V]]().MakeFromArray(associations)
+	var catalog = c.MakeFromSequence(array)
 	return catalog
 }
 
-func (c *catalogClass_[K, V]) FromMap(
+func (c *catalogClass_[K, V]) MakeFromMap(
 	associations map[K]V,
 ) CatalogLike[K, V] {
-	var catalog = c.Empty()
+	var catalog = c.Make()
 	for key, value := range associations {
 		catalog.SetValue(key, value)
 	}
 	return catalog
 }
 
-func (c *catalogClass_[K, V]) FromSequence(
+func (c *catalogClass_[K, V]) MakeFromSequence(
 	associations Sequential[AssociationLike[K, V]],
 ) CatalogLike[K, V] {
-	var catalog = c.Empty()
+	var catalog = c.Make()
 	var iterator = associations.GetIterator()
 	for iterator.HasNext() {
 		var association = iterator.GetNext()
@@ -89,13 +89,15 @@ func (c *catalogClass_[K, V]) FromSequence(
 	return catalog
 }
 
-func (c *catalogClass_[K, V]) FromString(associations string) CatalogLike[K, V] {
+func (c *catalogClass_[K, V]) MakeFromSource(
+	source string,
+	notation NotationLike,
+) CatalogLike[K, V] {
 	// First we parse it as a collection of any type value.
-	var cdcn = CDCNClass().Default()
-	var collection = cdcn.ParseCollection(associations).(Sequential[AssociationLike[Key, Value]])
+	var collection = notation.ParseSource(source).(Sequential[AssociationLike[Key, Value]])
 
 	// Then we convert it to a catalog of type AssociationLike[K, V].
-	var catalog = c.Empty()
+	var catalog = c.Make()
 	var iterator = collection.GetIterator()
 	for iterator.HasNext() {
 		var association = iterator.GetNext()
@@ -116,7 +118,7 @@ func (c *catalogClass_[K, V]) Extract(
 	catalog CatalogLike[K, V],
 	keys Sequential[K],
 ) CatalogLike[K, V] {
-	var result = c.Empty()
+	var result = c.Make()
 	var iterator = keys.GetIterator()
 	for iterator.HasNext() {
 		var key = iterator.GetNext()
@@ -134,7 +136,7 @@ func (c *catalogClass_[K, V]) Merge(
 	first CatalogLike[K, V],
 	second CatalogLike[K, V],
 ) CatalogLike[K, V] {
-	var catalog = c.FromSequence(first)
+	var catalog = c.MakeFromSequence(first)
 	var iterator = second.GetIterator()
 	for iterator.HasNext() {
 		var association = iterator.GetNext()
@@ -157,7 +159,7 @@ type catalog_[K comparable, V Value] struct {
 // Associative Interface
 
 func (v *catalog_[K, V]) GetKeys() Sequential[K] {
-	var keys = ListClass[K]().Empty()
+	var keys = ListClass[K]().Make()
 	var iterator = v.associations.GetIterator()
 	for iterator.HasNext() {
 		var association = iterator.GetNext()
@@ -177,7 +179,7 @@ func (v *catalog_[K, V]) GetValue(key K) V {
 }
 
 func (v *catalog_[K, V]) GetValues(keys Sequential[K]) Sequential[V] {
-	var values = ListClass[V]().Empty()
+	var values = ListClass[V]().Make()
 	var iterator = keys.GetIterator()
 	for iterator.HasNext() {
 		var key = iterator.GetNext()
@@ -204,8 +206,8 @@ func (v *catalog_[K, V]) RemoveValue(key K) V {
 }
 
 func (v *catalog_[K, V]) RemoveValues(keys Sequential[K]) Sequential[V] {
-	var values = ListClass[V]().Empty()
-	var iterator = IteratorClass[K]().FromSequence(keys)
+	var values = ListClass[V]().Make()
+	var iterator = IteratorClass[K]().Make(keys)
 	for iterator.HasNext() {
 		var key = iterator.GetNext()
 		values.AppendValue(v.RemoveValue(key))
@@ -220,7 +222,7 @@ func (v *catalog_[K, V]) SetValue(key K, value V) {
 		association.SetValue(value)
 	} else {
 		// Add a new association.
-		association = AssociationClass[K, V]().FromPair(key, value)
+		association = AssociationClass[K, V]().Make(key, value)
 		v.associations.AppendValue(association)
 		v.keys[key] = association
 	}
@@ -262,10 +264,9 @@ func (v *catalog_[K, V]) SortValuesWithRanker(ranker RankingFunction) {
 	v.associations.SortValuesWithRanker(ranker)
 }
 
-// Private Interface
+// Stringer Interface
 
-// This public class method returns the canonical string for this catalog.
 func (v *catalog_[K, V]) String() string {
-	var cdcn = CDCNClass().Default()
-	return cdcn.FormatCollection(v)
+	var formatter = FormatterClass().Make()
+	return formatter.FormatCollection(v)
 }

@@ -202,9 +202,8 @@ func (v *parser_) parseAssociations() (
 	}
 
 	// Handle the multi-line case.
-	var eolToken col.TokenLike
-	_, eolToken, ok = v.parseToken(TypeEOL, "")
-	if ok {
+	var _, eolToken, isMultilined = v.parseToken(TypeEOL, "")
+	if isMultilined {
 		association, token, ok = v.parseAssociation()
 		if !ok {
 			// This must be a collection of values instead.
@@ -427,10 +426,11 @@ func (v *parser_) parsePrimitive() (
 	return primitive, token, ok
 }
 
-func (v *parser_) parseToken(
-	expectedType col.TokenType,
-	expectedValue string,
-) (value string, token col.TokenLike, ok bool) {
+func (v *parser_) parseToken(expectedType col.TokenType, expectedValue string) (
+	value string,
+	token col.TokenLike,
+	ok bool,
+) {
 	token = v.getNextToken()
 	value = token.GetValue()
 	if token.GetType() == expectedType {
@@ -475,8 +475,8 @@ func (v *parser_) parseValues() (
 	}
 
 	// Handle the multi-line case.
-	_, _, ok = v.parseToken(TypeEOL, "")
-	if ok {
+	var _, _, isMultilined = v.parseToken(TypeEOL, "")
+	if isMultilined {
 		value, token, ok = v.parseValue()
 		if !ok {
 			var message = v.formatError(token)

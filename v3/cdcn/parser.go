@@ -539,10 +539,10 @@ var grammar = map[string]string{
     ":"  ! No associations.`,
 	"$association": `key ":" value`,
 	"$key":         `primitive`,
+	"$value":       `collection | primitive`,
+	"$primitive":   `BOOLEAN | COMPLEX | FLOAT | HEXADECIMAL | INTEGER | NIL | RUNE | STRING`,
 	"$values": `
     value ("," value)*
     EOL (value EOL)+
     " "  ! No values.`,
-	"$value":     `collection | primitive`,
-	"$primitive": `BOOLEAN | COMPLEX | FLOAT | INTEGER | NIL | RUNE | STRING | UNSIGNED`,
 }

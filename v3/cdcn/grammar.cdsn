@@ -34,6 +34,8 @@ $BOOLEAN: "false" | "true"
 
 $COMPLEX: "(" FLOAT SIGN FLOAT "i)"
 
+$CONTEXT: "array" | "Array" | "Catalog" | "List" | "map" | "Map" | "Queue" | "Set" | "Stack"
+
 $DELIMITER: "[" | "]" | "(" | ")" | ":" | ","
 
 $EXPONENT: ('e' | 'E') SIGN ORDINAL
@@ -41,6 +43,8 @@ $EXPONENT: ('e' | 'E') SIGN ORDINAL
 $FLOAT: SIGN? SCALAR EXPONENT?
 
 $FRACTION: '.' BASE10+
+
+$HEXADECIMAL: "0x" BASE16+
 
 $INTEGER: ZERO | SIGN? ORDINAL
 
@@ -58,11 +62,7 @@ $SIGN: '+' | '-'
 
 $STRING: '"' (ESCAPE | ~('"' | CONTROL))* '"'
 
-$CONTEXT: "array" | "Array" | "Catalog" | "List" | "map" | "Map" | "Queue" | "Set" | "Stack"
-
 $UNICODE: 'x' BASE16{2} | 'u' BASE16{4} | 'U' BASE16{8}
-
-$UNSIGNED: "0x" BASE16+
 
 $ZERO: '0'
 
@@ -102,13 +102,13 @@ $association: key ":" value
 
 $key: primitive
 
+$value: collection | primitive
+
+$primitive: BOOLEAN | COMPLEX | FLOAT | HEXADECIMAL | INTEGER | NIL | RUNE | STRING
+
 $values:
     value ("," value)*
     EOL (value EOL)+
     " "  ! No values.
 
-
-$value: collection | primitive
-
-$primitive: BOOLEAN | COMPLEX | FLOAT | INTEGER | NIL | RUNE | STRING | UNSIGNED
 

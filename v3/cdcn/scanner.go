@@ -53,13 +53,13 @@ func ScannerClass() col.ScannerClassLike {
 // Public Class Constructors
 
 func (c *scannerClass_) Make(
-	document string,
+	source string,
 	tokens chan col.TokenLike,
 ) col.ScannerLike {
 	var scanner = &scanner_{
 		line:     1,
 		position: 1,
-		runes:    []rune(document),
+		runes:    []rune(source),
 		tokens:   tokens,
 	}
 	go scanner.scanTokens() // Start scanning tokens in the background.
@@ -78,7 +78,7 @@ func (c *scannerClass_) MatchToken(tokenType col.TokenType, text string) []strin
 
 type scanner_ struct {
 	first    int // A zero based index of the first possible rune in the next token.
-	line     int // The line number in the document of the next rune.
+	line     int // The line number in the source string of the next rune.
 	next     int // A zero based index of the next possible rune in the next token.
 	position int // The position in the current line of the next rune.
 	runes    []rune

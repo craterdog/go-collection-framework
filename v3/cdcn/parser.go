@@ -54,8 +54,8 @@ func (c *parserClass_) Make() col.ParserLike {
 // Private Class Type Definition
 
 type parser_ struct {
-	source string
 	next   col.StackLike[col.TokenLike] // A stack of unprocessed retrieved tokens.
+	source string                       // The original source code.
 	tokens chan col.TokenLike           // A queue of unread tokens from the scanner.
 }
 

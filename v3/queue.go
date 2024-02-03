@@ -15,45 +15,52 @@ import (
 	syn "sync"
 )
 
-// CLASS NAMESPACE
+// CLASS ACCESS
 
-// Private Class Namespace Type
-
-type queueClass_[V Value] struct {
-	defaultCapacity int
-}
-
-// Private Class Namespace References
+// Reference
 
 var queueClass = map[string]any{}
 
-// Public Class Namespace Access
+// Function
 
-func QueueClass[V Value]() QueueClassLike[V] {
+func Queue[V Value]() QueueClassLike[V] {
+	// Generate the name of the bound class type.
 	var class QueueClassLike[V]
-	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
-	var value = queueClass[key]
+	var name = fmt.Sprintf("%T", class)
+
+	// Check for existing bound class type.
+	var value = queueClass[name]
 	switch actual := value.(type) {
 	case *queueClass_[V]:
 		// This bound class type already exists.
 		class = actual
 	default:
-		// Create a new bound class type.
+		// Add a new bound class type.
 		class = &queueClass_[V]{
 			defaultCapacity: 16,
 		}
-		queueClass[key] = class
+		queueClass[name] = class
 	}
+
+	// Return a reference to the bound class type.
 	return class
 }
 
-// Public Class Constants
+// CLASS METHODS
+
+// Target
+
+type queueClass_[V Value] struct {
+	defaultCapacity int
+}
+
+// Constants
 
 func (c *queueClass_[V]) DefaultCapacity() int {
 	return c.defaultCapacity
 }
 
-// Public Class Constructors
+// Constructors
 
 func (c *queueClass_[V]) Make() QueueLike[V] {
 	var queue = c.MakeWithCapacity(c.defaultCapacity)
@@ -61,7 +68,7 @@ func (c *queueClass_[V]) Make() QueueLike[V] {
 }
 
 func (c *queueClass_[V]) MakeFromArray(values []V) QueueLike[V] {
-	var array = ArrayClass[V]().MakeFromArray(values)
+	var array = Array[V]().MakeFromArray(values)
 	var queue = c.MakeFromSequence(array)
 	return queue
 }
@@ -98,7 +105,7 @@ func (c *queueClass_[V]) MakeWithCapacity(capacity int) QueueLike[V] {
 		capacity = c.defaultCapacity
 	}
 	var available = make(chan bool, capacity)
-	var values = ListClass[V]().Make()
+	var values = List[V]().Make()
 	var queue = &queue_[V]{
 		available: available,
 		capacity:  capacity,
@@ -107,14 +114,16 @@ func (c *queueClass_[V]) MakeWithCapacity(capacity int) QueueLike[V] {
 	return queue
 }
 
-// Public Class Functions
+// Functions
 
-// This public class function connects the output of the specified input Queue
-// with a number of new output queues specified by the size parameter and
-// returns a sequence of the new output queues. Each value added to the input
-// queue will be added automatically to ALL of the output queues. This pattern
-// is useful when a set of DIFFERENT operations needs to occur for every value
-// and each operation can be done in parallel.
+/*
+This public class function connects the output of the specified input Queue with
+a number of new output queues specified by the size parameter and returns a
+sequence of the new output queues. Each value added to the input queue will be
+added automatically to ALL of the output queues. This pattern is useful when a
+set of DIFFERENT operations needs to occur for every value and each operation
+can be done in parallel.
+*/
 func (c *queueClass_[V]) Fork(
 	group Synchronized,
 	input QueueLike[V],
@@ -127,7 +136,7 @@ func (c *queueClass_[V]) Fork(
 
 	// Create the new output queues.
 	var capacity = input.GetCapacity()
-	var outputs = ListClass[QueueLike[V]]().Make()
+	var outputs = List[QueueLike[V]]().Make()
 	for i := 0; i < size; i++ {
 		outputs.AppendValue(c.MakeWithCapacity(capacity))
 	}
@@ -166,11 +175,13 @@ func (c *queueClass_[V]) Fork(
 	return outputs
 }
 
-// This public class function connects the outputs of the specified sequence of
-// input queues with a new output queue returns the new output queue. Each value
-// removed from each input queue will automatically be added to the output
-// queue. This pattern is useful when the results of the processing with a
-// Split() function need to be consolidated into a single queue.
+/*
+This public class function connects the outputs of the specified sequence of
+input queues with a new output queue returns the new output queue. Each value
+removed from each input queue will automatically be added to the output queue.
+This pattern is useful when the results of the processing with a Split()
+function need to be consolidated into a single queue.
+*/
 func (c *queueClass_[V]) Join(
 	group Synchronized,
 	inputs Sequential[QueueLike[V]],
@@ -212,13 +223,15 @@ func (c *queueClass_[V]) Join(
 	return output
 }
 
-// This public class function connects the output of the specified input Queue
-// with the number of output queues specified by the size parameter and returns
-// a sequence of the new output queues. Each value added to the input queue will
-// be added automatically to ONE of the output queues. This pattern is useful
-// when a SINGLE operation needs to occur for each value and the operation can
-// be done on the values in parallel. The results can then be consolidated later
-// on using the Join() function.
+/*
+This public class function connects the output of the specified input Queue with
+the number of output queues specified by the size parameter and returns a
+sequence of the new output queues. Each value added to the input queue will be
+added automatically to ONE of the output queues. This pattern is useful when a
+SINGLE operation needs to occur for each value and the operation can be done on
+the values in parallel. The results can then be consolidated later on using the
+Join() function.
+*/
 func (c *queueClass_[V]) Split(
 	group Synchronized,
 	input QueueLike[V],
@@ -231,7 +244,7 @@ func (c *queueClass_[V]) Split(
 
 	// Create the new output queues.
 	var capacity = input.GetCapacity()
-	var outputs = ListClass[QueueLike[V]]().Make()
+	var outputs = List[QueueLike[V]]().Make()
 	for i := 0; i < size; i++ {
 		outputs.AppendValue(c.MakeWithCapacity(capacity))
 	}
@@ -270,9 +283,9 @@ func (c *queueClass_[V]) Split(
 	return outputs
 }
 
-// CLASS INSTANCES
+// INSTANCE METHODS
 
-// Private Class Type Definition
+// Target
 
 type queue_[V Value] struct {
 	available chan bool
@@ -281,12 +294,15 @@ type queue_[V Value] struct {
 	values    ListLike[V]
 }
 
-// NOTE: If the Go "chan" type ever supports snapshots of its state, the
-// underlying list can be removed and the channel modified to pass the values
-// instead of the availability. Currently, the underlying list is only required
-// by the "AsArray()" class method.
+/*
+NOTE:
+If the Go "chan" type ever supports snapshots of its state, the underlying list
+can be removed and the channel modified to pass the values instead of the
+availability. Currently, the underlying list is only required by the "AsArray()"
+class method.
+*/
 
-// Limited Interface
+// Limited
 
 func (v *queue_[V]) AddValue(value V) {
 	v.mutex.Lock()
@@ -302,11 +318,11 @@ func (v *queue_[V]) GetCapacity() int {
 func (v *queue_[V]) RemoveAll() {
 	v.mutex.Lock()
 	v.available = make(chan bool, v.capacity)
-	v.values = ListClass[V]().Make()
+	v.values = List[V]().Make()
 	v.mutex.Unlock()
 }
 
-// Sequential Interface
+// Sequential
 
 func (v *queue_[V]) AsArray() []V {
 	v.mutex.Lock()
@@ -336,18 +352,19 @@ func (v *queue_[V]) IsEmpty() bool {
 	return result
 }
 
-// Stringer Interface
+// Stringer
 
 func (v *queue_[V]) String() string {
-	var formatter = FormatterClass().Make()
+	var formatter = Formatter().Make()
 	return formatter.FormatCollection(v)
 }
 
-// Public Interface
+// Public
 
 func (v *queue_[V]) CloseQueue() {
 	v.mutex.Lock()
-	close(v.available) // No more values can be placed on the queue.
+	close(v.available)
+	// No more values can be placed on the queue.
 	v.mutex.Unlock()
 }
 

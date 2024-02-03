@@ -18,8 +18,8 @@ import (
 )
 
 func TestArrayConstructors(t *tes.T) {
-	var notation = not.NotationClass().Make()
-	var Array = col.ArrayClass[int64]()
+	var notation = not.Notation().Make()
+	var Array = col.Array[int64]()
 	var sequence = Array.MakeFromArray([]int64{1, 2, 3})
 	var _ = Array.MakeFromSequence(sequence)
 	var _ = Array.MakeFromSource("[ ](Array)", notation)
@@ -27,7 +27,7 @@ func TestArrayConstructors(t *tes.T) {
 }
 
 func TestEmptyArray(t *tes.T) {
-	var array = col.ArrayClass[string]().MakeWithSize(0)
+	var array = col.Array[string]().MakeWithSize(0)
 	ass.True(t, array.IsEmpty())
 	ass.Equal(t, 0, array.GetSize())
 	ass.Equal(t, []string{}, array.AsArray())
@@ -48,7 +48,7 @@ func TestEmptyArray(t *tes.T) {
 }
 
 func TestArrayWithSize(t *tes.T) {
-	var array = col.ArrayClass[string]().MakeWithSize(3)
+	var array = col.Array[string]().MakeWithSize(3)
 	ass.False(t, array.IsEmpty())
 	ass.Equal(t, 3, array.GetSize())
 	ass.Equal(t, []string{"", "", ""}, array.AsArray())
@@ -68,7 +68,7 @@ func TestArrayWithSize(t *tes.T) {
 }
 
 func TestArrayIndexOfZero(t *tes.T) {
-	var array = col.ArrayClass[int]().MakeFromArray([]int{1, 2, 3})
+	var array = col.Array[int]().MakeFromArray([]int{1, 2, 3})
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "Indices must be positive or negative ordinals, not zero.", e)
@@ -80,8 +80,8 @@ func TestArrayIndexOfZero(t *tes.T) {
 }
 
 func TestArrayWithStrings(t *tes.T) {
-	var collator = col.CollatorClass().Make()
-	var Array = col.ArrayClass[string]()
+	var collator = col.Collator().Make()
+	var Array = col.Array[string]()
 	var array = Array.MakeFromArray([]string{"foo", "bar", "baz"})
 	var foobar = Array.MakeFromArray([]string{"foo", "bar"})
 	ass.False(t, array.IsEmpty())
@@ -107,7 +107,7 @@ func TestArrayWithStrings(t *tes.T) {
 }
 
 func TestArrayWithIntegers(t *tes.T) {
-	var array = col.ArrayClass[int]().MakeFromArray([]int{1, 2, 3})
+	var array = col.Array[int]().MakeFromArray([]int{1, 2, 3})
 	for index, value := range array.AsArray() {
 		ass.Equal(t, index, array.GetValue(value)-1)
 		ass.Equal(t, index, array.GetValue(value-4)-1)

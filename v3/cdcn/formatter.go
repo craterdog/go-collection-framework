@@ -14,16 +14,10 @@ import (
 	col "github.com/craterdog/go-collection-framework/v3"
 )
 
-// CLASS NAMESPACE
+// CLASS ACCESS
 
-// Public Class Namespace Access
+// Function
 
-/*
-FormatterClass defines an implementation of a formatter-like class that uses
-Crater Dog Collection Notation™ (CDCN) for formatting collections.  Since the
-go-collection-framework uses the same formatting notation this class simply
-delegates to the collection framework's formatter class.
-*/
-func FormatterClass() col.FormatterClassLike {
-	return col.FormatterClass()
+func Formatter() col.FormatterClassLike {
+	return col.Formatter()
 }

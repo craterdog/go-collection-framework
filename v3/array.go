@@ -14,39 +14,46 @@ import (
 	fmt "fmt"
 )
 
-// CLASS NAMESPACE
+// CLASS ACCESS
 
-// Private Class Namespace Type
-
-type arrayClass_[V Value] struct {
-	// This class defines no constants.
-}
-
-// Private Class Namespace References
+// Reference
 
 var arrayClass = map[string]any{}
 
-// Public Class Namespace Access
+// Function
 
-func ArrayClass[V Value]() ArrayClassLike[V] {
+func Array[V Value]() ArrayClassLike[V] {
+	// Generate the name of the bound class type.
 	var class ArrayClassLike[V]
-	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
-	var value = arrayClass[key]
+	var name = fmt.Sprintf("%T", class)
+
+	// Check for existing bound class type.
+	var value = arrayClass[name]
 	switch actual := value.(type) {
 	case *arrayClass_[V]:
 		// This bound class type already exists.
 		class = actual
 	default:
-		// Create a new bound class type.
+		// Add a new bound class type.
 		class = &arrayClass_[V]{
 			// This class defines no constants.
 		}
-		arrayClass[key] = class
+		arrayClass[name] = class
 	}
+
+	// Return a reference to the bound class type.
 	return class
 }
 
-// Public Class Constructors
+// CLASS METHODS
+
+// Target
+
+type arrayClass_[V Value] struct {
+	// This class defines no constants.
+}
+
+// Constructors
 
 func (c *arrayClass_[V]) MakeFromArray(values []V) ArrayLike[V] {
 	var size = len(values)
@@ -90,13 +97,13 @@ func (c *arrayClass_[V]) MakeWithSize(size int) ArrayLike[V] {
 	return array_[V](array)
 }
 
-// CLASS INSTANCES
+// INSTANCE METHODS
 
-// Private Class Type Definition
+// Target
 
 type array_[V Value] []V
 
-// Accessible Interface
+// Accessible
 
 func (v array_[V]) GetValue(index int) V {
 	index = v.toZeroBased(index)
@@ -108,11 +115,11 @@ func (v array_[V]) GetValues(first int, last int) Sequential[V] {
 	last = v.toZeroBased(last)
 	var sequence = v[first : last+1]
 	// Copy the underlying Go array.
-	var array = ArrayClass[V]().MakeFromArray(sequence)
+	var array = Array[V]().MakeFromArray(sequence)
 	return array
 }
 
-// Sequential Interface
+// Sequential
 
 func (v array_[V]) AsArray() []V {
 	var length = len(v)
@@ -122,7 +129,7 @@ func (v array_[V]) AsArray() []V {
 }
 
 func (v array_[V]) GetIterator() IteratorLike[V] {
-	var iterator = IteratorClass[V]().Make(v)
+	var iterator = Iterator[V]().Make(v)
 	return iterator
 }
 
@@ -134,39 +141,39 @@ func (v array_[V]) IsEmpty() bool {
 	return len(v) == 0
 }
 
-// Sortable Interface
+// Sortable
 
 func (v array_[V]) ReverseValues() {
-	var sorter = SorterClass[V]().Make()
+	var sorter = Sorter[V]().Make()
 	sorter.ReverseValues(v)
 }
 
 func (v array_[V]) ShuffleValues() {
-	var sorter = SorterClass[V]().Make()
+	var sorter = Sorter[V]().Make()
 	sorter.ShuffleValues(v)
 }
 
 func (v array_[V]) SortValues() {
-	var collator = CollatorClass().Make()
+	var collator = Collator().Make()
 	var ranker = collator.RankValues
 	v.SortValuesWithRanker(ranker)
 }
 
 func (v array_[V]) SortValuesWithRanker(ranker RankingFunction) {
 	if v.GetSize() > 1 {
-		var sorter = SorterClass[V]().MakeWithRanker(ranker)
+		var sorter = Sorter[V]().MakeWithRanker(ranker)
 		sorter.SortValues(v)
 	}
 }
 
-// Stringer Interface
+// Stringer
 
 func (v array_[V]) String() string {
-	var formatter = FormatterClass().Make()
+	var formatter = Formatter().Make()
 	return formatter.FormatCollection(v)
 }
 
-// Updatable Interface
+// Updatable
 
 func (v array_[V]) SetValue(index int, value V) {
 	index = v.toZeroBased(index)
@@ -181,15 +188,17 @@ func (v array_[V]) SetValues(index int, values Sequential[V]) {
 	copy(v[first:last], values.AsArray())
 }
 
-// Private Interface
+// Private
 
-// This private class method normalizes a relative ORDINAL-based index into this
-// Array to match the Go (ZERO-based) indexing. The following transformation is
-// performed:
-//
-//	[-size..-1] and [1..size] => [0..size)
-//
-// Notice that the specified index cannot be zero since zero is NOT an ordinal.
+/*
+This private class method normalizes a relative ORDINAL-based index into this
+Array to match the Go (ZERO-based) indexing. The following transformation is
+performed:
+
+	[-size..-1] and [1..size] => [0..size)
+
+Notice that the specified index cannot be zero since zero is NOT an ordinal.
+*/
 func (v array_[V]) toZeroBased(index int) int {
 	var size = v.GetSize()
 	switch {

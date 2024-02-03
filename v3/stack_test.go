@@ -18,21 +18,21 @@ import (
 )
 
 func TestStackConstructor(t *tes.T) {
-	var notation = not.NotationClass().Make()
-	var Stack = col.StackClass[int64]()
+	var notation = not.Notation().Make()
+	var Stack = col.Stack[int64]()
 	var _ = Stack.MakeFromSource("[ ](Stack)", notation)
 	var _ = Stack.MakeFromSource("[1, 2, 3](Stack)", notation)
 }
 
 func TestStackConstructors(t *tes.T) {
-	var Stack = col.StackClass[int64]()
+	var Stack = col.Stack[int64]()
 	var stack1 = Stack.MakeFromArray([]int64{1, 2, 3})
 	var stack2 = Stack.MakeFromSequence(stack1)
 	ass.Equal(t, stack1.AsArray(), stack2.AsArray())
 }
 
 func TestStackWithSmallCapacity(t *tes.T) {
-	var stack = col.StackClass[int]().MakeWithCapacity(1)
+	var stack = col.Stack[int]().MakeWithCapacity(1)
 	stack.AddValue(1)
 	defer func() {
 		if e := recover(); e != nil {
@@ -45,7 +45,7 @@ func TestStackWithSmallCapacity(t *tes.T) {
 }
 
 func TestEmptyStackRemoval(t *tes.T) {
-	var stack = col.StackClass[int]().Make()
+	var stack = col.Stack[int]().Make()
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "Attempted to remove the top of an empty stack!", e)
@@ -57,7 +57,7 @@ func TestEmptyStackRemoval(t *tes.T) {
 }
 
 func TestStacksWithStrings(t *tes.T) {
-	var stack = col.StackClass[string]().Make()
+	var stack = col.Stack[string]().Make()
 	ass.True(t, stack.IsEmpty())
 	ass.Equal(t, 0, stack.GetSize())
 	stack.RemoveAll()

@@ -14,45 +14,54 @@ import (
 	fmt "fmt"
 )
 
-// CLASS NAMESPACE
+// CLASS ACCESS
 
-// Private Class Namespace Type
-
-// The Go language requires the key type here support the "comparable"
-// interface so we must narrow it down from type Key (i.e "any").
-type catalogClass_[K comparable, V Value] struct {
-	// This class defines no constants.
-}
-
-// Private Class Namespace References
+// Reference
 
 var catalogClass = map[string]any{}
 
-// Public Class Namespace Access
+// Function
 
-func CatalogClass[K comparable, V Value]() CatalogClassLike[K, V] {
+func Catalog[K comparable, V Value]() CatalogClassLike[K, V] {
+	// Generate the name of the bound class type.
 	var class CatalogClassLike[K, V]
-	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
-	var value = catalogClass[key]
+	var name = fmt.Sprintf("%T", class)
+
+	// Check for existing bound class type.
+	var value = catalogClass[name]
 	switch actual := value.(type) {
 	case *catalogClass_[K, V]:
 		// This bound class type already exists.
 		class = actual
 	default:
-		// Create a new bound class type.
+		// Add a new bound class type.
 		class = &catalogClass_[K, V]{
 			// This class defines no constants.
 		}
-		catalogClass[key] = class
+		catalogClass[name] = class
 	}
+
+	// Return a reference to the bound class type.
 	return class
 }
 
-// Public Class Constructors
+// CLASS METHODS
+
+// Target
+
+/*
+The Go language requires the key type here support the "comparable" interface so
+we must narrow it down from type Key (i.e "any").
+*/
+type catalogClass_[K comparable, V Value] struct {
+	// This class defines no constants.
+}
+
+// Constructors
 
 func (c *catalogClass_[K, V]) Make() CatalogLike[K, V] {
 	var keys = map[K]AssociationLike[K, V]{}
-	var associations = ListClass[AssociationLike[K, V]]().Make()
+	var associations = List[AssociationLike[K, V]]().Make()
 	var catalog = &catalog_[K, V]{associations, keys}
 	return catalog
 }
@@ -60,7 +69,7 @@ func (c *catalogClass_[K, V]) Make() CatalogLike[K, V] {
 func (c *catalogClass_[K, V]) MakeFromArray(
 	associations []AssociationLike[K, V],
 ) CatalogLike[K, V] {
-	var array = ArrayClass[AssociationLike[K, V]]().MakeFromArray(associations)
+	var array = Array[AssociationLike[K, V]]().MakeFromArray(associations)
 	var catalog = c.MakeFromSequence(array)
 	return catalog
 }
@@ -108,12 +117,14 @@ func (c *catalogClass_[K, V]) MakeFromSource(
 	return catalog
 }
 
-// Public Class Functions
+// Functions
 
-// This public class function returns a new catalog containing only the
-// associations that are in the specified catalog that have the specified keys.
-// The associations in the resulting catalog will be in the same order as the
-// specified keys.
+/*
+This public class function returns a new catalog containing only the
+associations that are in the specified catalog that have the specified keys.
+The associations in the resulting catalog will be in the same order as the
+specified keys.
+*/
 func (c *catalogClass_[K, V]) Extract(
 	catalog CatalogLike[K, V],
 	keys Sequential[K],
@@ -128,10 +139,12 @@ func (c *catalogClass_[K, V]) Extract(
 	return result
 }
 
-// This public class function returns a new catalog containing all of the
-// associations that are in the specified Catalogs in the order that they appear
-// in each catalog.  If a key is present in both Catalogs, the value of the key
-// from the second catalog takes precedence.
+/*
+This public class function returns a new catalog containing all of the
+associations that are in the specified Catalogs in the order that they appear in
+each catalog.  If a key is present in both Catalogs, the value of the key from
+the second catalog takes precedence.
+*/
 func (c *catalogClass_[K, V]) Merge(
 	first CatalogLike[K, V],
 	second CatalogLike[K, V],
@@ -147,19 +160,19 @@ func (c *catalogClass_[K, V]) Merge(
 	return catalog
 }
 
-// CLASS INSTANCES
+// INSTANCE METHODS
 
-// Private Class Type Definition
+// Target
 
 type catalog_[K comparable, V Value] struct {
 	associations ListLike[AssociationLike[K, V]]
 	keys         map[K]AssociationLike[K, V]
 }
 
-// Associative Interface
+// Associative
 
 func (v *catalog_[K, V]) GetKeys() Sequential[K] {
-	var keys = ListClass[K]().Make()
+	var keys = List[K]().Make()
 	var iterator = v.associations.GetIterator()
 	for iterator.HasNext() {
 		var association = iterator.GetNext()
@@ -179,7 +192,7 @@ func (v *catalog_[K, V]) GetValue(key K) V {
 }
 
 func (v *catalog_[K, V]) GetValues(keys Sequential[K]) Sequential[V] {
-	var values = ListClass[V]().Make()
+	var values = List[V]().Make()
 	var iterator = keys.GetIterator()
 	for iterator.HasNext() {
 		var key = iterator.GetNext()
@@ -206,8 +219,8 @@ func (v *catalog_[K, V]) RemoveValue(key K) V {
 }
 
 func (v *catalog_[K, V]) RemoveValues(keys Sequential[K]) Sequential[V] {
-	var values = ListClass[V]().Make()
-	var iterator = IteratorClass[K]().Make(keys)
+	var values = List[V]().Make()
+	var iterator = Iterator[K]().Make(keys)
 	for iterator.HasNext() {
 		var key = iterator.GetNext()
 		values.AppendValue(v.RemoveValue(key))
@@ -222,13 +235,13 @@ func (v *catalog_[K, V]) SetValue(key K, value V) {
 		association.SetValue(value)
 	} else {
 		// Add a new association.
-		association = AssociationClass[K, V]().Make(key, value)
+		association = Association[K, V]().Make(key, value)
 		v.associations.AppendValue(association)
 		v.keys[key] = association
 	}
 }
 
-// Sequential Interface
+// Sequential
 
 func (v *catalog_[K, V]) AsArray() []AssociationLike[K, V] {
 	return v.associations.AsArray()
@@ -246,7 +259,7 @@ func (v *catalog_[K, V]) IsEmpty() bool {
 	return v.associations.IsEmpty()
 }
 
-// Sortable Interface
+// Sortable
 
 func (v *catalog_[K, V]) ReverseValues() {
 	v.associations.ReverseValues()
@@ -264,9 +277,9 @@ func (v *catalog_[K, V]) SortValuesWithRanker(ranker RankingFunction) {
 	v.associations.SortValuesWithRanker(ranker)
 }
 
-// Stringer Interface
+// Stringer
 
 func (v *catalog_[K, V]) String() string {
-	var formatter = FormatterClass().Make()
+	var formatter = Formatter().Make()
 	return formatter.FormatCollection(v)
 }

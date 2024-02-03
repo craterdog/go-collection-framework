@@ -39,7 +39,7 @@ package collections
 
 // PACKAGE TYPES
 
-// Specialized Types
+// Specialized
 
 /*
 Collection is a generic type representing any type of collections of values.
@@ -67,7 +67,7 @@ scanner.
 */
 type TokenType int64
 
-// Functional Types
+// Functional
 
 /*
 ComparingFunction defines the signature for any function that can determine
@@ -90,9 +90,9 @@ implements this signature.
 */
 type RankingFunction func(first Value, second Value) int
 
-// PACKAGE ABSTRACTIONS
+// PACKAGE INTERFACES
 
-// Abstract Interfaces
+// Aspects
 
 /*
 Accessible[V Value] defines the set of method signatures that must be
@@ -230,7 +230,228 @@ type Updatable[V Value] interface {
 	SetValues(index int, values Sequential[V])
 }
 
-// Abstract Classes
+// Classes
+
+/*
+ArrayClassLike[V Value] defines the set of class constants, constructors and
+functions that must be supported by all array-class-like namespaces.
+*/
+type ArrayClassLike[V Value] interface {
+	// Constructors
+	MakeFromArray(values []V) ArrayLike[V]
+	MakeFromSequence(values Sequential[V]) ArrayLike[V]
+	MakeFromSource(source string, notation NotationLike) ArrayLike[V]
+	MakeWithSize(size int) ArrayLike[V]
+}
+
+/*
+AssociationClassLike[K Key, V Value] defines the set of class constants,
+constructors and functions that must be supported by all
+association-class-like namespaces.
+*/
+type AssociationClassLike[K Key, V Value] interface {
+	// Constructors
+	Make(key K, value V) AssociationLike[K, V]
+}
+
+/*
+CatalogClassLike[K comparable, V Value] defines the set of class constants,
+constructors and functions that must be supported by all catalog-class-like
+namespaces.
+*/
+type CatalogClassLike[K comparable, V Value] interface {
+	// Constructors
+	Make() CatalogLike[K, V]
+	MakeFromArray(associations []AssociationLike[K, V]) CatalogLike[K, V]
+	MakeFromMap(associations map[K]V) CatalogLike[K, V]
+	MakeFromSequence(associations Sequential[AssociationLike[K, V]]) CatalogLike[K, V]
+	MakeFromSource(source string, notation NotationLike) CatalogLike[K, V]
+
+	// Functions
+	Extract(catalog CatalogLike[K, V], keys Sequential[K]) CatalogLike[K, V]
+	Merge(first, second CatalogLike[K, V]) CatalogLike[K, V]
+}
+
+/*
+CollatorClassLike defines the set of class constants, constructors and functions
+that must be supported by all collator-class-like namespaces.
+*/
+type CollatorClassLike interface {
+	// Constants
+	DefaultDepth() int
+
+	// Constructors
+	Make() CollatorLike
+	MakeWithDepth(depth int) CollatorLike
+}
+
+/*
+FormatterClassLike defines the set of class constants, constructors and
+functions that must be supported by all formatter-class-like namespaces.
+*/
+type FormatterClassLike interface {
+	// Constants
+	DefaultDepth() int
+
+	// Constructors
+	Make() FormatterLike
+	MakeWithDepth(depth int) FormatterLike
+}
+
+/*
+IteratorClassLike[V Value] defines the set of class constants, constructors and
+functions that must be supported by all iterator-class-like namespaces.
+*/
+type IteratorClassLike[V Value] interface {
+	// Constructors
+	Make(sequence Sequential[V]) IteratorLike[V]
+}
+
+/*
+ListClassLike[V Value] defines the set of class constants, constructors and
+functions that must be supported by all list-class-like namespaces.
+*/
+type ListClassLike[V Value] interface {
+	// Constructors
+	Make() ListLike[V]
+	MakeFromArray(values []V) ListLike[V]
+	MakeFromSequence(values Sequential[V]) ListLike[V]
+	MakeFromSource(source string, notation NotationLike) ListLike[V]
+
+	// Functions
+	Concatenate(first, second ListLike[V]) ListLike[V]
+}
+
+/*
+MapClassLike[K comparable, V Value] defines the set of class constants,
+constructors and functions that must be supported by all map-class-like
+namespaces.
+*/
+type MapClassLike[K comparable, V Value] interface {
+	// Constructors
+	Make() MapLike[K, V]
+	MakeFromArray(associations []AssociationLike[K, V]) MapLike[K, V]
+	MakeFromMap(associations map[K]V) MapLike[K, V]
+	MakeFromSequence(associations Sequential[AssociationLike[K, V]]) MapLike[K, V]
+	MakeFromSource(source string, notation NotationLike) MapLike[K, V]
+}
+
+/*
+NotationClassLike defines the set of class constants, constructors and
+functions that must be supported by all notation-class-like namespaces.
+*/
+type NotationClassLike interface {
+	// Constants
+	DefaultDepth() int
+
+	// Constructors
+	Make() NotationLike
+	MakeWithDepth(depth int) NotationLike
+}
+
+/*
+ParserClassLike defines the set of class constants, constructors and functions
+that must be supported by all parser-class-like namespaces.
+*/
+type ParserClassLike interface {
+	// Constructors
+	Make() ParserLike
+}
+
+/*
+QueueClassLike[V Value] defines the set of class constants, constructors and
+functions that must be supported by all queue-class-like namespaces.
+*/
+type QueueClassLike[V Value] interface {
+	// Constants
+	DefaultCapacity() int
+
+	// Constructors
+	Make() QueueLike[V]
+	MakeFromArray(values []V) QueueLike[V]
+	MakeFromSequence(values Sequential[V]) QueueLike[V]
+	MakeFromSource(source string, notation NotationLike) QueueLike[V]
+	MakeWithCapacity(capacity int) QueueLike[V]
+
+	// Functions
+	Fork(group Synchronized, input QueueLike[V], size int) Sequential[QueueLike[V]]
+	Join(group Synchronized, inputs Sequential[QueueLike[V]]) QueueLike[V]
+	Split(group Synchronized, input QueueLike[V], size int) Sequential[QueueLike[V]]
+}
+
+/*
+ScannerClassLike defines the set of class constants, constructors and functions
+that must be supported by all scanner-class-like namespaces.
+*/
+type ScannerClassLike interface {
+	// Constructors
+	Make(document string, tokens chan TokenLike) ScannerLike
+
+	// Functions
+	MatchToken(tokenType TokenType, text string) []string
+}
+
+/*
+SetClassLike[V Value] defines the set of class constants, constructors and
+functions that must be supported by all set-class-like namespaces.
+*/
+type SetClassLike[V Value] interface {
+	// Constructors
+	Make() SetLike[V]
+	MakeFromArray(values []V) SetLike[V]
+	MakeFromSequence(values Sequential[V]) SetLike[V]
+	MakeFromSource(source string, notation NotationLike) SetLike[V]
+	MakeWithCollator(collator CollatorLike) SetLike[V]
+
+	// Functions
+	And(first, second SetLike[V]) SetLike[V]
+	Or(first, second SetLike[V]) SetLike[V]
+	Sans(first, second SetLike[V]) SetLike[V]
+	Xor(first, second SetLike[V]) SetLike[V]
+}
+
+/*
+SorterClassLike[V Value] defines the set of class constants, constructors and
+functions that must be supported by all sorter-class-like namespaces.
+*/
+type SorterClassLike[V Value] interface {
+	// Constants
+	DefaultRanker() RankingFunction
+
+	// Constructors
+	Make() SorterLike[V]
+	MakeWithRanker(ranker RankingFunction) SorterLike[V]
+}
+
+/*
+StackClassLike[V Value] defines the set of class constants, constructors and
+functions that must be supported by all stack-class-like namespaces.
+*/
+type StackClassLike[V Value] interface {
+	// Constants
+	DefaultCapacity() int
+
+	// Constructors
+	Make() StackLike[V]
+	MakeFromArray(values []V) StackLike[V]
+	MakeFromSequence(values Sequential[V]) StackLike[V]
+	MakeFromSource(source string, notation NotationLike) StackLike[V]
+	MakeWithCapacity(capacity int) StackLike[V]
+}
+
+/*
+TokenClassLike defines the set of class constants, constructors and functions
+that must be supported by all token-class-like namespaces.
+*/
+type TokenClassLike interface {
+	// Constructors
+	Make(line, position int, tokenType TokenType, tokenValue string) TokenLike
+
+	// Functions
+	AsString(tokenType TokenType) string
+}
+
+// Instances
 
 /*
 ArrayLike[V Value] defines the set of aspects and methods that must be supported
@@ -513,225 +734,4 @@ type TokenLike interface {
 	GetPosition() int
 	GetType() TokenType
 	GetValue() string
-}
-
-// Abstract Namespaces
-
-/*
-ArrayClassLike[V Value] defines the set of class constants, constructors and
-functions that must be supported by all array-class-like namespaces.
-*/
-type ArrayClassLike[V Value] interface {
-	// Constructors
-	MakeFromArray(values []V) ArrayLike[V]
-	MakeFromSequence(values Sequential[V]) ArrayLike[V]
-	MakeFromSource(source string, notation NotationLike) ArrayLike[V]
-	MakeWithSize(size int) ArrayLike[V]
-}
-
-/*
-AssociationClassLike[K Key, V Value] defines the set of class constants,
-constructors and functions that must be supported by all
-association-class-like namespaces.
-*/
-type AssociationClassLike[K Key, V Value] interface {
-	// Constructors
-	Make(key K, value V) AssociationLike[K, V]
-}
-
-/*
-CatalogClassLike[K comparable, V Value] defines the set of class constants,
-constructors and functions that must be supported by all catalog-class-like
-namespaces.
-*/
-type CatalogClassLike[K comparable, V Value] interface {
-	// Constructors
-	Make() CatalogLike[K, V]
-	MakeFromArray(associations []AssociationLike[K, V]) CatalogLike[K, V]
-	MakeFromMap(associations map[K]V) CatalogLike[K, V]
-	MakeFromSequence(associations Sequential[AssociationLike[K, V]]) CatalogLike[K, V]
-	MakeFromSource(source string, notation NotationLike) CatalogLike[K, V]
-
-	// Functions
-	Extract(catalog CatalogLike[K, V], keys Sequential[K]) CatalogLike[K, V]
-	Merge(first, second CatalogLike[K, V]) CatalogLike[K, V]
-}
-
-/*
-CollatorClassLike defines the set of class constants, constructors and functions
-that must be supported by all collator-class-like namespaces.
-*/
-type CollatorClassLike interface {
-	// Constants
-	DefaultDepth() int
-
-	// Constructors
-	Make() CollatorLike
-	MakeWithDepth(depth int) CollatorLike
-}
-
-/*
-FormatterClassLike defines the set of class constants, constructors and
-functions that must be supported by all formatter-class-like namespaces.
-*/
-type FormatterClassLike interface {
-	// Constants
-	DefaultDepth() int
-
-	// Constructors
-	Make() FormatterLike
-	MakeWithDepth(depth int) FormatterLike
-}
-
-/*
-IteratorClassLike[V Value] defines the set of class constants, constructors and
-functions that must be supported by all iterator-class-like namespaces.
-*/
-type IteratorClassLike[V Value] interface {
-	// Constructors
-	Make(sequence Sequential[V]) IteratorLike[V]
-}
-
-/*
-ListClassLike[V Value] defines the set of class constants, constructors and
-functions that must be supported by all list-class-like namespaces.
-*/
-type ListClassLike[V Value] interface {
-	// Constructors
-	Make() ListLike[V]
-	MakeFromArray(values []V) ListLike[V]
-	MakeFromSequence(values Sequential[V]) ListLike[V]
-	MakeFromSource(source string, notation NotationLike) ListLike[V]
-
-	// Functions
-	Concatenate(first, second ListLike[V]) ListLike[V]
-}
-
-/*
-MapClassLike[K comparable, V Value] defines the set of class constants,
-constructors and functions that must be supported by all map-class-like
-namespaces.
-*/
-type MapClassLike[K comparable, V Value] interface {
-	// Constructors
-	Make() MapLike[K, V]
-	MakeFromArray(associations []AssociationLike[K, V]) MapLike[K, V]
-	MakeFromMap(associations map[K]V) MapLike[K, V]
-	MakeFromSequence(associations Sequential[AssociationLike[K, V]]) MapLike[K, V]
-	MakeFromSource(source string, notation NotationLike) MapLike[K, V]
-}
-
-/*
-NotationClassLike defines the set of class constants, constructors and
-functions that must be supported by all notation-class-like namespaces.
-*/
-type NotationClassLike interface {
-	// Constants
-	DefaultDepth() int
-
-	// Constructors
-	Make() NotationLike
-	MakeWithDepth(depth int) NotationLike
-}
-
-/*
-ParserClassLike defines the set of class constants, constructors and functions
-that must be supported by all parser-class-like namespaces.
-*/
-type ParserClassLike interface {
-	// Constructors
-	Make() ParserLike
-}
-
-/*
-QueueClassLike[V Value] defines the set of class constants, constructors and
-functions that must be supported by all queue-class-like namespaces.
-*/
-type QueueClassLike[V Value] interface {
-	// Constants
-	DefaultCapacity() int
-
-	// Constructors
-	Make() QueueLike[V]
-	MakeFromArray(values []V) QueueLike[V]
-	MakeFromSequence(values Sequential[V]) QueueLike[V]
-	MakeFromSource(source string, notation NotationLike) QueueLike[V]
-	MakeWithCapacity(capacity int) QueueLike[V]
-
-	// Functions
-	Fork(group Synchronized, input QueueLike[V], size int) Sequential[QueueLike[V]]
-	Join(group Synchronized, inputs Sequential[QueueLike[V]]) QueueLike[V]
-	Split(group Synchronized, input QueueLike[V], size int) Sequential[QueueLike[V]]
-}
-
-/*
-ScannerClassLike defines the set of class constants, constructors and functions
-that must be supported by all scanner-class-like namespaces.
-*/
-type ScannerClassLike interface {
-	// Constructors
-	Make(document string, tokens chan TokenLike) ScannerLike
-
-	// Functions
-	MatchToken(tokenType TokenType, text string) []string
-}
-
-/*
-SetClassLike[V Value] defines the set of class constants, constructors and
-functions that must be supported by all set-class-like namespaces.
-*/
-type SetClassLike[V Value] interface {
-	// Constructors
-	Make() SetLike[V]
-	MakeFromArray(values []V) SetLike[V]
-	MakeFromSequence(values Sequential[V]) SetLike[V]
-	MakeFromSource(source string, notation NotationLike) SetLike[V]
-	MakeWithCollator(collator CollatorLike) SetLike[V]
-
-	// Functions
-	And(first, second SetLike[V]) SetLike[V]
-	Or(first, second SetLike[V]) SetLike[V]
-	Sans(first, second SetLike[V]) SetLike[V]
-	Xor(first, second SetLike[V]) SetLike[V]
-}
-
-/*
-SorterClassLike[V Value] defines the set of class constants, constructors and
-functions that must be supported by all sorter-class-like namespaces.
-*/
-type SorterClassLike[V Value] interface {
-	// Constants
-	DefaultRanker() RankingFunction
-
-	// Constructors
-	Make() SorterLike[V]
-	MakeWithRanker(ranker RankingFunction) SorterLike[V]
-}
-
-/*
-StackClassLike[V Value] defines the set of class constants, constructors and
-functions that must be supported by all stack-class-like namespaces.
-*/
-type StackClassLike[V Value] interface {
-	// Constants
-	DefaultCapacity() int
-
-	// Constructors
-	Make() StackLike[V]
-	MakeFromArray(values []V) StackLike[V]
-	MakeFromSequence(values Sequential[V]) StackLike[V]
-	MakeFromSource(source string, notation NotationLike) StackLike[V]
-	MakeWithCapacity(capacity int) StackLike[V]
-}
-
-/*
-TokenClassLike defines the set of class constants, constructors and functions
-that must be supported by all token-class-like namespaces.
-*/
-type TokenClassLike interface {
-	// Constructors
-	Make(line, position int, tokenType TokenType, tokenValue string) TokenLike
-
-	// Functions
-	AsString(tokenType TokenType) string
 }

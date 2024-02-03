@@ -14,42 +14,49 @@ import (
 	fmt "fmt"
 )
 
-// CLASS NAMESPACE
+// CLASS ACCESS
 
-// Private Class Namespace Type
-
-type listClass_[V Value] struct {
-	// This class defines no constants.
-}
-
-// Private Class Namespace References
+// Reference
 
 var listClass = map[string]any{}
 
-// Public Class Namespace Access
+// Function
 
-func ListClass[V Value]() ListClassLike[V] {
+func List[V Value]() ListClassLike[V] {
+	// Generate the name of the bound class type.
 	var class ListClassLike[V]
-	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
-	var value = listClass[key]
+	var name = fmt.Sprintf("%T", class)
+
+	// Check for existing bound class type.
+	var value = listClass[name]
 	switch actual := value.(type) {
 	case *listClass_[V]:
 		// This bound class type already exists.
 		class = actual
 	default:
-		// Create a new bound class type.
+		// Add a new bound class type.
 		class = &listClass_[V]{
 			// This class defines no constants.
 		}
-		listClass[key] = class
+		listClass[name] = class
 	}
+
+	// Return a reference to the bound class type.
 	return class
 }
 
-// Public Class Constructors
+// CLASS METHODS
+
+// Target
+
+type listClass_[V Value] struct {
+	// This class defines no constants.
+}
+
+// Constructors
 
 func (c *listClass_[V]) Make() ListLike[V] {
-	var values = ArrayClass[V]().MakeWithSize(0)
+	var values = Array[V]().MakeWithSize(0)
 	var list = &list_[V]{
 		values: values,
 	}
@@ -57,7 +64,7 @@ func (c *listClass_[V]) Make() ListLike[V] {
 }
 
 func (c *listClass_[V]) MakeFromArray(values []V) ListLike[V] {
-	var array = ArrayClass[V]().MakeFromArray(values)
+	var array = Array[V]().MakeFromArray(values)
 	var list = c.MakeFromSequence(array)
 	return list
 }
@@ -89,10 +96,8 @@ func (c *listClass_[V]) MakeFromSource(
 	return list
 }
 
-// Public Class Functions
+// Functions
 
-// This public class function returns the concatenation of the two specified
-// lists.
 func (c *listClass_[V]) Concatenate(first, second ListLike[V]) ListLike[V] {
 	var list = c.Make()
 	list.AppendValues(first)
@@ -100,15 +105,15 @@ func (c *listClass_[V]) Concatenate(first, second ListLike[V]) ListLike[V] {
 	return list
 }
 
-// CLASS INSTANCES
+// INSTANCE METHODS
 
-// Private Class Type Definition
+// Target
 
 type list_[V Value] struct {
 	values ArrayLike[V]
 }
 
-// Accessible Interface
+// Accessible
 
 func (v *list_[V]) GetValue(index int) V {
 	return v.values.GetValue(index)
@@ -118,13 +123,13 @@ func (v *list_[V]) GetValues(first int, last int) Sequential[V] {
 	return v.values.GetValues(first, last)
 }
 
-// Expandable Interface
+// Expandable
 
 func (v *list_[V]) AppendValue(value V) {
 
 	// Create a new larger array.
 	var size = v.GetSize() + 1
-	var array = ArrayClass[V]().MakeWithSize(size)
+	var array = Array[V]().MakeWithSize(size)
 
 	// Copy the existing values into the new array.
 	var index int
@@ -147,7 +152,7 @@ func (v *list_[V]) AppendValues(values Sequential[V]) {
 
 	// Create a new larger array.
 	var size = v.GetSize() + values.GetSize()
-	var array = ArrayClass[V]().MakeWithSize(size)
+	var array = Array[V]().MakeWithSize(size)
 
 	// Copy the existing values into the new array.
 	var index int
@@ -174,7 +179,7 @@ func (v *list_[V]) InsertValue(slot int, value V) {
 
 	// Create a new larger array.
 	var size = v.GetSize() + 1
-	var array = ArrayClass[V]().MakeWithSize(size)
+	var array = Array[V]().MakeWithSize(size)
 
 	// Copy the values into the new array.
 	var iterator = v.GetIterator()
@@ -198,7 +203,7 @@ func (v *list_[V]) InsertValues(slot int, values Sequential[V]) {
 
 	// Create a new larger array.
 	var size = v.GetSize() + values.GetSize()
-	var array = ArrayClass[V]().MakeWithSize(size)
+	var array = Array[V]().MakeWithSize(size)
 
 	// Copy the values into the new array.
 	var iterator = v.GetIterator()
@@ -223,7 +228,7 @@ func (v *list_[V]) InsertValues(slot int, values Sequential[V]) {
 }
 
 func (v *list_[V]) RemoveAll() {
-	v.values = ArrayClass[V]().MakeWithSize(0)
+	v.values = Array[V]().MakeWithSize(0)
 }
 
 func (v *list_[V]) RemoveValue(index int) V {
@@ -231,7 +236,7 @@ func (v *list_[V]) RemoveValue(index int) V {
 	// Create a new smaller array.
 	var removed = v.GetValue(index)
 	var size = v.GetSize() - 1
-	var array = ArrayClass[V]().MakeWithSize(size)
+	var array = Array[V]().MakeWithSize(size)
 
 	// Copy the remaining values into the new array.
 	var counter = v.toNormalized(index)
@@ -260,7 +265,7 @@ func (v *list_[V]) RemoveValues(first int, last int) Sequential[V] {
 	last = v.toNormalized(last)
 	var delta = last - first + 1
 	var size = v.GetSize() - delta
-	var Array = ArrayClass[V]()
+	var Array = Array[V]()
 	var removed = Array.MakeWithSize(delta)
 	var array = Array.MakeWithSize(size)
 
@@ -287,7 +292,7 @@ func (v *list_[V]) RemoveValues(first int, last int) Sequential[V] {
 	return removed
 }
 
-// Searchable Interface
+// Searchable
 
 func (v *list_[V]) ContainsAll(values Sequential[V]) bool {
 	var iterator = values.GetIterator()
@@ -320,7 +325,7 @@ func (v *list_[V]) ContainsValue(value V) bool {
 }
 
 func (v *list_[V]) GetIndex(value V) int {
-	var compare = CollatorClass().Make().CompareValues
+	var compare = Collator().Make().CompareValues
 	for index, candidate := range v.AsArray() {
 		if compare(candidate, value) {
 			// Found the value.
@@ -331,7 +336,7 @@ func (v *list_[V]) GetIndex(value V) int {
 	return 0
 }
 
-// Sequential Interface
+// Sequential
 
 func (v *list_[V]) AsArray() []V {
 	return v.values.AsArray()
@@ -349,7 +354,7 @@ func (v *list_[V]) IsEmpty() bool {
 	return v.values.IsEmpty()
 }
 
-// Sortable Interface
+// Sortable
 
 func (v *list_[V]) ReverseValues() {
 	v.values.ReverseValues()
@@ -367,14 +372,14 @@ func (v *list_[V]) SortValuesWithRanker(ranker RankingFunction) {
 	v.values.SortValuesWithRanker(ranker)
 }
 
-// Stringer Interface
+// Stringer
 
 func (v *list_[V]) String() string {
-	var formatter = FormatterClass().Make()
+	var formatter = Formatter().Make()
 	return formatter.FormatCollection(v)
 }
 
-// Updatable Interface
+// Updatable
 
 func (v *list_[V]) SetValue(index int, value V) {
 	v.values.SetValue(index, value)
@@ -384,11 +389,13 @@ func (v *list_[V]) SetValues(index int, values Sequential[V]) {
 	v.values.SetValues(index, values)
 }
 
-// Private Interface
+// Private
 
-// This private class method normalizes the specified index.  The following
-// transformation is performed:
-// [-size..-1] and [1..size] => [1..size]
+/*
+This private instance method normalizes the specified index.  The following
+transformation is performed:
+[-size..-1] and [1..size] => [1..size]
+*/
 func (v *list_[V]) toNormalized(index int) int {
 	var size = v.GetSize()
 	switch {

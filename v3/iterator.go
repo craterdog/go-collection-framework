@@ -14,39 +14,46 @@ import (
 	fmt "fmt"
 )
 
-// CLASS NAMESPACE
+// CLASS ACCESS
 
-// Private Class Namespace Type
-
-type iteratorClass_[V Value] struct {
-	// This class does not define any constants.
-}
-
-// Private Class Namespace References
+// Reference
 
 var iteratorClass = map[string]any{}
 
-// Public Class Namespace Access
+// Function
 
-func IteratorClass[V Value]() IteratorClassLike[V] {
+func Iterator[V Value]() IteratorClassLike[V] {
+	// Generate the name of the bound class type.
 	var class IteratorClassLike[V]
-	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
-	var value = iteratorClass[key]
+	var name = fmt.Sprintf("%T", class)
+
+	// Check for existing bound class type.
+	var value = iteratorClass[name]
 	switch actual := value.(type) {
 	case *iteratorClass_[V]:
 		// This bound class type already exists.
 		class = actual
 	default:
-		// Create a new bound class type.
+		// Add a new bound class type.
 		class = &iteratorClass_[V]{
 			// This class does not define any constants.
 		}
-		iteratorClass[key] = class
+		iteratorClass[name] = class
 	}
+
+	// Return a reference to the bound class type.
 	return class
 }
 
-// Public Class Constructors
+// CLASS METHODS
+
+// Target
+
+type iteratorClass_[V Value] struct {
+	// This class does not define any constants.
+}
+
+// Constructors
 
 func (c *iteratorClass_[V]) Make(sequence Sequential[V]) IteratorLike[V] {
 	var values = sequence.AsArray() // The returned Go array is immutable.
@@ -58,9 +65,9 @@ func (c *iteratorClass_[V]) Make(sequence Sequential[V]) IteratorLike[V] {
 	return iterator
 }
 
-// CLASS INSTANCES
+// INSTANCE METHODS
 
-// Private Class Type Definition
+// Target
 
 type iterator_[V Value] struct {
 	size   int // So we can safely cache the size.
@@ -68,7 +75,7 @@ type iterator_[V Value] struct {
 	values []V // The Go array of values is immutable.
 }
 
-// Public Interface
+// Public
 
 func (v *iterator_[V]) GetNext() V {
 	var result V

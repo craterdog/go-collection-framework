@@ -18,15 +18,15 @@ import (
 )
 
 func TestListConstructor(t *tes.T) {
-	var notation = not.NotationClass().Make()
-	var _ = col.ListClass[int64]().MakeFromSource("[ ](List)", notation)
-	var _ = col.ListClass[int64]().MakeFromSource("[1, 2, 3](List)", notation)
+	var notation = not.Notation().Make()
+	var _ = col.List[int64]().MakeFromSource("[ ](List)", notation)
+	var _ = col.List[int64]().MakeFromSource("[1, 2, 3](List)", notation)
 }
 
 func TestListsWithStrings(t *tes.T) {
-	var Array = col.ArrayClass[string]()
-	var List = col.ListClass[string]()
-	var collator = col.CollatorClass().Make()
+	var Array = col.Array[string]()
+	var List = col.List[string]()
+	var collator = col.Collator().Make()
 	var foo = Array.MakeFromArray([]string{"foo"})
 	var bar = Array.MakeFromArray([]string{"bar"})
 	var baz = Array.MakeFromArray([]string{"baz"})
@@ -152,8 +152,8 @@ func TestListsWithStrings(t *tes.T) {
 }
 
 func TestListsWithTildes(t *tes.T) {
-	var array = col.ArrayClass[Integer]().MakeFromArray([]Integer{3, 1, 4, 5, 9, 2})
-	var list = col.ListClass[Integer]().MakeFromSequence(array)
+	var array = col.Array[Integer]().MakeFromArray([]Integer{3, 1, 4, 5, 9, 2})
+	var list = col.List[Integer]().MakeFromSequence(array)
 	ass.False(t, list.IsEmpty())            // [3,1,4,5,9,2]
 	ass.Equal(t, 6, list.GetSize())         // [3,1,4,5,9,2]
 	ass.Equal(t, 3, int(list.GetValue(1)))  // [3,1,4,5,9,2]
@@ -164,9 +164,9 @@ func TestListsWithTildes(t *tes.T) {
 }
 
 func TestListsWithConcatenate(t *tes.T) {
-	var List = col.ListClass[int]()
-	var collator = col.CollatorClass().Make()
-	var Array = col.ArrayClass[int]()
+	var List = col.List[int]()
+	var collator = col.Collator().Make()
+	var Array = col.Array[int]()
 	var onetwothree = Array.MakeFromArray([]int{1, 2, 3})
 	var fourfivesix = Array.MakeFromArray([]int{4, 5, 6})
 	var onethrusix = Array.MakeFromArray([]int{1, 2, 3, 4, 5, 6})
@@ -181,8 +181,8 @@ func TestListsWithConcatenate(t *tes.T) {
 }
 
 func TestListsWithEmptyLists(t *tes.T) {
-	var collator = col.CollatorClass().Make()
-	var List = col.ListClass[int]()
+	var collator = col.Collator().Make()
+	var List = col.List[int]()
 	var empty = List.Make()
 	var list = List.Concatenate(empty, empty)
 	ass.True(t, collator.CompareValues(empty, empty))

@@ -18,40 +18,42 @@ import (
 	utf "unicode/utf8"
 )
 
-// CLASS NAMESPACE
+// CLASS ACCESS
 
-// Private Class Namespace Type
-
-type parserClass_ struct {
-	channelSize int
-	stackSize   int
-}
-
-// Private Class Namespace Reference
+// Reference
 
 var parserClass = &parserClass_{
 	channelSize: 16,
 	stackSize:   4,
 }
 
-// Public Class Namespace Access
+// Function
 
-func ParserClass() col.ParserClassLike {
+func Parser() col.ParserClassLike {
 	return parserClass
 }
 
-// Public Class Constructors
+// CLASS METHODS
+
+// Target
+
+type parserClass_ struct {
+	channelSize int
+	stackSize   int
+}
+
+// Constructors
 
 func (c *parserClass_) Make() col.ParserLike {
 	var parser = &parser_{
-		next: col.StackClass[col.TokenLike]().MakeWithCapacity(c.stackSize),
+		next: col.Stack[col.TokenLike]().MakeWithCapacity(c.stackSize),
 	}
 	return parser
 }
 
-// CLASS INSTANCES
+// INSTANCE METHODS
 
-// Private Class Type Definition
+// Target
 
 type parser_ struct {
 	next   col.StackLike[col.TokenLike] // A stack of unprocessed retrieved tokens.
@@ -59,13 +61,13 @@ type parser_ struct {
 	tokens chan col.TokenLike           // A queue of unread tokens from the scanner.
 }
 
-// Public Interface
+// Public
 
 func (v *parser_) ParseSource(source string) col.Collection {
 	// The scanner runs in a separate Go routine.
 	v.source = source
 	v.tokens = make(chan col.TokenLike, parserClass.channelSize)
-	ScannerClass().Make(v.source, v.tokens)
+	Scanner().Make(v.source, v.tokens)
 
 	// Parse the tokens from the scanner.
 	var collection, token, ok = v.parseCollection()
@@ -89,10 +91,12 @@ func (v *parser_) ParseSource(source string) col.Collection {
 	return collection
 }
 
-// Private Interface
+// Private
 
-// This private class method returns an error message containing the context for
-// a parsing error.
+/*
+This private class method returns an error message containing the context for a
+parsing error.
+*/
 func (v *parser_) formatError(token col.TokenLike) string {
 	var message = fmt.Sprintf(
 		"An unexpected token was received by the parser: %v\n",
@@ -123,8 +127,10 @@ func (v *parser_) formatError(token col.TokenLike) string {
 	return message
 }
 
-// This private class method is useful when creating scanner and parser error
-// messages that include the required grammatical rules.
+/*
+This private class method is useful when creating scanner and parser error
+messages that include the required grammatical rules.
+*/
 func (v *parser_) generateGrammar(expected string, symbols ...string) string {
 	var message = "Was expecting '" + expected + "' from:\n"
 	for _, symbol := range symbols {
@@ -137,8 +143,10 @@ func (v *parser_) generateGrammar(expected string, symbols ...string) string {
 	return message
 }
 
-// This private class method attempts to read the next token from the token
-// stream and return it.
+/*
+This private class method attempts to read the next token from the token
+stream and return it.
+*/
 func (v *parser_) getNextToken() col.TokenLike {
 	var next col.TokenLike
 	if v.next.IsEmpty() {
@@ -183,7 +191,7 @@ func (v *parser_) parseAssociation() (
 			"$value")
 		panic(message)
 	}
-	association = col.AssociationClass[col.Key, col.Value]().Make(key, value)
+	association = col.Association[col.Key, col.Value]().Make(key, value)
 	return association, token, true
 }
 
@@ -193,7 +201,7 @@ func (v *parser_) parseAssociations() (
 	ok bool,
 ) {
 	var association col.AssociationLike[col.Key, col.Value]
-	associations = col.CatalogClass[col.Key, col.Value]().Make()
+	associations = col.Catalog[col.Key, col.Value]().Make()
 
 	// Handle the empty case.
 	_, token, ok = v.parseToken(TypeDelimiter, ":")
@@ -324,15 +332,15 @@ func (v *parser_) parseCollection() (
 		case "array":
 			collection = sequence.AsArray()
 		case "Array":
-			collection = col.ArrayClass[col.Value]().MakeFromArray(sequence.AsArray())
+			collection = col.Array[col.Value]().MakeFromArray(sequence.AsArray())
 		case "List":
-			collection = col.ListClass[col.Value]().MakeFromSequence(sequence)
+			collection = col.List[col.Value]().MakeFromSequence(sequence)
 		case "Queue":
-			collection = col.QueueClass[col.Value]().MakeFromSequence(sequence)
+			collection = col.Queue[col.Value]().MakeFromSequence(sequence)
 		case "Set":
-			collection = col.SetClass[col.Value]().MakeFromSequence(sequence)
+			collection = col.Set[col.Value]().MakeFromSequence(sequence)
 		case "Stack":
-			collection = col.StackClass[col.Value]().MakeFromSequence(sequence)
+			collection = col.Stack[col.Value]().MakeFromSequence(sequence)
 		default:
 			var message = fmt.Sprintf("Found an unknown collection type: %q", context)
 			panic(message)
@@ -350,9 +358,9 @@ func (v *parser_) parseCollection() (
 			}
 			collection = map_
 		case "Map":
-			collection = col.MapClass[col.Key, col.Value]().MakeFromArray(sequence.AsArray())
+			collection = col.Map[col.Key, col.Value]().MakeFromArray(sequence.AsArray())
 		case "Catalog":
-			collection = col.CatalogClass[col.Key, col.Value]().MakeFromSequence(sequence)
+			collection = col.Catalog[col.Key, col.Value]().MakeFromSequence(sequence)
 		default:
 			var message = fmt.Sprintf("Found an unknown collection type: %q", context)
 			panic(message)
@@ -412,14 +420,14 @@ func (v *parser_) parsePrimitive() (
 	}
 	_, token, ok = v.parseToken(TypeRune, "")
 	if ok {
-		var matches = ScannerClass().MatchToken(TypeRune, token.GetValue())
+		var matches = Scanner().MatchToken(TypeRune, token.GetValue())
 		var match, _ = stc.Unquote(matches[0])
 		primitive, _ = utf.DecodeRuneInString(match)
 		return primitive, token, true
 	}
 	_, token, ok = v.parseToken(TypeString, "")
 	if ok {
-		var matches = ScannerClass().MatchToken(TypeString, token.GetValue())
+		var matches = Scanner().MatchToken(TypeString, token.GetValue())
 		primitive, _ = stc.Unquote(matches[0])
 		return primitive, token, true
 	}
@@ -465,7 +473,7 @@ func (v *parser_) parseValues() (
 	ok bool,
 ) {
 	var value col.Value
-	values = col.ListClass[col.Value]().Make()
+	values = col.List[col.Value]().Make()
 
 	// Handle the empty case.
 	_, token, ok = v.parseToken(TypeDelimiter, "]")
@@ -529,7 +537,9 @@ func (v *parser_) putBack(token col.TokenLike) {
 	v.next.AddValue(token)
 }
 
-// This Go map captures the syntax rules for collections of Go primitives.
+/*
+This Go map captures the syntax rules for collections of Go primitives.
+*/
 var grammar = map[string]string{
 	"$source":     `collection EOF  ! Terminated with an end-of-file marker.`,
 	"$collection": `"[" (associations | values) "]" "(" CONTEXT ")"`,

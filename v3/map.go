@@ -14,41 +14,51 @@ import (
 	fmt "fmt"
 )
 
-// CLASS NAMESPACE
+// CLASS ACCESS
 
-// Private Class Namespace Type
-
-// The Go language requires the key type here support the "comparable"
-// interface so we must narrow it down from type Key (i.e. "any").
-type mapClass_[K comparable, V Value] struct {
-	// This class defines no constants.
-}
-
-// Private Class Namespace References
+// Reference
 
 var mapClass = map[string]any{}
 
-// Public Class Namespace Access
+// Function
 
-func MapClass[K comparable, V Value]() MapClassLike[K, V] {
+func Map[K comparable, V Value]() MapClassLike[K, V] {
+	// Generate the name of the bound class type.
 	var class MapClassLike[K, V]
-	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
-	var value = mapClass[key]
+	var name = fmt.Sprintf("%T", class)
+
+	// Check for existing bound class type.
+	var value = mapClass[name]
 	switch actual := value.(type) {
 	case *mapClass_[K, V]:
 		// This bound class type already exists.
 		class = actual
 	default:
-		// Create a new bound class type.
+		// Add a new bound class type.
 		class = &mapClass_[K, V]{
 			// This class defines no constants.
 		}
-		mapClass[key] = class
+		mapClass[name] = class
 	}
+
+	// Return a reference to the bound class type.
 	return class
 }
 
-// Public Class Constructors
+// CLASS METHODS
+
+// Target
+
+/*
+NOTE:
+The Go language requires the key type here support the "comparable" interface so
+we must narrow it down from type Key (i.e. "any").
+*/
+type mapClass_[K comparable, V Value] struct {
+	// This class defines no constants.
+}
+
+// Constructors
 
 func (c *mapClass_[K, V]) Make() MapLike[K, V] {
 	return map_[K, V](map[K]V{})
@@ -108,16 +118,16 @@ func (c *mapClass_[K, V]) MakeFromSource(
 	return map_
 }
 
-// CLASS INSTANCES
+// INSTANCE METHODS
 
-// Private Class Type Definition
+// Target
 
 type map_[K comparable, V Value] map[K]V
 
-// Associative Interface
+// Associative
 
 func (v map_[K, V]) GetKeys() Sequential[K] {
-	var keys = ListClass[K]().Make()
+	var keys = List[K]().Make()
 	var iterator = v.GetIterator()
 	for iterator.HasNext() {
 		var association = iterator.GetNext()
@@ -132,7 +142,7 @@ func (v map_[K, V]) GetValue(key K) V {
 }
 
 func (v map_[K, V]) GetValues(keys Sequential[K]) Sequential[V] {
-	var values = ListClass[V]().Make()
+	var values = List[V]().Make()
 	var iterator = keys.GetIterator()
 	for iterator.HasNext() {
 		var key = iterator.GetNext()
@@ -159,7 +169,7 @@ func (v map_[K, V]) RemoveValue(key K) V {
 }
 
 func (v map_[K, V]) RemoveValues(keys Sequential[K]) Sequential[V] {
-	var values = ListClass[V]().Make()
+	var values = List[V]().Make()
 	var iterator = keys.GetIterator()
 	for iterator.HasNext() {
 		var key = iterator.GetNext()
@@ -172,14 +182,14 @@ func (v map_[K, V]) SetValue(key K, value V) {
 	v[key] = value
 }
 
-// Sequential Interface
+// Sequential
 
 func (v map_[K, V]) AsArray() []AssociationLike[K, V] {
 	var size = len(v)
 	var result = make([]AssociationLike[K, V], size)
 	var index = 0
 	for key, value := range v {
-		var association = AssociationClass[K, V]().Make(key, value)
+		var association = Association[K, V]().Make(key, value)
 		result[index] = association
 		index++
 	}
@@ -187,7 +197,7 @@ func (v map_[K, V]) AsArray() []AssociationLike[K, V] {
 }
 
 func (v map_[K, V]) GetIterator() IteratorLike[AssociationLike[K, V]] {
-	var array = ArrayClass[AssociationLike[K, V]]().MakeFromArray(v.AsArray())
+	var array = Array[AssociationLike[K, V]]().MakeFromArray(v.AsArray())
 	var iterator = array.GetIterator()
 	return iterator
 }
@@ -200,9 +210,9 @@ func (v map_[K, V]) IsEmpty() bool {
 	return len(v) == 0
 }
 
-// Stringer Interface
+// Stringer
 
 func (v map_[K, V]) String() string {
-	var formatter = FormatterClass().Make()
+	var formatter = Formatter().Make()
 	return formatter.FormatCollection(v)
 }

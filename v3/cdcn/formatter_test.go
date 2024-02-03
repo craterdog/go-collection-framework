@@ -18,9 +18,9 @@ import (
 )
 
 func TestFormatDepths(t *tes.T) {
-	var Formatter = not.FormatterClass()
+	var Formatter = not.Formatter()
 	var formatter = Formatter.MakeWithDepth(0)
-	var array = col.ArrayClass[any]().MakeFromArray([]any{1, []any{1, 2, []any{1, 2, 3}}})
+	var array = col.Array[any]().MakeFromArray([]any{1, []any{1, 2, []any{1, 2, 3}}})
 	var s = formatter.FormatCollection(array)
 	ass.Equal(t, "[...](Array)", s)
 	formatter = Formatter.MakeWithDepth(1)
@@ -32,7 +32,7 @@ func TestFormatDepths(t *tes.T) {
 }
 
 func TestFormatInvalidType(t *tes.T) {
-	var formatter = not.FormatterClass().MakeWithDepth(8)
+	var formatter = not.Formatter().MakeWithDepth(8)
 	var s struct{}
 	defer func() {
 		if e := recover(); e != nil {

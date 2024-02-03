@@ -16,45 +16,52 @@ import (
 	big "math/big"
 )
 
-// CLASS NAMESPACE
+// CLASS ACCESS
 
-// Private Class Namespace Type
-
-type sorterClass_[V Value] struct {
-	defaultRanker RankingFunction
-}
-
-// Private Class Namespace References
+// Reference
 
 var sorterClass = map[string]any{}
 
-// Public Class Namespace Access
+// Function
 
-func SorterClass[V Value]() SorterClassLike[V] {
+func Sorter[V Value]() SorterClassLike[V] {
+	// Generate the name of the bound class type.
 	var class SorterClassLike[V]
-	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
-	var value = sorterClass[key]
+	var name = fmt.Sprintf("%T", class)
+
+	// Check for existing bound class type.
+	var value = sorterClass[name]
 	switch actual := value.(type) {
 	case *sorterClass_[V]:
 		// This bound class type already exists.
 		class = actual
 	default:
-		// Create a new bound class type.
+		// Add a new bound class type.
 		class = &sorterClass_[V]{
-			defaultRanker: CollatorClass().Make().RankValues,
+			defaultRanker: Collator().Make().RankValues,
 		}
-		sorterClass[key] = class
+		sorterClass[name] = class
 	}
+
+	// Return a reference to the bound class type.
 	return class
 }
 
-// Public Class Constants
+// CLASS METHODS
+
+// Target
+
+type sorterClass_[V Value] struct {
+	defaultRanker RankingFunction
+}
+
+// Constants
 
 func (c *sorterClass_[V]) DefaultRanker() RankingFunction {
 	return c.defaultRanker
 }
 
-// Public Class Constructors
+// Constructors
 
 func (c *sorterClass_[V]) Make() SorterLike[V] {
 	var sorter = &sorter_[V]{
@@ -70,15 +77,15 @@ func (c *sorterClass_[V]) MakeWithRanker(ranker RankingFunction) SorterLike[V] {
 	return sorter
 }
 
-// CLASS INSTANCES
+// INSTANCE METHODS
 
-// Private Class Type Definition
+// Target
 
 type sorter_[V Value] struct {
 	rank RankingFunction
 }
 
-// Systematic Interface
+// Systematic
 
 func (v *sorter_[V]) ReverseValues(values []V) {
 	// Reverse the values in place using Go's multi-assignment capability.
@@ -103,23 +110,24 @@ func (v *sorter_[V]) SortValues(values []V) {
 	v.sortValues(values)
 }
 
-// Public Interface
+// Public
 
 func (v *sorter_[V]) GetRanker() RankingFunction {
 	return v.rank
 }
 
-// Private Interface
+// Private
 
-// This private class method sorts the values in the specified Go array in place
-// using an iterative merge sort along with the ranking function associated with
-// this sorter.  The algorithm is documented here:
-//   - https://en.wikipedia.org/wiki/Merge_sort#Bottom-up_implementation
-//
-// This iterative approach saves on memory allocation by swapping between two
-// Go arrays of the same size rather than allocating new Go arrays for each
-// sub-array.  This results in stable O[nlog(n)] time and O[n] space
-// performance.
+/*
+This private class method sorts the values in the specified Go array in place
+using an iterative merge sort along with the ranking function associated with
+this sorter.  The algorithm is documented here:
+  - https://en.wikipedia.org/wiki/Merge_sort#Bottom-up_implementation
+
+This iterative approach saves on memory allocation by swapping between two Go
+arrays of the same size rather than allocating new Go arrays for each sub-array.
+This results in stable O[nlog(n)] time and O[n] space performance.
+*/
 func (v *sorter_[V]) sortValues(values []V) {
 	// Create a buffer Go array.
 	var length = len(values)
@@ -159,8 +167,10 @@ func (v *sorter_[V]) sortValues(values []V) {
 	copy(values, buffer) // Both Go arrays are now sorted.
 }
 
-// This private class method is used for the merging part of the merge sort
-// algorithm.
+/*
+This private class method is used for the merging part of the merge sort
+algorithm.
+*/
 func (v *sorter_[V]) mergeArrays(left []V, right []V, merged []V) {
 	var leftIndex = 0
 	var leftLength = len(left)
@@ -198,8 +208,10 @@ func (v *sorter_[V]) mergeArrays(left []V, right []V, merged []V) {
 	}
 }
 
-// This private class method generates a cryptographically secure random index
-// in the range [0..size).
+/*
+This private class method generates a cryptographically secure random index in
+the range [0..size).
+*/
 func (v *sorter_[V]) randomizeIndex(size int) int {
 	var random, err = ran.Int(ran.Reader, big.NewInt(int64(size)))
 	if err != nil {

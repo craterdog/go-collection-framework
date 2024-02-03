@@ -17,7 +17,7 @@ import (
 )
 
 func TestParseBadFirst(t *tes.T) {
-	var parser = not.ParserClass().Make()
+	var parser = not.Parser().Make()
 	var source = `bad[ ](array)
 `
 	defer func() {
@@ -34,7 +34,7 @@ func TestParseBadFirst(t *tes.T) {
 }
 
 func TestParseBadMiddle(t *tes.T) {
-	var parser = not.ParserClass().Make()
+	var parser = not.Parser().Make()
 	var source = `[bad](array)
 `
 	defer func() {
@@ -51,7 +51,7 @@ func TestParseBadMiddle(t *tes.T) {
 }
 
 func TestParseBadEnd(t *tes.T) {
-	var parser = not.ParserClass().Make()
+	var parser = not.Parser().Make()
 	var source = `[ ](array)bad
 `
 	defer func() {
@@ -68,7 +68,7 @@ func TestParseBadEnd(t *tes.T) {
 }
 
 func TestParseExtraEOL(t *tes.T) {
-	var parser = not.ParserClass().Make()
+	var parser = not.Parser().Make()
 	var source = `[ ](array)
 
 `

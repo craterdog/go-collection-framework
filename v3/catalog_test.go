@@ -18,8 +18,8 @@ import (
 )
 
 func TestCatalogConstructors(t *tes.T) {
-	var notation = not.NotationClass().Make()
-	var Catalog = col.CatalogClass[rune, int64]()
+	var notation = not.Notation().Make()
+	var Catalog = col.Catalog[rune, int64]()
 	var _ = Catalog.MakeFromArray([]col.AssociationLike[rune, int64]{})
 	var _ = Catalog.MakeFromSource("[:](Catalog)", notation)
 	var _ = Catalog.MakeFromSource("['a': 1, 'b': 2, 'c': 3](Catalog)", notation)
@@ -32,13 +32,13 @@ func TestCatalogConstructors(t *tes.T) {
 }
 
 func TestCatalogsWithStringsAndIntegers(t *tes.T) {
-	var collator = col.CollatorClass().Make()
-	var keys = col.ArrayClass[string]().MakeFromArray([]string{"foo", "bar"})
-	var Association = col.AssociationClass[string, int]()
+	var collator = col.Collator().Make()
+	var keys = col.Array[string]().MakeFromArray([]string{"foo", "bar"})
+	var Association = col.Association[string, int]()
 	var association1 = Association.Make("foo", 1)
 	var association2 = Association.Make("bar", 2)
 	var association3 = Association.Make("baz", 3)
-	var Catalog = col.CatalogClass[string, int]()
+	var Catalog = col.Catalog[string, int]()
 	var catalog = Catalog.Make()
 	ass.True(t, catalog.IsEmpty())
 	ass.Equal(t, 0, catalog.GetSize())
@@ -60,7 +60,7 @@ func TestCatalogsWithStringsAndIntegers(t *tes.T) {
 	ass.Equal(t, 3, catalog.GetSize())
 	var catalog2 = Catalog.MakeFromSequence(catalog)
 	ass.True(t, collator.CompareValues(catalog, catalog2))
-	var m = col.MapClass[string, int]().MakeFromMap(map[string]int{
+	var m = col.Map[string, int]().MakeFromMap(map[string]int{
 		"foo": 1,
 		"bar": 2,
 		"baz": 3,
@@ -99,12 +99,12 @@ func TestCatalogsWithStringsAndIntegers(t *tes.T) {
 }
 
 func TestCatalogsWithMerge(t *tes.T) {
-	var collator = col.CollatorClass().Make()
-	var Association = col.AssociationClass[string, int]()
+	var collator = col.Collator().Make()
+	var Association = col.Association[string, int]()
 	var association1 = Association.Make("foo", 1)
 	var association2 = Association.Make("bar", 2)
 	var association3 = Association.Make("baz", 3)
-	var Catalog = col.CatalogClass[string, int]()
+	var Catalog = col.Catalog[string, int]()
 	var catalog1 = Catalog.Make()
 	catalog1.SetValue(association1.GetKey(), association1.GetValue())
 	catalog1.SetValue(association2.GetKey(), association2.GetValue())
@@ -120,13 +120,13 @@ func TestCatalogsWithMerge(t *tes.T) {
 }
 
 func TestCatalogsWithExtract(t *tes.T) {
-	var collator = col.CollatorClass().Make()
-	var keys = col.ArrayClass[string]().MakeFromArray([]string{"foo", "baz"})
-	var Association = col.AssociationClass[string, int]()
+	var collator = col.Collator().Make()
+	var keys = col.Array[string]().MakeFromArray([]string{"foo", "baz"})
+	var Association = col.Association[string, int]()
 	var association1 = Association.Make("foo", 1)
 	var association2 = Association.Make("bar", 2)
 	var association3 = Association.Make("baz", 3)
-	var Catalog = col.CatalogClass[string, int]()
+	var Catalog = col.Catalog[string, int]()
 	var catalog1 = Catalog.Make()
 	catalog1.SetValue(association1.GetKey(), association1.GetValue())
 	catalog1.SetValue(association2.GetKey(), association2.GetValue())
@@ -145,9 +145,9 @@ func TestCatalogsWithExtract(t *tes.T) {
 }
 
 func TestCatalogsWithEmptyCatalogs(t *tes.T) {
-	var collator = col.CollatorClass().Make()
-	var keys = col.ArrayClass[int]().MakeWithSize(0)
-	var Catalog = col.CatalogClass[int, string]()
+	var collator = col.Collator().Make()
+	var keys = col.Array[int]().MakeWithSize(0)
+	var Catalog = col.Catalog[int, string]()
 	var catalog1 = Catalog.Make()
 	var catalog2 = Catalog.Make()
 	var catalog3 = Catalog.Merge(catalog1, catalog2)

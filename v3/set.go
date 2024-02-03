@@ -14,48 +14,55 @@ import (
 	fmt "fmt"
 )
 
-// CLASS NAMESPACE
+// CLASS ACCESS
 
-// Private Class Namespace Type
-
-type setClass_[V Value] struct {
-	// This class defines no constants.
-}
-
-// Private Class Namespace References
+// Reference
 
 var setClass = map[string]any{}
 
-// Public Class Namespace Access
+// Function
 
-func SetClass[V Value]() SetClassLike[V] {
+func Set[V Value]() SetClassLike[V] {
+	// Generate the name of the bound class type.
 	var class SetClassLike[V]
-	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
-	var value = setClass[key]
+	var name = fmt.Sprintf("%T", class)
+
+	// Check for existing bound class type.
+	var value = setClass[name]
 	switch actual := value.(type) {
 	case *setClass_[V]:
 		// This bound class type already exists.
 		class = actual
 	default:
-		// Create a new bound class type.
+		// Add a new bound class type.
 		class = &setClass_[V]{
 			// This class defines no constants.
 		}
-		setClass[key] = class
+		setClass[name] = class
 	}
+
+	// Return a reference to the bound class type.
 	return class
 }
 
-// Public Class Constructors
+// CLASS METHODS
+
+// Target
+
+type setClass_[V Value] struct {
+	// This class defines no constants.
+}
+
+// Constructors
 
 func (c *setClass_[V]) Make() SetLike[V] {
-	var collator = CollatorClass().Make()
+	var collator = Collator().Make()
 	var set = c.MakeWithCollator(collator)
 	return set
 }
 
 func (c *setClass_[V]) MakeFromArray(values []V) SetLike[V] {
-	var array = ArrayClass[V]().MakeFromArray(values)
+	var array = Array[V]().MakeFromArray(values)
 	var set = c.MakeFromSequence(array)
 	return set
 }
@@ -88,7 +95,7 @@ func (c *setClass_[V]) MakeFromSource(
 }
 
 func (c *setClass_[V]) MakeWithCollator(collator CollatorLike) SetLike[V] {
-	var values = ListClass[V]().Make()
+	var values = List[V]().Make()
 	var set = &set_[V]{
 		collator,
 		values,
@@ -96,10 +103,8 @@ func (c *setClass_[V]) MakeWithCollator(collator CollatorLike) SetLike[V] {
 	return set
 }
 
-// Public Class Functions
+// Functions
 
-// This public class function returns the logical conjunction of the specified
-// sets.
 func (c *setClass_[V]) And(first, second SetLike[V]) SetLike[V] {
 	var result = c.MakeWithCollator(first.GetCollator())
 	var iterator = first.GetIterator()
@@ -112,8 +117,6 @@ func (c *setClass_[V]) And(first, second SetLike[V]) SetLike[V] {
 	return result
 }
 
-// This public class function returns the logical disjunction of the specified
-// sets.
 func (c *setClass_[V]) Or(first, second SetLike[V]) SetLike[V] {
 	var result = c.MakeWithCollator(first.GetCollator())
 	result.AddValues(first)
@@ -121,8 +124,6 @@ func (c *setClass_[V]) Or(first, second SetLike[V]) SetLike[V] {
 	return result
 }
 
-// This public class function returns the logical material non-implication of
-// the specified sets.
 func (c *setClass_[V]) Sans(first, second SetLike[V]) SetLike[V] {
 	var result = c.MakeWithCollator(first.GetCollator())
 	result.AddValues(first)
@@ -130,23 +131,21 @@ func (c *setClass_[V]) Sans(first, second SetLike[V]) SetLike[V] {
 	return result
 }
 
-// This public class function returns the logical exclusive disjunction of the
-// specified sets.
 func (c *setClass_[V]) Xor(first, second SetLike[V]) SetLike[V] {
 	var result = c.Or(c.Sans(first, second), c.Sans(second, first))
 	return result
 }
 
-// CLASS INSTANCES
+// INSTANCE METHODS
 
-// Private Class Type Definition
+// Target
 
 type set_[V Value] struct {
 	collator CollatorLike
 	values   ListLike[V]
 }
 
-// Accessible Interface
+// Accessible
 
 func (v *set_[V]) GetValue(index int) V {
 	return v.values.GetValue(index)
@@ -156,7 +155,7 @@ func (v *set_[V]) GetValues(first int, last int) Sequential[V] {
 	return v.values.GetValues(first, last)
 }
 
-// Flexible Interface
+// Flexible
 
 func (v *set_[V]) AddValue(value V) {
 	var slot, found = v.findIndex(value)
@@ -194,7 +193,7 @@ func (v *set_[V]) RemoveValues(values Sequential[V]) {
 	}
 }
 
-// Searchable Interface
+// Searchable
 
 func (v *set_[V]) ContainsAll(values Sequential[V]) bool {
 	var iterator = values.GetIterator()
@@ -235,7 +234,7 @@ func (v *set_[V]) GetIndex(value V) int {
 	return index
 }
 
-// Sequential Interface
+// Sequential
 
 func (v *set_[V]) AsArray() []V {
 	return v.values.AsArray()
@@ -254,28 +253,30 @@ func (v *set_[V]) IsEmpty() bool {
 	return v.values.IsEmpty()
 }
 
-// Stringer Interface
+// Stringer
 
 func (v *set_[V]) String() string {
-	var formatter = FormatterClass().Make()
+	var formatter = Formatter().Make()
 	return formatter.FormatCollection(v)
 }
 
-// Public Interface
+// Public
 
 func (v *set_[V]) GetCollator() CollatorLike {
 	return v.collator
 }
 
-// Private Interface
+// Private
 
-// This private class method performs a binary search of the set for the
-// specified value. It returns two results:
-//   - index: The index of the value, or if not found, the slot in which it
-//     could be inserted in the underlying list.
-//   - found: A boolean stating whether or not the value was found.
-//
-// The algorithm performs a true O[log(n)] worst case search.
+/*
+This private class method performs a binary search of the set for the specified
+value. It returns two results:
+  - index: The index of the value, or if not found, the slot in which it could
+    be inserted in the underlying list.
+  - found: A boolean stating whether or not the value was found.
+
+The algorithm performs a true O[log(n)] worst case search.
+*/
 func (v *set_[V]) findIndex(value V) (index int, found bool) {
 	// We use iteration instead of recursion for better performance.
 	//    start        first      middle       last          end
@@ -305,7 +306,7 @@ func (v *set_[V]) findIndex(value V) (index int, found bool) {
 		}
 	}
 	// The value was not found, the last index represents the SLOT where it
-	// would be inserted. NOTE: Since the value was not found, the indexes are
+	// would be inserted.  Since the value was not found, the indexes are
 	// inverted: last < first (i.e. last = first - 1).
 	return last, false
 }

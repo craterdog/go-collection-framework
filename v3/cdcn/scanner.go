@@ -17,15 +17,9 @@ import (
 	sts "strings"
 )
 
-// CLASS NAMESPACE
+// CLASS ACCESS
 
-// Private Class Namespace Type
-
-type scannerClass_ struct {
-	matchers map[col.TokenType]*reg.Regexp
-}
-
-// Private Class Namespace Reference
+// Reference
 
 var scannerClass = &scannerClass_{
 	matchers: map[col.TokenType]*reg.Regexp{
@@ -44,13 +38,21 @@ var scannerClass = &scannerClass_{
 	},
 }
 
-// Public Class Namespace Access
+// Function
 
-func ScannerClass() col.ScannerClassLike {
+func Scanner() col.ScannerClassLike {
 	return scannerClass
 }
 
-// Public Class Constructors
+// CLASS METHODS
+
+// Target
+
+type scannerClass_ struct {
+	matchers map[col.TokenType]*reg.Regexp
+}
+
+// Constructors
 
 func (c *scannerClass_) Make(
 	source string,
@@ -66,15 +68,15 @@ func (c *scannerClass_) Make(
 	return scanner
 }
 
-// Public Class Functions
+// Functions
 
 func (c *scannerClass_) MatchToken(tokenType col.TokenType, text string) []string {
 	return c.matchers[tokenType].FindStringSubmatch(text)
 }
 
-// CLASS INSTANCES
+// INSTANCE METHODS
 
-// Private Class Type Definition
+// Target
 
 type scanner_ struct {
 	first    int // A zero based index of the first possible rune in the next token.
@@ -85,7 +87,7 @@ type scanner_ struct {
 	tokens   chan col.TokenLike
 }
 
-// Private Interface
+// Private
 
 func (v *scanner_) emitToken(tokenType col.TokenType) {
 	var tokenValue = string(v.runes[v.first:v.next])
@@ -107,7 +109,7 @@ func (v *scanner_) emitToken(tokenType col.TokenType) {
 	case "\v":
 		tokenValue = "<VTAB>"
 	}
-	var token = TokenClass().Make(v.line, v.position, tokenType, tokenValue)
+	var token = Token().Make(v.line, v.position, tokenType, tokenValue)
 	//fmt.Println(token) // Uncomment when debugging.
 	v.tokens <- token
 }
@@ -123,7 +125,7 @@ func (v *scanner_) foundError() {
 
 func (v *scanner_) foundToken(tokenType col.TokenType) bool {
 	var text = string(v.runes[v.next:])
-	var matches = ScannerClass().MatchToken(tokenType, text)
+	var matches = Scanner().MatchToken(tokenType, text)
 	if len(matches) > 0 {
 		var token = []rune(matches[0])
 		v.next += len(token)
@@ -178,12 +180,13 @@ loop:
 	close(v.tokens)
 }
 
-// These private constants define the regular expression sub-patterns that make
-// up all token types.  Unfortunately there is no way to make them private to
-// the scanner class namespace since they must be TRUE Go constants to be
-// initialized in this way.  We append an underscore to each name to lessen the
-// chance of a name collision with other private Go class constants in this
-// package.
+/*
+These private constants define the regular expression sub-patterns that make up
+all token types.  Unfortunately there is no way to make them private to the
+scanner class namespace since they must be TRUE Go constants to be initialized
+in this way.  We append an underscore to each name to lessen the chance of a
+name collision with other private Go class constants in this package.
+*/
 const (
 	base10_      = `[0-9]`
 	base16_      = `[0-9a-f]`

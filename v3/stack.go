@@ -14,48 +14,55 @@ import (
 	fmt "fmt"
 )
 
-// CLASS NAMESPACE
+// CLASS ACCESS
 
-// Private Class Namespace Type
-
-type stackClass_[V Value] struct {
-	defaultCapacity int
-}
-
-// Private Class Namespace References
+// Reference
 
 var stackClass = map[string]any{}
 
-// Public Class Namespace Access
+// Function
 
-func StackClass[V Value]() StackClassLike[V] {
+func Stack[V Value]() StackClassLike[V] {
+	// Generate the name of the bound class type.
 	var class StackClassLike[V]
-	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
-	var value = stackClass[key]
+	var name = fmt.Sprintf("%T", class)
+
+	// Check for existing bound class type.
+	var value = stackClass[name]
 	switch actual := value.(type) {
 	case *stackClass_[V]:
 		// This bound class type already exists.
 		class = actual
 	default:
-		// Create a new bound class type.
+		// Add a new bound class type.
 		class = &stackClass_[V]{
 			defaultCapacity: 16,
 		}
-		stackClass[key] = class
+		stackClass[name] = class
 	}
+
+	// Return a reference to the bound class type.
 	return class
 }
 
-// Public Class Constants
+// CLASS METHODS
+
+// Target
+
+type stackClass_[V Value] struct {
+	defaultCapacity int
+}
+
+// Constants
 
 func (c *stackClass_[V]) DefaultCapacity() int {
 	return c.defaultCapacity
 }
 
-// Public Class Constructors
+// Constructors
 
 func (c *stackClass_[V]) Make() StackLike[V] {
-	var list = ListClass[V]().Make()
+	var list = List[V]().Make()
 	var stack = &stack_[V]{
 		capacity: c.defaultCapacity,
 		values:   list,
@@ -64,7 +71,7 @@ func (c *stackClass_[V]) Make() StackLike[V] {
 }
 
 func (c *stackClass_[V]) MakeFromArray(values []V) StackLike[V] {
-	var list = ListClass[V]().MakeFromArray(values)
+	var list = List[V]().MakeFromArray(values)
 	var stack = &stack_[V]{
 		capacity: c.defaultCapacity,
 		values:   list,
@@ -73,7 +80,7 @@ func (c *stackClass_[V]) MakeFromArray(values []V) StackLike[V] {
 }
 
 func (c *stackClass_[V]) MakeFromSequence(values Sequential[V]) StackLike[V] {
-	var list = ListClass[V]().MakeFromSequence(values)
+	var list = List[V]().MakeFromSequence(values)
 	var stack = &stack_[V]{
 		capacity: c.defaultCapacity,
 		values:   list,
@@ -104,7 +111,7 @@ func (c *stackClass_[V]) MakeWithCapacity(capacity int) StackLike[V] {
 	if capacity < 1 {
 		panic("A stack must have a capacity greater than zero.")
 	}
-	var list = ListClass[V]().Make()
+	var list = List[V]().Make()
 	var stack = &stack_[V]{
 		capacity: capacity,
 		values:   list,
@@ -112,16 +119,16 @@ func (c *stackClass_[V]) MakeWithCapacity(capacity int) StackLike[V] {
 	return stack
 }
 
-// CLASS INSTANCES
+// INSTANCE METHODS
 
-// Private Class Type Definition
+// Target
 
 type stack_[V Value] struct {
 	capacity int
 	values   ListLike[V]
 }
 
-// Limited Interface
+// Limited
 
 func (v *stack_[V]) AddValue(value V) {
 	if v.values.GetSize() == v.capacity {
@@ -142,7 +149,7 @@ func (v *stack_[V]) RemoveAll() {
 	v.values.RemoveAll()
 }
 
-// Sequential Interface
+// Sequential
 
 func (v *stack_[V]) AsArray() []V {
 	return v.values.AsArray()
@@ -160,14 +167,14 @@ func (v *stack_[V]) IsEmpty() bool {
 	return v.values.IsEmpty()
 }
 
-// Stringer Interface
+// Stringer
 
 func (v *stack_[V]) String() string {
-	var formatter = FormatterClass().Make()
+	var formatter = Formatter().Make()
 	return formatter.FormatCollection(v)
 }
 
-// Public Interface
+// Public
 
 func (v *stack_[V]) RemoveTop() V {
 	if v.values.IsEmpty() {

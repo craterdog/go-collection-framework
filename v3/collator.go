@@ -18,33 +18,35 @@ import (
 	sts "strings"
 )
 
-// CLASS NAMESPACE
+// CLASS ACCESS
 
-// Private Class Namespace Type
-
-type collatorClass_ struct {
-	defaultDepth int
-}
-
-// Private Class Namespace Reference
+// Reference
 
 var collatorClass = &collatorClass_{
 	defaultDepth: 16,
 }
 
-// Public Class Namespace Access
+// Function
 
-func CollatorClass() CollatorClassLike {
+func Collator() CollatorClassLike {
 	return collatorClass
 }
 
-// Public Class Constants
+// CLASS METHODS
+
+// Target
+
+type collatorClass_ struct {
+	defaultDepth int
+}
+
+// Constants
 
 func (c *collatorClass_) DefaultDepth() int {
 	return c.defaultDepth
 }
 
-// Public Class Constructors
+// Constructors
 
 func (c *collatorClass_) Make() CollatorLike {
 	var collator = &collator_{
@@ -63,16 +65,16 @@ func (c *collatorClass_) MakeWithDepth(depth int) CollatorLike {
 	return collator
 }
 
-// CLASS INSTANCES
+// INSTANCE METHODS
 
-// Private Class Type Definition
+// Target
 
 type collator_ struct {
 	depth   int
 	maximum int
 }
 
-// Public Interface
+// Public
 
 func (v *collator_) CompareValues(first Value, second Value) bool {
 	return v.compareValues(ref.ValueOf(first), ref.ValueOf(second))
@@ -82,10 +84,8 @@ func (v *collator_) RankValues(first Value, second Value) int {
 	return v.rankValues(ref.ValueOf(first), ref.ValueOf(second))
 }
 
-// Private Interface
+// Private
 
-// This private class method determines whether or not the specified Go arrays
-// have the same value.
 func (v *collator_) compareArrays(first ref.Value, second ref.Value) bool {
 	// Check for maximum traversal depth.
 	if v.depth == v.maximum {
@@ -112,14 +112,10 @@ func (v *collator_) compareArrays(first ref.Value, second ref.Value) bool {
 	return true
 }
 
-// This private class method determines whether or not the specified primitives
-// have the same value.
 func (v *collator_) comparePrimitives(first, second ref.Value) bool {
 	return first.Interface() == second.Interface()
 }
 
-// This private class method determines whether or not the specified interfaces
-// have the same getter values.
 func (v *collator_) compareInterfaces(first ref.Value, second ref.Value) bool {
 	var typeRef = first.Type() // We know the structures are the same type.
 	var count = typeRef.NumMethod()
@@ -139,8 +135,6 @@ func (v *collator_) compareInterfaces(first ref.Value, second ref.Value) bool {
 	return true
 }
 
-// This private class method determines whether or not the specified Go maps
-// have the same value.
 func (v *collator_) compareMaps(first ref.Value, second ref.Value) bool {
 	// Check for maximum traversal depth.
 	if v.depth == v.maximum {
@@ -170,8 +164,6 @@ func (v *collator_) compareMaps(first ref.Value, second ref.Value) bool {
 	return true
 }
 
-// This private class method determines whether or not the specified sequences
-// have the same value.
 func (v *collator_) compareSequences(first ref.Value, second ref.Value) bool {
 	// Compare the Go arrays for the two sequences.
 	var firstArray = first.MethodByName("AsArray").Call([]ref.Value{})[0]
@@ -179,8 +171,6 @@ func (v *collator_) compareSequences(first ref.Value, second ref.Value) bool {
 	return v.compareArrays(firstArray, secondArray)
 }
 
-// This private class method determines whether or not the specified reflective
-// values are equal using reflection and a recursive descent algorithm.
 func (v *collator_) compareValues(first ref.Value, second ref.Value) bool {
 	// Handle any invalid values.
 	if !first.IsValid() {
@@ -267,8 +257,6 @@ func (v *collator_) compareValues(first ref.Value, second ref.Value) bool {
 	}
 }
 
-// This private class method removes the generics from the type string for the
-// specified type and converts an empty interface into type "any".
 func (v *collator_) getType(type_ ref.Type) string {
 	var result = type_.String()
 	result = sts.TrimPrefix(result, "*")
@@ -309,8 +297,6 @@ func (v *collator_) getType(type_ ref.Type) string {
 	return result
 }
 
-// This private class method returns the ranking order of the specified Go
-// arrays using a recursive descent algorithm.
 func (v *collator_) rankArrays(first ref.Value, second ref.Value) int {
 	// Check for maximum traversal depth.
 	if v.depth == v.maximum {
@@ -352,8 +338,6 @@ func (v *collator_) rankArrays(first ref.Value, second ref.Value) int {
 	return 0
 }
 
-// This private class method returns the ranking order of the specified boolean
-// values.
 func (v *collator_) rankBooleans(first, second bool) int {
 	if !first && second {
 		return -1
@@ -364,8 +348,6 @@ func (v *collator_) rankBooleans(first, second bool) int {
 	return 0
 }
 
-// This private class method returns the ranking order of the specified complex
-// number values.
 func (v *collator_) rankComplex(first, second complex128) int {
 	if first == second {
 		return 0
@@ -393,12 +375,13 @@ func (v *collator_) rankComplex(first, second complex128) int {
 	}
 }
 
-// This private class method returns the ranking order of the specified
-// primitives.  NOTE: Go does not provide an easy way to a apply a possible tilde
-// type (e.g. ~string) to its primitive (named) type without knowing whether or
-// not it is actually a tilde type. So we must convert it to a string and then
-// parse it back again...
-// This method attempts to hide that ugliness from the rest of the code.
+/*
+NOTE:
+Go does not provide an easy way to a apply a possible tilde type (e.g.  ~string)
+to its primitive (named) type without knowing whether or not it is actually a
+tilde type. So we must convert it to a string and then parse it back again...
+This method attempts to hide that ugliness from the rest of the code.
+*/
 func (v *collator_) rankPrimitives(first, second ref.Value) int {
 	var firstValue = first.Interface()
 	var secondValue = second.Interface()
@@ -437,8 +420,6 @@ func (v *collator_) rankPrimitives(first, second ref.Value) int {
 	}
 }
 
-// This private class method returns the ranking order of the specified floating
-// point numbers.
 func (v *collator_) rankFloats(first, second float64) int {
 	if first < second {
 		return -1
@@ -449,8 +430,6 @@ func (v *collator_) rankFloats(first, second float64) int {
 	return 0
 }
 
-// This private class method returns the ranking order of the specified
-// interfaces by ranking the results of their getter methods.
 func (v *collator_) rankInterfaces(first ref.Value, second ref.Value) int {
 	var typeRef = first.Type() // We know the structures are the same type.
 	var count = first.NumMethod()
@@ -470,15 +449,16 @@ func (v *collator_) rankInterfaces(first ref.Value, second ref.Value) int {
 	return 0
 }
 
-// This private class method returns the ranking order of the specified Go maps
-// using a recursive descent algorithm. NOTE: currently the implementation of Go
-// maps is hashtable based. The order of the keys is random, even for two Go
-// maps with the same keys if the associations were entered in different
-// sequences.  Therefore at this time it is necessary to sort the key arrays for
-// each Go map.  This introduces a circular dependency between the implementation
-// of the collator and the sorter types:
-//
-//	rankMaps() -> SortValues() -> RankingFunction
+/*
+NOTE:
+Currently the implementation of Go maps is hashtable based. The order of the
+keys is random, even for two Go maps with the same keys if the associations
+were entered in different sequences.  Therefore at this time it is necessary to
+sort the key arrays for each Go map.  This introduces a circular dependency
+between the implementation of the collator and the sorter types:
+
+	rankMaps() -> SortValues() -> RankingFunction
+*/
 func (v *collator_) rankMaps(first ref.Value, second ref.Value) int {
 	// Check for maximum traversal depth.
 	if v.depth == v.maximum {
@@ -486,7 +466,7 @@ func (v *collator_) rankMaps(first ref.Value, second ref.Value) int {
 	}
 
 	// Extract and sort the keys for the two Go maps.
-	var sorter = SorterClass[ref.Value]().MakeWithRanker(v.rankReflective)
+	var sorter = Sorter[ref.Value]().MakeWithRanker(v.rankReflective)
 	var firstKeys = first.MapKeys() // The returned keys are in random order.
 	sorter.SortValues(firstKeys)
 	var secondKeys = second.MapKeys() // The returned keys are in random order.
@@ -546,15 +526,12 @@ func (v *collator_) rankMaps(first ref.Value, second ref.Value) int {
 	return 0
 }
 
-// This private class method returns the relative ranking of the specified
-// values using reflection.
 func (v *collator_) rankReflective(first Value, second Value) int {
 	var firstValue = first.(ref.Value)
 	var secondValue = second.(ref.Value)
 	return v.rankValues(firstValue, secondValue)
 }
 
-// This private class method returns the ranking order of the specified runes.
 func (v *collator_) rankRunes(first, second int32) int {
 	if first < second {
 		return -1
@@ -565,8 +542,6 @@ func (v *collator_) rankRunes(first, second int32) int {
 	return 0
 }
 
-// This private class method returns the ranking order of the specified
-// sequences using a recursive descent algorithm.
 func (v *collator_) rankSequences(first ref.Value, second ref.Value) int {
 	// Rank the Go arrays for the two sequences.
 	var firstArray = first.MethodByName("AsArray").Call([]ref.Value{})[0]
@@ -574,8 +549,6 @@ func (v *collator_) rankSequences(first ref.Value, second ref.Value) int {
 	return v.rankArrays(firstArray, secondArray)
 }
 
-// This private class method returns the ranking order of the specified signed
-// integers.
 func (v *collator_) rankSigned(first, second int64) int {
 	if first < second {
 		return -1
@@ -586,8 +559,6 @@ func (v *collator_) rankSigned(first, second int64) int {
 	return 0
 }
 
-// This private class method returns the ranking order of the specified string
-// values.
 func (v *collator_) rankStrings(first, second string) int {
 	if first < second {
 		// The first string comes before the second string alphabetically.
@@ -601,8 +572,6 @@ func (v *collator_) rankStrings(first, second string) int {
 	return 0
 }
 
-// This private class method returns the ranking order of the specified
-// structures by ranking the associated fields.
 func (v *collator_) rankStructures(first ref.Value, second ref.Value) int {
 	var count = first.NumField() // The structures are the same type.
 	for index := 0; index < count; index++ {
@@ -620,8 +589,6 @@ func (v *collator_) rankStructures(first ref.Value, second ref.Value) int {
 	return 0
 }
 
-// This private class method returns the ranking order of the specified unsigned
-// integers.
 func (v *collator_) rankUnsigned(first, second uint64) int {
 	if first < second {
 		return -1
@@ -632,8 +599,6 @@ func (v *collator_) rankUnsigned(first, second uint64) int {
 	return 0
 }
 
-// This private method returns the ranking order of the specified values using
-// reflection and a recursive descent algorithm.
 func (v *collator_) rankValues(first ref.Value, second ref.Value) int {
 	// Handle any nil pointers.
 	if !first.IsValid() {

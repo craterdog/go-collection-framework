@@ -14,55 +14,62 @@ import (
 	fmt "fmt"
 )
 
-// CLASS NAMESPACE
+// CLASS ACCESS
 
-// Private Class Namespace Type
-
-type associationClass_[K Key, V Value] struct {
-	// This class has no class constants.
-}
-
-// Private Class Namespace References
+// Reference
 
 var associationClass = map[string]any{}
 
-// Public Class Namespace Access
+// Function
 
-func AssociationClass[K Key, V Value]() AssociationClassLike[K, V] {
+func Association[K Key, V Value]() AssociationClassLike[K, V] {
+	// Generate the name of the bound class type.
 	var class AssociationClassLike[K, V]
-	var key = fmt.Sprintf("%T", class) // The name of the bound class type.
-	var value = associationClass[key]
+	var name = fmt.Sprintf("%T", class)
+
+	// Check for existing bound class type.
+	var value = associationClass[name]
 	switch actual := value.(type) {
 	case *associationClass_[K, V]:
 		// This bound class type already exists.
 		class = actual
 	default:
-		// Create a new bound class type.
+		// Add a new bound class type.
 		class = &associationClass_[K, V]{
 			// This class has no class constants.
 		}
-		associationClass[key] = class
+		associationClass[name] = class
 	}
+
+	// Return a reference to the bound class type.
 	return class
 }
 
-// Public Class Constructors
+// CLASS METHODS
+
+// Target
+
+type associationClass_[K Key, V Value] struct {
+	// This class has no class constants.
+}
+
+// Constructors
 
 func (c *associationClass_[K, V]) Make(key K, value V) AssociationLike[K, V] {
 	var association = &association_[K, V]{key, value}
 	return association
 }
 
-// CLASS INSTANCES
+// INSTANCE METHODS
 
-// Private Class Type Definition
+// Target
 
 type association_[K Key, V Value] struct {
 	key   K
 	value V
 }
 
-// Public Interface
+// Public
 
 func (v *association_[K, V]) GetKey() K {
 	return v.key

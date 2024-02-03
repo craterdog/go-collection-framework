@@ -15,15 +15,9 @@ import (
 	col "github.com/craterdog/go-collection-framework/v3"
 )
 
-// CLASS NAMESPACE
+// CLASS ACCESS
 
-// Private Class Namespace Type
-
-type tokenClass_ struct {
-	strings map[col.TokenType]string
-}
-
-// Private Class Namespace Reference
+// Reference
 
 var tokenClass = &tokenClass_{
 	strings: map[col.TokenType]string{
@@ -44,13 +38,21 @@ var tokenClass = &tokenClass_{
 	},
 }
 
-// Public Class Namespace Access
+// Function
 
-func TokenClass() col.TokenClassLike {
+func Token() col.TokenClassLike {
 	return tokenClass
 }
 
-// Public Class Constructors
+// CLASS METHODS
+
+// Target
+
+type tokenClass_ struct {
+	strings map[col.TokenType]string
+}
+
+// Constructors
 
 func (c *tokenClass_) Make(
 	line int,
@@ -67,15 +69,15 @@ func (c *tokenClass_) Make(
 	return token
 }
 
-// Public Class Functions
+// Functions
 
 func (c *tokenClass_) AsString(tokenType col.TokenType) string {
 	return c.strings[tokenType]
 }
 
-// CLASS INSTANCES
+// INSTANCE METHODS
 
-// Private Class Type Definition
+// Target
 
 type token_ struct {
 	line       int // The line number of the token in the source string.
@@ -84,7 +86,7 @@ type token_ struct {
 	tokenValue string
 }
 
-// Stringer Interface
+// Stringer
 
 func (v *token_) String() string {
 	var s = fmt.Sprintf("%q", v.tokenValue)
@@ -92,14 +94,14 @@ func (v *token_) String() string {
 		s = fmt.Sprintf("%.40q...", v.tokenValue)
 	}
 	return fmt.Sprintf("Token [type: %s, line: %d, position: %d]: %s",
-		TokenClass().AsString(v.tokenType),
+		Token().AsString(v.tokenType),
 		v.line,
 		v.position,
 		s,
 	)
 }
 
-// Public Interface
+// Public
 
 func (v *token_) GetLine() int {
 	return v.line

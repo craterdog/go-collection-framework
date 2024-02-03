@@ -22,7 +22,7 @@ import (
 const collectionTests = "./test/"
 
 func TestCollectionRoundtrips(t *tes.T) {
-	var cdcn = not.NotationClass().Make()
+	var cdcn = not.Notation().Make()
 	var files, err = osx.ReadDir(collectionTests)
 	if err != nil {
 		var message = fmt.Sprintf("Could not find the %s directory.", collectionTests)

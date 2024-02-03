@@ -17,42 +17,44 @@ import (
 	sts "strings"
 )
 
-// CLASS NAMESPACE
+// CLASS ACCESS
 
-// Private Class Namespace Type
-
-type formatterClass_ struct {
-	defaultDepth int
-}
-
-// Private Class Namespace Reference
+// Reference
 
 var formatterClass = &formatterClass_{
 	defaultDepth: 8,
 }
 
-// Public Class Namespace Access
+// Function
 
 /*
-FormatterClass defines an implementation of a formatter-like class that uses
-Crater Dog Collection Notation™ (CDCN) for formatting collections.  This is
-required by the Go `Stringer` interface when the `String()` method is called on
-a collection.  If not for the requirement to support the Go `Stringer` interface
+Formatter defines an implementation of a formatter-like class that uses Crater
+Dog Collection Notation™ (CDCN) for formatting collections.  This is required by
+the Go `Stringer` interface when the `String()` method is called on a
+collection.  If not for the requirement to support the Go `Stringer` interface
 this class would be located in the `cdcn` package with the rest of the CDCN
 classes.  Instead, the `cdcn.FormatterClass` must delegate its implementation to
 this class to avoid circular dependencies.
 */
-func FormatterClass() FormatterClassLike {
+func Formatter() FormatterClassLike {
 	return formatterClass
 }
 
-// Public Class Constants
+// CLASS METHODS
+
+// Target
+
+type formatterClass_ struct {
+	defaultDepth int
+}
+
+// Constants
 
 func (c *formatterClass_) DefaultDepth() int {
 	return c.defaultDepth
 }
 
-// Public Class Constructors
+// Constructors
 
 func (c *formatterClass_) Make() FormatterLike {
 	return c.MakeWithDepth(c.defaultDepth)
@@ -65,9 +67,9 @@ func (c *formatterClass_) MakeWithDepth(depth int) FormatterLike {
 	return formatter
 }
 
-// CLASS INSTANCES
+// INSTANCE METHODS
 
-// Private Class Type Definition
+// Target
 
 type formatter_ struct {
 	depth   int
@@ -75,7 +77,7 @@ type formatter_ struct {
 	result  sts.Builder
 }
 
-// Public Interface
+// Public
 
 func (v *formatter_) FormatCollection(collection Collection) string {
 	var reflected = ref.ValueOf(collection)
@@ -83,14 +85,12 @@ func (v *formatter_) FormatCollection(collection Collection) string {
 	return v.getResult()
 }
 
-// Private Interface
+// Private
 
-// This private class method appends the specified string to the result.
 func (v *formatter_) appendString(s string) {
 	v.result.WriteString(s)
 }
 
-// This private class method appends a properly indented newline to the result.
 func (v *formatter_) appendNewline() {
 	var separator = "\n"
 	for level := 0; level < v.depth; level++ {
@@ -99,10 +99,11 @@ func (v *formatter_) appendNewline() {
 	v.result.WriteString(separator)
 }
 
-// This private class method determines the actual type of the specified value
-// and calls the corresponding format function for that type.  NOTE: Because the
-// Go language doesn't handle generic types very well in type switches, we use
-// reflection to handle all generic types.
+/*
+NOTE:
+Because the Go language doesn't handle generic types very well in type switches,
+we use reflection to handle all generic types.
+*/
 func (v *formatter_) formatValue(value any) {
 	switch actual := value.(type) {
 	// Handle primitive types.
@@ -166,8 +167,6 @@ func (v *formatter_) formatValue(value any) {
 	}
 }
 
-// This private class method adds the canonical format for the specified Go
-// array of values to the state of the formatter.
 func (v *formatter_) formatArray(array ref.Value) {
 	var size = array.Len()
 	switch {
@@ -191,8 +190,6 @@ func (v *formatter_) formatArray(array ref.Value) {
 	}
 }
 
-// This private class method adds the canonical format for the specified Go map
-// of key-value pairs to the state of the formatter.
 func (v *formatter_) formatMap(map_ ref.Value) {
 	var keys = map_.MapKeys()
 	var size = len(keys)
@@ -223,32 +220,22 @@ func (v *formatter_) formatMap(map_ ref.Value) {
 	}
 }
 
-// This private class method appends the nil string for the specified value to
-// the result.
 func (v *formatter_) formatNil(value any) {
 	v.appendString("<nil>")
 }
 
-// This private class method appends the name of the specified boolean value to
-// the result.
 func (v *formatter_) formatBoolean(boolean bool) {
 	v.appendString(stc.FormatBool(boolean))
 }
 
-// This private class method appends the base 10 string for the specified
-// integer value to the result.
 func (v *formatter_) formatInteger(integer int64) {
 	v.appendString(stc.FormatInt(integer, 10))
 }
 
-// This private class method appends the base 16 string for the specified
-// unsigned integer value to the result.
 func (v *formatter_) formatUnsigned(unsigned uint64) {
 	v.appendString("0x" + stc.FormatUint(unsigned, 16))
 }
 
-// This private class method appends the base 10 string for the specified
-// floating point value to the result using scientific notation if necessary.
 func (v *formatter_) formatFloat(float float64) {
 	var str = stc.FormatFloat(float, 'G', -1, 64)
 	if !sts.Contains(str, ".") && !sts.Contains(str, "E") {
@@ -257,8 +244,6 @@ func (v *formatter_) formatFloat(float float64) {
 	v.appendString(str)
 }
 
-// This private class method appends the base 10 string for the specified
-// complex number value to the result using scientific notation if necessary.
 func (v *formatter_) formatComplex(complex_ complex128) {
 	var real_ = real(complex_)
 	var imag_ = imag(complex_)
@@ -271,20 +256,14 @@ func (v *formatter_) formatComplex(complex_ complex128) {
 	v.appendString("i)")
 }
 
-// This private class method appends the string for the specified rune value to
-// the result.
 func (v *formatter_) formatRune(rune_ rune) {
 	v.appendString(stc.QuoteRune(rune_))
 }
 
-// This private class method appends the string for the specified string value
-// to the result.
 func (v *formatter_) formatString(string_ string) {
 	v.appendString(stc.Quote(string_))
 }
 
-// This private class method appends the string for the specified association to
-// the result.
 func (v *formatter_) formatAssociation(association ref.Value) {
 	var key = association.MethodByName("GetKey").Call([]ref.Value{})[0]
 	v.formatValue(key.Interface())
@@ -293,8 +272,6 @@ func (v *formatter_) formatAssociation(association ref.Value) {
 	v.formatValue(value.Interface())
 }
 
-// This private class method appends the string for the specified sequence of
-// associations to the result.
 func (v *formatter_) formatSequence(sequence ref.Value) {
 	var iterator = sequence.MethodByName("GetIterator").Call([]ref.Value{})[0]
 	var size = sequence.MethodByName("GetSize").Call([]ref.Value{})[0].Interface()
@@ -323,8 +300,6 @@ func (v *formatter_) formatSequence(sequence ref.Value) {
 	}
 }
 
-// This private class method appends the string for the specified collection of
-// values to the result. It uses recursion to format each value.
 func (v *formatter_) formatCollection(collection ref.Value) {
 	v.appendString("[")
 	var type_ = v.getName(collection)
@@ -346,16 +321,17 @@ func (v *formatter_) formatCollection(collection ref.Value) {
 	v.appendString("](" + type_ + ")")
 }
 
-// This private class method returns the canonically formatted string result.
 func (v *formatter_) getResult() string {
 	var result = v.result.String()
 	v.result.Reset()
 	return result
 }
 
-// This private class method extracts the type name string from the full
-// reflected type.  NOTE: This hack is necessary since Go does not handle type
-// switches with generics very well.
+/*
+NOTE:
+This hack is necessary since Go does not handle type switches with generics very
+well.
+*/
 func (v *formatter_) getName(collection ref.Value) string {
 	var type_ = collection.Type().String()
 	switch {

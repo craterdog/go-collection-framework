@@ -14,33 +14,35 @@ import (
 	col "github.com/craterdog/go-collection-framework/v3"
 )
 
-// CLASS NAMESPACE
+// CLASS ACCESS
 
-// Private Class Namespace Type
-
-type notationClass_ struct {
-	defaultDepth int
-}
-
-// Private Class Namespace Reference
+// Reference
 
 var notationClass = &notationClass_{
 	defaultDepth: 8,
 }
 
-// Public Class Namespace Access
+// Function
 
-func NotationClass() col.NotationClassLike {
+func Notation() col.NotationClassLike {
 	return notationClass
 }
 
-// Public Class Constants
+// CLASS METHODS
+
+// Target
+
+type notationClass_ struct {
+	defaultDepth int
+}
+
+// Constants
 
 func (c *notationClass_) DefaultDepth() int {
 	return c.defaultDepth
 }
 
-// Public Class Constructors
+// Constructors
 
 func (c *notationClass_) Make() col.NotationLike {
 	var notation = c.MakeWithDepth(c.defaultDepth)
@@ -52,22 +54,22 @@ func (c *notationClass_) MakeWithDepth(depth int) col.NotationLike {
 		depth = c.defaultDepth
 	}
 	var notation = &notation_{
-		formatter: FormatterClass().MakeWithDepth(depth),
-		parser:    ParserClass().Make(),
+		formatter: Formatter().MakeWithDepth(depth),
+		parser:    Parser().Make(),
 	}
 	return notation
 }
 
-// CLASS INSTANCES
+// INSTANCE METHODS
 
-// Private Class Type Definition
+// Target
 
 type notation_ struct {
 	formatter col.FormatterLike
 	parser    col.ParserLike
 }
 
-// Public Interface
+// Public
 
 func (v *notation_) FormatCollection(collection col.Collection) string {
 	return v.formatter.FormatCollection(collection)

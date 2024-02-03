@@ -191,7 +191,7 @@ func (v array_[V]) SetValues(index int, values Sequential[V]) {
 // Private
 
 /*
-This private class method normalizes a relative ORDINAL-based index into this
+This private instance method normalizes a relative ORDINAL-based index into this
 Array to match the Go (ZERO-based) indexing. The following transformation is
 performed:
 

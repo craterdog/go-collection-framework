@@ -269,8 +269,8 @@ func (v *set_[V]) GetCollator() CollatorLike {
 // Private
 
 /*
-This private class method performs a binary search of the set for the specified
-value. It returns two results:
+This private instance method performs a binary search of the set for the
+specified value. It returns two results:
   - index: The index of the value, or if not found, the slot in which it could
     be inserted in the underlying list.
   - found: A boolean stating whether or not the value was found.

@@ -116,14 +116,6 @@ func (c *queueClass_[V]) MakeWithCapacity(capacity int) QueueLike[V] {
 
 // Functions
 
-/*
-This public class function connects the output of the specified input Queue with
-a number of new output queues specified by the size parameter and returns a
-sequence of the new output queues. Each value added to the input queue will be
-added automatically to ALL of the output queues. This pattern is useful when a
-set of DIFFERENT operations needs to occur for every value and each operation
-can be done in parallel.
-*/
 func (c *queueClass_[V]) Fork(
 	group Synchronized,
 	input QueueLike[V],
@@ -175,13 +167,6 @@ func (c *queueClass_[V]) Fork(
 	return outputs
 }
 
-/*
-This public class function connects the outputs of the specified sequence of
-input queues with a new output queue returns the new output queue. Each value
-removed from each input queue will automatically be added to the output queue.
-This pattern is useful when the results of the processing with a Split()
-function need to be consolidated into a single queue.
-*/
 func (c *queueClass_[V]) Join(
 	group Synchronized,
 	inputs Sequential[QueueLike[V]],
@@ -223,15 +208,6 @@ func (c *queueClass_[V]) Join(
 	return output
 }
 
-/*
-This public class function connects the output of the specified input Queue with
-the number of output queues specified by the size parameter and returns a
-sequence of the new output queues. Each value added to the input queue will be
-added automatically to ONE of the output queues. This pattern is useful when a
-SINGLE operation needs to occur for each value and the operation can be done on
-the values in parallel. The results can then be consolidated later on using the
-Join() function.
-*/
 func (c *queueClass_[V]) Split(
 	group Synchronized,
 	input QueueLike[V],
@@ -299,7 +275,7 @@ NOTE:
 If the Go "chan" type ever supports snapshots of its state, the underlying list
 can be removed and the channel modified to pass the values instead of the
 availability. Currently, the underlying list is only required by the "AsArray()"
-class method.
+instance method.
 */
 
 // Limited

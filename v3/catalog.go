@@ -119,12 +119,6 @@ func (c *catalogClass_[K, V]) MakeFromSource(
 
 // Functions
 
-/*
-This public class function returns a new catalog containing only the
-associations that are in the specified catalog that have the specified keys.
-The associations in the resulting catalog will be in the same order as the
-specified keys.
-*/
 func (c *catalogClass_[K, V]) Extract(
 	catalog CatalogLike[K, V],
 	keys Sequential[K],
@@ -139,12 +133,6 @@ func (c *catalogClass_[K, V]) Extract(
 	return result
 }
 
-/*
-This public class function returns a new catalog containing all of the
-associations that are in the specified Catalogs in the order that they appear in
-each catalog.  If a key is present in both Catalogs, the value of the key from
-the second catalog takes precedence.
-*/
 func (c *catalogClass_[K, V]) Merge(
 	first CatalogLike[K, V],
 	second CatalogLike[K, V],

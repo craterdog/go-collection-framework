@@ -36,12 +36,12 @@ The CDCN (Crater Dog Collection Notation™) functionality was moved into its ow
 sub-package.  This will allow support for additional notations like XML and
 JSON to be added later in their own sub-packages.
 
-### Class Level Namespaces for Each Class
+### Class Level Scoping for Each Class
 Each exported class defined in the collection framework now has an associated
-class _namespace_.  All _constants_, _constructors_ and _class functions_ are now
-accessed via its class namespace functions.  See the latest
+class scope.  All _constants_, _constructors_ and _class functions_ are now
+accessed via its class access function.  See the latest
 [Crater Dog Technologies™ Go Coding Conventions](https://github.com/craterdog/go-coding-conventions/wiki#class-namespaces)
-for more details on class namespaces.
+for more details on this class-based model.
 
 ### Fully Encapsulated `Array[V]` and `Map[K, V]` Classes 
 These two classes which were type extensions before are now fully encapsulated

@@ -268,7 +268,16 @@ type CatalogClassLike[K comparable, V Value] interface {
 	MakeFromSource(source string, notation NotationLike) CatalogLike[K, V]
 
 	// Functions
+
+	// Extract returns a new catalog containing only the associations that are in
+	// the specified catalog that have the specified keys.  The associations in the
+	// resulting catalog will be in the same order as the specified keys.
 	Extract(catalog CatalogLike[K, V], keys Sequential[K]) CatalogLike[K, V]
+
+	// Merge returns a new catalog containing all of the associations that are in
+	// the specified Catalogs in the order that they appear in each catalog.  If a
+	// key is present in both Catalogs, the value of the key from the second
+	// catalog takes precedence.
 	Merge(first, second CatalogLike[K, V]) CatalogLike[K, V]
 }
 
@@ -374,8 +383,29 @@ type QueueClassLike[V Value] interface {
 	MakeWithCapacity(capacity int) QueueLike[V]
 
 	// Functions
+
+	// This public class function connects the output of the specified input Queue
+	// with a number of new output queues specified by the size parameter and
+	// returns a sequence of the new output queues. Each value added to the input
+	// queue will be added automatically to ALL of the output queues. This pattern
+	// is useful when a set of DIFFERENT operations needs to occur for every value
+	// and each operation can be done in parallel.
 	Fork(group Synchronized, input QueueLike[V], size int) Sequential[QueueLike[V]]
+
+	// This public class function connects the outputs of the specified sequence
+	// of input queues with a new output queue returns the new output queue. Each
+	// value removed from each input queue will automatically be added to the
+	// output queue.  This pattern is useful when the results of the processing
+	// with a Split() function need to be consolidated into a single queue.
 	Join(group Synchronized, inputs Sequential[QueueLike[V]]) QueueLike[V]
+
+	// This public class function connects the output of the specified input Queue
+	// with the number of output queues specified by the size parameter and returns
+	// a sequence of the new output queues. Each value added to the input queue
+	// will be added automatically to ONE of the output queues. This pattern is
+	// useful when a SINGLE operation needs to occur for each value and the
+	// operation can be done on the values in parallel. The results can then be
+	// consolidated later on using the Join() function.
 	Split(group Synchronized, input QueueLike[V], size int) Sequential[QueueLike[V]]
 }
 

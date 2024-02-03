@@ -119,7 +119,7 @@ func (v *sorter_[V]) GetRanker() RankingFunction {
 // Private
 
 /*
-This private class method sorts the values in the specified Go array in place
+This private instance method sorts the values in the specified Go array in place
 using an iterative merge sort along with the ranking function associated with
 this sorter.  The algorithm is documented here:
   - https://en.wikipedia.org/wiki/Merge_sort#Bottom-up_implementation
@@ -168,7 +168,7 @@ func (v *sorter_[V]) sortValues(values []V) {
 }
 
 /*
-This private class method is used for the merging part of the merge sort
+This private instance method is used for the merging part of the merge sort
 algorithm.
 */
 func (v *sorter_[V]) mergeArrays(left []V, right []V, merged []V) {
@@ -209,7 +209,7 @@ func (v *sorter_[V]) mergeArrays(left []V, right []V, merged []V) {
 }
 
 /*
-This private class method generates a cryptographically secure random index in
+This private instance method generates a cryptographically secure random index in
 the range [0..size).
 */
 func (v *sorter_[V]) randomizeIndex(size int) int {

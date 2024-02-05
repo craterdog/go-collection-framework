@@ -37,7 +37,7 @@ on interfaces, not on each other.
 */
 package collections
 
-// PACKAGE TYPES
+// TYPES
 
 // Specialized
 
@@ -90,7 +90,7 @@ implements this signature.
 */
 type RankingFunction func(first Value, second Value) int
 
-// PACKAGE INTERFACES
+// INTERFACES
 
 // Aspects
 

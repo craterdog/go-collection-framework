@@ -32,9 +32,9 @@ import (
 	col "github.com/craterdog/go-collection-framework/v3"
 )
 
-// PACKAGE TYPES
+// TYPES
 
-// Enumerated Types
+// Enumerated
 
 /*
 This enumerated type represents all possible values for a CDCN token type.

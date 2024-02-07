@@ -234,7 +234,7 @@ type Updatable[V Value] interface {
 
 /*
 ArrayClassLike[V Value] defines the set of class constants, constructors and
-functions that must be supported by all array-class-like namespaces.
+functions that must be supported by all array-class-like classes.
 */
 type ArrayClassLike[V Value] interface {
 	// Constructors
@@ -247,7 +247,7 @@ type ArrayClassLike[V Value] interface {
 /*
 AssociationClassLike[K Key, V Value] defines the set of class constants,
 constructors and functions that must be supported by all
-association-class-like namespaces.
+association-class-like classes.
 */
 type AssociationClassLike[K Key, V Value] interface {
 	// Constructors
@@ -257,7 +257,7 @@ type AssociationClassLike[K Key, V Value] interface {
 /*
 CatalogClassLike[K comparable, V Value] defines the set of class constants,
 constructors and functions that must be supported by all catalog-class-like
-namespaces.
+classes.
 */
 type CatalogClassLike[K comparable, V Value] interface {
 	// Constructors
@@ -283,7 +283,7 @@ type CatalogClassLike[K comparable, V Value] interface {
 
 /*
 CollatorClassLike defines the set of class constants, constructors and functions
-that must be supported by all collator-class-like namespaces.
+that must be supported by all collator-class-like classes.
 */
 type CollatorClassLike interface {
 	// Constants
@@ -296,7 +296,7 @@ type CollatorClassLike interface {
 
 /*
 FormatterClassLike defines the set of class constants, constructors and
-functions that must be supported by all formatter-class-like namespaces.
+functions that must be supported by all formatter-class-like classes.
 */
 type FormatterClassLike interface {
 	// Constants
@@ -309,7 +309,7 @@ type FormatterClassLike interface {
 
 /*
 IteratorClassLike[V Value] defines the set of class constants, constructors and
-functions that must be supported by all iterator-class-like namespaces.
+functions that must be supported by all iterator-class-like classes.
 */
 type IteratorClassLike[V Value] interface {
 	// Constructors
@@ -318,7 +318,7 @@ type IteratorClassLike[V Value] interface {
 
 /*
 ListClassLike[V Value] defines the set of class constants, constructors and
-functions that must be supported by all list-class-like namespaces.
+functions that must be supported by all list-class-like classes.
 */
 type ListClassLike[V Value] interface {
 	// Constructors
@@ -334,7 +334,7 @@ type ListClassLike[V Value] interface {
 /*
 MapClassLike[K comparable, V Value] defines the set of class constants,
 constructors and functions that must be supported by all map-class-like
-namespaces.
+classes.
 */
 type MapClassLike[K comparable, V Value] interface {
 	// Constructors
@@ -347,7 +347,7 @@ type MapClassLike[K comparable, V Value] interface {
 
 /*
 NotationClassLike defines the set of class constants, constructors and
-functions that must be supported by all notation-class-like namespaces.
+functions that must be supported by all notation-class-like classes.
 */
 type NotationClassLike interface {
 	// Constants
@@ -360,7 +360,7 @@ type NotationClassLike interface {
 
 /*
 ParserClassLike defines the set of class constants, constructors and functions
-that must be supported by all parser-class-like namespaces.
+that must be supported by all parser-class-like classes.
 */
 type ParserClassLike interface {
 	// Constructors
@@ -369,7 +369,7 @@ type ParserClassLike interface {
 
 /*
 QueueClassLike[V Value] defines the set of class constants, constructors and
-functions that must be supported by all queue-class-like namespaces.
+functions that must be supported by all queue-class-like classes.
 */
 type QueueClassLike[V Value] interface {
 	// Constants
@@ -411,7 +411,7 @@ type QueueClassLike[V Value] interface {
 
 /*
 ScannerClassLike defines the set of class constants, constructors and functions
-that must be supported by all scanner-class-like namespaces.
+that must be supported by all scanner-class-like classes.
 */
 type ScannerClassLike interface {
 	// Constructors
@@ -423,7 +423,7 @@ type ScannerClassLike interface {
 
 /*
 SetClassLike[V Value] defines the set of class constants, constructors and
-functions that must be supported by all set-class-like namespaces.
+functions that must be supported by all set-class-like classes.
 */
 type SetClassLike[V Value] interface {
 	// Constructors
@@ -442,7 +442,7 @@ type SetClassLike[V Value] interface {
 
 /*
 SorterClassLike[V Value] defines the set of class constants, constructors and
-functions that must be supported by all sorter-class-like namespaces.
+functions that must be supported by all sorter-class-like classes.
 */
 type SorterClassLike[V Value] interface {
 	// Constants
@@ -455,7 +455,7 @@ type SorterClassLike[V Value] interface {
 
 /*
 StackClassLike[V Value] defines the set of class constants, constructors and
-functions that must be supported by all stack-class-like namespaces.
+functions that must be supported by all stack-class-like classes.
 */
 type StackClassLike[V Value] interface {
 	// Constants
@@ -471,7 +471,7 @@ type StackClassLike[V Value] interface {
 
 /*
 TokenClassLike defines the set of class constants, constructors and functions
-that must be supported by all token-class-like namespaces.
+that must be supported by all token-class-like classes.
 */
 type TokenClassLike interface {
 	// Constructors
@@ -485,11 +485,11 @@ type TokenClassLike interface {
 
 /*
 ArrayLike[V Value] defines the set of aspects and methods that must be supported
-by all array-like classes.  An array-like class maintains a fixed length indexed
-sequence of values.  Each value is associated with an implicit positive integer
-index. An array-like class uses ORDINAL based indexing rather than the more
-common—and nonsensical—ZERO based indexing scheme (see the description of what
-this means in the Accessible interface definition).
+by all array-like instances.  An array-like class maintains a fixed length
+indexed sequence of values.  Each value is associated with an implicit positive
+integer index. An array-like class uses ORDINAL based indexing rather than the
+more common—and nonsensical—ZERO based indexing scheme (see the description of
+what this means in the Accessible interface definition).
 
 This type is parameterized as follows:
   - V is any type of value.
@@ -507,14 +507,14 @@ type ArrayLike[V Value] interface {
 
 /*
 AssociationLike[K Key, V Value] defines the set of aspects and methods that must
-be supported by all association-like classes.  An association-like class
+be supported by all association-like instances.  An association-like class
 maintains information about a key-value association.
 
 This type is parameterized as follows:
   - K is a primitive type of key.
   - V is any type of value.
 
-This type is used by catalog-like classes to maintain their associations.
+This type is used by catalog-like instances to maintain their associations.
 */
 type AssociationLike[K Key, V Value] interface {
 	// Methods
@@ -525,7 +525,7 @@ type AssociationLike[K Key, V Value] interface {
 
 /*
 CatalogLike[K Key, V Value] defines the set of aspects and methods that must be
-supported by all catalog-like classes.  A catalog-like class maintains a
+supported by all catalog-like instances.  A catalog-like class maintains a
 sequence of key-value associations.
 
 This type is parameterized as follows:
@@ -543,7 +543,7 @@ type CatalogLike[K Key, V Value] interface {
 
 /*
 CollatorLike defines the set of aspects and methods that must be supported by
-all collator-like classes.  A collator-like class is capable of comparing and
+all collator-like instances.  A collator-like class is capable of comparing and
 ranking two values of any type.
 */
 type CollatorLike interface {
@@ -554,7 +554,7 @@ type CollatorLike interface {
 
 /*
 IteratorLike[V Value] defines the set of aspects and methods that must be
-supported by all iterator-like classes.  An iterator-like class can be used to
+supported by all iterator-like instances.  An iterator-like class can be used to
 move forward and backward over the values in a sequence.  It implements the Gang
 of Four (GoF) Iterator Design Pattern:
 
@@ -592,7 +592,7 @@ type IteratorLike[V Value] interface {
 
 /*
 FormatterLike defines the set of aspects and methods that must be supported by
-all formatter-like classes.
+all formatter-like instances.
 */
 type FormatterLike interface {
 	// Methods
@@ -601,7 +601,7 @@ type FormatterLike interface {
 
 /*
 ListLike[V Value] defines the set of aspects and methods that must be supported
-by all list-like classes.  A list-like class maintains a dynamic sequence of
+by all list-like instances.  A list-like class maintains a dynamic sequence of
 values which can grow or shrink as needed.  Each value is associated with an
 implicit positive integer index. An array-like class uses ORDINAL based indexing
 rather than the more common—and nonsensical—ZERO based indexing scheme (see the
@@ -625,7 +625,7 @@ type ListLike[V Value] interface {
 
 /*
 MapLike[K Key, V Value] defines the set of aspects and methods that must be
-supported by all map-like classes.  A map-like class extends the primitive Go
+supported by all map-like instances.  A map-like class extends the primitive Go
 map type and maintains a sequence of key-value associations.  The order of the
 key-value associations in a primitive Go map is random, even for two Go maps
 containing the same key-value associations.
@@ -644,7 +644,7 @@ type MapLike[K Key, V Value] interface {
 
 /*
 NotationLike defines the set of aspects and methods that must be supported by
-all notation-like classes.  A notation-like class can be used to parse and
+all notation-like instances.  A notation-like class can be used to parse and
 format collections using a canonical notation like XML, JSON and  CDCN
 (Crater Dog Collection Notation™).
 */
@@ -656,7 +656,7 @@ type NotationLike interface {
 
 /*
 ParserLike defines the set of aspects and methods that must be supported by
-all parser-like classes.
+all parser-like instances.
 */
 type ParserLike interface {
 	// Methods
@@ -665,7 +665,7 @@ type ParserLike interface {
 
 /*
 QueueLike[V Value] defines the set of aspects and methods that must be supported
-by all queue-like classes.  A queue-like class implements FIFO (i.e.
+by all queue-like instances.  A queue-like class implements FIFO (i.e.
 first-in-first-out) semantics.
 
 This type is parameterized as follows:
@@ -688,7 +688,7 @@ type QueueLike[V Value] interface {
 
 /*
 ScannerLike defines the set of aspects and methods that must be supported by all
-scanner-like classes.
+scanner-like instances.
 */
 type ScannerLike interface {
 	// Methods
@@ -696,7 +696,7 @@ type ScannerLike interface {
 
 /*
 SetLike[V Value] defines the set of aspects and methods that must be supported
-by all set-like classes.  A set-like class maintains an ordered sequence of
+by all set-like instances.  A set-like class maintains an ordered sequence of
 values which can grow or shrink as needed.
 
 This type is parameterized as follows:
@@ -717,8 +717,8 @@ type SetLike[V Value] interface {
 
 /*
 SorterLike[V Value] defines the set of aspects and methods that must be
-supported by all sorter-like classes.  A sorter-like class implements a specific
-sorting algorithm.
+supported by all sorter-like instances.  A sorter-like class implements a
+specific sorting algorithm.
 
 This type is parameterized as follows:
   - V is any type of value.
@@ -736,7 +736,7 @@ type SorterLike[V Value] interface {
 
 /*
 StackLike[V Value] defines the set of aspects and methods that must be supported
-by all stack-like classes.  A stack-like class implements LIFO (i.e.
+by all stack-like instances.  A stack-like class implements LIFO (i.e.
 last-in-first-out) semantics.
 
 This type is parameterized as follows:
@@ -756,7 +756,7 @@ type StackLike[V Value] interface {
 
 /*
 TokenLike defines the set of aspects and methods that must be supported by all
-token-like classes.
+token-like instances.
 */
 type TokenLike interface {
 	// Methods

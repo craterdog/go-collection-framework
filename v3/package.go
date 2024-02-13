@@ -498,7 +498,7 @@ This type essentially provides a higher level abstraction for the primitive Go
 array type.
 */
 type ArrayLike[V Value] interface {
-	// Aspects
+	// Abstractions
 	Accessible[V]
 	Sequential[V]
 	Sortable[V]
@@ -535,7 +535,7 @@ This type is parameterized as follows:
 A catalog-like class can use any association-like class key-value association.
 */
 type CatalogLike[K Key, V Value] interface {
-	// Aspects
+	// Abstractions
 	Associative[K, V]
 	Sequential[AssociationLike[K, V]]
 	Sortable[AssociationLike[K, V]]
@@ -614,7 +614,7 @@ All comparison and ranking of values in the sequence is done using the default
 collator.
 */
 type ListLike[V Value] interface {
-	// Aspects
+	// Abstractions
 	Accessible[V]
 	Expandable[V]
 	Searchable[V]
@@ -637,7 +637,7 @@ This type is parameterized as follows:
 A map-like class can use any association-like class key-value association.
 */
 type MapLike[K Key, V Value] interface {
-	// Aspects
+	// Abstractions
 	Associative[K, V]
 	Sequential[AssociationLike[K, V]]
 }
@@ -677,7 +677,7 @@ maximum length and will block on attempts to add a value it is full.  It will
 also block on attempts to remove a value when it is empty.
 */
 type QueueLike[V Value] interface {
-	// Aspects
+	// Abstractions
 	Limited[V]
 	Sequential[V]
 
@@ -705,7 +705,7 @@ This type is parameterized as follows:
 The order of the values is determined by a configurable RankingFunction.
 */
 type SetLike[V Value] interface {
-	// Aspects
+	// Abstractions
 	Accessible[V]
 	Flexible[V]
 	Searchable[V]
@@ -727,7 +727,7 @@ A sorter-like class uses a ranking function to order the values.  If no ranking
 function is specified the values are sorted into their natural order.
 */
 type SorterLike[V Value] interface {
-	// Aspects
+	// Abstractions
 	Systematic[V]
 
 	// Methods
@@ -746,7 +746,7 @@ A stack-like class enforces a maximum depth and will panic if that depth is
 exceeded.  It will also panic on attempts to remove a value when it is empty.
 */
 type StackLike[V Value] interface {
-	// Aspects
+	// Abstractions
 	Limited[V]
 	Sequential[V]
 

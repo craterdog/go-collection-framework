@@ -484,12 +484,12 @@ type TokenClassLike interface {
 // Instances
 
 /*
-ArrayLike[V Value] defines the set of aspects and methods that must be supported
-by all array-like instances.  An array-like class maintains a fixed length
-indexed sequence of values.  Each value is associated with an implicit positive
-integer index. An array-like class uses ORDINAL based indexing rather than the
-more common—and nonsensical—ZERO based indexing scheme (see the description of
-what this means in the Accessible interface definition).
+ArrayLike[V Value] defines the set of abstractions and methods that must be
+supported by all array-like instances.  An array-like class maintains a fixed
+length indexed sequence of values.  Each value is associated with an implicit
+positive integer index. An array-like class uses ORDINAL based indexing rather
+than the more common—and nonsensical—ZERO based indexing scheme (see the
+description of what this means in the Accessible interface definition).
 
 This type is parameterized as follows:
   - V is any type of value.
@@ -506,8 +506,8 @@ type ArrayLike[V Value] interface {
 }
 
 /*
-AssociationLike[K Key, V Value] defines the set of aspects and methods that must
-be supported by all association-like instances.  An association-like class
+AssociationLike[K Key, V Value] defines the set of abstractions and methods that
+must be supported by all association-like instances.  An association-like class
 maintains information about a key-value association.
 
 This type is parameterized as follows:
@@ -524,9 +524,9 @@ type AssociationLike[K Key, V Value] interface {
 }
 
 /*
-CatalogLike[K Key, V Value] defines the set of aspects and methods that must be
-supported by all catalog-like instances.  A catalog-like class maintains a
-sequence of key-value associations.
+CatalogLike[K Key, V Value] defines the set of abstractions and methods that
+must be supported by all catalog-like instances.  A catalog-like class maintains
+a sequence of key-value associations.
 
 This type is parameterized as follows:
   - K is a primitive type of key.
@@ -542,9 +542,9 @@ type CatalogLike[K Key, V Value] interface {
 }
 
 /*
-CollatorLike defines the set of aspects and methods that must be supported by
-all collator-like instances.  A collator-like class is capable of comparing and
-ranking two values of any type.
+CollatorLike defines the set of abstractions and methods that must be supported
+by all collator-like instances.  A collator-like class is capable of comparing
+and ranking two values of any type.
 */
 type CollatorLike interface {
 	// Methods
@@ -553,7 +553,7 @@ type CollatorLike interface {
 }
 
 /*
-IteratorLike[V Value] defines the set of aspects and methods that must be
+IteratorLike[V Value] defines the set of abstractions and methods that must be
 supported by all iterator-like instances.  An iterator-like class can be used to
 move forward and backward over the values in a sequence.  It implements the Gang
 of Four (GoF) Iterator Design Pattern:
@@ -591,8 +591,8 @@ type IteratorLike[V Value] interface {
 }
 
 /*
-FormatterLike defines the set of aspects and methods that must be supported by
-all formatter-like instances.
+FormatterLike defines the set of abstractions and methods that must be supported
+by all formatter-like instances.
 */
 type FormatterLike interface {
 	// Methods
@@ -600,12 +600,12 @@ type FormatterLike interface {
 }
 
 /*
-ListLike[V Value] defines the set of aspects and methods that must be supported
-by all list-like instances.  A list-like class maintains a dynamic sequence of
-values which can grow or shrink as needed.  Each value is associated with an
-implicit positive integer index. An array-like class uses ORDINAL based indexing
-rather than the more common—and nonsensical—ZERO based indexing scheme (see the
-description of what this means in the Accessible interface definition).
+ListLike[V Value] defines the set of abstractions and methods that must be
+supported by all list-like instances.  A list-like class maintains a dynamic
+sequence of values which can grow or shrink as needed.  Each value is associated
+with an implicit positive integer index. An array-like class uses ORDINAL based
+indexing rather than the more common—and nonsensical—ZERO based indexing scheme
+(see the description of what this means in the Accessible interface definition).
 
 This type is parameterized as follows:
   - V is any type of value.
@@ -624,7 +624,7 @@ type ListLike[V Value] interface {
 }
 
 /*
-MapLike[K Key, V Value] defines the set of aspects and methods that must be
+MapLike[K Key, V Value] defines the set of abstractions and methods that must be
 supported by all map-like instances.  A map-like class extends the primitive Go
 map type and maintains a sequence of key-value associations.  The order of the
 key-value associations in a primitive Go map is random, even for two Go maps
@@ -643,8 +643,8 @@ type MapLike[K Key, V Value] interface {
 }
 
 /*
-NotationLike defines the set of aspects and methods that must be supported by
-all notation-like instances.  A notation-like class can be used to parse and
+NotationLike defines the set of abstractions and methods that must be supported
+by all notation-like instances.  A notation-like class can be used to parse and
 format collections using a canonical notation like XML, JSON and  CDCN
 (Crater Dog Collection Notation™).
 */
@@ -655,7 +655,7 @@ type NotationLike interface {
 }
 
 /*
-ParserLike defines the set of aspects and methods that must be supported by
+ParserLike defines the set of abstractions and methods that must be supported by
 all parser-like instances.
 */
 type ParserLike interface {
@@ -664,9 +664,9 @@ type ParserLike interface {
 }
 
 /*
-QueueLike[V Value] defines the set of aspects and methods that must be supported
-by all queue-like instances.  A queue-like class implements FIFO (i.e.
-first-in-first-out) semantics.
+QueueLike[V Value] defines the set of abstractions and methods that must be
+supported by all queue-like instances.  A queue-like class implements FIFO
+(i.e.  first-in-first-out) semantics.
 
 This type is parameterized as follows:
   - V is any type of value.
@@ -687,17 +687,17 @@ type QueueLike[V Value] interface {
 }
 
 /*
-ScannerLike defines the set of aspects and methods that must be supported by all
-scanner-like instances.
+ScannerLike defines the set of abstractions and methods that must be supported
+by all scanner-like instances.
 */
 type ScannerLike interface {
 	// Methods
 }
 
 /*
-SetLike[V Value] defines the set of aspects and methods that must be supported
-by all set-like instances.  A set-like class maintains an ordered sequence of
-values which can grow or shrink as needed.
+SetLike[V Value] defines the set of abstractions and methods that must be
+supported by all set-like instances.  A set-like class maintains an ordered
+sequence of values which can grow or shrink as needed.
 
 This type is parameterized as follows:
   - V is any type of value.
@@ -716,7 +716,7 @@ type SetLike[V Value] interface {
 }
 
 /*
-SorterLike[V Value] defines the set of aspects and methods that must be
+SorterLike[V Value] defines the set of abstractions and methods that must be
 supported by all sorter-like instances.  A sorter-like class implements a
 specific sorting algorithm.
 
@@ -735,9 +735,9 @@ type SorterLike[V Value] interface {
 }
 
 /*
-StackLike[V Value] defines the set of aspects and methods that must be supported
-by all stack-like instances.  A stack-like class implements LIFO (i.e.
-last-in-first-out) semantics.
+StackLike[V Value] defines the set of abstractions and methods that must be
+supported by all stack-like instances.  A stack-like class implements LIFO
+(i.e.  last-in-first-out) semantics.
 
 This type is parameterized as follows:
   - V is any type of value.
@@ -755,8 +755,8 @@ type StackLike[V Value] interface {
 }
 
 /*
-TokenLike defines the set of aspects and methods that must be supported by all
-token-like instances.
+TokenLike defines the set of abstractions and methods that must be supported by
+all token-like instances.
 */
 type TokenLike interface {
 	// Methods

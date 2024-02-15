@@ -39,7 +39,7 @@ package collections
 
 // TYPES
 
-// Specialized
+// Specializations
 
 /*
 Collection is a generic type representing any type of collections of values.
@@ -67,7 +67,7 @@ scanner.
 */
 type TokenType int64
 
-// Functional
+// Functionals
 
 /*
 ComparingFunction defines the signature for any function that can determine

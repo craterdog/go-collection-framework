@@ -34,7 +34,7 @@ import (
 
 // TYPES
 
-// Enumerated
+// Enumerations
 
 /*
 This enumerated type represents all possible values for a CDCN token type.

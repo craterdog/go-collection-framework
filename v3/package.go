@@ -112,6 +112,7 @@ Notice that because the indices are ordinal based, the positive and negative
 indices are symmetrical.
 */
 type Accessible[V Value] interface {
+	// Methods
 	GetValue(index int) V
 	GetValues(first int, last int) Sequential[V]
 }
@@ -121,6 +122,7 @@ Associative[K Key, V Value] defines the set of method signatures that must be
 supported by all sequences of key-value associations.
 */
 type Associative[K Key, V Value] interface {
+	// Methods
 	GetKeys() Sequential[K]
 	GetValue(key K) V
 	GetValues(keys Sequential[K]) Sequential[V]
@@ -135,6 +137,7 @@ Expandable[V Value] defines the set of method signatures that must be supported
 by all sequences that allow new values to be appended, inserted and removed.
 */
 type Expandable[V Value] interface {
+	// Methods
 	AppendValue(value V)
 	AppendValues(values Sequential[V])
 	InsertValue(slot int, value V)
@@ -150,6 +153,7 @@ all sequences of values that allow new values to be added and existing values to
 be removed.
 */
 type Flexible[V Value] interface {
+	// Methods
 	AddValue(value V)
 	AddValues(values Sequential[V])
 	RemoveAll()
@@ -163,6 +167,7 @@ all sequences of values that allow new values to be added and limit the total
 number of values in the sequence.
 */
 type Limited[V Value] interface {
+	// Methods
 	AddValue(value V)
 	GetCapacity() int
 	RemoveAll()
@@ -173,6 +178,7 @@ Searchable[V Value] defines the set of method signatures that must be supported
 by all searchable sequences of values.
 */
 type Searchable[V Value] interface {
+	// Methods
 	ContainsAll(values Sequential[V]) bool
 	ContainsAny(values Sequential[V]) bool
 	ContainsValue(value V) bool
@@ -184,6 +190,7 @@ Sequential[V Value] defines the set of method signatures that must be supported
 by all sequences of values.
 */
 type Sequential[V Value] interface {
+	// Methods
 	AsArray() []V
 	GetIterator() IteratorLike[V]
 	GetSize() int
@@ -195,6 +202,7 @@ Sortable[V Value] defines the set of method signatures that must be supported by
 all sequences whose values may be reordered using various sorting algorithms.
 */
 type Sortable[V Value] interface {
+	// Methods
 	ReverseValues()
 	ShuffleValues()
 	SortValues()
@@ -206,6 +214,7 @@ Synchronized defines the set of method signatures that must be supported by all
 synchronized groups of threads.
 */
 type Synchronized interface {
+	// Methods
 	Add(delta int)
 	Done()
 	Wait()
@@ -216,6 +225,7 @@ Systematic[V Value] defines the set of method signatures that must be supported
 by all systematic sorting agents.
 */
 type Systematic[V Value] interface {
+	// Methods
 	ReverseValues(values []V)
 	ShuffleValues(values []V)
 	SortValues(values []V)
@@ -226,6 +236,7 @@ Updatable[V Value] defines the set of method signatures that must be supported
 by all updatable sequences of values.
 */
 type Updatable[V Value] interface {
+	// Methods
 	SetValue(index int, value V)
 	SetValues(index int, values Sequential[V])
 }

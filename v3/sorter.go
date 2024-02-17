@@ -14,6 +14,7 @@ import (
 	ran "crypto/rand"
 	fmt "fmt"
 	big "math/big"
+	syn "sync"
 )
 
 // CLASS ACCESS
@@ -21,6 +22,7 @@ import (
 // Reference
 
 var sorterClass = map[string]any{}
+var sorterMutex syn.Mutex
 
 // Function
 
@@ -30,6 +32,7 @@ func Sorter[V Value]() SorterClassLike[V] {
 	var name = fmt.Sprintf("%T", class)
 
 	// Check for existing bound class type.
+	sorterMutex.Lock()
 	var value = sorterClass[name]
 	switch actual := value.(type) {
 	case *sorterClass_[V]:
@@ -42,6 +45,7 @@ func Sorter[V Value]() SorterClassLike[V] {
 		}
 		sorterClass[name] = class
 	}
+	sorterMutex.Unlock()
 
 	// Return a reference to the bound class type.
 	return class

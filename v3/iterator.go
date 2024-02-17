@@ -12,6 +12,7 @@ package collections
 
 import (
 	fmt "fmt"
+	syn "sync"
 )
 
 // CLASS ACCESS
@@ -19,6 +20,7 @@ import (
 // Reference
 
 var iteratorClass = map[string]any{}
+var iteratorMutex syn.Mutex
 
 // Function
 
@@ -28,6 +30,7 @@ func Iterator[V Value]() IteratorClassLike[V] {
 	var name = fmt.Sprintf("%T", class)
 
 	// Check for existing bound class type.
+	iteratorMutex.Lock()
 	var value = iteratorClass[name]
 	switch actual := value.(type) {
 	case *iteratorClass_[V]:
@@ -40,6 +43,7 @@ func Iterator[V Value]() IteratorClassLike[V] {
 		}
 		iteratorClass[name] = class
 	}
+	iteratorMutex.Unlock()
 
 	// Return a reference to the bound class type.
 	return class

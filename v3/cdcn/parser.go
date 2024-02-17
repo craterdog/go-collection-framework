@@ -23,8 +23,8 @@ import (
 // Reference
 
 var parserClass = &parserClass_{
-	channelSize: 16,
-	stackSize:   4,
+	queueSize: 16,
+	stackSize: 4,
 }
 
 // Function
@@ -38,8 +38,8 @@ func Parser() col.ParserClassLike {
 // Target
 
 type parserClass_ struct {
-	channelSize int
-	stackSize   int
+	queueSize int
+	stackSize int
 }
 
 // Constructors
@@ -58,7 +58,7 @@ func (c *parserClass_) Make() col.ParserLike {
 type parser_ struct {
 	next   col.StackLike[col.TokenLike] // A stack of unprocessed retrieved tokens.
 	source string                       // The original source code.
-	tokens chan col.TokenLike           // A queue of unread tokens from the scanner.
+	tokens col.QueueLike[col.TokenLike] // A queue of unread tokens from the scanner.
 }
 
 // Public
@@ -66,7 +66,7 @@ type parser_ struct {
 func (v *parser_) ParseSource(source string) col.Collection {
 	// The scanner runs in a separate Go routine.
 	v.source = source
-	v.tokens = make(chan col.TokenLike, parserClass.channelSize)
+	v.tokens = col.Queue[col.TokenLike]().MakeWithCapacity(parserClass.queueSize)
 	Scanner().Make(v.source, v.tokens)
 
 	// Parse the tokens from the scanner.
@@ -79,7 +79,7 @@ func (v *parser_) ParseSource(source string) col.Collection {
 		)
 		panic(message)
 	}
-	_, token, ok = v.parseToken(TypeEOF, "")
+	_, token, ok = v.parseToken(EOFToken, "")
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateGrammar("EOF",
@@ -150,12 +150,12 @@ stream and return it.
 func (v *parser_) getNextToken() col.TokenLike {
 	var next col.TokenLike
 	if v.next.IsEmpty() {
-		var token, ok = <-v.tokens
+		var token, ok = v.tokens.RemoveHead() // Will block if queue is empty.
 		if !ok {
 			panic("The token channel terminated without an EOF token.")
 		}
 		next = token
-		if next.GetType() == TypeError {
+		if next.GetType() == ErrorToken {
 			var message = v.formatError(next)
 			panic(message)
 		}
@@ -176,7 +176,7 @@ func (v *parser_) parseAssociation() (
 	if !ok {
 		return association, token, false
 	}
-	_, _, ok = v.parseToken(TypeDelimiter, ":")
+	_, _, ok = v.parseToken(DelimiterToken, ":")
 	if !ok {
 		// Put back the primitive key token.
 		v.putBack(token)
@@ -204,13 +204,13 @@ func (v *parser_) parseAssociations() (
 	associations = col.Catalog[col.Key, col.Value]().Make()
 
 	// Handle the empty case.
-	_, token, ok = v.parseToken(TypeDelimiter, ":")
+	_, token, ok = v.parseToken(DelimiterToken, ":")
 	if ok {
 		return associations, token, true
 	}
 
 	// Handle the multi-line case.
-	var _, eolToken, isMultilined = v.parseToken(TypeEOL, "")
+	var _, eolToken, isMultilined = v.parseToken(EOLToken, "")
 	if isMultilined {
 		association, token, ok = v.parseAssociation()
 		if !ok {
@@ -222,7 +222,7 @@ func (v *parser_) parseAssociations() (
 			var key = association.GetKey()
 			var value = association.GetValue()
 			associations.SetValue(key, value)
-			_, token, ok = v.parseToken(TypeEOL, "")
+			_, token, ok = v.parseToken(EOLToken, "")
 			if !ok {
 				var message = v.formatError(token)
 				message += v.generateGrammar("EOL",
@@ -245,7 +245,7 @@ func (v *parser_) parseAssociations() (
 		var key = association.GetKey()
 		var value = association.GetValue()
 		associations.SetValue(key, value)
-		_, token, ok = v.parseToken(TypeDelimiter, ",")
+		_, token, ok = v.parseToken(DelimiterToken, ",")
 		if ok {
 			association, token, ok = v.parseAssociation()
 			if !ok {
@@ -267,7 +267,7 @@ func (v *parser_) parseCollection() (
 	ok bool,
 ) {
 	var context string
-	_, token, ok = v.parseToken(TypeDelimiter, "[")
+	_, token, ok = v.parseToken(DelimiterToken, "[")
 	if !ok {
 		return collection, token, false
 	}
@@ -286,7 +286,7 @@ func (v *parser_) parseCollection() (
 			panic(message)
 		}
 	}
-	_, token, ok = v.parseToken(TypeDelimiter, "]")
+	_, token, ok = v.parseToken(DelimiterToken, "]")
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateGrammar("]",
@@ -296,7 +296,7 @@ func (v *parser_) parseCollection() (
 		)
 		panic(message)
 	}
-	_, token, ok = v.parseToken(TypeDelimiter, "(")
+	_, token, ok = v.parseToken(DelimiterToken, "(")
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateGrammar("(",
@@ -306,7 +306,7 @@ func (v *parser_) parseCollection() (
 		)
 		panic(message)
 	}
-	context, token, ok = v.parseToken(TypeContext, "")
+	context, token, ok = v.parseToken(ContextToken, "")
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateGrammar("CONTEXT",
@@ -316,7 +316,7 @@ func (v *parser_) parseCollection() (
 		)
 		panic(message)
 	}
-	_, token, ok = v.parseToken(TypeDelimiter, ")")
+	_, token, ok = v.parseToken(DelimiterToken, ")")
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateGrammar(")",
@@ -388,47 +388,47 @@ func (v *parser_) parsePrimitive() (
 	token col.TokenLike,
 	ok bool,
 ) {
-	_, token, ok = v.parseToken(TypeBoolean, "")
+	_, token, ok = v.parseToken(BooleanToken, "")
 	if ok {
 		primitive, _ = stc.ParseBool(token.GetValue())
 		return primitive, token, true
 	}
-	_, token, ok = v.parseToken(TypeComplex, "")
+	_, token, ok = v.parseToken(ComplexToken, "")
 	if ok {
 		primitive, _ = stc.ParseComplex(token.GetValue(), 128)
 		return primitive, token, true
 	}
-	_, token, ok = v.parseToken(TypeFloat, "")
+	_, token, ok = v.parseToken(FloatToken, "")
 	if ok {
 		primitive, _ = stc.ParseFloat(token.GetValue(), 64)
 		return primitive, token, true
 	}
-	_, token, ok = v.parseToken(TypeHexadecimal, "")
+	_, token, ok = v.parseToken(HexadecimalToken, "")
 	if ok {
 		primitive, _ = stc.ParseUint(token.GetValue()[2:], 16, 64)
 		return primitive, token, true
 	}
-	_, token, ok = v.parseToken(TypeInteger, "")
+	_, token, ok = v.parseToken(IntegerToken, "")
 	if ok {
 		primitive, _ = stc.ParseInt(token.GetValue(), 10, 64)
 		return primitive, token, true
 	}
-	_, token, ok = v.parseToken(TypeNil, "")
+	_, token, ok = v.parseToken(NilToken, "")
 	if ok {
 		primitive = nil
 		return primitive, token, true
 	}
-	_, token, ok = v.parseToken(TypeRune, "")
+	_, token, ok = v.parseToken(RuneToken, "")
 	if ok {
-		var matches = Scanner().MatchToken(TypeRune, token.GetValue())
-		var match, _ = stc.Unquote(matches[0])
+		var matches = Scanner().MatchToken(RuneToken, token.GetValue())
+		var match, _ = stc.Unquote(matches.GetValue(1))
 		primitive, _ = utf.DecodeRuneInString(match)
 		return primitive, token, true
 	}
-	_, token, ok = v.parseToken(TypeString, "")
+	_, token, ok = v.parseToken(StringToken, "")
 	if ok {
-		var matches = Scanner().MatchToken(TypeString, token.GetValue())
-		primitive, _ = stc.Unquote(matches[0])
+		var matches = Scanner().MatchToken(StringToken, token.GetValue())
+		primitive, _ = stc.Unquote(matches.GetValue(1))
 		return primitive, token, true
 	}
 	return primitive, token, ok
@@ -476,14 +476,14 @@ func (v *parser_) parseValues() (
 	values = col.List[col.Value]().Make()
 
 	// Handle the empty case.
-	_, token, ok = v.parseToken(TypeDelimiter, "]")
+	_, token, ok = v.parseToken(DelimiterToken, "]")
 	if ok {
 		v.putBack(token)
 		return values, token, true
 	}
 
 	// Handle the multi-line case.
-	var _, _, isMultilined = v.parseToken(TypeEOL, "")
+	var _, _, isMultilined = v.parseToken(EOLToken, "")
 	if isMultilined {
 		value, token, ok = v.parseValue()
 		if !ok {
@@ -496,7 +496,7 @@ func (v *parser_) parseValues() (
 		}
 		for ok {
 			values.AppendValue(value)
-			_, token, ok = v.parseToken(TypeEOL, "")
+			_, token, ok = v.parseToken(EOLToken, "")
 			if !ok {
 				var message = v.formatError(token)
 				message += v.generateGrammar("EOL",
@@ -517,7 +517,7 @@ func (v *parser_) parseValues() (
 	}
 	for ok {
 		values.AppendValue(value)
-		_, token, ok = v.parseToken(TypeDelimiter, ",")
+		_, token, ok = v.parseToken(DelimiterToken, ",")
 		if ok {
 			value, token, ok = v.parseValue()
 			if !ok {
@@ -541,16 +541,16 @@ func (v *parser_) putBack(token col.TokenLike) {
 This Go map captures the syntax rules for collections of Go primitives.
 */
 var grammar = map[string]string{
-	"$source":     `collection EOF  ! Terminated with an end-of-file marker.`,
-	"$collection": `"[" (associations | values) "]" "(" CONTEXT ")"`,
+	"$association": `key ":" value`,
 	"$associations": `
     association ("," association)*
     EOL (association EOL)+
     ":"  ! No associations.`,
-	"$association": `key ":" value`,
-	"$key":         `primitive`,
-	"$value":       `collection | primitive`,
-	"$primitive":   `BOOLEAN | COMPLEX | FLOAT | HEXADECIMAL | INTEGER | NIL | RUNE | STRING`,
+	"$collection": `"[" (associations | values) "]" "(" CONTEXT ")"`,
+	"$key":        `primitive`,
+	"$primitive":  `BOOLEAN | COMPLEX | FLOAT | HEXADECIMAL | INTEGER | NIL | RUNE | STRING`,
+	"$source":     `collection EOF  ! Terminated with an end-of-file marker.`,
+	"$value":      `collection | primitive`,
 	"$values": `
     value ("," value)*
     EOL (value EOL)+

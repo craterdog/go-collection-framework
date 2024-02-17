@@ -12,6 +12,7 @@ package collections
 
 import (
 	fmt "fmt"
+	syn "sync"
 )
 
 // CLASS ACCESS
@@ -19,6 +20,7 @@ import (
 // Reference
 
 var stackClass = map[string]any{}
+var stackMutex syn.Mutex
 
 // Function
 
@@ -28,6 +30,7 @@ func Stack[V Value]() StackClassLike[V] {
 	var name = fmt.Sprintf("%T", class)
 
 	// Check for existing bound class type.
+	stackMutex.Lock()
 	var value = stackClass[name]
 	switch actual := value.(type) {
 	case *stackClass_[V]:
@@ -40,6 +43,7 @@ func Stack[V Value]() StackClassLike[V] {
 		}
 		stackClass[name] = class
 	}
+	stackMutex.Unlock()
 
 	// Return a reference to the bound class type.
 	return class

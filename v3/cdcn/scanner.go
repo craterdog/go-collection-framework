@@ -23,18 +23,18 @@ import (
 
 var scannerClass = &scannerClass_{
 	matchers: map[col.TokenType]*reg.Regexp{
-		TypeBoolean:     reg.MustCompile(`^(?:` + boolean_ + `)`),
-		TypeComplex:     reg.MustCompile(`^(?:` + complex_ + `)`),
-		TypeContext:     reg.MustCompile(`^(?:` + context_ + `)`),
-		TypeDelimiter:   reg.MustCompile(`^(?:` + delimiter_ + `)`),
-		TypeEOL:         reg.MustCompile(`^(?:` + eol_ + `)`),
-		TypeFloat:       reg.MustCompile(`^(?:` + float_ + `)`),
-		TypeHexadecimal: reg.MustCompile(`^(?:` + hexadecimal_ + `)`),
-		TypeInteger:     reg.MustCompile(`^(?:` + integer_ + `)`),
-		TypeNil:         reg.MustCompile(`^(?:` + nil_ + `)`),
-		TypeRune:        reg.MustCompile(`^(?:` + rune_ + `)`),
-		TypeSpace:       reg.MustCompile(`^(?:` + space_ + `)`),
-		TypeString:      reg.MustCompile(`^(?:` + string_ + `)`),
+		BooleanToken:     reg.MustCompile(`^(?:` + boolean_ + `)`),
+		ComplexToken:     reg.MustCompile(`^(?:` + complex_ + `)`),
+		ContextToken:     reg.MustCompile(`^(?:` + context_ + `)`),
+		DelimiterToken:   reg.MustCompile(`^(?:` + delimiter_ + `)`),
+		EOLToken:         reg.MustCompile(`^(?:` + eol_ + `)`),
+		FloatToken:       reg.MustCompile(`^(?:` + float_ + `)`),
+		HexadecimalToken: reg.MustCompile(`^(?:` + hexadecimal_ + `)`),
+		IntegerToken:     reg.MustCompile(`^(?:` + integer_ + `)`),
+		NilToken:         reg.MustCompile(`^(?:` + nil_ + `)`),
+		RuneToken:        reg.MustCompile(`^(?:` + rune_ + `)`),
+		SpaceToken:       reg.MustCompile(`^(?:` + space_ + `)`),
+		StringToken:      reg.MustCompile(`^(?:` + string_ + `)`),
 	},
 }
 
@@ -56,7 +56,7 @@ type scannerClass_ struct {
 
 func (c *scannerClass_) Make(
 	source string,
-	tokens chan col.TokenLike,
+	tokens col.QueueLike[col.TokenLike],
 ) col.ScannerLike {
 	var scanner = &scanner_{
 		line:     1,
@@ -70,8 +70,13 @@ func (c *scannerClass_) Make(
 
 // Functions
 
-func (c *scannerClass_) MatchToken(tokenType col.TokenType, text string) []string {
-	return c.matchers[tokenType].FindStringSubmatch(text)
+func (c *scannerClass_) MatchToken(
+	tokenType col.TokenType,
+	text string,
+) col.ListLike[string] {
+	var matcher = c.matchers[tokenType]
+	var matches = matcher.FindStringSubmatch(text)
+	return col.List[string]().MakeFromArray(matches)
 }
 
 // INSTANCE METHODS
@@ -84,7 +89,7 @@ type scanner_ struct {
 	next     int // A zero based index of the next possible rune in the next token.
 	position int // The position in the current line of the next rune.
 	runes    []rune
-	tokens   chan col.TokenLike
+	tokens   col.QueueLike[col.TokenLike]
 }
 
 // Private
@@ -111,28 +116,29 @@ func (v *scanner_) emitToken(tokenType col.TokenType) {
 	}
 	var token = Token().Make(v.line, v.position, tokenType, tokenValue)
 	//fmt.Println(token) // Uncomment when debugging.
-	v.tokens <- token
+	v.tokens.AddValue(token) // Will block if queue is full.
 }
 
 func (v *scanner_) foundEOF() {
-	v.emitToken(TypeEOF)
+	v.emitToken(EOFToken)
 }
 
 func (v *scanner_) foundError() {
 	v.next++
-	v.emitToken(TypeError)
+	v.emitToken(ErrorToken)
 }
 
 func (v *scanner_) foundToken(tokenType col.TokenType) bool {
 	var text = string(v.runes[v.next:])
 	var matches = Scanner().MatchToken(tokenType, text)
-	if len(matches) > 0 {
-		var token = []rune(matches[0])
+	if !matches.IsEmpty() {
+		var match = matches.GetValue(1)
+		var token = []rune(match)
 		v.next += len(token)
-		if tokenType != TypeSpace {
+		if tokenType != SpaceToken {
 			v.emitToken(tokenType)
 		}
-		var count = sts.Count(matches[0], "\n")
+		var count = sts.Count(match, "\n")
 		if count > 0 {
 			v.line += count
 			v.position = v.indexOfLastEOL(token)
@@ -159,25 +165,25 @@ func (v *scanner_) scanTokens() {
 loop:
 	for v.next < len(v.runes) {
 		switch {
-		case v.foundToken(TypeBoolean):
-		case v.foundToken(TypeComplex):
-		case v.foundToken(TypeContext):
-		case v.foundToken(TypeDelimiter):
-		case v.foundToken(TypeEOL):
-		case v.foundToken(TypeFloat):
-		case v.foundToken(TypeHexadecimal):
-		case v.foundToken(TypeInteger):
-		case v.foundToken(TypeNil):
-		case v.foundToken(TypeRune):
-		case v.foundToken(TypeSpace):
-		case v.foundToken(TypeString):
+		case v.foundToken(BooleanToken):
+		case v.foundToken(ComplexToken):
+		case v.foundToken(ContextToken):
+		case v.foundToken(DelimiterToken):
+		case v.foundToken(EOLToken):
+		case v.foundToken(FloatToken):
+		case v.foundToken(HexadecimalToken):
+		case v.foundToken(IntegerToken):
+		case v.foundToken(NilToken):
+		case v.foundToken(RuneToken):
+		case v.foundToken(SpaceToken):
+		case v.foundToken(StringToken):
 		default:
 			v.foundError()
 			break loop
 		}
 	}
 	v.foundEOF()
-	close(v.tokens)
+	v.tokens.CloseQueue()
 }
 
 /*

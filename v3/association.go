@@ -12,6 +12,7 @@ package collections
 
 import (
 	fmt "fmt"
+	syn "sync"
 )
 
 // CLASS ACCESS
@@ -19,6 +20,7 @@ import (
 // Reference
 
 var associationClass = map[string]any{}
+var associationMutex syn.Mutex
 
 // Function
 
@@ -28,6 +30,7 @@ func Association[K Key, V Value]() AssociationClassLike[K, V] {
 	var name = fmt.Sprintf("%T", class)
 
 	// Check for existing bound class type.
+	associationMutex.Lock()
 	var value = associationClass[name]
 	switch actual := value.(type) {
 	case *associationClass_[K, V]:
@@ -40,6 +43,7 @@ func Association[K Key, V Value]() AssociationClassLike[K, V] {
 		}
 		associationClass[name] = class
 	}
+	associationMutex.Unlock()
 
 	// Return a reference to the bound class type.
 	return class

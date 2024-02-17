@@ -40,18 +40,18 @@ import (
 This enumerated type represents all possible values for a CDCN token type.
 */
 const (
-	TypeError col.TokenType = iota
-	TypeBoolean
-	TypeComplex
-	TypeContext
-	TypeDelimiter
-	TypeEOF
-	TypeEOL
-	TypeFloat
-	TypeHexadecimal
-	TypeInteger
-	TypeNil
-	TypeRune
-	TypeSpace
-	TypeString
+	ErrorToken col.TokenType = iota
+	BooleanToken
+	ComplexToken
+	ContextToken
+	DelimiterToken
+	EOFToken
+	EOLToken
+	FloatToken
+	HexadecimalToken
+	IntegerToken
+	NilToken
+	RuneToken
+	SpaceToken
+	StringToken
 )

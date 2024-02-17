@@ -20,6 +20,7 @@ import (
 // Reference
 
 var queueClass = map[string]any{}
+var queueMutex syn.Mutex
 
 // Function
 
@@ -29,6 +30,7 @@ func Queue[V Value]() QueueClassLike[V] {
 	var name = fmt.Sprintf("%T", class)
 
 	// Check for existing bound class type.
+	queueMutex.Lock()
 	var value = queueClass[name]
 	switch actual := value.(type) {
 	case *queueClass_[V]:
@@ -41,6 +43,7 @@ func Queue[V Value]() QueueClassLike[V] {
 		}
 		queueClass[name] = class
 	}
+	queueMutex.Unlock()
 
 	// Return a reference to the bound class type.
 	return class

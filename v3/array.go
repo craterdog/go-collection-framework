@@ -12,6 +12,7 @@ package collections
 
 import (
 	fmt "fmt"
+	syn "sync"
 )
 
 // CLASS ACCESS
@@ -19,6 +20,7 @@ import (
 // Reference
 
 var arrayClass = map[string]any{}
+var arrayMutex syn.Mutex
 
 // Function
 
@@ -28,6 +30,7 @@ func Array[V Value]() ArrayClassLike[V] {
 	var name = fmt.Sprintf("%T", class)
 
 	// Check for existing bound class type.
+	arrayMutex.Lock()
 	var value = arrayClass[name]
 	switch actual := value.(type) {
 	case *arrayClass_[V]:
@@ -40,6 +43,7 @@ func Array[V Value]() ArrayClassLike[V] {
 		}
 		arrayClass[name] = class
 	}
+	arrayMutex.Unlock()
 
 	// Return a reference to the bound class type.
 	return class

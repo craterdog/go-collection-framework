@@ -426,10 +426,10 @@ that must be supported by all scanner-class-like classes.
 */
 type ScannerClassLike interface {
 	// Constructors
-	Make(document string, tokens chan TokenLike) ScannerLike
+	Make(document string, tokens QueueLike[TokenLike]) ScannerLike
 
 	// Functions
-	MatchToken(tokenType TokenType, text string) []string
+	MatchToken(tokenType TokenType, text string) ListLike[string]
 }
 
 /*
@@ -702,7 +702,6 @@ ScannerLike defines the set of abstractions and methods that must be supported
 by all scanner-like instances.
 */
 type ScannerLike interface {
-	// Methods
 }
 
 /*

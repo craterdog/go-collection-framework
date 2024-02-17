@@ -12,6 +12,7 @@ package collections
 
 import (
 	fmt "fmt"
+	syn "sync"
 )
 
 // CLASS ACCESS
@@ -19,6 +20,7 @@ import (
 // Reference
 
 var catalogClass = map[string]any{}
+var catalogMutex syn.Mutex
 
 // Function
 
@@ -28,6 +30,7 @@ func Catalog[K comparable, V Value]() CatalogClassLike[K, V] {
 	var name = fmt.Sprintf("%T", class)
 
 	// Check for existing bound class type.
+	catalogMutex.Lock()
 	var value = catalogClass[name]
 	switch actual := value.(type) {
 	case *catalogClass_[K, V]:
@@ -40,6 +43,7 @@ func Catalog[K comparable, V Value]() CatalogClassLike[K, V] {
 		}
 		catalogClass[name] = class
 	}
+	catalogMutex.Unlock()
 
 	// Return a reference to the bound class type.
 	return class

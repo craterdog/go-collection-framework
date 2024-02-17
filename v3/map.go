@@ -12,6 +12,7 @@ package collections
 
 import (
 	fmt "fmt"
+	syn "sync"
 )
 
 // CLASS ACCESS
@@ -19,6 +20,7 @@ import (
 // Reference
 
 var mapClass = map[string]any{}
+var mapMutex syn.Mutex
 
 // Function
 
@@ -28,6 +30,7 @@ func Map[K comparable, V Value]() MapClassLike[K, V] {
 	var name = fmt.Sprintf("%T", class)
 
 	// Check for existing bound class type.
+	mapMutex.Lock()
 	var value = mapClass[name]
 	switch actual := value.(type) {
 	case *mapClass_[K, V]:
@@ -40,6 +43,7 @@ func Map[K comparable, V Value]() MapClassLike[K, V] {
 		}
 		mapClass[name] = class
 	}
+	mapMutex.Unlock()
 
 	// Return a reference to the bound class type.
 	return class

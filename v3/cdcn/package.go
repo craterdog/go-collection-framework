@@ -14,12 +14,12 @@ notation-like abstract class for parsing and formatting source files containing
 Crater Dog Collection Notation™ (CDCN).  The complete language grammar for CDCN
 is located here:
 
-	https://github.com/craterdog/go-collection-framework/blob/main/v3/cdcn/grammar.cdcn
+  - https://github.com/craterdog/go-collection-framework/blob/main/v3/cdcn/grammar.cdcn
 
 This package follows the Crater Dog Technologies™ (craterdog) Go Coding
 Conventions located here:
 
-	https://github.com/craterdog/go-coding-conventions/wiki
+  - https://github.com/craterdog/go-coding-conventions/wiki
 
 Additional implementations of the classes provided by this package can be
 developed and used seamlessly since the interface definitions only depend on

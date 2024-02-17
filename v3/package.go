@@ -23,12 +23,12 @@ abstractions:
 
 For detailed documentation on this package refer to the wiki:
 
-	https://github.com/craterdog/go-collection-framework/wiki
+  - https://github.com/craterdog/go-collection-framework/wiki
 
 This package follows the Crater Dog Technologies™ (craterdog) Go Coding
 Conventions located here:
 
-	https://github.com/craterdog/go-coding-conventions/wiki
+  - https://github.com/craterdog/go-coding-conventions/wiki
 
 Additional implementations of the classes provided by this package can be
 developed and used seamlessly since the interface definitions only depend on

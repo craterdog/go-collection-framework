@@ -22,12 +22,10 @@ abstractions:
   - Queue (a blocking FIFO)
 
 For detailed documentation on this package refer to the wiki:
-
   - https://github.com/craterdog/go-collection-framework/wiki
 
 This package follows the Crater Dog Technologies™ (craterdog) Go Coding
 Conventions located here:
-
   - https://github.com/craterdog/go-coding-conventions/wiki
 
 Additional implementations of the classes provided by this package can be
@@ -607,8 +605,7 @@ IteratorLike[V Value] defines the set of abstractions and methods that must be
 supported by all iterator-like instances.  An iterator-like class can be used to
 move forward and backward over the values in a sequence.  It implements the Gang
 of Four (GoF) Iterator Design Pattern:
-
-	https://en.wikipedia.org/wiki/Iterator_pattern
+  - https://en.wikipedia.org/wiki/Iterator_pattern
 
 A iterator agent locks into the slots that reside between each value in the
 sequence:

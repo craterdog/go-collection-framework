@@ -268,7 +268,16 @@ type AssociationClassLike[K Key, V Value] interface {
 /*
 CatalogClassLike[K comparable, V Value] defines the set of class constants,
 constructors and functions that must be supported by all catalog-class-like
-classes.
+classes.  The following functions are supported:
+
+Extract() returns a new catalog containing only the associations that are in
+the specified catalog that have the specified keys.  The associations in the
+resulting catalog will be in the same order as the specified keys.
+
+Merge() returns a new catalog containing all of the associations that are in
+the specified Catalogs in the order that they appear in each catalog.  If a
+key is present in both Catalogs, the value of the key from the second
+catalog takes precedence.
 */
 type CatalogClassLike[K comparable, V Value] interface {
 	// Constructors
@@ -279,16 +288,7 @@ type CatalogClassLike[K comparable, V Value] interface {
 	MakeFromSource(source string, notation NotationLike) CatalogLike[K, V]
 
 	// Functions
-
-	// Extract returns a new catalog containing only the associations that are in
-	// the specified catalog that have the specified keys.  The associations in the
-	// resulting catalog will be in the same order as the specified keys.
 	Extract(catalog CatalogLike[K, V], keys Sequential[K]) CatalogLike[K, V]
-
-	// Merge returns a new catalog containing all of the associations that are in
-	// the specified Catalogs in the order that they appear in each catalog.  If a
-	// key is present in both Catalogs, the value of the key from the second
-	// catalog takes precedence.
 	Merge(first, second CatalogLike[K, V]) CatalogLike[K, V]
 }
 
@@ -329,7 +329,11 @@ type IteratorClassLike[V Value] interface {
 
 /*
 ListClassLike[V Value] defines the set of class constants, constructors and
-functions that must be supported by all list-class-like classes.
+functions that must be supported by all list-class-like classes.  The following
+functions are supported:
+
+Concatenate() combines two lists into a new list containing all values in both
+lists.  The order of the values in each list is preserved in the new list.
 */
 type ListClassLike[V Value] interface {
 	// Constructors
@@ -380,7 +384,29 @@ type ParserClassLike interface {
 
 /*
 QueueClassLike[V Value] defines the set of class constants, constructors and
-functions that must be supported by all queue-class-like classes.
+functions that must be supported by all queue-class-like classes.  The following
+functions are supported:
+
+Fork() connects the output of the specified input Queue with a number of new
+output queues specified by the size parameter and returns a sequence of the new
+output queues. Each value added to the input queue will be added automatically
+to ALL of the output queues. This pattern is useful when a set of DIFFERENT
+operations needs to occur for every value and each operation can be done in
+parallel.
+
+Join() connects the outputs of the specified sequence of input queues with a new
+output queue returns the new output queue. Each value removed from each input
+queue will automatically be added to the output queue.  This pattern is useful
+when the results of the processing with a Split() function need to be
+consolidated into a single queue.
+
+Split() connects the output of the specified input Queue with the number of
+output queues specified by the size parameter and returns a sequence of the new
+output queues. Each value added to the input queue will be added automatically
+to ONE of the output queues. This pattern is useful when a SINGLE operation
+needs to occur for each value and the operation can be done on the values in
+parallel.  The results can then be consolidated later on using the Join()
+function.
 */
 type QueueClassLike[V Value] interface {
 	// Constants
@@ -394,35 +420,28 @@ type QueueClassLike[V Value] interface {
 	MakeWithCapacity(capacity int) QueueLike[V]
 
 	// Functions
-
-	// This public class function connects the output of the specified input Queue
-	// with a number of new output queues specified by the size parameter and
-	// returns a sequence of the new output queues. Each value added to the input
-	// queue will be added automatically to ALL of the output queues. This pattern
-	// is useful when a set of DIFFERENT operations needs to occur for every value
-	// and each operation can be done in parallel.
-	Fork(group Synchronized, input QueueLike[V], size int) Sequential[QueueLike[V]]
-
-	// This public class function connects the outputs of the specified sequence
-	// of input queues with a new output queue returns the new output queue. Each
-	// value removed from each input queue will automatically be added to the
-	// output queue.  This pattern is useful when the results of the processing
-	// with a Split() function need to be consolidated into a single queue.
+	Fork(
+		group Synchronized,
+		input QueueLike[V],
+		size int,
+	) Sequential[QueueLike[V]]
 	Join(group Synchronized, inputs Sequential[QueueLike[V]]) QueueLike[V]
-
-	// This public class function connects the output of the specified input Queue
-	// with the number of output queues specified by the size parameter and returns
-	// a sequence of the new output queues. Each value added to the input queue
-	// will be added automatically to ONE of the output queues. This pattern is
-	// useful when a SINGLE operation needs to occur for each value and the
-	// operation can be done on the values in parallel. The results can then be
-	// consolidated later on using the Join() function.
-	Split(group Synchronized, input QueueLike[V], size int) Sequential[QueueLike[V]]
+	Split(
+		group Synchronized,
+		input QueueLike[V],
+		size int,
+	) Sequential[QueueLike[V]]
 }
 
 /*
 ScannerClassLike defines the set of class constants, constructors and functions
-that must be supported by all scanner-class-like classes.
+that must be supported by all scanner-class-like classes.  The following
+functions are supported:
+
+MatchToken() a list of strings representing any matches found in the specified
+text of the specified token type using the regular expression defined for that
+token type.  If the regular expression contains submatch patterns the matching
+substrings are returned as additional values in the list.
 */
 type ScannerClassLike interface {
 	// Constructors
@@ -434,7 +453,20 @@ type ScannerClassLike interface {
 
 /*
 SetClassLike[V Value] defines the set of class constants, constructors and
-functions that must be supported by all set-class-like classes.
+functions that must be supported by all set-class-like classes.  The following
+functions are supported:
+
+And() returns a new set containing the values that are both of the specified
+sets.
+
+Or() returns a new set containing the values that are in either of the specified
+sets.
+
+Sans() returns a new set containing the values that are in the first specified
+set but not in the second specified set.
+
+Xor() returns a new set containing the values that are in the first specified
+set or the second specified set but not both.
 */
 type SetClassLike[V Value] interface {
 	// Constructors
@@ -482,11 +514,18 @@ type StackClassLike[V Value] interface {
 
 /*
 TokenClassLike defines the set of class constants, constructors and functions
-that must be supported by all token-class-like classes.
+that must be supported by all token-class-like classes.  The following functions
+are supported:
+
+AsString() returns a string representing the specified token type.
 */
 type TokenClassLike interface {
 	// Constructors
-	Make(line, position int, tokenType TokenType, tokenValue string) TokenLike
+	Make(
+		line, position int,
+		tokenType TokenType,
+		tokenValue string,
+	) TokenLike
 
 	// Functions
 	AsString(tokenType TokenType) string

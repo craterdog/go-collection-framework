@@ -12,7 +12,6 @@ package cdcn
 
 import (
 	fmt "fmt"
-	col "github.com/craterdog/go-collection-framework/v3"
 )
 
 // CLASS ACCESS
@@ -20,7 +19,7 @@ import (
 // Reference
 
 var tokenClass = &tokenClass_{
-	strings: map[col.TokenType]string{
+	strings: map[TokenType]string{
 		BooleanToken:     "Boolean",
 		ComplexToken:     "Complex",
 		ContextToken:     "Context",
@@ -40,7 +39,7 @@ var tokenClass = &tokenClass_{
 
 // Function
 
-func Token() col.TokenClassLike {
+func Token() TokenClassLike {
 	return tokenClass
 }
 
@@ -49,7 +48,7 @@ func Token() col.TokenClassLike {
 // Target
 
 type tokenClass_ struct {
-	strings map[col.TokenType]string
+	strings map[TokenType]string
 }
 
 // Constructors
@@ -57,9 +56,9 @@ type tokenClass_ struct {
 func (c *tokenClass_) Make(
 	line int,
 	position int,
-	tokenType col.TokenType,
+	tokenType TokenType,
 	tokenValue string,
-) col.TokenLike {
+) TokenLike {
 	var token = &token_{
 		line:       line,
 		position:   position,
@@ -71,7 +70,7 @@ func (c *tokenClass_) Make(
 
 // Functions
 
-func (c *tokenClass_) AsString(tokenType col.TokenType) string {
+func (c *tokenClass_) AsString(tokenType TokenType) string {
 	return c.strings[tokenType]
 }
 
@@ -82,7 +81,7 @@ func (c *tokenClass_) AsString(tokenType col.TokenType) string {
 type token_ struct {
 	line       int // The line number of the token in the source string.
 	position   int // The position in the line of the first rune of the token.
-	tokenType  col.TokenType
+	tokenType  TokenType
 	tokenValue string
 }
 
@@ -111,7 +110,7 @@ func (v *token_) GetPosition() int {
 	return v.position
 }
 
-func (v *token_) GetType() col.TokenType {
+func (v *token_) GetType() TokenType {
 	return v.tokenType
 }
 

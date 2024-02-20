@@ -22,7 +22,7 @@ import (
 // Reference
 
 var scannerClass = &scannerClass_{
-	matchers: map[col.TokenType]*reg.Regexp{
+	matchers: map[TokenType]*reg.Regexp{
 		BooleanToken:     reg.MustCompile(`^(?:` + boolean_ + `)`),
 		ComplexToken:     reg.MustCompile(`^(?:` + complex_ + `)`),
 		ContextToken:     reg.MustCompile(`^(?:` + context_ + `)`),
@@ -40,7 +40,7 @@ var scannerClass = &scannerClass_{
 
 // Function
 
-func Scanner() col.ScannerClassLike {
+func Scanner() ScannerClassLike {
 	return scannerClass
 }
 
@@ -49,15 +49,15 @@ func Scanner() col.ScannerClassLike {
 // Target
 
 type scannerClass_ struct {
-	matchers map[col.TokenType]*reg.Regexp
+	matchers map[TokenType]*reg.Regexp
 }
 
 // Constructors
 
 func (c *scannerClass_) Make(
 	source string,
-	tokens col.QueueLike[col.TokenLike],
-) col.ScannerLike {
+	tokens col.QueueLike[TokenLike],
+) ScannerLike {
 	var scanner = &scanner_{
 		line:     1,
 		position: 1,
@@ -71,7 +71,7 @@ func (c *scannerClass_) Make(
 // Functions
 
 func (c *scannerClass_) MatchToken(
-	tokenType col.TokenType,
+	tokenType TokenType,
 	text string,
 ) col.ListLike[string] {
 	var matcher = c.matchers[tokenType]
@@ -89,12 +89,12 @@ type scanner_ struct {
 	next     int // A zero based index of the next possible rune in the next token.
 	position int // The position in the current line of the next rune.
 	runes    []rune
-	tokens   col.QueueLike[col.TokenLike]
+	tokens   col.QueueLike[TokenLike]
 }
 
 // Private
 
-func (v *scanner_) emitToken(tokenType col.TokenType) {
+func (v *scanner_) emitToken(tokenType TokenType) {
 	var tokenValue = string(v.runes[v.first:v.next])
 	switch tokenValue {
 	case "\x00":
@@ -128,7 +128,7 @@ func (v *scanner_) foundError() {
 	v.emitToken(ErrorToken)
 }
 
-func (v *scanner_) foundToken(tokenType col.TokenType) bool {
+func (v *scanner_) foundToken(tokenType TokenType) bool {
 	var text = string(v.runes[v.next:])
 	var matches = Scanner().MatchToken(tokenType, text)
 	if !matches.IsEmpty() {

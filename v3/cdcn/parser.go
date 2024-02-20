@@ -29,7 +29,7 @@ var parserClass = &parserClass_{
 
 // Function
 
-func Parser() col.ParserClassLike {
+func Parser() ParserClassLike {
 	return parserClass
 }
 
@@ -44,9 +44,9 @@ type parserClass_ struct {
 
 // Constructors
 
-func (c *parserClass_) Make() col.ParserLike {
+func (c *parserClass_) Make() ParserLike {
 	var parser = &parser_{
-		next: col.Stack[col.TokenLike]().MakeWithCapacity(c.stackSize),
+		next: col.Stack[TokenLike]().MakeWithCapacity(c.stackSize),
 	}
 	return parser
 }
@@ -56,9 +56,9 @@ func (c *parserClass_) Make() col.ParserLike {
 // Target
 
 type parser_ struct {
-	next   col.StackLike[col.TokenLike] // A stack of unprocessed retrieved tokens.
+	next   col.StackLike[TokenLike] // A stack of unprocessed retrieved tokens.
 	source string                       // The original source code.
-	tokens col.QueueLike[col.TokenLike] // A queue of unread tokens from the scanner.
+	tokens col.QueueLike[TokenLike] // A queue of unread tokens from the scanner.
 }
 
 // Public
@@ -66,7 +66,7 @@ type parser_ struct {
 func (v *parser_) ParseSource(source string) col.Collection {
 	// The scanner runs in a separate Go routine.
 	v.source = source
-	v.tokens = col.Queue[col.TokenLike]().MakeWithCapacity(parserClass.queueSize)
+	v.tokens = col.Queue[TokenLike]().MakeWithCapacity(parserClass.queueSize)
 	Scanner().Make(v.source, v.tokens)
 
 	// Parse the tokens from the scanner.
@@ -97,7 +97,7 @@ func (v *parser_) ParseSource(source string) col.Collection {
 This private class method returns an error message containing the context for a
 parsing error.
 */
-func (v *parser_) formatError(token col.TokenLike) string {
+func (v *parser_) formatError(token TokenLike) string {
 	var message = fmt.Sprintf(
 		"An unexpected token was received by the parser: %v\n",
 		token,
@@ -147,8 +147,8 @@ func (v *parser_) generateGrammar(expected string, symbols ...string) string {
 This private class method attempts to read the next token from the token
 stream and return it.
 */
-func (v *parser_) getNextToken() col.TokenLike {
-	var next col.TokenLike
+func (v *parser_) getNextToken() TokenLike {
+	var next TokenLike
 	if v.next.IsEmpty() {
 		var token, ok = v.tokens.RemoveHead() // Will block if queue is empty.
 		if !ok {
@@ -167,7 +167,7 @@ func (v *parser_) getNextToken() col.TokenLike {
 
 func (v *parser_) parseAssociation() (
 	association col.AssociationLike[col.Key, col.Value],
-	token col.TokenLike,
+	token TokenLike,
 	ok bool,
 ) {
 	var key col.Key
@@ -197,7 +197,7 @@ func (v *parser_) parseAssociation() (
 
 func (v *parser_) parseAssociations() (
 	associations col.CatalogLike[col.Key, col.Value],
-	token col.TokenLike,
+	token TokenLike,
 	ok bool,
 ) {
 	var association col.AssociationLike[col.Key, col.Value]
@@ -263,7 +263,7 @@ func (v *parser_) parseAssociations() (
 
 func (v *parser_) parseCollection() (
 	collection col.Collection,
-	token col.TokenLike,
+	token TokenLike,
 	ok bool,
 ) {
 	var context string
@@ -374,7 +374,7 @@ func (v *parser_) parseCollection() (
 
 func (v *parser_) parseKey() (
 	key col.Key,
-	token col.TokenLike,
+	token TokenLike,
 	ok bool,
 ) {
 	var primitive col.Primitive
@@ -385,7 +385,7 @@ func (v *parser_) parseKey() (
 
 func (v *parser_) parsePrimitive() (
 	primitive col.Primitive,
-	token col.TokenLike,
+	token TokenLike,
 	ok bool,
 ) {
 	_, token, ok = v.parseToken(BooleanToken, "")
@@ -434,9 +434,9 @@ func (v *parser_) parsePrimitive() (
 	return primitive, token, ok
 }
 
-func (v *parser_) parseToken(expectedType col.TokenType, expectedValue string) (
+func (v *parser_) parseToken(expectedType TokenType, expectedValue string) (
 	value string,
-	token col.TokenLike,
+	token TokenLike,
 	ok bool,
 ) {
 	token = v.getNextToken()
@@ -453,7 +453,7 @@ func (v *parser_) parseToken(expectedType col.TokenType, expectedValue string) (
 
 func (v *parser_) parseValue() (
 	value col.Value,
-	token col.TokenLike,
+	token TokenLike,
 	ok bool,
 ) {
 	value, token, ok = v.parsePrimitive()
@@ -469,7 +469,7 @@ func (v *parser_) parseValue() (
 
 func (v *parser_) parseValues() (
 	values col.ListLike[col.Value],
-	token col.TokenLike,
+	token TokenLike,
 	ok bool,
 ) {
 	var value col.Value
@@ -533,7 +533,7 @@ func (v *parser_) parseValues() (
 	return values, token, true
 }
 
-func (v *parser_) putBack(token col.TokenLike) {
+func (v *parser_) putBack(token TokenLike) {
 	v.next.AddValue(token)
 }
 

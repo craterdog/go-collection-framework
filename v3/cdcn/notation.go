@@ -66,7 +66,7 @@ func (c *notationClass_) MakeWithDepth(depth int) col.NotationLike {
 
 type notation_ struct {
 	formatter col.FormatterLike
-	parser    col.ParserLike
+	parser    ParserLike
 }
 
 // Public

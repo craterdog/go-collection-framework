@@ -63,7 +63,7 @@ type Value any
 TokenType is a specialized type representing any token type recognized by a
 scanner.
 */
-type TokenType int64
+type TokenType uint8
 
 // Functionals
 

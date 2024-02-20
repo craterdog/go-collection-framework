@@ -57,7 +57,7 @@ func (c *parserClass_) Make() ParserLike {
 
 type parser_ struct {
 	next   col.StackLike[TokenLike] // A stack of unprocessed retrieved tokens.
-	source string                       // The original source code.
+	source string                   // The original source code.
 	tokens col.QueueLike[TokenLike] // A queue of unread tokens from the scanner.
 }
 

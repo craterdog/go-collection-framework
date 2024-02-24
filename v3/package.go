@@ -55,6 +55,12 @@ Primitive is a generic type representing any type of Go primitive value.
 type Primitive any
 
 /*
+TokenType is a specialized type representing any token type recognized by a
+scanner.
+*/
+type TokenType uint8
+
+/*
 Value is a generic type representing any type of value.
 */
 type Value any
@@ -366,6 +372,15 @@ type NotationClassLike interface {
 }
 
 /*
+ParserClassLike defines the set of class constants, constructors and functions
+that must be supported by all parser-class-like classes.
+*/
+type ParserClassLike interface {
+	// Constructors
+	Make() ParserLike
+}
+
+/*
 QueueClassLike[V Value] defines the set of class constants, constructors and
 functions that must be supported by all queue-class-like classes.  The following
 functions are supported:
@@ -414,6 +429,24 @@ type QueueClassLike[V Value] interface {
 		input QueueLike[V],
 		size int,
 	) Sequential[QueueLike[V]]
+}
+
+/*
+ScannerClassLike defines the set of class constants, constructors and functions
+that must be supported by all scanner-class-like classes.  The following
+functions are supported:
+
+MatchToken() a list of strings representing any matches found in the specified
+text of the specified token type using the regular expression defined for that
+token type.  If the regular expression contains submatch patterns the matching
+substrings are returned as additional values in the list.
+*/
+type ScannerClassLike interface {
+	// Constructors
+	Make(document string, tokens QueueLike[TokenLike]) ScannerLike
+
+	// Functions
+	MatchToken(tokenType TokenType, text string) ListLike[string]
 }
 
 /*
@@ -475,6 +508,25 @@ type StackClassLike[V Value] interface {
 	MakeFromSequence(values Sequential[V]) StackLike[V]
 	MakeFromSource(source string, notation NotationLike) StackLike[V]
 	MakeWithCapacity(capacity int) StackLike[V]
+}
+
+/*
+TokenClassLike defines the set of class constants, constructors and functions
+that must be supported by all token-class-like classes.  The following functions
+are supported:
+
+AsString() returns a string representing the specified token type.
+*/
+type TokenClassLike interface {
+	// Constructors
+	Make(
+		line, position int,
+		tokenType TokenType,
+		tokenValue string,
+	) TokenLike
+
+	// Functions
+	AsString(tokenType TokenType) string
 }
 
 // Instances
@@ -549,6 +601,15 @@ type CollatorLike interface {
 }
 
 /*
+FormatterLike defines the set of abstractions and methods that must be supported
+by all formatter-like instances.
+*/
+type FormatterLike interface {
+	// Methods
+	FormatCollection(collection Collection) string
+}
+
+/*
 IteratorLike[V Value] defines the set of abstractions and methods that must be
 supported by all iterator-like instances.  An iterator-like class can be used to
 move forward and backward over the values in a sequence.  It implements the Gang
@@ -583,15 +644,6 @@ type IteratorLike[V Value] interface {
 	ToEnd()
 	ToSlot(slot int)
 	ToStart()
-}
-
-/*
-FormatterLike defines the set of abstractions and methods that must be supported
-by all formatter-like instances.
-*/
-type FormatterLike interface {
-	// Methods
-	FormatCollection(collection Collection) string
 }
 
 /*
@@ -650,6 +702,15 @@ type NotationLike interface {
 }
 
 /*
+ParserLike defines the set of abstractions and methods that must be supported by
+all parser-like instances.
+*/
+type ParserLike interface {
+	// Methods
+	ParseSource(source string) Collection
+}
+
+/*
 QueueLike[V Value] defines the set of abstractions and methods that must be
 supported by all queue-like instances.  A queue-like class implements FIFO
 (i.e.  first-in-first-out) semantics.
@@ -670,6 +731,13 @@ type QueueLike[V Value] interface {
 	// Methods
 	CloseQueue()
 	RemoveHead() (head V, ok bool)
+}
+
+/*
+ScannerLike defines the set of abstractions and methods that must be supported
+by all scanner-like instances.
+*/
+type ScannerLike interface {
 }
 
 /*
@@ -730,4 +798,16 @@ type StackLike[V Value] interface {
 
 	// Methods
 	RemoveTop() V
+}
+
+/*
+TokenLike defines the set of abstractions and methods that must be supported by
+all token-like instances.
+*/
+type TokenLike interface {
+	// Methods
+	GetLine() int
+	GetPosition() int
+	GetType() TokenType
+	GetValue() string
 }

@@ -167,7 +167,6 @@ number of values in the sequence.
 type Limited[V Value] interface {
 	// Methods
 	AddValue(value V)
-	GetCapacity() int
 	RemoveAll()
 }
 
@@ -287,7 +286,7 @@ type CatalogClassLike[K comparable, V Value] interface {
 
 	// Functions
 	Extract(catalog CatalogLike[K, V], keys Sequential[K]) CatalogLike[K, V]
-	Merge(first, second CatalogLike[K, V]) CatalogLike[K, V]
+	Merge(first CatalogLike[K, V], second CatalogLike[K, V]) CatalogLike[K, V]
 }
 
 /*
@@ -341,7 +340,7 @@ type ListClassLike[V Value] interface {
 	MakeFromSource(source string, notation NotationLike) ListLike[V]
 
 	// Functions
-	Concatenate(first, second ListLike[V]) ListLike[V]
+	Concatenate(first ListLike[V], second ListLike[V]) ListLike[V]
 }
 
 /*
@@ -475,10 +474,10 @@ type SetClassLike[V Value] interface {
 	MakeWithCollator(collator CollatorLike) SetLike[V]
 
 	// Functions
-	And(first, second SetLike[V]) SetLike[V]
-	Or(first, second SetLike[V]) SetLike[V]
-	Sans(first, second SetLike[V]) SetLike[V]
-	Xor(first, second SetLike[V]) SetLike[V]
+	And(first SetLike[V], second SetLike[V]) SetLike[V]
+	Or(first SetLike[V], second SetLike[V]) SetLike[V]
+	Sans(first SetLike[V], second SetLike[V]) SetLike[V]
+	Xor(first SetLike[V], second SetLike[V]) SetLike[V]
 }
 
 /*
@@ -520,7 +519,8 @@ AsString() returns a string representing the specified token type.
 type TokenClassLike interface {
 	// Constructors
 	Make(
-		line, position int,
+		line int,
+		position int,
 		tokenType TokenType,
 		tokenValue string,
 	) TokenLike
@@ -724,6 +724,9 @@ maximum length and will block on attempts to add a value it is full.  It will
 also block on attempts to remove a value when it is empty.
 */
 type QueueLike[V Value] interface {
+	// Attributes
+	GetCapacity() int
+
 	// Abstractions
 	Limited[V]
 	Sequential[V]
@@ -751,14 +754,14 @@ This type is parameterized as follows:
 The order of the values is determined by a configurable RankingFunction.
 */
 type SetLike[V Value] interface {
+	// Attributes
+	GetCollator() CollatorLike
+
 	// Abstractions
 	Accessible[V]
 	Flexible[V]
 	Searchable[V]
 	Sequential[V]
-
-	// Methods
-	GetCollator() CollatorLike
 }
 
 /*
@@ -773,11 +776,11 @@ A sorter-like class uses a ranking function to order the values.  If no ranking
 function is specified the values are sorted into their natural order.
 */
 type SorterLike[V Value] interface {
+	// Attributes
+	GetRanker() RankingFunction
+
 	// Abstractions
 	Systematic[V]
-
-	// Methods
-	GetRanker() RankingFunction
 }
 
 /*
@@ -792,6 +795,9 @@ A stack-like class enforces a maximum depth and will panic if that depth is
 exceeded.  It will also panic on attempts to remove a value when it is empty.
 */
 type StackLike[V Value] interface {
+	// Attributes
+	GetCapacity() int
+
 	// Abstractions
 	Limited[V]
 	Sequential[V]

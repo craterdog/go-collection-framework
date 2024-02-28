@@ -98,7 +98,8 @@ AsString() returns a string representing the specified token type.
 type TokenClassLike interface {
 	// Constructors
 	Make(
-		line, position int,
+		line int,
+		position int,
 		tokenType TokenType,
 		tokenValue string,
 	) TokenLike
@@ -130,7 +131,7 @@ TokenLike defines the set of abstractions and methods that must be supported by
 all token-like instances.
 */
 type TokenLike interface {
-	// Methods
+	// Attributes
 	GetLine() int
 	GetPosition() int
 	GetType() TokenType

@@ -40,7 +40,7 @@ JSON to be added later in their own sub-packages.
 Each exported class defined in the collection framework now has an associated
 class scope.  All _constants_, _constructors_ and _class functions_ are now
 accessed via its class access function.  See the latest
-[Crater Dog Technologies™ Go Coding Conventions](https://github.com/craterdog/go-coding-conventions/wiki#class-namespaces)
+[Crater Dog Technologies™ Go Coding Conventions](https://github.com/craterdog/go-class-framework/wiki#class-namespaces)
 for more details on this class-based model.
 
 ### Fully Encapsulated `Array[V]` and `Map[K, V]` Classes 

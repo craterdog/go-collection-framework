@@ -27,13 +27,12 @@ When you decide to help address one of the tickets for this project, do the
 following:
  1. Create a [fork](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks) of the current main repository.
  1. Add unit tests that will verify the correctness of the code changes and any
- new code.
+    new code.
  1. Make the changes to the existing code and add any new code that is required.
- 1. Make sure that all code changes and new code meet the
- [coding conventions](https://github.com/craterdog/go-coding-conventions/wiki)
-   and that all unit tests pass.
- 1. Create a [pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request) for your proposed
- changes.
+ 1. Make sure that all code changes and new code meet the coding conventions for
+    the [class framework](https://github.com/craterdog/go-class-framework/wiki)
+    and that all unit tests pass.
+ 1. Create a [pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request) for your proposed changes.
  1. We will review the pull request and then merge the changes into the main branch.
 
 ### Project Related Discussions

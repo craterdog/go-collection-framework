@@ -22,7 +22,7 @@ import (
 // Reference
 
 var formatterClass = &formatterClass_{
-	defaultDepth: 8,
+	defaultMaximum_: 8,
 }
 
 // Function
@@ -45,26 +45,30 @@ func Formatter() FormatterClassLike {
 // Target
 
 type formatterClass_ struct {
-	defaultDepth int
+	defaultMaximum_ int
 }
 
 // Constants
 
-func (c *formatterClass_) DefaultDepth() int {
-	return c.defaultDepth
+func (c *formatterClass_) DefaultMaximum() int {
+	return c.defaultMaximum_
 }
 
 // Constructors
 
 func (c *formatterClass_) Make() FormatterLike {
-	return c.MakeWithDepth(c.defaultDepth)
+	return &formatter_{
+		maximum_: c.defaultMaximum_,
+	}
 }
 
-func (c *formatterClass_) MakeWithDepth(depth int) FormatterLike {
-	var formatter = &formatter_{
-		maximum: depth,
+func (c *formatterClass_) MakeWithMaximum(maximum int) FormatterLike {
+	if maximum < 0 {
+		maximum = c.defaultMaximum_
 	}
-	return formatter
+	return &formatter_{
+		maximum_: maximum,
+	}
 }
 
 // INSTANCE METHODS
@@ -72,9 +76,19 @@ func (c *formatterClass_) MakeWithDepth(depth int) FormatterLike {
 // Target
 
 type formatter_ struct {
-	depth   int
-	maximum int
-	result  sts.Builder
+	depth_   int
+	maximum_ int
+	result_  sts.Builder
+}
+
+// Attributes
+
+func (v *formatter_) GetDepth() int {
+	return v.depth_
+}
+
+func (v *formatter_) GetMaximum() int {
+	return v.maximum_
 }
 
 // Public
@@ -88,15 +102,15 @@ func (v *formatter_) FormatCollection(collection Collection) string {
 // Private
 
 func (v *formatter_) appendString(s string) {
-	v.result.WriteString(s)
+	v.result_.WriteString(s)
 }
 
 func (v *formatter_) appendNewline() {
 	var separator = "\n"
-	for level := 0; level < v.depth; level++ {
+	for level := 0; level < v.depth_; level++ {
 		separator += "    "
 	}
-	v.result.WriteString(separator)
+	v.result_.WriteString(separator)
 }
 
 /*
@@ -170,7 +184,7 @@ func (v *formatter_) formatValue(value any) {
 func (v *formatter_) formatArray(array ref.Value) {
 	var size = array.Len()
 	switch {
-	case v.depth == v.maximum:
+	case v.depth_ == v.maximum_:
 		// Truncate the recursion.
 		v.appendString("...")
 	case size == 0:
@@ -179,13 +193,13 @@ func (v *formatter_) formatArray(array ref.Value) {
 		var value = array.Index(0)
 		v.formatValue(value.Interface())
 	default:
-		v.depth++
+		v.depth_++
 		for i := 0; i < size; i++ {
 			v.appendNewline()
 			var value = array.Index(i)
 			v.formatValue(value.Interface())
 		}
-		v.depth--
+		v.depth_--
 		v.appendNewline()
 	}
 }
@@ -194,7 +208,7 @@ func (v *formatter_) formatMap(map_ ref.Value) {
 	var keys = map_.MapKeys()
 	var size = len(keys)
 	switch {
-	case v.depth == v.maximum:
+	case v.depth_ == v.maximum_:
 		// Truncate the recursion.
 		v.appendString("...")
 	case size == 0:
@@ -206,7 +220,7 @@ func (v *formatter_) formatMap(map_ ref.Value) {
 		v.appendString(": ")
 		v.formatValue(value.Interface())
 	default:
-		v.depth++
+		v.depth_++
 		for i := 0; i < size; i++ {
 			v.appendNewline()
 			var key = keys[i]
@@ -215,7 +229,7 @@ func (v *formatter_) formatMap(map_ ref.Value) {
 			v.appendString(": ")
 			v.formatValue(value.Interface())
 		}
-		v.depth--
+		v.depth_--
 		v.appendNewline()
 	}
 }
@@ -276,7 +290,7 @@ func (v *formatter_) formatSequence(sequence ref.Value) {
 	var iterator = sequence.MethodByName("GetIterator").Call([]ref.Value{})[0]
 	var size = sequence.MethodByName("GetSize").Call([]ref.Value{})[0].Interface()
 	switch {
-	case v.depth == v.maximum:
+	case v.depth_ == v.maximum_:
 		// Truncate the recursion.
 		v.appendString("...")
 	case size == 0:
@@ -289,13 +303,13 @@ func (v *formatter_) formatSequence(sequence ref.Value) {
 		var value = iterator.MethodByName("GetNext").Call([]ref.Value{})[0]
 		v.formatValue(value.Interface())
 	default:
-		v.depth++
+		v.depth_++
 		for iterator.MethodByName("HasNext").Call([]ref.Value{})[0].Interface().(bool) {
 			v.appendNewline()
 			var value = iterator.MethodByName("GetNext").Call([]ref.Value{})[0]
 			v.formatValue(value.Interface())
 		}
-		v.depth--
+		v.depth_--
 		v.appendNewline()
 	}
 }
@@ -322,8 +336,8 @@ func (v *formatter_) formatCollection(collection ref.Value) {
 }
 
 func (v *formatter_) getResult() string {
-	var result = v.result.String()
-	v.result.Reset()
+	var result = v.result_.String()
+	v.result_.Reset()
 	return result
 }
 

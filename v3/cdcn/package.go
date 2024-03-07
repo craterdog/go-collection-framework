@@ -13,7 +13,7 @@ Package cdcn defines a set of classes that provide an implementation of the
 notation-like abstract class for parsing and formatting source files containing
 Crater Dog Collection Notation™ (CDCN).  The complete language grammar for CDCN
 is located here:
-  - https://github.com/craterdog/go-collection-framework/blob/main/v3/cdcn/grammar.cdcn
+  - https://github.com/craterdog/go-collection-framework/blob/main/v3/cdcn/grammar.cdsn
 
 This package follows the Crater Dog Technologies™ (craterdog) Go Coding
 Conventions located here:
@@ -82,10 +82,10 @@ substrings are returned as additional values in the list.
 */
 type ScannerClassLike interface {
 	// Constructors
-	Make(document string, tokens col.QueueLike[TokenLike]) ScannerLike
+	MakeFromSource(source string, tokens col.QueueLike[TokenLike]) ScannerLike
 
 	// Functions
-	MatchToken(tokenType TokenType, text string) col.ListLike[string]
+	MatchToken(type_ TokenType, text string) col.ListLike[string]
 }
 
 /*
@@ -97,15 +97,15 @@ AsString() returns a string representing the specified token type.
 */
 type TokenClassLike interface {
 	// Constructors
-	Make(
-		line int,
-		position int,
-		tokenType TokenType,
-		tokenValue string,
+	MakeWithAttributes(
+		line_ int,
+		position_ int,
+		type_ TokenType,
+		value_ string,
 	) TokenLike
 
 	// Functions
-	AsString(tokenType TokenType) string
+	AsString(type_ TokenType) string
 }
 
 // Instances

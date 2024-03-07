@@ -16,22 +16,22 @@ import (
 	tes "testing"
 )
 
-func TestFormatDepths(t *tes.T) {
+func TestFormatMaximum(t *tes.T) {
 	var Formatter = col.Formatter()
-	var formatter = Formatter.MakeWithDepth(0)
+	var formatter = Formatter.MakeWithMaximum(0)
 	var array = col.Array[any]().MakeFromArray([]any{1, []any{1, 2, []any{1, 2, 3}}})
 	var s = formatter.FormatCollection(array)
 	ass.Equal(t, "[...](Array)", s)
-	formatter = Formatter.MakeWithDepth(1)
+	formatter = Formatter.MakeWithMaximum(1)
 	s = formatter.FormatCollection(array)
 	ass.Equal(t, "[\n    1\n    [...](array)\n](Array)", s)
-	formatter = Formatter.MakeWithDepth(2)
+	formatter = Formatter.MakeWithMaximum(2)
 	s = formatter.FormatCollection(array)
 	ass.Equal(t, "[\n    1\n    [\n        1\n        2\n        [...](array)\n    ](array)\n](Array)", s)
 }
 
 func TestFormatInvalidType(t *tes.T) {
-	var formatter = col.Formatter().MakeWithDepth(8)
+	var formatter = col.Formatter().MakeWithMaximum(8)
 	var s struct{}
 	defer func() {
 		if e := recover(); e != nil {

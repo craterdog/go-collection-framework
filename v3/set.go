@@ -100,11 +100,10 @@ func (c *setClass_[V]) MakeFromSource(
 
 func (c *setClass_[V]) MakeWithCollator(collator CollatorLike) SetLike[V] {
 	var values = List[V]().Make()
-	var set = &set_[V]{
-		collator,
-		values,
+	return &set_[V]{
+		collator_: collator,
+		values_:   values,
 	}
-	return set
 }
 
 // Functions
@@ -136,8 +135,7 @@ func (c *setClass_[V]) Sans(first, second SetLike[V]) SetLike[V] {
 }
 
 func (c *setClass_[V]) Xor(first, second SetLike[V]) SetLike[V] {
-	var result = c.Or(c.Sans(first, second), c.Sans(second, first))
-	return result
+	return c.Or(c.Sans(first, second), c.Sans(second, first))
 }
 
 // INSTANCE METHODS
@@ -145,18 +143,24 @@ func (c *setClass_[V]) Xor(first, second SetLike[V]) SetLike[V] {
 // Target
 
 type set_[V Value] struct {
-	collator CollatorLike
-	values   ListLike[V]
+	collator_ CollatorLike
+	values_   ListLike[V]
+}
+
+// Attributes
+
+func (v *set_[V]) GetCollator() CollatorLike {
+	return v.collator_
 }
 
 // Accessible
 
 func (v *set_[V]) GetValue(index int) V {
-	return v.values.GetValue(index)
+	return v.values_.GetValue(index)
 }
 
 func (v *set_[V]) GetValues(first int, last int) Sequential[V] {
-	return v.values.GetValues(first, last)
+	return v.values_.GetValues(first, last)
 }
 
 // Flexible
@@ -165,7 +169,7 @@ func (v *set_[V]) AddValue(value V) {
 	var slot, found = v.findIndex(value)
 	if !found {
 		// The value is not already a member, so add it.
-		v.values.InsertValue(slot, value)
+		v.values_.InsertValue(slot, value)
 	}
 }
 
@@ -178,14 +182,14 @@ func (v *set_[V]) AddValues(values Sequential[V]) {
 }
 
 func (v *set_[V]) RemoveAll() {
-	v.values.RemoveAll()
+	v.values_.RemoveAll()
 }
 
 func (v *set_[V]) RemoveValue(value V) {
 	var index, found = v.findIndex(value)
 	if found {
 		// The value is a member, so remove it.
-		v.values.RemoveValue(index)
+		v.values_.RemoveValue(index)
 	}
 }
 
@@ -241,20 +245,20 @@ func (v *set_[V]) GetIndex(value V) int {
 // Sequential
 
 func (v *set_[V]) AsArray() []V {
-	return v.values.AsArray()
+	return v.values_.AsArray()
 }
 
 func (v *set_[V]) GetIterator() IteratorLike[V] {
-	var iterator = v.values.GetIterator()
+	var iterator = v.values_.GetIterator()
 	return iterator
 }
 
 func (v *set_[V]) GetSize() int {
-	return v.values.GetSize()
+	return v.values_.GetSize()
 }
 
 func (v *set_[V]) IsEmpty() bool {
-	return v.values.IsEmpty()
+	return v.values_.IsEmpty()
 }
 
 // Stringer
@@ -262,12 +266,6 @@ func (v *set_[V]) IsEmpty() bool {
 func (v *set_[V]) String() string {
 	var formatter = Formatter().Make()
 	return formatter.FormatCollection(v)
-}
-
-// Public
-
-func (v *set_[V]) GetCollator() CollatorLike {
-	return v.collator
 }
 
 // Private
@@ -293,7 +291,7 @@ func (v *set_[V]) findIndex(value V) (index int, found bool) {
 	for size > 0 {
 		var middle = first + size/2 // Rounds down to the nearest integer.
 		var candidate = v.GetValue(middle)
-		switch v.collator.RankValues(value, candidate) {
+		switch v.collator_.RankValues(value, candidate) {
 		case -1:
 			// The index of the value is less than the middle
 			// index so the first index stays the same.

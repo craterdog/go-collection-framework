@@ -59,9 +59,14 @@ type associationClass_[K Key, V Value] struct {
 
 // Constructors
 
-func (c *associationClass_[K, V]) Make(key K, value V) AssociationLike[K, V] {
-	var association = &association_[K, V]{key, value}
-	return association
+func (c *associationClass_[K, V]) MakeWithAttributes(
+	key K,
+	value V,
+) AssociationLike[K, V] {
+	return &association_[K, V]{
+		key_:   key,
+		value_: value,
+	}
 }
 
 // INSTANCE METHODS
@@ -69,20 +74,20 @@ func (c *associationClass_[K, V]) Make(key K, value V) AssociationLike[K, V] {
 // Target
 
 type association_[K Key, V Value] struct {
-	key   K
-	value V
+	key_   K
+	value_ V
 }
 
-// Public
+// Attributes
 
 func (v *association_[K, V]) GetKey() K {
-	return v.key
+	return v.key_
 }
 
 func (v *association_[K, V]) GetValue() V {
-	return v.value
+	return v.value_
 }
 
 func (v *association_[K, V]) SetValue(value V) {
-	v.value = value
+	v.value_ = value
 }

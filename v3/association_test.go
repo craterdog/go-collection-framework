@@ -17,7 +17,7 @@ import (
 )
 
 func TestAssociations(t *tes.T) {
-	var association = col.Association[string, int]().Make("foo", 1)
+	var association = col.Association[string, int]().MakeWithAttributes("foo", 1)
 	ass.Equal(t, "foo", association.GetKey())
 	ass.Equal(t, 1, association.GetValue())
 	association.SetValue(2)

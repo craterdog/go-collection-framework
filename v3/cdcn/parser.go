@@ -23,8 +23,8 @@ import (
 // Reference
 
 var parserClass = &parserClass_{
-	queueSize: 16,
-	stackSize: 4,
+	queueSize_: 16,
+	stackSize_: 4,
 }
 
 // Function
@@ -38,17 +38,16 @@ func Parser() ParserClassLike {
 // Target
 
 type parserClass_ struct {
-	queueSize int
-	stackSize int
+	queueSize_ int
+	stackSize_ int
 }
 
 // Constructors
 
 func (c *parserClass_) Make() ParserLike {
-	var parser = &parser_{
-		next: col.Stack[TokenLike]().MakeWithCapacity(c.stackSize),
+	return &parser_{
+		next_: col.Stack[TokenLike]().MakeWithCapacity(c.stackSize_),
 	}
-	return parser
 }
 
 // INSTANCE METHODS
@@ -56,18 +55,18 @@ func (c *parserClass_) Make() ParserLike {
 // Target
 
 type parser_ struct {
-	next   col.StackLike[TokenLike] // A stack of unprocessed retrieved tokens.
-	source string                   // The original source code.
-	tokens col.QueueLike[TokenLike] // A queue of unread tokens from the scanner.
+	next_   col.StackLike[TokenLike] // A stack of unprocessed retrieved tokens.
+	source_ string                   // The original source code.
+	tokens_ col.QueueLike[TokenLike] // A queue of unread tokens from the scanner.
 }
 
 // Public
 
 func (v *parser_) ParseSource(source string) col.Collection {
 	// The scanner runs in a separate Go routine.
-	v.source = source
-	v.tokens = col.Queue[TokenLike]().MakeWithCapacity(parserClass.queueSize)
-	Scanner().Make(v.source, v.tokens)
+	v.source_ = source
+	v.tokens_ = col.Queue[TokenLike]().MakeWithCapacity(parserClass.queueSize_)
+	Scanner().MakeFromSource(v.source_, v.tokens_)
 
 	// Parse the tokens from the scanner.
 	var collection, token, ok = v.parseCollection()
@@ -103,7 +102,7 @@ func (v *parser_) formatError(token TokenLike) string {
 		token,
 	)
 	var line = token.GetLine()
-	var lines = sts.Split(v.source, "\n")
+	var lines = sts.Split(v.source_, "\n")
 
 	message += "\033[36m"
 	if line > 1 {
@@ -149,8 +148,8 @@ stream and return it.
 */
 func (v *parser_) getNextToken() TokenLike {
 	var next TokenLike
-	if v.next.IsEmpty() {
-		var token, ok = v.tokens.RemoveHead() // Will block if queue is empty.
+	if v.next_.IsEmpty() {
+		var token, ok = v.tokens_.RemoveHead() // Will block if queue is empty.
 		if !ok {
 			panic("The token channel terminated without an EOF token.")
 		}
@@ -160,7 +159,7 @@ func (v *parser_) getNextToken() TokenLike {
 			panic(message)
 		}
 	} else {
-		next = v.next.RemoveTop()
+		next = v.next_.RemoveTop()
 	}
 	return next
 }
@@ -191,7 +190,7 @@ func (v *parser_) parseAssociation() (
 			"$value")
 		panic(message)
 	}
-	association = col.Association[col.Key, col.Value]().Make(key, value)
+	association = col.Association[col.Key, col.Value]().MakeWithAttributes(key, value)
 	return association, token, true
 }
 
@@ -534,7 +533,7 @@ func (v *parser_) parseValues() (
 }
 
 func (v *parser_) putBack(token TokenLike) {
-	v.next.AddValue(token)
+	v.next_.AddValue(token)
 }
 
 /*

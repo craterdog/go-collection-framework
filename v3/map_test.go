@@ -44,9 +44,9 @@ func TestEmptyMaps(t *tes.T) {
 
 func TestMapsWithStringsAndIntegers(t *tes.T) {
 	var Association = col.Association[string, int]()
-	var association1 = Association.Make("foo", 1)
-	var association2 = Association.Make("bar", 2)
-	var association3 = Association.Make("baz", 3)
+	var association1 = Association.MakeWithAttributes("foo", 1)
+	var association2 = Association.MakeWithAttributes("bar", 2)
+	var association3 = Association.MakeWithAttributes("baz", 3)
 	var Map = col.Map[string, int]()
 	var m = Map.MakeFromArray([]col.AssociationLike[string, int]{
 		association1,

@@ -41,7 +41,7 @@ func Sorter[V Value]() SorterClassLike[V] {
 	default:
 		// Add a new bound class type.
 		class = &sorterClass_[V]{
-			defaultRanker: Collator().Make().RankValues,
+			defaultRanker_: Collator().Make().RankValues,
 		}
 		sorterClass[name] = class
 	}
@@ -56,29 +56,27 @@ func Sorter[V Value]() SorterClassLike[V] {
 // Target
 
 type sorterClass_[V Value] struct {
-	defaultRanker RankingFunction
+	defaultRanker_ RankingFunction
 }
 
 // Constants
 
 func (c *sorterClass_[V]) DefaultRanker() RankingFunction {
-	return c.defaultRanker
+	return c.defaultRanker_
 }
 
 // Constructors
 
 func (c *sorterClass_[V]) Make() SorterLike[V] {
-	var sorter = &sorter_[V]{
-		rank: c.defaultRanker,
+	return &sorter_[V]{
+		ranker_: c.defaultRanker_,
 	}
-	return sorter
 }
 
 func (c *sorterClass_[V]) MakeWithRanker(ranker RankingFunction) SorterLike[V] {
-	var sorter = &sorter_[V]{
-		rank: ranker,
+	return &sorter_[V]{
+		ranker_: ranker,
 	}
-	return sorter
 }
 
 // INSTANCE METHODS
@@ -86,7 +84,7 @@ func (c *sorterClass_[V]) MakeWithRanker(ranker RankingFunction) SorterLike[V] {
 // Target
 
 type sorter_[V Value] struct {
-	rank RankingFunction
+	ranker_ RankingFunction
 }
 
 // Systematic
@@ -117,7 +115,7 @@ func (v *sorter_[V]) SortValues(values []V) {
 // Public
 
 func (v *sorter_[V]) GetRanker() RankingFunction {
-	return v.rank
+	return v.ranker_
 }
 
 // Private
@@ -190,7 +188,7 @@ func (v *sorter_[V]) mergeArrays(left []V, right []V, merged []V) {
 		if leftIndex < leftLength && rightIndex < rightLength {
 
 			// Copy the next smallest value to the merged Go array.
-			if v.rank(left[leftIndex], right[rightIndex]) < 0 {
+			if v.ranker_(left[leftIndex], right[rightIndex]) < 0 {
 				merged[mergedIndex] = left[leftIndex]
 				leftIndex++
 			} else {

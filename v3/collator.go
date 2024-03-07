@@ -23,7 +23,7 @@ import (
 // Reference
 
 var collatorClass = &collatorClass_{
-	defaultDepth: 16,
+	defaultMaximum_: 16,
 }
 
 // Function
@@ -37,32 +37,30 @@ func Collator() CollatorClassLike {
 // Target
 
 type collatorClass_ struct {
-	defaultDepth int
+	defaultMaximum_ int
 }
 
 // Constants
 
-func (c *collatorClass_) DefaultDepth() int {
-	return c.defaultDepth
+func (c *collatorClass_) DefaultMaximum() int {
+	return c.defaultMaximum_
 }
 
 // Constructors
 
 func (c *collatorClass_) Make() CollatorLike {
-	var collator = &collator_{
-		maximum: c.defaultDepth,
+	return &collator_{
+		maximum_: c.defaultMaximum_,
 	}
-	return collator
 }
 
-func (c *collatorClass_) MakeWithDepth(depth int) CollatorLike {
-	if depth < 0 || depth > c.defaultDepth {
-		depth = c.defaultDepth
+func (c *collatorClass_) MakeWithMaximum(maximum int) CollatorLike {
+	if maximum < 0 {
+		maximum = c.defaultMaximum_
 	}
-	var collator = &collator_{
-		maximum: depth,
+	return &collator_{
+		maximum_: maximum,
 	}
-	return collator
 }
 
 // INSTANCE METHODS
@@ -70,8 +68,18 @@ func (c *collatorClass_) MakeWithDepth(depth int) CollatorLike {
 // Target
 
 type collator_ struct {
-	depth   int
-	maximum int
+	depth_   int
+	maximum_ int
+}
+
+// Attributes
+
+func (v *collator_) GetDepth() int {
+	return v.depth_
+}
+
+func (v *collator_) GetMaximum() int {
+	return v.maximum_
 }
 
 // Public
@@ -88,8 +96,8 @@ func (v *collator_) RankValues(first Value, second Value) int {
 
 func (v *collator_) compareArrays(first ref.Value, second ref.Value) bool {
 	// Check for maximum traversal depth.
-	if v.depth == v.maximum {
-		panic(fmt.Sprintf("The maximum traversal depth was exceeded: %v", v.depth))
+	if v.depth_ == v.maximum_ {
+		panic(fmt.Sprintf("The maximum traversal depth was exceeded: %v", v.depth_))
 	}
 
 	// Compare the sizes of the Go arrays.
@@ -101,13 +109,13 @@ func (v *collator_) compareArrays(first ref.Value, second ref.Value) bool {
 
 	// Compare the values of the Go arrays.
 	for i := 0; i < size; i++ {
-		v.depth++
+		v.depth_++
 		if !v.compareValues(first.Index(i), second.Index(i)) {
 			// Two of the values in the Go arrays are different.
-			v.depth--
+			v.depth_--
 			return false
 		}
-		v.depth--
+		v.depth_--
 	}
 	return true
 }
@@ -137,8 +145,8 @@ func (v *collator_) compareInterfaces(first ref.Value, second ref.Value) bool {
 
 func (v *collator_) compareMaps(first ref.Value, second ref.Value) bool {
 	// Check for maximum traversal depth.
-	if v.depth == v.maximum {
-		panic(fmt.Sprintf("The maximum traversal depth was exceeded: %v", v.depth))
+	if v.depth_ == v.maximum_ {
+		panic(fmt.Sprintf("The maximum traversal depth was exceeded: %v", v.depth_))
 	}
 
 	// Compare the sizes of the two Go maps.
@@ -150,16 +158,16 @@ func (v *collator_) compareMaps(first ref.Value, second ref.Value) bool {
 	// Compare the keys and values for the two Go maps.
 	var iterator = first.MapRange()
 	for iterator.Next() {
-		v.depth++
+		v.depth_++
 		var key = iterator.Key()
 		var firstValue = iterator.Value()
 		var secondValue = second.MapIndex(key)
 		if !v.compareValues(firstValue, secondValue) {
 			// The values don't match.
-			v.depth--
+			v.depth_--
 			return false
 		}
-		v.depth--
+		v.depth_--
 	}
 	return true
 }
@@ -299,8 +307,8 @@ func (v *collator_) getType(type_ ref.Type) string {
 
 func (v *collator_) rankArrays(first ref.Value, second ref.Value) int {
 	// Check for maximum traversal depth.
-	if v.depth == v.maximum {
-		panic(fmt.Sprintf("The maximum traversal depth was exceeded: %v", v.depth))
+	if v.depth_ == v.maximum_ {
+		panic(fmt.Sprintf("The maximum traversal depth was exceeded: %v", v.depth_))
 	}
 
 	// Determine the smallest Go array.
@@ -313,20 +321,20 @@ func (v *collator_) rankArrays(first ref.Value, second ref.Value) int {
 
 	// Iterate through the smallest Go array.
 	for i := 0; i < firstSize; i++ {
-		v.depth++
+		v.depth_++
 		var rank = v.rankValues(first.Index(i), second.Index(i))
 		if rank < 0 {
 			// The value in the first Go array comes before its matching value.
-			v.depth--
+			v.depth_--
 			return -1
 		}
 		if rank > 0 {
 			// The value in the first Go array comes after its matching value.
-			v.depth--
+			v.depth_--
 			return 1
 		}
 		// The two values match.
-		v.depth--
+		v.depth_--
 	}
 
 	// The Go arrays contain the same initial values.
@@ -461,8 +469,8 @@ between the implementation of the collator and the sorter types:
 */
 func (v *collator_) rankMaps(first ref.Value, second ref.Value) int {
 	// Check for maximum traversal depth.
-	if v.depth == v.maximum {
-		panic(fmt.Sprintf("The maximum traversal depth was exceeded: %v", v.depth))
+	if v.depth_ == v.maximum_ {
+		panic(fmt.Sprintf("The maximum traversal depth was exceeded: %v", v.depth_))
 	}
 
 	// Extract and sort the keys for the two Go maps.
@@ -482,7 +490,7 @@ func (v *collator_) rankMaps(first ref.Value, second ref.Value) int {
 
 	// Iterate through the smallest Go map.
 	for i := 0; i < firstSize; i++ {
-		v.depth++
+		v.depth_++
 
 		// Rank the two keys.
 		var firstKey = firstKeys[i]
@@ -490,12 +498,12 @@ func (v *collator_) rankMaps(first ref.Value, second ref.Value) int {
 		var keyRank = v.rankValues(firstKey, secondKey)
 		if keyRank < 0 {
 			// The key in the first Go map comes before its matching key.
-			v.depth--
+			v.depth_--
 			return -1
 		}
 		if keyRank > 0 {
 			// The key in the first Go map comes after its matching key.
-			v.depth--
+			v.depth_--
 			return 1
 		}
 
@@ -505,15 +513,15 @@ func (v *collator_) rankMaps(first ref.Value, second ref.Value) int {
 		var valueRank = v.rankValues(firstValue, secondValue)
 		if valueRank < 0 {
 			// The value in the first Go map comes before its matching value.
-			v.depth--
+			v.depth_--
 			return -1
 		}
 		if valueRank > 0 {
 			// The value in the first Go map comes after its matching value.
-			v.depth--
+			v.depth_--
 			return 1
 		}
-		v.depth--
+		v.depth_--
 	}
 
 	// The Go maps contain the same initial associations.

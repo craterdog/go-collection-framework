@@ -125,6 +125,16 @@ type Associative[K Key, V Value] interface {
 }
 
 /*
+Canonical defines the set of method signatures that must be supported by all
+canonical notations.
+*/
+type Canonical interface {
+	// Methods
+	FormatCollection(collection Collection) string
+	ParseSource(source string) Collection
+}
+
+/*
 Expandable[V Value] defines the set of method signatures that must be supported
 by all sequences that allow new values to be appended, inserted and removed.
 */
@@ -656,9 +666,8 @@ format collections using a canonical notation like XML, JSON and  CDCN
 (Crater Dog Collection Notation™).
 */
 type NotationLike interface {
-	// Methods
-	FormatCollection(collection Collection) string
-	ParseSource(source string) Collection
+	// Abstractions
+	Canonical
 }
 
 /*

@@ -54,7 +54,7 @@ type notation_ struct {
 	parser_    ParserLike
 }
 
-// Public
+// Canonical
 
 func (v *notation_) FormatCollection(collection col.Collection) string {
 	return v.formatter_.FormatCollection(collection)

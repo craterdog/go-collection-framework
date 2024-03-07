@@ -59,12 +59,12 @@ type iteratorClass_[V Value] struct {
 
 // Constructors
 
-func (c *iteratorClass_[V]) MakeFromSequence(sequence Sequential[V]) IteratorLike[V] {
-	var values = sequence.AsArray() // The returned Go array is immutable.
-	var size = len(values)
+func (c *iteratorClass_[V]) MakeFromSequence(values Sequential[V]) IteratorLike[V] {
+	var array = values.AsArray() // The returned Go array is immutable.
+	var size = len(array)
 	return &iterator_[V]{
-		size_:   size,
-		values_: values,
+		size_:  size,
+		array_: array,
 	}
 }
 
@@ -73,9 +73,9 @@ func (c *iteratorClass_[V]) MakeFromSequence(sequence Sequential[V]) IteratorLik
 // Target
 
 type iterator_[V Value] struct {
-	size_   int // So we can safely cache the size.
-	slot_   int // The initial slot is zero.
-	values_ []V // The Go array of values is immutable.
+	size_  int // So we can safely cache the size.
+	slot_  int // The initial slot is zero.
+	array_ []V // The Go array of values is immutable.
 }
 
 // Public
@@ -84,7 +84,7 @@ func (v *iterator_[V]) GetNext() V {
 	var result V
 	if v.slot_ < v.size_ {
 		v.slot_ = v.slot_ + 1
-		result = v.values_[v.slot_-1] // convert to ZERO based indexing
+		result = v.array_[v.slot_-1] // convert to ZERO based indexing
 	}
 	return result
 }
@@ -92,7 +92,7 @@ func (v *iterator_[V]) GetNext() V {
 func (v *iterator_[V]) GetPrevious() V {
 	var result V
 	if v.slot_ > 0 {
-		result = v.values_[v.slot_-1] // convert to ZERO based indexing
+		result = v.array_[v.slot_-1] // convert to ZERO based indexing
 		v.slot_ = v.slot_ - 1
 	}
 	return result

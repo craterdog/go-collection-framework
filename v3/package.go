@@ -315,7 +315,7 @@ functions that must be supported by all iterator-class-like classes.
 */
 type IteratorClassLike[V Value] interface {
 	// Constructors
-	MakeFromSequence(sequence Sequential[V]) IteratorLike[V]
+	MakeFromSequence(values Sequential[V]) IteratorLike[V]
 }
 
 /*

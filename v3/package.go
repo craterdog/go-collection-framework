@@ -55,12 +55,6 @@ Primitive is a generic type representing any type of Go primitive value.
 type Primitive any
 
 /*
-TokenType is a specialized type representing any token type recognized by a
-scanner.
-*/
-type TokenType uint8
-
-/*
 Value is a generic type representing any type of value.
 */
 type Value any
@@ -259,7 +253,7 @@ association-class-like classes.
 */
 type AssociationClassLike[K Key, V Value] interface {
 	// Constructors
-	Make(key K, value V) AssociationLike[K, V]
+	MakeWithAttributes(key K, value V) AssociationLike[K, V]
 }
 
 /*
@@ -295,11 +289,11 @@ that must be supported by all collator-class-like classes.
 */
 type CollatorClassLike interface {
 	// Constants
-	DefaultDepth() int
+	DefaultMaximum() int
 
 	// Constructors
 	Make() CollatorLike
-	MakeWithDepth(depth int) CollatorLike
+	MakeWithMaximum(maximum int) CollatorLike
 }
 
 /*
@@ -308,11 +302,11 @@ functions that must be supported by all formatter-class-like classes.
 */
 type FormatterClassLike interface {
 	// Constants
-	DefaultDepth() int
+	DefaultMaximum() int
 
 	// Constructors
 	Make() FormatterLike
-	MakeWithDepth(depth int) FormatterLike
+	MakeWithMaximum(maximum int) FormatterLike
 }
 
 /*
@@ -321,7 +315,7 @@ functions that must be supported by all iterator-class-like classes.
 */
 type IteratorClassLike[V Value] interface {
 	// Constructors
-	Make(sequence Sequential[V]) IteratorLike[V]
+	MakeFromSequence(sequence Sequential[V]) IteratorLike[V]
 }
 
 /*
@@ -362,12 +356,8 @@ NotationClassLike defines the set of class constants, constructors and
 functions that must be supported by all notation-class-like classes.
 */
 type NotationClassLike interface {
-	// Constants
-	DefaultDepth() int
-
 	// Constructors
 	Make() NotationLike
-	MakeWithDepth(depth int) NotationLike
 }
 
 /*
@@ -431,24 +421,6 @@ type QueueClassLike[V Value] interface {
 }
 
 /*
-ScannerClassLike defines the set of class constants, constructors and functions
-that must be supported by all scanner-class-like classes.  The following
-functions are supported:
-
-MatchToken() a list of strings representing any matches found in the specified
-text of the specified token type using the regular expression defined for that
-token type.  If the regular expression contains submatch patterns the matching
-substrings are returned as additional values in the list.
-*/
-type ScannerClassLike interface {
-	// Constructors
-	Make(document string, tokens QueueLike[TokenLike]) ScannerLike
-
-	// Functions
-	MatchToken(tokenType TokenType, text string) ListLike[string]
-}
-
-/*
 SetClassLike[V Value] defines the set of class constants, constructors and
 functions that must be supported by all set-class-like classes.  The following
 functions are supported:
@@ -507,26 +479,6 @@ type StackClassLike[V Value] interface {
 	MakeFromSequence(values Sequential[V]) StackLike[V]
 	MakeFromSource(source string, notation NotationLike) StackLike[V]
 	MakeWithCapacity(capacity int) StackLike[V]
-}
-
-/*
-TokenClassLike defines the set of class constants, constructors and functions
-that must be supported by all token-class-like classes.  The following functions
-are supported:
-
-AsString() returns a string representing the specified token type.
-*/
-type TokenClassLike interface {
-	// Constructors
-	Make(
-		line int,
-		position int,
-		tokenType TokenType,
-		tokenValue string,
-	) TokenLike
-
-	// Functions
-	AsString(tokenType TokenType) string
 }
 
 // Instances
@@ -595,6 +547,10 @@ by all collator-like instances.  A collator-like class is capable of comparing
 and ranking two values of any type.
 */
 type CollatorLike interface {
+	// Attributes
+	GetDepth() int
+	GetMaximum() int
+
 	// Methods
 	CompareValues(first Value, second Value) bool
 	RankValues(first Value, second Value) int
@@ -605,6 +561,10 @@ FormatterLike defines the set of abstractions and methods that must be supported
 by all formatter-like instances.
 */
 type FormatterLike interface {
+	// Attributes
+	GetDepth() int
+	GetMaximum() int
+
 	// Methods
 	FormatCollection(collection Collection) string
 }
@@ -804,16 +764,4 @@ type StackLike[V Value] interface {
 
 	// Methods
 	RemoveTop() V
-}
-
-/*
-TokenLike defines the set of abstractions and methods that must be supported by
-all token-like instances.
-*/
-type TokenLike interface {
-	// Methods
-	GetLine() int
-	GetPosition() int
-	GetType() TokenType
-	GetValue() string
 }

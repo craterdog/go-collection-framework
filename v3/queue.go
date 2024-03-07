@@ -39,7 +39,7 @@ func Queue[V Value]() QueueClassLike[V] {
 	default:
 		// Add a new bound class type.
 		class = &queueClass_[V]{
-			defaultCapacity: 16,
+			defaultCapacity_: 16,
 		}
 		queueClass[name] = class
 	}
@@ -54,26 +54,24 @@ func Queue[V Value]() QueueClassLike[V] {
 // Target
 
 type queueClass_[V Value] struct {
-	defaultCapacity int
+	defaultCapacity_ int
 }
 
 // Constants
 
 func (c *queueClass_[V]) DefaultCapacity() int {
-	return c.defaultCapacity
+	return c.defaultCapacity_
 }
 
 // Constructors
 
 func (c *queueClass_[V]) Make() QueueLike[V] {
-	var queue = c.MakeWithCapacity(c.defaultCapacity)
-	return queue
+	return c.MakeWithCapacity(c.defaultCapacity_)
 }
 
 func (c *queueClass_[V]) MakeFromArray(values []V) QueueLike[V] {
 	var array = Array[V]().MakeFromArray(values)
-	var queue = c.MakeFromSequence(array)
-	return queue
+	return c.MakeFromSequence(array)
 }
 
 func (c *queueClass_[V]) MakeFromSequence(values Sequential[V]) QueueLike[V] {
@@ -105,16 +103,15 @@ func (c *queueClass_[V]) MakeFromSource(
 
 func (c *queueClass_[V]) MakeWithCapacity(capacity int) QueueLike[V] {
 	if capacity < 1 {
-		capacity = c.defaultCapacity
+		capacity = c.defaultCapacity_
 	}
 	var available = make(chan bool, capacity)
 	var values = List[V]().Make()
-	var queue = &queue_[V]{
-		available: available,
-		capacity:  capacity,
-		values:    values,
+	return &queue_[V]{
+		available_: available,
+		capacity_:  capacity,
+		values_:    values,
 	}
-	return queue
 }
 
 // Functions
@@ -267,10 +264,10 @@ func (c *queueClass_[V]) Split(
 // Target
 
 type queue_[V Value] struct {
-	available chan bool
-	capacity  int
-	mutex     syn.Mutex
-	values    ListLike[V]
+	available_ chan bool
+	capacity_  int
+	mutex_     syn.Mutex
+	values_    ListLike[V]
 }
 
 /*
@@ -284,50 +281,50 @@ instance method.
 // Limited
 
 func (v *queue_[V]) AddValue(value V) {
-	v.mutex.Lock()
-	v.values.AppendValue(value)
-	v.mutex.Unlock()
-	v.available <- true // The queue will block if at capacity.
+	v.mutex_.Lock()
+	v.values_.AppendValue(value)
+	v.mutex_.Unlock()
+	v.available_ <- true // The queue will block if at capacity.
 }
 
 func (v *queue_[V]) GetCapacity() int {
-	return v.capacity
+	return v.capacity_
 }
 
 func (v *queue_[V]) RemoveAll() {
-	v.mutex.Lock()
-	v.available = make(chan bool, v.capacity)
-	v.values = List[V]().Make()
-	v.mutex.Unlock()
+	v.mutex_.Lock()
+	v.available_ = make(chan bool, v.capacity_)
+	v.values_ = List[V]().Make()
+	v.mutex_.Unlock()
 }
 
 // Sequential
 
 func (v *queue_[V]) AsArray() []V {
-	v.mutex.Lock()
-	var array = v.values.AsArray()
-	v.mutex.Unlock()
+	v.mutex_.Lock()
+	var array = v.values_.AsArray()
+	v.mutex_.Unlock()
 	return array
 }
 
 func (v *queue_[V]) GetIterator() IteratorLike[V] {
-	v.mutex.Lock()
-	var iterator = v.values.GetIterator()
-	v.mutex.Unlock()
+	v.mutex_.Lock()
+	var iterator = v.values_.GetIterator()
+	v.mutex_.Unlock()
 	return iterator
 }
 
 func (v *queue_[V]) GetSize() int {
-	v.mutex.Lock()
-	var size = len(v.available)
-	v.mutex.Unlock()
+	v.mutex_.Lock()
+	var size = len(v.available_)
+	v.mutex_.Unlock()
 	return size
 }
 
 func (v *queue_[V]) IsEmpty() bool {
-	v.mutex.Lock()
-	var result = len(v.available) == 0
-	v.mutex.Unlock()
+	v.mutex_.Lock()
+	var result = len(v.available_) == 0
+	v.mutex_.Unlock()
 	return result
 }
 
@@ -341,10 +338,10 @@ func (v *queue_[V]) String() string {
 // Public
 
 func (v *queue_[V]) CloseQueue() {
-	v.mutex.Lock()
-	close(v.available)
+	v.mutex_.Lock()
+	close(v.available_)
 	// No more values can be placed on the queue.
-	v.mutex.Unlock()
+	v.mutex_.Unlock()
 }
 
 func (v *queue_[V]) RemoveHead() (V, bool) {
@@ -353,11 +350,11 @@ func (v *queue_[V]) RemoveHead() (V, bool) {
 	var ok bool
 
 	// Remove the head value from the queue if one exists.
-	_, ok = <-v.available // Will block until a value is available.
+	_, ok = <-v.available_ // Will block until a value is available.
 	if ok {
-		v.mutex.Lock()
-		head = v.values.RemoveValue(1)
-		v.mutex.Unlock()
+		v.mutex_.Lock()
+		head = v.values_.RemoveValue(1)
+		v.mutex_.Unlock()
 	}
 
 	// Return the results

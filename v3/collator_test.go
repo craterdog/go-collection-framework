@@ -52,11 +52,11 @@ type Fuz struct {
 
 func TestCollatorConstants(t *tes.T) {
 	var Collator = col.Collator()
-	ass.Equal(t, 16, Collator.DefaultDepth())
+	ass.Equal(t, 16, Collator.DefaultMaximum())
 }
 
-func TestCompareDepth(t *tes.T) {
-	var collator = col.Collator().MakeWithDepth(1)
+func TestCompareMaximum(t *tes.T) {
+	var collator = col.Collator().MakeWithMaximum(1)
 	var array = col.Array[any]().MakeFromArray([]any{"foo", []int{1, 2, 3}})
 	defer func() {
 		if e := recover(); e != nil {
@@ -68,8 +68,8 @@ func TestCompareDepth(t *tes.T) {
 	_ = collator.CompareValues(array, array)
 }
 
-func TestRankDepth(t *tes.T) {
-	var collator = col.Collator().MakeWithDepth(1)
+func TestRankMaximum(t *tes.T) {
+	var collator = col.Collator().MakeWithMaximum(1)
 	var array = col.Array[any]().MakeFromArray([]any{"foo", []int{1, 2, 3}})
 	defer func() {
 		if e := recover(); e != nil {

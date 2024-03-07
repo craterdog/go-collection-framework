@@ -19,7 +19,7 @@ import (
 // Reference
 
 var notationClass = &notationClass_{
-	defaultDepth: 8,
+	// This class defines no constants.
 }
 
 // Function
@@ -33,31 +33,16 @@ func Notation() col.NotationClassLike {
 // Target
 
 type notationClass_ struct {
-	defaultDepth int
-}
-
-// Constants
-
-func (c *notationClass_) DefaultDepth() int {
-	return c.defaultDepth
+	// This class defines no constants.
 }
 
 // Constructors
 
 func (c *notationClass_) Make() col.NotationLike {
-	var notation = c.MakeWithDepth(c.defaultDepth)
-	return notation
-}
-
-func (c *notationClass_) MakeWithDepth(depth int) col.NotationLike {
-	if depth < 0 || depth > c.defaultDepth {
-		depth = c.defaultDepth
+	return &notation_{
+		formatter_: Formatter().Make(),
+		parser_:    Parser().Make(),
 	}
-	var notation = &notation_{
-		formatter: Formatter().MakeWithDepth(depth),
-		parser:    Parser().Make(),
-	}
-	return notation
 }
 
 // INSTANCE METHODS
@@ -65,16 +50,16 @@ func (c *notationClass_) MakeWithDepth(depth int) col.NotationLike {
 // Target
 
 type notation_ struct {
-	formatter col.FormatterLike
-	parser    ParserLike
+	formatter_ col.FormatterLike
+	parser_    ParserLike
 }
 
 // Public
 
 func (v *notation_) FormatCollection(collection col.Collection) string {
-	return v.formatter.FormatCollection(collection)
+	return v.formatter_.FormatCollection(collection)
 }
 
 func (v *notation_) ParseSource(source string) col.Collection {
-	return v.parser.ParseSource(source)
+	return v.parser_.ParseSource(source)
 }

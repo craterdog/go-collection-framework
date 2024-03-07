@@ -59,14 +59,13 @@ type iteratorClass_[V Value] struct {
 
 // Constructors
 
-func (c *iteratorClass_[V]) Make(sequence Sequential[V]) IteratorLike[V] {
+func (c *iteratorClass_[V]) MakeFromSequence(sequence Sequential[V]) IteratorLike[V] {
 	var values = sequence.AsArray() // The returned Go array is immutable.
 	var size = len(values)
-	var iterator = &iterator_[V]{
-		size:   size,
-		values: values,
+	return &iterator_[V]{
+		size_:   size,
+		values_: values,
 	}
-	return iterator
 }
 
 // INSTANCE METHODS
@@ -74,60 +73,60 @@ func (c *iteratorClass_[V]) Make(sequence Sequential[V]) IteratorLike[V] {
 // Target
 
 type iterator_[V Value] struct {
-	size   int // So we can safely cache the size.
-	slot   int // The initial slot is zero.
-	values []V // The Go array of values is immutable.
+	size_   int // So we can safely cache the size.
+	slot_   int // The initial slot is zero.
+	values_ []V // The Go array of values is immutable.
 }
 
 // Public
 
 func (v *iterator_[V]) GetNext() V {
 	var result V
-	if v.slot < v.size {
-		v.slot = v.slot + 1
-		result = v.values[v.slot-1] // convert to ZERO based indexing
+	if v.slot_ < v.size_ {
+		v.slot_ = v.slot_ + 1
+		result = v.values_[v.slot_-1] // convert to ZERO based indexing
 	}
 	return result
 }
 
 func (v *iterator_[V]) GetPrevious() V {
 	var result V
-	if v.slot > 0 {
-		result = v.values[v.slot-1] // convert to ZERO based indexing
-		v.slot = v.slot - 1
+	if v.slot_ > 0 {
+		result = v.values_[v.slot_-1] // convert to ZERO based indexing
+		v.slot_ = v.slot_ - 1
 	}
 	return result
 }
 
 func (v *iterator_[V]) GetSlot() int {
-	return v.slot
+	return v.slot_
 }
 
 func (v *iterator_[V]) HasNext() bool {
-	return v.slot < v.size
+	return v.slot_ < v.size_
 }
 
 func (v *iterator_[V]) HasPrevious() bool {
-	return v.slot > 0
+	return v.slot_ > 0
 }
 
 func (v *iterator_[V]) ToEnd() {
-	v.slot = v.size
+	v.slot_ = v.size_
 }
 
 func (v *iterator_[V]) ToSlot(slot int) {
-	if slot > v.size {
-		slot = v.size
+	if slot > v.size_ {
+		slot = v.size_
 	}
-	if slot < -v.size {
-		slot = -v.size
+	if slot < -v.size_ {
+		slot = -v.size_
 	}
 	if slot < 0 {
-		slot = slot + v.size + 1
+		slot = slot + v.size_ + 1
 	}
-	v.slot = slot
+	v.slot_ = slot
 }
 
 func (v *iterator_[V]) ToStart() {
-	v.slot = 0
+	v.slot_ = 0
 }

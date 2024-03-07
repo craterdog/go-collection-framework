@@ -133,7 +133,7 @@ func (v array_[V]) AsArray() []V {
 }
 
 func (v array_[V]) GetIterator() IteratorLike[V] {
-	var iterator = Iterator[V]().Make(v)
+	var iterator = Iterator[V]().MakeFromSequence(v)
 	return iterator
 }
 

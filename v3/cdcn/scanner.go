@@ -22,7 +22,7 @@ import (
 // Reference
 
 var scannerClass = &scannerClass_{
-	matchers: map[TokenType]*reg.Regexp{
+	matchers_: map[TokenType]*reg.Regexp{
 		BooleanToken:     reg.MustCompile(`^(?:` + boolean_ + `)`),
 		ComplexToken:     reg.MustCompile(`^(?:` + complex_ + `)`),
 		ContextToken:     reg.MustCompile(`^(?:` + context_ + `)`),
@@ -49,20 +49,20 @@ func Scanner() ScannerClassLike {
 // Target
 
 type scannerClass_ struct {
-	matchers map[TokenType]*reg.Regexp
+	matchers_ map[TokenType]*reg.Regexp
 }
 
 // Constructors
 
-func (c *scannerClass_) Make(
+func (c *scannerClass_) MakeFromSource(
 	source string,
 	tokens col.QueueLike[TokenLike],
 ) ScannerLike {
 	var scanner = &scanner_{
-		line:     1,
-		position: 1,
-		runes:    []rune(source),
-		tokens:   tokens,
+		line_:     1,
+		position_: 1,
+		runes_:    []rune(source),
+		tokens_:   tokens,
 	}
 	go scanner.scanTokens() // Start scanning tokens in the background.
 	return scanner
@@ -71,10 +71,10 @@ func (c *scannerClass_) Make(
 // Functions
 
 func (c *scannerClass_) MatchToken(
-	tokenType TokenType,
+	type_ TokenType,
 	text string,
 ) col.ListLike[string] {
-	var matcher = c.matchers[tokenType]
+	var matcher = c.matchers_[type_]
 	var matches = matcher.FindStringSubmatch(text)
 	return col.List[string]().MakeFromArray(matches)
 }
@@ -84,39 +84,44 @@ func (c *scannerClass_) MatchToken(
 // Target
 
 type scanner_ struct {
-	first    int // A zero based index of the first possible rune in the next token.
-	line     int // The line number in the source string of the next rune.
-	next     int // A zero based index of the next possible rune in the next token.
-	position int // The position in the current line of the next rune.
-	runes    []rune
-	tokens   col.QueueLike[TokenLike]
+	first_    int // A zero based index of the first possible rune in the next token.
+	line_     int // The line number in the source string of the next rune.
+	next_     int // A zero based index of the next possible rune in the next token.
+	position_ int // The position in the current line of the next rune.
+	runes_    []rune
+	tokens_   col.QueueLike[TokenLike]
 }
 
 // Private
 
-func (v *scanner_) emitToken(tokenType TokenType) {
-	var tokenValue = string(v.runes[v.first:v.next])
-	switch tokenValue {
+func (v *scanner_) emitToken(type_ TokenType) {
+	var value = string(v.runes_[v.first_:v.next_])
+	switch value {
 	case "\x00":
-		tokenValue = "<NULL>"
+		value = "<NULL>"
 	case "\a":
-		tokenValue = "<BELL>"
+		value = "<BELL>"
 	case "\b":
-		tokenValue = "<BKSP>"
+		value = "<BKSP>"
 	case "\t":
-		tokenValue = "<HTAB>"
+		value = "<HTAB>"
 	case "\f":
-		tokenValue = "<FMFD>"
+		value = "<FMFD>"
 	case "\n":
-		tokenValue = "<EOLN>"
+		value = "<EOLN>"
 	case "\r":
-		tokenValue = "<CRTN>"
+		value = "<CRTN>"
 	case "\v":
-		tokenValue = "<VTAB>"
+		value = "<VTAB>"
 	}
-	var token = Token().Make(v.line, v.position, tokenType, tokenValue)
+	var token = Token().MakeWithAttributes(
+		v.line_,
+		v.position_,
+		type_,
+		value,
+	)
 	//fmt.Println(token) // Uncomment when debugging.
-	v.tokens.AddValue(token) // Will block if queue is full.
+	v.tokens_.AddValue(token) // Will block if queue is full.
 }
 
 func (v *scanner_) foundEOF() {
@@ -124,28 +129,28 @@ func (v *scanner_) foundEOF() {
 }
 
 func (v *scanner_) foundError() {
-	v.next++
+	v.next_++
 	v.emitToken(ErrorToken)
 }
 
-func (v *scanner_) foundToken(tokenType TokenType) bool {
-	var text = string(v.runes[v.next:])
-	var matches = Scanner().MatchToken(tokenType, text)
+func (v *scanner_) foundToken(type_ TokenType) bool {
+	var text = string(v.runes_[v.next_:])
+	var matches = Scanner().MatchToken(type_, text)
 	if !matches.IsEmpty() {
 		var match = matches.GetValue(1)
 		var token = []rune(match)
-		v.next += len(token)
-		if tokenType != SpaceToken {
-			v.emitToken(tokenType)
+		v.next_ += len(token)
+		if type_ != SpaceToken {
+			v.emitToken(type_)
 		}
 		var count = sts.Count(match, "\n")
 		if count > 0 {
-			v.line += count
-			v.position = v.indexOfLastEOL(token)
+			v.line_ += count
+			v.position_ = v.indexOfLastEOL(token)
 		} else {
-			v.position += v.next - v.first
+			v.position_ += v.next_ - v.first_
 		}
-		v.first = v.next
+		v.first_ = v.next_
 		return true
 	}
 	return false
@@ -163,7 +168,7 @@ func (v *scanner_) indexOfLastEOL(runes []rune) int {
 
 func (v *scanner_) scanTokens() {
 loop:
-	for v.next < len(v.runes) {
+	for v.next_ < len(v.runes_) {
 		switch {
 		case v.foundToken(BooleanToken):
 		case v.foundToken(ComplexToken):
@@ -183,7 +188,7 @@ loop:
 		}
 	}
 	v.foundEOF()
-	v.tokens.CloseQueue()
+	v.tokens_.CloseQueue()
 }
 
 /*

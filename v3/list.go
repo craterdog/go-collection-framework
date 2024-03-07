@@ -61,16 +61,14 @@ type listClass_[V Value] struct {
 
 func (c *listClass_[V]) Make() ListLike[V] {
 	var values = Array[V]().MakeWithSize(0)
-	var list = &list_[V]{
-		values: values,
+	return &list_[V]{
+		values_: values,
 	}
-	return list
 }
 
 func (c *listClass_[V]) MakeFromArray(values []V) ListLike[V] {
 	var array = Array[V]().MakeFromArray(values)
-	var list = c.MakeFromSequence(array)
-	return list
+	return c.MakeFromSequence(array)
 }
 
 func (c *listClass_[V]) MakeFromSequence(values Sequential[V]) ListLike[V] {
@@ -114,17 +112,17 @@ func (c *listClass_[V]) Concatenate(first, second ListLike[V]) ListLike[V] {
 // Target
 
 type list_[V Value] struct {
-	values ArrayLike[V]
+	values_ ArrayLike[V]
 }
 
 // Accessible
 
 func (v *list_[V]) GetValue(index int) V {
-	return v.values.GetValue(index)
+	return v.values_.GetValue(index)
 }
 
 func (v *list_[V]) GetValues(first int, last int) Sequential[V] {
-	return v.values.GetValues(first, last)
+	return v.values_.GetValues(first, last)
 }
 
 // Expandable
@@ -149,7 +147,7 @@ func (v *list_[V]) AppendValue(value V) {
 	array.SetValue(index, value)
 
 	// Update the internal array.
-	v.values = array
+	v.values_ = array
 }
 
 func (v *list_[V]) AppendValues(values Sequential[V]) {
@@ -176,7 +174,7 @@ func (v *list_[V]) AppendValues(values Sequential[V]) {
 	}
 
 	// Update the internal array.
-	v.values = array
+	v.values_ = array
 }
 
 func (v *list_[V]) InsertValue(slot int, value V) {
@@ -200,7 +198,7 @@ func (v *list_[V]) InsertValue(slot int, value V) {
 	}
 
 	// Update the internal array.
-	v.values = array
+	v.values_ = array
 }
 
 func (v *list_[V]) InsertValues(slot int, values Sequential[V]) {
@@ -228,11 +226,11 @@ func (v *list_[V]) InsertValues(slot int, values Sequential[V]) {
 	}
 
 	// Update the internal array.
-	v.values = array
+	v.values_ = array
 }
 
 func (v *list_[V]) RemoveAll() {
-	v.values = Array[V]().MakeWithSize(0)
+	v.values_ = Array[V]().MakeWithSize(0)
 }
 
 func (v *list_[V]) RemoveValue(index int) V {
@@ -257,7 +255,7 @@ func (v *list_[V]) RemoveValue(index int) V {
 	}
 
 	// Update the internal array.
-	v.values = array
+	v.values_ = array
 
 	return removed
 }
@@ -291,7 +289,7 @@ func (v *list_[V]) RemoveValues(first int, last int) Sequential[V] {
 	}
 
 	// Update the internal array.
-	v.values = array
+	v.values_ = array
 
 	return removed
 }
@@ -343,37 +341,37 @@ func (v *list_[V]) GetIndex(value V) int {
 // Sequential
 
 func (v *list_[V]) AsArray() []V {
-	return v.values.AsArray()
+	return v.values_.AsArray()
 }
 
 func (v *list_[V]) GetIterator() IteratorLike[V] {
-	return v.values.GetIterator()
+	return v.values_.GetIterator()
 }
 
 func (v *list_[V]) GetSize() int {
-	return v.values.GetSize()
+	return v.values_.GetSize()
 }
 
 func (v *list_[V]) IsEmpty() bool {
-	return v.values.IsEmpty()
+	return v.values_.IsEmpty()
 }
 
 // Sortable
 
 func (v *list_[V]) ReverseValues() {
-	v.values.ReverseValues()
+	v.values_.ReverseValues()
 }
 
 func (v *list_[V]) ShuffleValues() {
-	v.values.ShuffleValues()
+	v.values_.ShuffleValues()
 }
 
 func (v *list_[V]) SortValues() {
-	v.values.SortValues()
+	v.values_.SortValues()
 }
 
 func (v *list_[V]) SortValuesWithRanker(ranker RankingFunction) {
-	v.values.SortValuesWithRanker(ranker)
+	v.values_.SortValuesWithRanker(ranker)
 }
 
 // Stringer
@@ -386,11 +384,11 @@ func (v *list_[V]) String() string {
 // Updatable
 
 func (v *list_[V]) SetValue(index int, value V) {
-	v.values.SetValue(index, value)
+	v.values_.SetValue(index, value)
 }
 
 func (v *list_[V]) SetValues(index int, values Sequential[V]) {
-	v.values.SetValues(index, values)
+	v.values_.SetValues(index, values)
 }
 
 // Private

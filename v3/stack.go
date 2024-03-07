@@ -39,7 +39,7 @@ func Stack[V Value]() StackClassLike[V] {
 	default:
 		// Add a new bound class type.
 		class = &stackClass_[V]{
-			defaultCapacity: 16,
+			defaultCapacity_: 16,
 		}
 		stackClass[name] = class
 	}
@@ -54,42 +54,39 @@ func Stack[V Value]() StackClassLike[V] {
 // Target
 
 type stackClass_[V Value] struct {
-	defaultCapacity int
+	defaultCapacity_ int
 }
 
 // Constants
 
 func (c *stackClass_[V]) DefaultCapacity() int {
-	return c.defaultCapacity
+	return c.defaultCapacity_
 }
 
 // Constructors
 
 func (c *stackClass_[V]) Make() StackLike[V] {
 	var list = List[V]().Make()
-	var stack = &stack_[V]{
-		capacity: c.defaultCapacity,
-		values:   list,
+	return &stack_[V]{
+		capacity_: c.defaultCapacity_,
+		values_:   list,
 	}
-	return stack
 }
 
 func (c *stackClass_[V]) MakeFromArray(values []V) StackLike[V] {
 	var list = List[V]().MakeFromArray(values)
-	var stack = &stack_[V]{
-		capacity: c.defaultCapacity,
-		values:   list,
+	return &stack_[V]{
+		capacity_: c.defaultCapacity_,
+		values_:   list,
 	}
-	return stack
 }
 
 func (c *stackClass_[V]) MakeFromSequence(values Sequential[V]) StackLike[V] {
 	var list = List[V]().MakeFromSequence(values)
-	var stack = &stack_[V]{
-		capacity: c.defaultCapacity,
-		values:   list,
+	return &stack_[V]{
+		capacity_: c.defaultCapacity_,
+		values_:   list,
 	}
-	return stack
 }
 
 func (c *stackClass_[V]) MakeFromSource(
@@ -101,14 +98,13 @@ func (c *stackClass_[V]) MakeFromSource(
 
 	// Next we must convert each value explicitly to type V.
 	var anys = collection.AsArray()
-	var array = make([]V, c.defaultCapacity)
+	var array = make([]V, c.defaultCapacity_)
 	for index, value := range anys {
 		array[index] = value.(V)
 	}
 
 	// Then we can create the stack from the type V array.
-	var stack = c.MakeFromArray(array)
-	return stack
+	return c.MakeFromArray(array)
 }
 
 func (c *stackClass_[V]) MakeWithCapacity(capacity int) StackLike[V] {
@@ -116,11 +112,10 @@ func (c *stackClass_[V]) MakeWithCapacity(capacity int) StackLike[V] {
 		panic("A stack must have a capacity greater than zero.")
 	}
 	var list = List[V]().Make()
-	var stack = &stack_[V]{
-		capacity: capacity,
-		values:   list,
+	return &stack_[V]{
+		capacity_: capacity,
+		values_:   list,
 	}
-	return stack
 }
 
 // INSTANCE METHODS
@@ -128,47 +123,47 @@ func (c *stackClass_[V]) MakeWithCapacity(capacity int) StackLike[V] {
 // Target
 
 type stack_[V Value] struct {
-	capacity int
-	values   ListLike[V]
+	capacity_ int
+	values_   ListLike[V]
 }
 
 // Limited
 
 func (v *stack_[V]) AddValue(value V) {
-	if v.values.GetSize() == v.capacity {
+	if v.values_.GetSize() == v.capacity_ {
 		panic(fmt.Sprintf(
 			"Attempted to add a value onto a stack that has reached its capacity: %v\nvalue: %v\nstack: %v\n",
-			v.capacity,
+			v.capacity_,
 			value,
 			v))
 	}
-	v.values.InsertValue(0, value)
+	v.values_.InsertValue(0, value)
 }
 
 func (v *stack_[V]) GetCapacity() int {
-	return v.capacity
+	return v.capacity_
 }
 
 func (v *stack_[V]) RemoveAll() {
-	v.values.RemoveAll()
+	v.values_.RemoveAll()
 }
 
 // Sequential
 
 func (v *stack_[V]) AsArray() []V {
-	return v.values.AsArray()
+	return v.values_.AsArray()
 }
 
 func (v *stack_[V]) GetIterator() IteratorLike[V] {
-	return v.values.GetIterator()
+	return v.values_.GetIterator()
 }
 
 func (v *stack_[V]) GetSize() int {
-	return v.values.GetSize()
+	return v.values_.GetSize()
 }
 
 func (v *stack_[V]) IsEmpty() bool {
-	return v.values.IsEmpty()
+	return v.values_.IsEmpty()
 }
 
 // Stringer
@@ -181,8 +176,8 @@ func (v *stack_[V]) String() string {
 // Public
 
 func (v *stack_[V]) RemoveTop() V {
-	if v.values.IsEmpty() {
+	if v.values_.IsEmpty() {
 		panic("Attempted to remove the top of an empty stack!")
 	}
-	return v.values.RemoveValue(1)
+	return v.values_.RemoveValue(1)
 }

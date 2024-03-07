@@ -242,8 +242,8 @@ type ArrayClassLike[V Value] interface {
 	// Constructors
 	MakeFromArray(values []V) ArrayLike[V]
 	MakeFromSequence(values Sequential[V]) ArrayLike[V]
+	MakeFromSize(size int) ArrayLike[V]
 	MakeFromSource(source string, notation NotationLike) ArrayLike[V]
-	MakeWithSize(size int) ArrayLike[V]
 }
 
 /*
@@ -517,7 +517,7 @@ This type is parameterized as follows:
 This type is used by catalog-like instances to maintain their associations.
 */
 type AssociationLike[K Key, V Value] interface {
-	// Methods
+	// Attributes
 	GetKey() K
 	GetValue() V
 	SetValue(value V)

@@ -77,6 +77,11 @@ func (c *arrayClass_[V]) MakeFromSequence(values Sequential[V]) ArrayLike[V] {
 	return array_[V](array)
 }
 
+func (c *arrayClass_[V]) MakeFromSize(size int) ArrayLike[V] {
+	var array = make([]V, size) // All values initialized to zero.
+	return array_[V](array)
+}
+
 func (c *arrayClass_[V]) MakeFromSource(
 	source string,
 	notation NotationLike,
@@ -85,7 +90,7 @@ func (c *arrayClass_[V]) MakeFromSource(
 	var collection = notation.ParseSource(source).(Sequential[Value])
 
 	// Then we convert it to an Array of type V.
-	var array = c.MakeWithSize(collection.GetSize())
+	var array = c.MakeFromSize(collection.GetSize())
 	var index int
 	var iterator = collection.GetIterator()
 	for iterator.HasNext() {
@@ -94,11 +99,6 @@ func (c *arrayClass_[V]) MakeFromSource(
 		array.SetValue(index, value)
 	}
 	return array
-}
-
-func (c *arrayClass_[V]) MakeWithSize(size int) ArrayLike[V] {
-	var array = make([]V, size) // All values initialized to zero.
-	return array_[V](array)
 }
 
 // INSTANCE METHODS

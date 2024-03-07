@@ -27,7 +27,7 @@ func TestArrayConstructors(t *tes.T) {
 }
 
 func TestEmptyArray(t *tes.T) {
-	var array = col.Array[string]().MakeWithSize(0)
+	var array = col.Array[string]().MakeFromSize(0)
 	ass.True(t, array.IsEmpty())
 	ass.Equal(t, 0, array.GetSize())
 	ass.Equal(t, []string{}, array.AsArray())
@@ -48,7 +48,7 @@ func TestEmptyArray(t *tes.T) {
 }
 
 func TestArrayWithSize(t *tes.T) {
-	var array = col.Array[string]().MakeWithSize(3)
+	var array = col.Array[string]().MakeFromSize(3)
 	ass.False(t, array.IsEmpty())
 	ass.Equal(t, 3, array.GetSize())
 	ass.Equal(t, []string{"", "", ""}, array.AsArray())

@@ -146,7 +146,7 @@ func TestCatalogsWithExtract(t *tes.T) {
 
 func TestCatalogsWithEmptyCatalogs(t *tes.T) {
 	var collator = col.Collator().Make()
-	var keys = col.Array[int]().MakeWithSize(0)
+	var keys = col.Array[int]().MakeFromSize(0)
 	var Catalog = col.Catalog[int, string]()
 	var catalog1 = Catalog.Make()
 	var catalog2 = Catalog.Make()

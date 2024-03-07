@@ -60,7 +60,7 @@ type listClass_[V Value] struct {
 // Constructors
 
 func (c *listClass_[V]) Make() ListLike[V] {
-	var values = Array[V]().MakeWithSize(0)
+	var values = Array[V]().MakeFromSize(0)
 	return &list_[V]{
 		values_: values,
 	}
@@ -131,7 +131,7 @@ func (v *list_[V]) AppendValue(value V) {
 
 	// Create a new larger array.
 	var size = v.GetSize() + 1
-	var array = Array[V]().MakeWithSize(size)
+	var array = Array[V]().MakeFromSize(size)
 
 	// Copy the existing values into the new array.
 	var index int
@@ -154,7 +154,7 @@ func (v *list_[V]) AppendValues(values Sequential[V]) {
 
 	// Create a new larger array.
 	var size = v.GetSize() + values.GetSize()
-	var array = Array[V]().MakeWithSize(size)
+	var array = Array[V]().MakeFromSize(size)
 
 	// Copy the existing values into the new array.
 	var index int
@@ -181,7 +181,7 @@ func (v *list_[V]) InsertValue(slot int, value V) {
 
 	// Create a new larger array.
 	var size = v.GetSize() + 1
-	var array = Array[V]().MakeWithSize(size)
+	var array = Array[V]().MakeFromSize(size)
 
 	// Copy the values into the new array.
 	var iterator = v.GetIterator()
@@ -205,7 +205,7 @@ func (v *list_[V]) InsertValues(slot int, values Sequential[V]) {
 
 	// Create a new larger array.
 	var size = v.GetSize() + values.GetSize()
-	var array = Array[V]().MakeWithSize(size)
+	var array = Array[V]().MakeFromSize(size)
 
 	// Copy the values into the new array.
 	var iterator = v.GetIterator()
@@ -230,7 +230,7 @@ func (v *list_[V]) InsertValues(slot int, values Sequential[V]) {
 }
 
 func (v *list_[V]) RemoveAll() {
-	v.values_ = Array[V]().MakeWithSize(0)
+	v.values_ = Array[V]().MakeFromSize(0)
 }
 
 func (v *list_[V]) RemoveValue(index int) V {
@@ -238,7 +238,7 @@ func (v *list_[V]) RemoveValue(index int) V {
 	// Create a new smaller array.
 	var removed = v.GetValue(index)
 	var size = v.GetSize() - 1
-	var array = Array[V]().MakeWithSize(size)
+	var array = Array[V]().MakeFromSize(size)
 
 	// Copy the remaining values into the new array.
 	var counter = v.toNormalized(index)
@@ -268,8 +268,8 @@ func (v *list_[V]) RemoveValues(first int, last int) Sequential[V] {
 	var delta = last - first + 1
 	var size = v.GetSize() - delta
 	var Array = Array[V]()
-	var removed = Array.MakeWithSize(delta)
-	var array = Array.MakeWithSize(size)
+	var removed = Array.MakeFromSize(delta)
+	var array = Array.MakeFromSize(size)
 
 	// Split the existing values into the two new arrays.
 	var counter int

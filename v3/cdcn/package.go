@@ -103,10 +103,10 @@ AsString() returns a string representing the specified token type.
 type TokenClassLike interface {
 	// Constructors
 	MakeWithAttributes(
-		line_ int,
-		position_ int,
+		line int,
+		position int,
 		type_ TokenType,
-		value_ string,
+		value string,
 	) TokenLike
 
 	// Functions

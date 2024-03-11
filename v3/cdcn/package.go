@@ -35,6 +35,11 @@ import (
 // Specializations
 
 /*
+Primitive is a generic type representing any type of Go primitive value.
+*/
+type Primitive any
+
+/*
 TokenType is a specialized type representing any token type recognized by a
 scanner.
 */

@@ -50,24 +50,11 @@ Key is a generic type representing any type of associative key.
 type Key any
 
 /*
-Primitive is a generic type representing any type of Go primitive value.
-*/
-type Primitive any
-
-/*
 Value is a generic type representing any type of value.
 */
 type Value any
 
 // Functionals
-
-/*
-ComparingFunction defines the signature for any function that can determine
-whether or not two specified values are equal to each other.  The meaning of
-"equality" is determined by the specific function that implements this
-signature.
-*/
-type ComparingFunction func(first Value, second Value) bool
 
 /*
 RankingFunction defines the signature for any function that can determine
@@ -703,13 +690,6 @@ type QueueLike[V Value] interface {
 	// Methods
 	CloseQueue()
 	RemoveHead() (head V, ok bool)
-}
-
-/*
-ScannerLike defines the set of abstractions and methods that must be supported
-by all scanner-like instances.
-*/
-type ScannerLike interface {
 }
 
 /*

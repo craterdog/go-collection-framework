@@ -376,14 +376,14 @@ func (v *parser_) parseKey() (
 	token TokenLike,
 	ok bool,
 ) {
-	var primitive col.Primitive
+	var primitive Primitive
 	primitive, token, ok = v.parsePrimitive()
 	key = col.Key(primitive)
 	return key, token, ok
 }
 
 func (v *parser_) parsePrimitive() (
-	primitive col.Primitive,
+	primitive Primitive,
 	token TokenLike,
 	ok bool,
 ) {

@@ -569,7 +569,7 @@ var grammar = map[string]string{
 	"$association": `key ":" value`,
 	"$associations": `
     association ("," association)*
-    EOL (association EOL)+
+    (EOL association)+ EOL?
     ":"  ! No associations.`,
 	"$collection": `"[" (associations | values) "]" "(" CONTEXT ")"`,
 	"$key":        `primitive`,
@@ -578,6 +578,6 @@ var grammar = map[string]string{
 	"$value":      `collection | primitive`,
 	"$values": `
     value ("," value)*
-    EOL (value EOL)+
+    (EOL value)+ EOL?
     " "  ! No values.`,
 }

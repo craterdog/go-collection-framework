@@ -107,7 +107,6 @@ $associations:
     EOL (association EOL)+
     ":"  ! No associations.
 
-
 $association: key ":" value
 
 $key: primitive
@@ -120,5 +119,4 @@ $values:
     value ("," value)*
     EOL (value EOL)+
     " "  ! No values.
-
 

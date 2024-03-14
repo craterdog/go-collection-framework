@@ -104,7 +104,7 @@ $collection: "[" (associations | values) "]" "(" CONTEXT ")"
 
 $associations:
     association ("," association)*
-    EOL (association EOL)+
+    (EOL association)+ EOL?
     ":"  ! No associations.
 
 $association: key ":" value
@@ -117,6 +117,6 @@ $primitive: BOOLEAN | COMPLEX | FLOAT | HEXADECIMAL | INTEGER | NIL | RUNE | STR
 
 $values:
     value ("," value)*
-    EOL (value EOL)+
+    (EOL value)+ EOL?
     " "  ! No values.
 

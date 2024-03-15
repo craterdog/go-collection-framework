@@ -19,7 +19,7 @@ is located here:
 
 This package follows the Crater Dog Technologies™ (craterdog) Go Coding
 Conventions located here:
-  - https://github.com/craterdog/go-class-framework/wiki
+  - https://github.com/craterdog/go-package-framework/wiki
 
 Additional implementations of the classes provided by this package can be
 developed and used seamlessly since the interface definitions only depend on

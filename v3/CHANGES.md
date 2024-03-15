@@ -24,7 +24,7 @@ and was not changed in any significant ways.  That said, the following changes
 to the package made in `v3`:
 
 ### Consolidated Package Interface
-The public interface to a package is now captured in a `package.go` file.  This
+The public interface to a package is now captured in a `Model.go` file.  This
 file defines all abstract interfaces and types that are exported by the classes
 defined in the package.  If a new abstract interface or type is added to this
 file, the _minor_ version number of the package must be incremented.  If an
@@ -40,7 +40,7 @@ JSON to be added later in their own sub-packages.
 Each exported class defined in the collection framework now has an associated
 class scope.  All _constants_, _constructors_ and _class functions_ are now
 accessed via its class access function.  See the latest
-[Crater Dog Technologies™ Go Coding Conventions](https://github.com/craterdog/go-class-framework/wiki#class-namespaces)
+[Crater Dog Technologies™ Go Coding Conventions](https://github.com/craterdog/go-package-framework/wiki)
 for more details on this class-based model.
 
 ### Fully Encapsulated `Array[V]` and `Map[K, V]` Classes 

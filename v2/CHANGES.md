@@ -1,6 +1,6 @@
 <img src="https://craterdog.com/images/CraterDog.png" width="50%">
 
-## Go Collection Framework v2 Changes
+.    Copyright (c) 2009-2024 Crater Dog Technologies.  All Rights Reserved.    .
 The following changes to the module interface where introduced in v2:
 
 ### Decoupling of the List and Array Types

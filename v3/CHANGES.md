@@ -1,6 +1,6 @@
 <img src="https://craterdog.com/images/CraterDog.png" width="50%">
 
-.    Copyright (c) 2009-2024 Crater Dog Technologies.  All Rights Reserved.    .
+## Go Collection Framework v3 Changes
 The `v2` version of the collection framework showed weaknesses in the following
 areas:
  1. The exported package level functions were generally associated with a single

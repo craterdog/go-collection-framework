@@ -24,7 +24,7 @@ and was not changed in any significant ways.  That said, the following changes
 to the package made in `v3`:
 
 ### Consolidated Package Interface
-The public interface to a package is now captured in a `Model.go` file.  This
+The public interface to a package is now captured in a `Package.go` file.  This
 file defines all abstract interfaces and types that are exported by the classes
 defined in the package.  If a new abstract interface or type is added to this
 file, the _minor_ version number of the package must be incremented.  If an

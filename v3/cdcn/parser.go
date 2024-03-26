@@ -182,18 +182,21 @@ func (v *parser_) parseAssociation() (
 	token TokenLike,
 	ok bool,
 ) {
+	// Attempt to parse a primitive key.
 	var key col.Key
-	var value col.Value
 	key, token, ok = v.parseKey()
 	if !ok {
 		return association, token, false
 	}
 	_, _, ok = v.parseToken(DelimiterToken, ":")
 	if !ok {
-		// Put back the primitive key token.
+		// The primitive token is not a key.
 		v.putBack(token)
 		return association, token, false
 	}
+
+	// Attempt to parse a value.
+	var value col.Value
 	value, token, ok = v.parseValue()
 	if !ok {
 		var message = v.formatError(token)
@@ -203,6 +206,8 @@ func (v *parser_) parseAssociation() (
 			"value")
 		panic(message)
 	}
+
+	// Found an association.
 	association = col.Association[col.Key, col.Value]().MakeWithAttributes(key, value)
 	return association, token, true
 }
@@ -218,21 +223,20 @@ func (v *parser_) parseAssociations() (
 	// Check for an empty sequence.
 	_, token, ok = v.parseToken(DelimiterToken, ":")
 	if ok {
+		// Found an empty sequence.
 		return associations, token, true
 	}
 
 	// Attempt to parse a multi-line sequence of associations.
 	_, token, ok = v.parseToken(EOLToken, "")
 	if ok {
-		// Attempt to parse the first association.
+		// Attempt to parse one or more associations.
 		association, _, ok = v.parseAssociation()
 		if !ok {
 			// This must be a sequence of values instead.
 			v.putBack(token)
 			return associations, token, false
 		}
-
-		// Parse any additional associations.
 		for ok {
 			var key = association.GetKey()
 			var value = association.GetValue()
@@ -255,13 +259,11 @@ func (v *parser_) parseAssociations() (
 		return associations, token, true
 	}
 
-	// Attempt to parse the first association in an in-line sequence.
+	// Attempt to parse one or more associations in an in-line sequence.
 	association, token, ok = v.parseAssociation()
 	if !ok {
 		return associations, token, false
 	}
-
-	// Parse any additional associations.
 	for ok {
 		var value = association.GetValue()
 		var key = association.GetKey()
@@ -290,15 +292,18 @@ func (v *parser_) parseCollection() (
 	token TokenLike,
 	ok bool,
 ) {
-	var context string
+	// Attempt to parse the opening bracket of the collection.
 	_, token, ok = v.parseToken(DelimiterToken, "[")
 	if !ok {
 		return collection, token, false
 	}
+
+	// Attempt to parse a sequence of associations.
 	collection, _, ok = v.parseAssociations()
 	if !ok {
-		// The values must be attempted second since it may start with a component
-		// which cannot be put back as a single token.
+		// Attempt to parse a sequence of values. The values must be
+		// attempted second since it may start with a component which
+		// cannot be put back as a single token.
 		collection, _, ok = v.parseValues()
 		if !ok {
 			var message = v.formatError(token)
@@ -310,6 +315,8 @@ func (v *parser_) parseCollection() (
 			panic(message)
 		}
 	}
+
+	// Attempt to parse the closing bracket of the collection.
 	_, token, ok = v.parseToken(DelimiterToken, "]")
 	if !ok {
 		var message = v.formatError(token)
@@ -320,6 +327,8 @@ func (v *parser_) parseCollection() (
 		)
 		panic(message)
 	}
+
+	// Attempt to parse the opening bracket of the context.
 	_, token, ok = v.parseToken(DelimiterToken, "(")
 	if !ok {
 		var message = v.formatError(token)
@@ -330,6 +339,9 @@ func (v *parser_) parseCollection() (
 		)
 		panic(message)
 	}
+
+	// Attempt to parse the context for the collection.
+	var context string
 	context, token, ok = v.parseToken(ContextToken, "")
 	if !ok {
 		var message = v.formatError(token)
@@ -340,6 +352,8 @@ func (v *parser_) parseCollection() (
 		)
 		panic(message)
 	}
+
+	// Attempt to parse the opening bracket of the context.
 	_, token, ok = v.parseToken(DelimiterToken, ")")
 	if !ok {
 		var message = v.formatError(token)
@@ -350,6 +364,8 @@ func (v *parser_) parseCollection() (
 		)
 		panic(message)
 	}
+
+	// Found a collection of a specific type.
 	switch sequence := collection.(type) {
 	case col.Sequential[col.Value]:
 		switch context {
@@ -401,10 +417,16 @@ func (v *parser_) parseKey() (
 	token TokenLike,
 	ok bool,
 ) {
+	// Attempt to parse a primitive.
 	var primitive any
 	primitive, token, ok = v.parsePrimitive()
+	if !ok {
+		return key, token, false
+	}
+
+	// Found a primitive key.
 	key = col.Key(primitive)
-	return key, token, ok
+	return key, token, true
 }
 
 func (v *parser_) parsePrimitive() (
@@ -463,16 +485,19 @@ func (v *parser_) parseToken(expectedType TokenType, expectedValue string) (
 	token TokenLike,
 	ok bool,
 ) {
+	// Attempt to parse a specific token.
 	token = v.getNextToken()
-	value = token.GetValue()
 	if token.GetType() == expectedType {
-		var constrained = len(expectedValue) > 0
-		if !constrained || value == expectedValue {
+		value = token.GetValue()
+		if len(expectedValue) == 0 || expectedValue == value {
+			// Found the expected token.
 			return value, token, true
 		}
 	}
+
+	// This is not the right token.
 	v.putBack(token)
-	return "", token, false
+	return value, token, false
 }
 
 func (v *parser_) parseValue() (
@@ -480,14 +505,21 @@ func (v *parser_) parseValue() (
 	token TokenLike,
 	ok bool,
 ) {
+	// Attempt to parse a primitive.
 	value, token, ok = v.parsePrimitive()
 	if ok {
+		// Found a primitive value.
 		return value, token, true
 	}
+
+	// Attempt to parse a collection.
 	value, token, ok = v.parseCollection()
 	if ok {
+		// Found a collection value.
 		return value, token, true
 	}
+
+	// This is not a value.
 	return value, token, false
 }
 

@@ -48,7 +48,8 @@ type parserClass_ struct {
 
 func (c *parserClass_) Make() ParserLike {
 	return &parser_{
-		next_: col.Stack[TokenLike]().MakeWithCapacity(c.stackSize_),
+		tokens_: col.Queue[TokenLike]().MakeWithCapacity(c.queueSize_),
+		next_:   col.Stack[TokenLike]().MakeWithCapacity(c.stackSize_),
 	}
 }
 
@@ -57,9 +58,9 @@ func (c *parserClass_) Make() ParserLike {
 // Target
 
 type parser_ struct {
-	next_   col.StackLike[TokenLike] // A stack of unprocessed retrieved tokens.
 	source_ string                   // The original source code.
 	tokens_ col.QueueLike[TokenLike] // A queue of unread tokens from the scanner.
+	next_   col.StackLike[TokenLike] // A stack of read, but unprocessed tokens.
 }
 
 // Public
@@ -67,38 +68,42 @@ type parser_ struct {
 func (v *parser_) ParseSource(source string) col.Collection {
 	// The scanner runs in a separate Go routine.
 	v.source_ = source
-	v.tokens_ = col.Queue[TokenLike]().MakeWithCapacity(parserClass.queueSize_)
-	Scanner().MakeFromSource(v.source_, v.tokens_)
+	Scanner().Make(v.source_, v.tokens_)
 
-	// Parse the tokens from the scanner.
+	// Attempt to parse a collection.
 	var collection, token, ok = v.parseCollection()
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateGrammar("collection",
-			"$source",
-			"$collection",
+			"source",
+			"collection",
 		)
 		panic(message)
 	}
+
+	// Attempt to parse the end-of-file marker.
 	_, token, ok = v.parseToken(EOFToken, "")
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateGrammar("EOF",
-			"$source",
-			"$collection",
+			"source",
+			"collection",
 		)
 		panic(message)
 	}
+
+	// Found a collection.
 	return collection
 }
 
 // Private
 
 /*
-This private class method returns an error message containing the context for a
-parsing error.
+This private instance method returns an error message containing the context for
+a parsing error.
 */
 func (v *parser_) formatError(token TokenLike) string {
+	// Format the error message.
 	var message = fmt.Sprintf(
 		"An unexpected token was received by the parser: %v\n",
 		token,
@@ -106,12 +111,14 @@ func (v *parser_) formatError(token TokenLike) string {
 	var line = token.GetLine()
 	var lines = sts.Split(v.source_, "\n")
 
+	// Append the source line with the error in it.
 	message += "\033[36m"
 	if line > 1 {
 		message += fmt.Sprintf("%04d: ", line-1) + string(lines[line-2]) + "\n"
 	}
 	message += fmt.Sprintf("%04d: ", line) + string(lines[line-1]) + "\n"
 
+	// Append an arrow pointing to the error.
 	message += " \033[32m>>>─"
 	var count = 0
 	for count < token.GetPosition() {
@@ -120,6 +127,7 @@ func (v *parser_) formatError(token TokenLike) string {
 	}
 	message += "⌃\033[36m\n"
 
+	// Append the following source line for context.
 	if line < len(lines) {
 		message += fmt.Sprintf("%04d: ", line+1) + string(lines[line]) + "\n"
 	}
@@ -129,41 +137,44 @@ func (v *parser_) formatError(token TokenLike) string {
 }
 
 /*
-This private class method is useful when creating scanner and parser error
+This private instance method is useful when creating scanner and parser error
 messages that include the required grammatical rules.
 */
-func (v *parser_) generateGrammar(expected string, symbols ...string) string {
+func (v *parser_) generateGrammar(expected string, names ...string) string {
 	var message = "Was expecting '" + expected + "' from:\n"
-	for _, symbol := range symbols {
+	for _, name := range names {
 		message += fmt.Sprintf(
 			"  \033[32m%v: \033[33m%v\033[0m\n\n",
-			symbol,
-			grammar[symbol],
+			name,
+			grammar[name],
 		)
 	}
 	return message
 }
 
 /*
-This private class method attempts to read the next token from the token
+This private instance method attempts to read the next token from the token
 stream and return it.
 */
 func (v *parser_) getNextToken() TokenLike {
-	var next TokenLike
-	if v.next_.IsEmpty() {
-		var token, ok = v.tokens_.RemoveHead() // Will block if queue is empty.
-		if !ok {
-			panic("The token channel terminated without an EOF token.")
-		}
-		next = token
-		if next.GetType() == ErrorToken {
-			var message = v.formatError(next)
-			panic(message)
-		}
-	} else {
-		next = v.next_.RemoveTop()
+	// Check for any read, but unprocessed tokens.
+	if !v.next_.IsEmpty() {
+		return v.next_.RemoveTop()
 	}
-	return next
+
+	// Read a new token from the token stream.
+	var token, ok = v.tokens_.RemoveHead() // This will wait for a token.
+	if !ok {
+		panic("The token channel terminated without an EOF token.")
+	}
+
+	// Check for an error token.
+	if token.GetType() == ErrorToken {
+		var message = v.formatError(token)
+		panic(message)
+	}
+
+	return token
 }
 
 func (v *parser_) parseAssociation() (
@@ -187,9 +198,9 @@ func (v *parser_) parseAssociation() (
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateGrammar("value",
-			"$association",
-			"$key",
-			"$value")
+			"association",
+			"key",
+			"value")
 		panic(message)
 	}
 	association = col.Association[col.Key, col.Value]().MakeWithAttributes(key, value)
@@ -262,8 +273,8 @@ func (v *parser_) parseAssociations() (
 			if !ok {
 				var message = v.formatError(token)
 				message += v.generateGrammar("association",
-					"$associations",
-					"$association",
+					"associations",
+					"association",
 				)
 				panic(message)
 			}
@@ -292,9 +303,9 @@ func (v *parser_) parseCollection() (
 		if !ok {
 			var message = v.formatError(token)
 			message += v.generateGrammar("associations",
-				"$collection",
-				"$associations",
-				"$values",
+				"collection",
+				"associations",
+				"values",
 			)
 			panic(message)
 		}
@@ -303,9 +314,9 @@ func (v *parser_) parseCollection() (
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateGrammar("]",
-			"$collection",
-			"$associations",
-			"$values",
+			"collection",
+			"associations",
+			"values",
 		)
 		panic(message)
 	}
@@ -313,9 +324,9 @@ func (v *parser_) parseCollection() (
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateGrammar("(",
-			"$collection",
-			"$associations",
-			"$values",
+			"collection",
+			"associations",
+			"values",
 		)
 		panic(message)
 	}
@@ -323,9 +334,9 @@ func (v *parser_) parseCollection() (
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateGrammar("CONTEXT",
-			"$collection",
-			"$associations",
-			"$values",
+			"collection",
+			"associations",
+			"values",
 		)
 		panic(message)
 	}
@@ -333,9 +344,9 @@ func (v *parser_) parseCollection() (
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateGrammar(")",
-			"$collection",
-			"$associations",
-			"$values",
+			"collection",
+			"associations",
+			"values",
 		)
 		panic(message)
 	}
@@ -503,8 +514,8 @@ func (v *parser_) parseValues() (
 		if !ok {
 			var message = v.formatError(token)
 			message += v.generateGrammar("value",
-				"$values",
-				"$value",
+				"values",
+				"value",
 			)
 			panic(message)
 		}
@@ -546,8 +557,8 @@ func (v *parser_) parseValues() (
 			if !ok {
 				var message = v.formatError(token)
 				message += v.generateGrammar("value",
-					"$values",
-					"$value",
+					"values",
+					"value",
 				)
 				panic(message)
 			}
@@ -566,17 +577,17 @@ func (v *parser_) putBack(token TokenLike) {
 This Go map captures the syntax rules for collections of Go primitives.
 */
 var grammar = map[string]string{
-	"$association": `key ":" value`,
-	"$associations": `
+	"association": `key ":" value`,
+	"associations": `
     association ("," association)*
     (EOL association)+ EOL?
     ":"  ! No associations.`,
-	"$collection": `"[" (associations | values) "]" "(" CONTEXT ")"`,
-	"$key":        `primitive`,
-	"$primitive":  `BOOLEAN | COMPLEX | FLOAT | HEXADECIMAL | INTEGER | NIL | RUNE | STRING`,
-	"$source":     `collection EOF  ! Terminated with an end-of-file marker.`,
-	"$value":      `collection | primitive`,
-	"$values": `
+	"collection": `"[" (associations | values) "]" "(" Context ")"`,
+	"key":        `primitive`,
+	"primitive":  `Boolean | Complex | Float | Hexadecimal | Integer | Nil | Rune | String`,
+	"source":     `collection EOF  ! Terminated with an end-of-file marker.`,
+	"value":      `collection | primitive`,
+	"values": `
     value ("," value)*
     (EOL value)+ EOL?
     " "  ! No values.`,

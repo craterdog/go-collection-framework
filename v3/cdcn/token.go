@@ -86,22 +86,7 @@ type token_ struct {
 	value_    string
 }
 
-// Stringer
-
-func (v *token_) String() string {
-	var s = fmt.Sprintf("%q", v.value_)
-	if len(s) > 40 {
-		s = fmt.Sprintf("%.40q...", v.value_)
-	}
-	return fmt.Sprintf("Token [type: %s, line: %d, position: %d]: %s",
-		Token().AsString(v.type_),
-		v.line_,
-		v.position_,
-		s,
-	)
-}
-
-// Public
+// Attributes
 
 func (v *token_) GetLine() int {
 	return v.line_
@@ -117,4 +102,19 @@ func (v *token_) GetType() TokenType {
 
 func (v *token_) GetValue() string {
 	return v.value_
+}
+
+// Stringer
+
+func (v *token_) String() string {
+	var s = fmt.Sprintf("%q", v.value_)
+	if len(s) > 40 {
+		s = fmt.Sprintf("%.40q...", v.value_)
+	}
+	return fmt.Sprintf("Token [type: %s, line: %d, position: %d]: %s",
+		Token().AsString(v.type_),
+		v.line_,
+		v.position_,
+		s,
+	)
 }

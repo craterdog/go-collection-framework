@@ -84,7 +84,7 @@ substrings are returned as additional values in the list.
 */
 type ScannerClassLike interface {
 	// Constructors
-	MakeFromSource(source string, tokens col.QueueLike[TokenLike]) ScannerLike
+	Make(source string, tokens col.QueueLike[TokenLike]) ScannerLike
 
 	// Functions
 	MatchToken(type_ TokenType, text string) col.ListLike[string]

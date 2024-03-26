@@ -56,7 +56,7 @@ type scannerClass_ struct {
 
 // Constructors
 
-func (c *scannerClass_) MakeFromSource(
+func (c *scannerClass_) Make(
 	source string,
 	tokens col.QueueLike[TokenLike],
 ) ScannerLike {
@@ -116,14 +116,9 @@ func (v *scanner_) emitToken(type_ TokenType) {
 	case "\v":
 		value = "<VTAB>"
 	}
-	var token = Token().MakeWithAttributes(
-		v.line_,
-		v.position_,
-		type_,
-		value,
-	)
+	var token = Token().MakeWithAttributes(v.line_, v.position_, type_, value)
 	//fmt.Println(token) // Uncomment when debugging.
-	v.tokens_.AddValue(token) // Will block if queue is full.
+	v.tokens_.AddValue(token) // This will block if the queue is full.
 }
 
 func (v *scanner_) foundEOF() {
@@ -141,7 +136,8 @@ func (v *scanner_) foundToken(type_ TokenType) bool {
 	if !matches.IsEmpty() {
 		var match = matches.GetValue(1)
 		var token = []rune(match)
-		v.next_ += len(token)
+		var length = len(token)
+		v.next_ += length
 		if type_ != SpaceToken {
 			v.emitToken(type_)
 		}
@@ -190,15 +186,15 @@ loop:
 		}
 	}
 	v.foundEOF()
-	v.tokens_.CloseQueue()
 }
 
 /*
+NOTE:
 These private constants define the regular expression sub-patterns that make up
 all token types.  Unfortunately there is no way to make them private to the
-scanner class namespace since they must be TRUE Go constants to be initialized
-in this way.  We append an underscore to each name to lessen the chance of a
-name collision with other private Go class constants in this package.
+scanner class since they must be TRUE Go constants to be initialized in this
+way.  We append an underscore to each name to lessen the chance of a name
+collision with other private Go class constants in this package.
 */
 const (
 	base10_      = `[0-9]`

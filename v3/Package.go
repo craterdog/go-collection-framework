@@ -11,7 +11,7 @@
 */
 
 /*
-Package collections defines a set of simple, pragmatic abstract types and
+Package "collections" defines a set of simple, pragmatic abstract types and
 interfaces for Go based collections of values. It also provide an efficient and
 compact implementation of the following collection classes based on these
 abstractions:

@@ -345,7 +345,7 @@ func (v *parser_) parseCollection() (
 	context, token, ok = v.parseToken(ContextToken, "")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("CONTEXT",
+		message += v.generateGrammar("Context",
 			"collection",
 			"associations",
 			"values",

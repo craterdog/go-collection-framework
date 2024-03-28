@@ -83,7 +83,7 @@ func (v *parser_) ParseSource(source string) col.Collection {
 
 	// Attempt to parse optional end-of-line characters.
 	for ok {
-		_, token, ok = v.parseToken(EOLToken, "")
+		_, _, ok = v.parseToken(EOLToken, "")
 	}
 
 	// Attempt to parse the end-of-file marker.

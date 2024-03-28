@@ -134,7 +134,7 @@ type stack_[V Value] struct {
 func (v *stack_[V]) AddValue(value V) {
 	if v.values_.GetSize() == v.capacity_ {
 		panic(fmt.Sprintf(
-			"Attempted to add a value onto a stack that has reached its capacity: %v\nvalue: %v\nstack: %v\n",
+			"Attempted to add a value onto a stack that has reached its capacity: %v\nvalue: %v\nstack: %v",
 			v.capacity_,
 			value,
 			v))

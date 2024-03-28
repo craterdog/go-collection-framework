@@ -68,21 +68,3 @@ func TestParseBadEnd(t *tes.T) {
 	}()
 	var _ = parser.ParseSource(source)
 }
-
-func TestParseExtraEOL(t *tes.T) {
-	var parser = not.Parser().Make()
-	var source = `[ ](array)
-
-`
-	defer func() {
-		if e := recover(); e != nil {
-			ass.Equal(
-				t,
-				"An unexpected token was received by the parser: Token [type: EOL, line: 1, position: 11]: \"<EOLN>\"\n\x1b[36m0001: [ ](array)\n \x1b[32m>>>────────────⌃\x1b[36m\n0002: \n\x1b[0m\nWas expecting 'EOF' from:\n  \x1b[32msource: \x1b[33mcollection EOF  ! Terminated with an end-of-file marker.\x1b[0m\n\n  \x1b[32mcollection: \x1b[33m\"[\" (associations | values) \"]\" \"(\" Context \")\"\x1b[0m\n\n",
-				e)
-		} else {
-			ass.Fail(t, "Test should result in recovered panic.")
-		}
-	}()
-	var _ = parser.ParseSource(source)
-}

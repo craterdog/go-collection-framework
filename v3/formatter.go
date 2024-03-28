@@ -98,6 +98,7 @@ func (v *formatter_) GetMaximum() int {
 func (v *formatter_) FormatCollection(collection Collection) string {
 	var reflected = ref.ValueOf(collection)
 	v.formatCollection(reflected)
+	v.appendNewline()
 	return v.getResult()
 }
 

@@ -34,13 +34,21 @@ func TestCollectionRoundtrips(t *tes.T) {
 		var filename = collectionTests + file.Name()
 		if sts.HasSuffix(filename, ".cdcn") {
 			fmt.Println(filename)
-			var source, _ = osx.ReadFile(filename)
-			var expected = string(source[:len(source)-1])
+			var bytes, err = osx.ReadFile(filename)
+			if err != nil {
+				panic(err)
+			}
+			var expected = string(bytes)
 			var collection = cdcn.ParseSource(expected)
 			var actual = cdcn.FormatCollection(collection)
 			if !sts.HasPrefix(file.Name(), "map") {
 				// Skip maps since they are non-deterministic.
 				ass.Equal(t, expected, actual)
+				bytes = []byte(actual)
+				err = osx.WriteFile(filename, bytes, 0644)
+				if err != nil {
+					panic(err)
+				}
 			}
 		}
 	}

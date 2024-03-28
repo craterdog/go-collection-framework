@@ -81,6 +81,11 @@ func (v *parser_) ParseSource(source string) col.Collection {
 		panic(message)
 	}
 
+	// Attempt to parse optional end-of-line characters.
+	for ok {
+		_, token, ok = v.parseToken(EOLToken, "")
+	}
+
 	// Attempt to parse the end-of-file marker.
 	_, token, ok = v.parseToken(EOFToken, "")
 	if !ok {
@@ -353,7 +358,7 @@ func (v *parser_) parseCollection() (
 		panic(message)
 	}
 
-	// Attempt to parse the opening bracket of the context.
+	// Attempt to parse the closing bracket of the context.
 	_, token, ok = v.parseToken(DelimiterToken, ")")
 	if !ok {
 		var message = v.formatError(token)

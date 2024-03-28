@@ -97,7 +97,7 @@ matched by the parser in the order listed.  A rule definition may also be
 directly or indirectly recursive.  The sequence of factors within in a rule
 definition may be separated by spaces which are ignored by the parser.
 <!
-source: collection EOF  ! Terminated with an end-of-file marker.
+source: collection EOL* EOF  ! Terminated with an end-of-file marker.
 
 collection: "[" (associations | values) "]" "(" Context ")"
 

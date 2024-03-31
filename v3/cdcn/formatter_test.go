@@ -24,13 +24,13 @@ func TestFormatMaximums(t *tes.T) {
 	var formatter = Formatter.MakeWithMaximum(0)
 	var array = col.Array[any]().MakeFromArray([]any{1, []any{1, 2, []any{1, 2, 3}}})
 	var s = formatter.FormatCollection(array)
-	ass.Equal(t, "[...](Array)", s)
+	ass.Equal(t, "[...](Array)\n", s)
 	formatter = Formatter.MakeWithMaximum(1)
 	s = formatter.FormatCollection(array)
-	ass.Equal(t, "[\n    1\n    [...](array)\n](Array)", s)
+	ass.Equal(t, "[\n    1\n    [...](array)\n](Array)\n", s)
 	formatter = Formatter.MakeWithMaximum(2)
 	s = formatter.FormatCollection(array)
-	ass.Equal(t, "[\n    1\n    [\n        1\n        2\n        [...](array)\n    ](array)\n](Array)", s)
+	ass.Equal(t, "[\n    1\n    [\n        1\n        2\n        [...](array)\n    ](array)\n](Array)\n", s)
 }
 
 func TestFormatInvalidType(t *tes.T) {

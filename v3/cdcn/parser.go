@@ -74,9 +74,9 @@ func (v *parser_) ParseSource(source string) col.Collection {
 	var collection, token, ok = v.parseCollection()
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("collection",
-			"source",
-			"collection",
+		message += v.generateGrammar("Collection",
+			"Source",
+			"Collection",
 		)
 		panic(message)
 	}
@@ -91,8 +91,8 @@ func (v *parser_) ParseSource(source string) col.Collection {
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateGrammar("EOF",
-			"source",
-			"collection",
+			"Source",
+			"Collection",
 		)
 		panic(message)
 	}
@@ -205,10 +205,10 @@ func (v *parser_) parseAssociation() (
 	value, token, ok = v.parseValue()
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("value",
-			"association",
-			"key",
-			"value")
+		message += v.generateGrammar("Value",
+			"Association",
+			"Key",
+			"Value")
 		panic(message)
 	}
 
@@ -279,9 +279,9 @@ func (v *parser_) parseAssociations() (
 			association, token, ok = v.parseAssociation()
 			if !ok {
 				var message = v.formatError(token)
-				message += v.generateGrammar("association",
-					"associations",
-					"association",
+				message += v.generateGrammar("Association",
+					"Associations",
+					"Association",
 				)
 				panic(message)
 			}
@@ -312,10 +312,10 @@ func (v *parser_) parseCollection() (
 		collection, _, ok = v.parseValues()
 		if !ok {
 			var message = v.formatError(token)
-			message += v.generateGrammar("associations",
-				"collection",
-				"associations",
-				"values",
+			message += v.generateGrammar("Associations",
+				"Collection",
+				"Associations",
+				"Values",
 			)
 			panic(message)
 		}
@@ -326,9 +326,9 @@ func (v *parser_) parseCollection() (
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateGrammar("]",
-			"collection",
-			"associations",
-			"values",
+			"Collection",
+			"Associations",
+			"Values",
 		)
 		panic(message)
 	}
@@ -338,9 +338,9 @@ func (v *parser_) parseCollection() (
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateGrammar("(",
-			"collection",
-			"associations",
-			"values",
+			"Collection",
+			"Associations",
+			"Values",
 		)
 		panic(message)
 	}
@@ -351,9 +351,9 @@ func (v *parser_) parseCollection() (
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateGrammar("Context",
-			"collection",
-			"associations",
-			"values",
+			"Collection",
+			"Associations",
+			"Values",
 		)
 		panic(message)
 	}
@@ -363,9 +363,9 @@ func (v *parser_) parseCollection() (
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateGrammar(")",
-			"collection",
-			"associations",
-			"values",
+			"Collection",
+			"Associations",
+			"Values",
 		)
 		panic(message)
 	}
@@ -550,9 +550,9 @@ func (v *parser_) parseValues() (
 		value, token, ok = v.parseValue()
 		if !ok {
 			var message = v.formatError(token)
-			message += v.generateGrammar("value",
-				"values",
-				"value",
+			message += v.generateGrammar("Value",
+				"Values",
+				"Value",
 			)
 			panic(message)
 		}
@@ -593,9 +593,9 @@ func (v *parser_) parseValues() (
 			value, token, ok = v.parseValue()
 			if !ok {
 				var message = v.formatError(token)
-				message += v.generateGrammar("value",
-					"values",
-					"value",
+				message += v.generateGrammar("Value",
+					"Values",
+					"Value",
 				)
 				panic(message)
 			}
@@ -614,18 +614,18 @@ func (v *parser_) putBack(token TokenLike) {
 This Go map captures the syntax rules for collections of Go primitives.
 */
 var grammar = map[string]string{
-	"association": `key ":" value`,
-	"associations": `
-    association ("," association)*
-    (EOL association)+ EOL?
+	"Source":     `Collection EOL* EOF  ! Terminated with an end-of-file marker.`,
+	"Collection": `"[" (Associations | Values) "]" "(" context ")"`,
+	"Associations": `
+    Association ("," Association)*
+    (EOL Association)+ EOL?
     ":"  ! No associations.`,
-	"collection": `"[" (associations | values) "]" "(" Context ")"`,
-	"key":        `primitive`,
-	"primitive":  `Boolean | Complex | Float | Hexadecimal | Integer | Nil | Rune | String`,
-	"source":     `collection EOF  ! Terminated with an end-of-file marker.`,
-	"value":      `collection | primitive`,
-	"values": `
-    value ("," value)*
-    (EOL value)+ EOL?
+	"Association": `Key ":" Value`,
+	"Key":         `Primitive`,
+	"Value":       `Collection | Primitive`,
+	"Primitive":   `boolean | complex | float | hexadecimal | integer | nil | rune | string`,
+	"Values": `
+    Value ("," Value)*
+    (EOL Value)+ EOL?
     " "  ! No values.`,
 }

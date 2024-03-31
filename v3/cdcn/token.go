@@ -22,20 +22,20 @@ import (
 
 var tokenClass = &tokenClass_{
 	strings_: map[TokenType]string{
-		BooleanToken:     "Boolean",
-		ComplexToken:     "Complex",
-		ContextToken:     "Context",
-		DelimiterToken:   "Delimiter",
+		ErrorToken:       "error",
+		BooleanToken:     "boolean",
+		ComplexToken:     "complex",
+		ContextToken:     "context",
+		DelimiterToken:   "delimiter",
 		EOFToken:         "EOF",
 		EOLToken:         "EOL",
-		ErrorToken:       "Error",
-		FloatToken:       "Float",
-		HexadecimalToken: "Hexadecimal",
-		IntegerToken:     "Integer",
-		NilToken:         "Nil",
-		RuneToken:        "Rune",
-		SpaceToken:       "Space",
-		StringToken:      "String",
+		FloatToken:       "float",
+		HexadecimalToken: "hexadecimal",
+		IntegerToken:     "integer",
+		NilToken:         "nil",
+		RuneToken:        "rune",
+		SpaceToken:       "space",
+		StringToken:      "string",
 	},
 }
 

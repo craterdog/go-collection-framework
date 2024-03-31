@@ -26,7 +26,7 @@ func TestParseBadFirst(t *tes.T) {
 		if e := recover(); e != nil {
 			ass.Equal(
 				t,
-				"An unexpected token was received by the parser: Token [type: Error, line: 1, position: 1]: \"b\"\n\x1b[36m0001: bad[ ](array)\n \x1b[32m>>>──⌃\x1b[36m\n0002: \n\x1b[0m\n",
+				"An unexpected token was received by the parser: Token [type: error, line: 1, position: 1]: \"b\"\n\x1b[36m0001: bad[ ](array)\n \x1b[32m>>>──⌃\x1b[36m\n0002: \n\x1b[0m\n",
 				e)
 		} else {
 			ass.Fail(t, "Test should result in recovered panic.")
@@ -43,7 +43,7 @@ func TestParseBadMiddle(t *tes.T) {
 		if e := recover(); e != nil {
 			ass.Equal(
 				t,
-				"An unexpected token was received by the parser: Token [type: Error, line: 1, position: 2]: \"b\"\n\x1b[36m0001: [bad](array)\n \x1b[32m>>>───⌃\x1b[36m\n0002: \n\x1b[0m\n",
+				"An unexpected token was received by the parser: Token [type: error, line: 1, position: 2]: \"b\"\n\x1b[36m0001: [bad](array)\n \x1b[32m>>>───⌃\x1b[36m\n0002: \n\x1b[0m\n",
 				e)
 		} else {
 			ass.Fail(t, "Test should result in recovered panic.")
@@ -60,7 +60,7 @@ func TestParseBadEnd(t *tes.T) {
 		if e := recover(); e != nil {
 			ass.Equal(
 				t,
-				"An unexpected token was received by the parser: Token [type: Error, line: 1, position: 11]: \"b\"\n\x1b[36m0001: [ ](array)bad\n \x1b[32m>>>────────────⌃\x1b[36m\n0002: \n\x1b[0m\n",
+				"An unexpected token was received by the parser: Token [type: error, line: 1, position: 11]: \"b\"\n\x1b[36m0001: [ ](array)bad\n \x1b[32m>>>────────────⌃\x1b[36m\n0002: \n\x1b[0m\n",
 				e)
 		} else {
 			ass.Fail(t, "Test should result in recovered panic.")

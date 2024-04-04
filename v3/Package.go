@@ -37,9 +37,7 @@ on interfaces, not on each other.
 */
 package collections
 
-// TYPES
-
-// Specializations
+// Types
 
 /*
 Collection is a generic type representing any type of collections of values.
@@ -69,9 +67,10 @@ the relative ordering of two values. The result must be one of the following:
 The meaning of "less" and "more" is determined by the specific function that
 implements this signature.
 */
-type RankingFunction func(first Value, second Value) int
-
-// INTERFACES
+type RankingFunction func(
+	first Value,
+	second Value,
+) int
 
 // Aspects
 
@@ -95,7 +94,10 @@ indices are symmetrical.
 type Accessible[V Value] interface {
 	// Methods
 	GetValue(index int) V
-	GetValues(first int, last int) Sequential[V]
+	GetValues(
+		first int,
+		last int,
+	) Sequential[V]
 }
 
 /*
@@ -110,7 +112,10 @@ type Associative[K Key, V Value] interface {
 	RemoveAll()
 	RemoveValue(key K) V
 	RemoveValues(keys Sequential[K]) Sequential[V]
-	SetValue(key K, value V)
+	SetValue(
+		key K,
+		value V,
+	)
 }
 
 /*
@@ -131,11 +136,20 @@ type Expandable[V Value] interface {
 	// Methods
 	AppendValue(value V)
 	AppendValues(values Sequential[V])
-	InsertValue(slot int, value V)
-	InsertValues(slot int, values Sequential[V])
+	InsertValue(
+		slot int,
+		value V,
+	)
+	InsertValues(
+		slot int,
+		values Sequential[V],
+	)
 	RemoveAll()
 	RemoveValue(index int) V
-	RemoveValues(first int, last int) Sequential[V]
+	RemoveValues(
+		first int,
+		last int,
+	) Sequential[V]
 }
 
 /*
@@ -227,8 +241,14 @@ by all updatable sequences of values.
 */
 type Updatable[V Value] interface {
 	// Methods
-	SetValue(index int, value V)
-	SetValues(index int, values Sequential[V])
+	SetValue(
+		index int,
+		value V,
+	)
+	SetValues(
+		index int,
+		values Sequential[V],
+	)
 }
 
 // Classes
@@ -242,7 +262,10 @@ type ArrayClassLike[V Value] interface {
 	MakeFromArray(values []V) ArrayLike[V]
 	MakeFromSequence(values Sequential[V]) ArrayLike[V]
 	MakeFromSize(size int) ArrayLike[V]
-	MakeFromSource(source string, notation NotationLike) ArrayLike[V]
+	MakeFromSource(
+		source string,
+		notation NotationLike,
+	) ArrayLike[V]
 }
 
 /*
@@ -252,7 +275,10 @@ association-class-like classes.
 */
 type AssociationClassLike[K Key, V Value] interface {
 	// Constructors
-	MakeWithAttributes(key K, value V) AssociationLike[K, V]
+	MakeWithAttributes(
+		key K,
+		value V,
+	) AssociationLike[K, V]
 }
 
 /*
@@ -275,11 +301,20 @@ type CatalogClassLike[K comparable, V Value] interface {
 	MakeFromArray(associations []AssociationLike[K, V]) CatalogLike[K, V]
 	MakeFromMap(associations map[K]V) CatalogLike[K, V]
 	MakeFromSequence(associations Sequential[AssociationLike[K, V]]) CatalogLike[K, V]
-	MakeFromSource(source string, notation NotationLike) CatalogLike[K, V]
+	MakeFromSource(
+		source string,
+		notation NotationLike,
+	) CatalogLike[K, V]
 
 	// Functions
-	Extract(catalog CatalogLike[K, V], keys Sequential[K]) CatalogLike[K, V]
-	Merge(first CatalogLike[K, V], second CatalogLike[K, V]) CatalogLike[K, V]
+	Extract(
+		catalog CatalogLike[K, V],
+		keys Sequential[K],
+	) CatalogLike[K, V]
+	Merge(
+		first CatalogLike[K, V],
+		second CatalogLike[K, V],
+	) CatalogLike[K, V]
 }
 
 /*
@@ -330,10 +365,16 @@ type ListClassLike[V Value] interface {
 	Make() ListLike[V]
 	MakeFromArray(values []V) ListLike[V]
 	MakeFromSequence(values Sequential[V]) ListLike[V]
-	MakeFromSource(source string, notation NotationLike) ListLike[V]
+	MakeFromSource(
+		source string,
+		notation NotationLike,
+	) ListLike[V]
 
 	// Functions
-	Concatenate(first ListLike[V], second ListLike[V]) ListLike[V]
+	Concatenate(
+		first ListLike[V],
+		second ListLike[V],
+	) ListLike[V]
 }
 
 /*
@@ -347,7 +388,10 @@ type MapClassLike[K comparable, V Value] interface {
 	MakeFromArray(associations []AssociationLike[K, V]) MapLike[K, V]
 	MakeFromMap(associations map[K]V) MapLike[K, V]
 	MakeFromSequence(associations Sequential[AssociationLike[K, V]]) MapLike[K, V]
-	MakeFromSource(source string, notation NotationLike) MapLike[K, V]
+	MakeFromSource(
+		source string,
+		notation NotationLike,
+	) MapLike[K, V]
 }
 
 /*
@@ -402,7 +446,10 @@ type QueueClassLike[V Value] interface {
 	Make() QueueLike[V]
 	MakeFromArray(values []V) QueueLike[V]
 	MakeFromSequence(values Sequential[V]) QueueLike[V]
-	MakeFromSource(source string, notation NotationLike) QueueLike[V]
+	MakeFromSource(
+		source string,
+		notation NotationLike,
+	) QueueLike[V]
 	MakeWithCapacity(capacity int) QueueLike[V]
 
 	// Functions
@@ -411,7 +458,10 @@ type QueueClassLike[V Value] interface {
 		input QueueLike[V],
 		size int,
 	) Sequential[QueueLike[V]]
-	Join(group Synchronized, inputs Sequential[QueueLike[V]]) QueueLike[V]
+	Join(
+		group Synchronized,
+		inputs Sequential[QueueLike[V]],
+	) QueueLike[V]
 	Split(
 		group Synchronized,
 		input QueueLike[V],
@@ -441,14 +491,29 @@ type SetClassLike[V Value] interface {
 	Make() SetLike[V]
 	MakeFromArray(values []V) SetLike[V]
 	MakeFromSequence(values Sequential[V]) SetLike[V]
-	MakeFromSource(source string, notation NotationLike) SetLike[V]
+	MakeFromSource(
+		source string,
+		notation NotationLike,
+	) SetLike[V]
 	MakeWithCollator(collator CollatorLike) SetLike[V]
 
 	// Functions
-	And(first SetLike[V], second SetLike[V]) SetLike[V]
-	Or(first SetLike[V], second SetLike[V]) SetLike[V]
-	Sans(first SetLike[V], second SetLike[V]) SetLike[V]
-	Xor(first SetLike[V], second SetLike[V]) SetLike[V]
+	And(
+		first SetLike[V],
+		second SetLike[V],
+	) SetLike[V]
+	Or(
+		first SetLike[V],
+		second SetLike[V],
+	) SetLike[V]
+	Sans(
+		first SetLike[V],
+		second SetLike[V],
+	) SetLike[V]
+	Xor(
+		first SetLike[V],
+		second SetLike[V],
+	) SetLike[V]
 }
 
 /*
@@ -476,7 +541,10 @@ type StackClassLike[V Value] interface {
 	Make() StackLike[V]
 	MakeFromArray(values []V) StackLike[V]
 	MakeFromSequence(values Sequential[V]) StackLike[V]
-	MakeFromSource(source string, notation NotationLike) StackLike[V]
+	MakeFromSource(
+		source string,
+		notation NotationLike,
+	) StackLike[V]
 	MakeWithCapacity(capacity int) StackLike[V]
 }
 
@@ -551,8 +619,14 @@ type CollatorLike interface {
 	GetMaximum() int
 
 	// Methods
-	CompareValues(first Value, second Value) bool
-	RankValues(first Value, second Value) int
+	CompareValues(
+		first Value,
+		second Value,
+	) bool
+	RankValues(
+		first Value,
+		second Value,
+	) int
 }
 
 /*
@@ -691,7 +765,10 @@ type QueueLike[V Value] interface {
 
 	// Methods
 	CloseQueue()
-	RemoveHead() (head V, ok bool)
+	RemoveHead() (
+		head V,
+		ok bool,
+	)
 }
 
 /*

@@ -32,9 +32,7 @@ import (
 	col "github.com/craterdog/go-collection-framework/v3"
 )
 
-// TYPES
-
-// Specializations
+// Types
 
 /*
 TokenType is a specialized type representing any token type recognized by a
@@ -59,8 +57,6 @@ const (
 	StringToken
 )
 
-// INTERFACES
-
 // Classes
 
 /*
@@ -84,10 +80,16 @@ substrings are returned as additional values in the list.
 */
 type ScannerClassLike interface {
 	// Constructors
-	Make(source string, tokens col.QueueLike[TokenLike]) ScannerLike
+	Make(
+		source string,
+		tokens col.QueueLike[TokenLike],
+	) ScannerLike
 
 	// Functions
-	MatchToken(type_ TokenType, text string) col.ListLike[string]
+	MatchToken(
+		type_ TokenType,
+		text string,
+	) col.ListLike[string]
 }
 
 /*

@@ -111,7 +111,7 @@ func (v *parser_) formatError(token TokenLike) string {
 	// Format the error message.
 	var message = fmt.Sprintf(
 		"An unexpected token was received by the parser: %v\n",
-		token,
+		Scanner().FormatToken(token),
 	)
 	var line = token.GetLine()
 	var lines = sts.Split(v.source_, "\n")

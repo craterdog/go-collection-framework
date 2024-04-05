@@ -12,31 +12,14 @@
 
 package cdcn
 
-import (
-	fmt "fmt"
-)
+import ()
 
 // CLASS ACCESS
 
 // Reference
 
 var tokenClass = &tokenClass_{
-	strings_: map[TokenType]string{
-		ErrorToken:       "error",
-		BooleanToken:     "boolean",
-		ComplexToken:     "complex",
-		ContextToken:     "context",
-		DelimiterToken:   "delimiter",
-		EOFToken:         "EOF",
-		EOLToken:         "EOL",
-		FloatToken:       "float",
-		HexadecimalToken: "hexadecimal",
-		IntegerToken:     "integer",
-		NilToken:         "nil",
-		RuneToken:        "rune",
-		SpaceToken:       "space",
-		StringToken:      "string",
-	},
+	// This class has no private constants to initialize.
 }
 
 // Function
@@ -50,8 +33,10 @@ func Token() TokenClassLike {
 // Target
 
 type tokenClass_ struct {
-	strings_ map[TokenType]string
+	// This class has no private constants.
 }
+
+// Constants
 
 // Constructors
 
@@ -71,17 +56,13 @@ func (c *tokenClass_) MakeWithAttributes(
 
 // Functions
 
-func (c *tokenClass_) AsString(type_ TokenType) string {
-	return c.strings_[type_]
-}
-
 // INSTANCE METHODS
 
 // Target
 
 type token_ struct {
-	line_     int // The line number of the token in the source string.
-	position_ int // The position in the line of the first rune of the token.
+	line_     int
+	position_ int
 	type_     TokenType
 	value_    string
 }
@@ -104,17 +85,6 @@ func (v *token_) GetValue() string {
 	return v.value_
 }
 
-// Stringer
+// Public
 
-func (v *token_) String() string {
-	var s = fmt.Sprintf("%q", v.value_)
-	if len(s) > 40 {
-		s = fmt.Sprintf("%.40q...", v.value_)
-	}
-	return fmt.Sprintf("Token [type: %s, line: %d, position: %d]: %s",
-		Token().AsString(v.type_),
-		v.line_,
-		v.position_,
-		s,
-	)
-}
+// Private

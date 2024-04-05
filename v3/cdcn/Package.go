@@ -86,6 +86,7 @@ type ScannerClassLike interface {
 	) ScannerLike
 
 	// Functions
+	FormatToken(token TokenLike) string
 	MatchToken(
 		type_ TokenType,
 		text string,
@@ -94,10 +95,7 @@ type ScannerClassLike interface {
 
 /*
 TokenClassLike defines the set of class constants, constructors and functions
-that must be supported by all token-class-like classes.  The following functions
-are supported:
-
-AsString() returns a string representing the specified token type.
+that must be supported by all token-class-like classes.
 */
 type TokenClassLike interface {
 	// Constructors
@@ -107,9 +105,6 @@ type TokenClassLike interface {
 		type_ TokenType,
 		value string,
 	) TokenLike
-
-	// Functions
-	AsString(type_ TokenType) string
 }
 
 // Instances

@@ -13,7 +13,7 @@
 package cdcn
 
 import (
-	//fmt "fmt"
+	fmt "fmt"
 	col "github.com/craterdog/go-collection-framework/v3"
 	reg "regexp"
 	sts "strings"
@@ -24,6 +24,22 @@ import (
 // Reference
 
 var scannerClass = &scannerClass_{
+	tokens_: map[TokenType]string{
+		ErrorToken:       "error",
+		BooleanToken:     "boolean",
+		ComplexToken:     "complex",
+		ContextToken:     "context",
+		DelimiterToken:   "delimiter",
+		EOFToken:         "EOF",
+		EOLToken:         "EOL",
+		FloatToken:       "float",
+		HexadecimalToken: "hexadecimal",
+		IntegerToken:     "integer",
+		NilToken:         "nil",
+		RuneToken:        "rune",
+		SpaceToken:       "space",
+		StringToken:      "string",
+	},
 	matchers_: map[TokenType]*reg.Regexp{
 		BooleanToken:     reg.MustCompile(`^(?:` + boolean_ + `)`),
 		ComplexToken:     reg.MustCompile(`^(?:` + complex_ + `)`),
@@ -51,6 +67,7 @@ func Scanner() ScannerClassLike {
 // Target
 
 type scannerClass_ struct {
+	tokens_   map[TokenType]string
 	matchers_ map[TokenType]*reg.Regexp
 }
 
@@ -71,6 +88,21 @@ func (c *scannerClass_) Make(
 }
 
 // Functions
+
+func (c *scannerClass_) FormatToken(token TokenLike) string {
+	var value = token.GetValue()
+	var s = fmt.Sprintf("%q", value)
+	if len(s) > 40 {
+		s = fmt.Sprintf("%.40q...", value)
+	}
+	return fmt.Sprintf(
+		"Token [type: %s, line: %d, position: %d]: %s",
+		c.tokens_[token.GetType()],
+		token.GetLine(),
+		token.GetPosition(),
+		s,
+	)
+}
 
 func (c *scannerClass_) MatchToken(
 	type_ TokenType,
@@ -192,9 +224,9 @@ loop:
 NOTE:
 These private constants define the regular expression sub-patterns that make up
 all token types.  Unfortunately there is no way to make them private to the
-scanner class since they must be TRUE Go constants to be initialized in this
-way.  We append an underscore to each name to lessen the chance of a name
-collision with other private Go class constants in this package.
+scanner class namespace since they must be TRUE Go constants to be initialized
+in this way.  We append an underscore to each name to lessen the chance of a
+name collision with other private Go class constants in this package.
 */
 const (
 	base10_      = `[0-9]`

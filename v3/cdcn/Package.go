@@ -35,7 +35,7 @@ import (
 // Types
 
 /*
-TokenType is a specialized type representing any token type recognized by a
+TokenType is a constrained type representing any token type recognized by a
 scanner.
 */
 type TokenType uint8

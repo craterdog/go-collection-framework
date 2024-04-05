@@ -26,10 +26,13 @@ var associationMutex syn.Mutex
 
 // Function
 
-func Association[K Key, V Value]() AssociationClassLike[K, V] {
+func Association[
+	K Key,
+	V Value,
+]() AssociationClassLike[K, V] {
 	// Generate the name of the bound class type.
-	var class AssociationClassLike[K, V]
-	var name = fmt.Sprintf("%T", class)
+	var result_ AssociationClassLike[K, V]
+	var name = fmt.Sprintf("%T", result_)
 
 	// Check for existing bound class type.
 	associationMutex.Lock()
@@ -37,27 +40,32 @@ func Association[K Key, V Value]() AssociationClassLike[K, V] {
 	switch actual := value.(type) {
 	case *associationClass_[K, V]:
 		// This bound class type already exists.
-		class = actual
+		result_ = actual
 	default:
 		// Add a new bound class type.
-		class = &associationClass_[K, V]{
-			// This class has no class constants.
+		result_ = &associationClass_[K, V]{
+			// This class has no private constants to initialize.
 		}
-		associationClass[name] = class
+		associationClass[name] = result_
 	}
 	associationMutex.Unlock()
 
 	// Return a reference to the bound class type.
-	return class
+	return result_
 }
 
 // CLASS METHODS
 
 // Target
 
-type associationClass_[K Key, V Value] struct {
-	// This class has no class constants.
+type associationClass_[
+	K Key,
+	V Value,
+] struct {
+	// This class has no private constants.
 }
+
+// Constants
 
 // Constructors
 
@@ -71,11 +79,16 @@ func (c *associationClass_[K, V]) MakeWithAttributes(
 	}
 }
 
+// Functions
+
 // INSTANCE METHODS
 
 // Target
 
-type association_[K Key, V Value] struct {
+type association_[
+	K Key,
+	V Value,
+] struct {
 	key_   K
 	value_ V
 }
@@ -93,3 +106,7 @@ func (v *association_[K, V]) GetValue() V {
 func (v *association_[K, V]) SetValue(value V) {
 	v.value_ = value
 }
+
+// Public
+
+// Private

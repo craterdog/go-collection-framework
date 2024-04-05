@@ -62,7 +62,15 @@ Key: Primitive
 
 Value: Collection | Primitive
 
-Primitive: boolean | complex | float | hexadecimal | integer | nil | rune | string
+Primitive:
+    boolean
+    complex
+    float
+    hexadecimal
+    integer
+    nil
+    rune
+    string
 
 Values:
     Value ("," Value)*
@@ -87,7 +95,16 @@ boolean: "false" | "true"
 
 complex: "(" float sign float "i)"
 
-context: "array" | "Array" | "Catalog" | "List" | "map" | "Map" | "Queue" | "Set" | "Stack"
+context:
+    "array"
+    "Array"
+    "Catalog"
+    "List"
+    "map"
+    "Map"
+    "Queue"
+    "Set"
+    "Stack"
 
 delimiter: "[" | "]" | "(" | ")" | ":" | ","
 

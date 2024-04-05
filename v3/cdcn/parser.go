@@ -623,7 +623,15 @@ var grammar = map[string]string{
 	"Association": `Key ":" Value`,
 	"Key":         `Primitive`,
 	"Value":       `Collection | Primitive`,
-	"Primitive":   `boolean | complex | float | hexadecimal | integer | nil | rune | string`,
+	"Primitive": `
+    boolean
+    complex
+    float
+    hexadecimal
+    integer
+    nil
+    rune
+    string`,
 	"Values": `
     Value ("," Value)*
     (EOL Value)+ EOL?

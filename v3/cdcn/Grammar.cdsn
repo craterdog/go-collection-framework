@@ -53,7 +53,7 @@ Collection: "[" (Associations | Values) "]" "(" context ")"
 
 Associations:
     Association ("," Association)*
-    (EOL Association)+ EOL?
+    (EOL Association)+ EOL
     ":"  ! No associations.
 
 Association: Key ":" Value
@@ -74,7 +74,7 @@ Primitive:
 
 Values:
     Value ("," Value)*
-    (EOL Value)+ EOL?
+    (EOL Value)+ EOL
     " "  ! No values.
 
 !>

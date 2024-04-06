@@ -222,74 +222,27 @@ func (v *parser_) parseAssociations() (
 	token TokenLike,
 	ok bool,
 ) {
-	var association col.AssociationLike[col.Key, col.Value]
-	associations = col.Catalog[col.Key, col.Value]().Make()
-
-	// Check for an empty sequence.
+	// Check for an empty sequence of associations.
 	_, token, ok = v.parseToken(DelimiterToken, ":")
 	if ok {
-		// Found an empty sequence.
+		associations = col.Catalog[col.Key, col.Value]().Make()
 		return associations, token, true
 	}
 
-	// Attempt to parse a multi-line sequence of associations.
-	_, token, ok = v.parseToken(EOLToken, "")
+	// Attempt to parse an inline sequence of associations.
+	associations, token, ok = v.parseInlineAssociations()
 	if ok {
-		// Attempt to parse one or more associations.
-		association, _, ok = v.parseAssociation()
-		if !ok {
-			// This must be a sequence of values instead.
-			v.putBack(token)
-			return associations, token, false
-		}
-		for ok {
-			var key = association.GetKey()
-			var value = association.GetValue()
-			associations.SetValue(key, value)
-			_, token, ok = v.parseToken(EOLToken, "")
-			if !ok {
-				break
-			}
-			association, _, ok = v.parseAssociation()
-			if !ok {
-				v.putBack(token)
-				break
-			}
-		}
-
-		// Attempt to parse an optional end-of-line character.
-		_, token, _ = v.parseToken(EOLToken, "")
-
-		// Found a multi-line sequence of associations.
 		return associations, token, true
 	}
 
-	// Attempt to parse one or more associations in an in-line sequence.
-	association, token, ok = v.parseAssociation()
-	if !ok {
-		return associations, token, false
-	}
-	for ok {
-		var value = association.GetValue()
-		var key = association.GetKey()
-		associations.SetValue(key, value)
-		_, token, ok = v.parseToken(DelimiterToken, ",")
-		if ok {
-			// Attempt to parse a association.
-			association, token, ok = v.parseAssociation()
-			if !ok {
-				var message = v.formatError(token)
-				message += v.generateGrammar("Association",
-					"Associations",
-					"Association",
-				)
-				panic(message)
-			}
-		}
+	// Attempt to parse an multi-line sequence of associations.
+	associations, token, ok = v.parseMultilineAssociations()
+	if ok {
+		return associations, token, true
 	}
 
-	// Found an in-line sequence of associations.
-	return associations, token, true
+	// This is not a sequence of associations.
+	return associations, token, false
 }
 
 func (v *parser_) parseCollection() (
@@ -417,6 +370,73 @@ func (v *parser_) parseCollection() (
 	return collection, token, true
 }
 
+func (v *parser_) parseInlineAssociations() (
+	associations col.CatalogLike[col.Key, col.Value],
+	token TokenLike,
+	ok bool,
+) {
+	// Attempt to parse one or more inline associations.
+	var association col.AssociationLike[col.Key, col.Value]
+	association, token, ok = v.parseAssociation()
+	if !ok {
+		// This is not an inline sequence of associations.
+		return associations, token, false
+	}
+	associations = col.Catalog[col.Key, col.Value]().Make()
+	for ok {
+		var value = association.GetValue()
+		var key = association.GetKey()
+		associations.SetValue(key, value)
+		_, token, ok = v.parseToken(DelimiterToken, ",")
+		if ok {
+			association, token, ok = v.parseAssociation()
+			if !ok {
+				var message = v.formatError(token)
+				message += v.generateGrammar("Association",
+					"Associations",
+					"Association",
+				)
+				panic(message)
+			}
+		}
+	}
+
+	// Found an inline sequence of associations.
+	return associations, token, true
+}
+
+func (v *parser_) parseInlineValues() (
+	values col.ListLike[col.Value],
+	token TokenLike,
+	ok bool,
+) {
+	// Attempt to parse one or more inline values.
+	var value col.Value
+	value, token, ok = v.parseValue()
+	if !ok {
+		return values, token, false
+	}
+	values = col.List[col.Value]().Make()
+	for ok {
+		values.AppendValue(value)
+		_, token, ok = v.parseToken(DelimiterToken, ",")
+		if ok {
+			value, token, ok = v.parseValue()
+			if !ok {
+				var message = v.formatError(token)
+				message += v.generateGrammar("Value",
+					"Values",
+					"Value",
+				)
+				panic(message)
+			}
+		}
+	}
+
+	// Found an inline sequence of values.
+	return values, token, true
+}
+
 func (v *parser_) parseKey() (
 	key col.Key,
 	token TokenLike,
@@ -432,6 +452,93 @@ func (v *parser_) parseKey() (
 	// Found a primitive key.
 	key = col.Key(primitive)
 	return key, token, true
+}
+
+func (v *parser_) parseMultilineAssociations() (
+	associations col.CatalogLike[col.Key, col.Value],
+	token TokenLike,
+	ok bool,
+) {
+	// Attempt to parse one or more multi-line associations.
+	var eolToken TokenLike
+	_, eolToken, ok = v.parseToken(EOLToken, "")
+	if !ok {
+		// This is not a multi-line sequence of associations.
+		return associations, eolToken, false
+	}
+	var association col.AssociationLike[col.Key, col.Value]
+	association, token, ok = v.parseAssociation()
+	if !ok {
+		// This must be a sequence of values instead.
+		v.putBack(eolToken)
+		return associations, token, false
+	}
+	associations = col.Catalog[col.Key, col.Value]().Make()
+	for ok {
+		var key = association.GetKey()
+		var value = association.GetValue()
+		associations.SetValue(key, value)
+		_, eolToken, ok = v.parseToken(EOLToken, "")
+		if !ok {
+			var message = v.formatError(eolToken)
+			message += v.generateGrammar("EOL",
+				"Associations",
+				"Association",
+			)
+			panic(message)
+		}
+		association, token, ok = v.parseAssociation()
+		if !ok {
+			break
+		}
+	}
+
+	// Found a multi-line sequence of associations.
+	return associations, token, true
+}
+
+func (v *parser_) parseMultilineValues() (
+	values col.ListLike[col.Value],
+	token TokenLike,
+	ok bool,
+) {
+	// Attempt to parse one or more multi-line values.
+	var eolToken TokenLike
+	_, eolToken, ok = v.parseToken(EOLToken, "")
+	if !ok {
+		// This is not a multi-line sequence of values.
+		return values, eolToken, false
+	}
+	var value col.Value
+	value, token, ok = v.parseValue()
+	if !ok {
+		var message = v.formatError(token)
+		message += v.generateGrammar("Value",
+			"Values",
+			"Value",
+		)
+		panic(message)
+	}
+	values = col.List[col.Value]().Make()
+	for ok {
+		values.AppendValue(value)
+		_, eolToken, ok = v.parseToken(EOLToken, "")
+		if !ok {
+			var message = v.formatError(eolToken)
+			message += v.generateGrammar("EOL",
+				"Values",
+				"Value",
+			)
+			panic(message)
+		}
+		value, token, ok = v.parseValue()
+		if !ok {
+			break
+		}
+	}
+
+	// Found a multi-line sequence of values.
+	return values, token, true
 }
 
 func (v *parser_) parsePrimitive() (
@@ -533,77 +640,28 @@ func (v *parser_) parseValues() (
 	token TokenLike,
 	ok bool,
 ) {
-	var value col.Value
-	values = col.List[col.Value]().Make()
-
 	// Check for an empty sequence.
 	_, token, ok = v.parseToken(DelimiterToken, "]")
 	if ok {
 		v.putBack(token)
+		values = col.List[col.Value]().Make()
 		return values, token, true
 	}
 
-	// Attempt to parse a multi-line sequence of values.
-	_, _, ok = v.parseToken(EOLToken, "")
+	// Attempt to parse an inline sequence of values.
+	values, token, ok = v.parseInlineValues()
 	if ok {
-		// Attempt to parse the first value.
-		value, token, ok = v.parseValue()
-		if !ok {
-			var message = v.formatError(token)
-			message += v.generateGrammar("Value",
-				"Values",
-				"Value",
-			)
-			panic(message)
-		}
-
-		// Parse any additional values.
-		for ok {
-			values.AppendValue(value)
-			_, token, ok = v.parseToken(EOLToken, "")
-			if !ok {
-				break
-			}
-			value, _, ok = v.parseValue()
-			if !ok {
-				v.putBack(token)
-				break
-			}
-		}
-
-		// Attempt to parse an optional end-of-line character.
-		_, token, _ = v.parseToken(EOLToken, "")
-
-		// Found a multi-line sequence of values.
 		return values, token, true
 	}
 
-	// Attempt to parse the first value in an in-line sequence.
-	value, token, ok = v.parseValue()
-	if !ok {
-		return values, token, false
+	// Attempt to parse an multi-line sequence of values.
+	values, token, ok = v.parseMultilineValues()
+	if ok {
+		return values, token, true
 	}
 
-	// Parse any additional values.
-	for ok {
-		values.AppendValue(value)
-		_, token, ok = v.parseToken(DelimiterToken, ",")
-		if ok {
-			// Attempt to parse a value.
-			value, token, ok = v.parseValue()
-			if !ok {
-				var message = v.formatError(token)
-				message += v.generateGrammar("Value",
-					"Values",
-					"Value",
-				)
-				panic(message)
-			}
-		}
-	}
-
-	// Found an in-line sequence of values.
-	return values, token, true
+	// This is not a sequence of values.
+	return values, token, false
 }
 
 func (v *parser_) putBack(token TokenLike) {

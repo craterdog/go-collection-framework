@@ -122,10 +122,6 @@ func (v *collator_) compareArrays(first ref.Value, second ref.Value) bool {
 	return true
 }
 
-func (v *collator_) comparePrimitives(first, second ref.Value) bool {
-	return first.Interface() == second.Interface()
-}
-
 func (v *collator_) compareInterfaces(first ref.Value, second ref.Value) bool {
 	var typeRef = first.Type() // We know the structures are the same type.
 	var count = typeRef.NumMethod()
@@ -172,6 +168,10 @@ func (v *collator_) compareMaps(first ref.Value, second ref.Value) bool {
 		v.depth_--
 	}
 	return true
+}
+
+func (v *collator_) comparePrimitives(first, second ref.Value) bool {
+	return first.Interface() == second.Interface()
 }
 
 func (v *collator_) compareSequences(first ref.Value, second ref.Value) bool {
@@ -385,51 +385,6 @@ func (v *collator_) rankComplex(first, second complex128) int {
 	}
 }
 
-/*
-NOTE:
-Go does not provide an easy way to a apply a possible tilde type (e.g.  ~string)
-to its primitive (named) type without knowing whether or not it is actually a
-tilde type. So we must convert it to a string and then parse it back again...
-This method attempts to hide that ugliness from the rest of the code.
-*/
-func (v *collator_) rankPrimitives(first, second ref.Value) int {
-	var firstValue = first.Interface()
-	var secondValue = second.Interface()
-	switch first.Kind() {
-	case ref.Bool:
-		var firstBoolean, _ = stc.ParseBool(fmt.Sprintf("%v", firstValue))
-		var secondBoolean, _ = stc.ParseBool(fmt.Sprintf("%v", secondValue))
-		return v.rankBooleans(firstBoolean, secondBoolean)
-	case ref.Uint8, ref.Uint16, ref.Uint32, ref.Uint64, ref.Uint:
-		var firstUnsigned, _ = stc.ParseUint(fmt.Sprintf("%v", firstValue), 10, 64)
-		var secondUnsigned, _ = stc.ParseUint(fmt.Sprintf("%v", secondValue), 10, 64)
-		return v.rankUnsigned(firstUnsigned, secondUnsigned)
-	case ref.Int8, ref.Int16, ref.Int64, ref.Int:
-		var firstSigned, _ = stc.ParseInt(fmt.Sprintf("%v", firstValue), 10, 64)
-		var secondSigned, _ = stc.ParseInt(fmt.Sprintf("%v", secondValue), 10, 64)
-		return v.rankSigned(firstSigned, secondSigned)
-	case ref.Float32, ref.Float64:
-		var firstFloat, _ = stc.ParseFloat(fmt.Sprintf("%v", firstValue), 64)
-		var secondFloat, _ = stc.ParseFloat(fmt.Sprintf("%v", secondValue), 64)
-		return v.rankFloats(firstFloat, secondFloat)
-	case ref.Complex64, ref.Complex128:
-		var firstComplex, _ = stc.ParseComplex(fmt.Sprintf("%v", firstValue), 128)
-		var secondComplex, _ = stc.ParseComplex(fmt.Sprintf("%v", secondValue), 128)
-		return v.rankComplex(firstComplex, secondComplex)
-	case ref.Int32: // Runes
-		var firstRune, _ = stc.ParseInt(fmt.Sprintf("%v", firstValue), 10, 32)
-		var secondRune, _ = stc.ParseInt(fmt.Sprintf("%v", secondValue), 10, 32)
-		return v.rankRunes(rune(firstRune), rune(secondRune))
-	case ref.String:
-		var firstString = fmt.Sprintf("%v", firstValue)
-		var secondString = fmt.Sprintf("%v", secondValue)
-		return v.rankStrings(firstString, secondString)
-	default:
-		var message = fmt.Sprintf("Attempted to rank %v(%T) and %v(%T)", firstValue, firstValue, secondValue, secondValue)
-		panic(message)
-	}
-}
-
 func (v *collator_) rankFloats(first, second float64) int {
 	if first < second {
 		return -1
@@ -459,17 +414,15 @@ func (v *collator_) rankInterfaces(first ref.Value, second ref.Value) int {
 	return 0
 }
 
-/*
-NOTE:
-Currently the implementation of Go maps is hashtable based. The order of the
-keys is random, even for two Go maps with the same keys if the associations
-were entered in different sequences.  Therefore at this time it is necessary to
-sort the key arrays for each Go map.  This introduces a circular dependency
-between the implementation of the collator and the sorter types:
-
-	rankMaps() -> SortValues() -> RankingFunction
-*/
 func (v *collator_) rankMaps(first ref.Value, second ref.Value) int {
+	// NOTE: Currently the implementation of Go maps is hashtable based. The
+	// order of the keys is random, even for two Go maps with the same keys if
+	// the associations were entered in different sequences.  Therefore at this
+	// time it is necessary to sort the key arrays for each Go map.  This
+	// introduces a circular dependency between the implementation of the
+	// collator and the sorter types:
+	//     rankMaps() -> SortValues() -> RankingFunction
+
 	// Check for maximum traversal depth.
 	if v.depth_ == v.maximum_ {
 		panic(fmt.Sprintf("The maximum traversal depth was exceeded: %v", v.depth_))
@@ -534,6 +487,49 @@ func (v *collator_) rankMaps(first ref.Value, second ref.Value) int {
 
 	// All keys and values match.
 	return 0
+}
+
+func (v *collator_) rankPrimitives(first, second ref.Value) int {
+	// NOTE: Go does not provide an easy way to a apply a possible tilde type
+	// (e.g.  ~string) to its primitive (named) type without knowing whether or
+	// not it is actually a tilde type. So we must convert it to a string and
+	// then parse it back again...  This method attempts to hide that ugliness
+	// from the rest of the code.
+	var firstValue = first.Interface()
+	var secondValue = second.Interface()
+	switch first.Kind() {
+	case ref.Bool:
+		var firstBoolean, _ = stc.ParseBool(fmt.Sprintf("%v", firstValue))
+		var secondBoolean, _ = stc.ParseBool(fmt.Sprintf("%v", secondValue))
+		return v.rankBooleans(firstBoolean, secondBoolean)
+	case ref.Uint8, ref.Uint16, ref.Uint32, ref.Uint64, ref.Uint:
+		var firstUnsigned, _ = stc.ParseUint(fmt.Sprintf("%v", firstValue), 10, 64)
+		var secondUnsigned, _ = stc.ParseUint(fmt.Sprintf("%v", secondValue), 10, 64)
+		return v.rankUnsigned(firstUnsigned, secondUnsigned)
+	case ref.Int8, ref.Int16, ref.Int64, ref.Int:
+		var firstSigned, _ = stc.ParseInt(fmt.Sprintf("%v", firstValue), 10, 64)
+		var secondSigned, _ = stc.ParseInt(fmt.Sprintf("%v", secondValue), 10, 64)
+		return v.rankSigned(firstSigned, secondSigned)
+	case ref.Float32, ref.Float64:
+		var firstFloat, _ = stc.ParseFloat(fmt.Sprintf("%v", firstValue), 64)
+		var secondFloat, _ = stc.ParseFloat(fmt.Sprintf("%v", secondValue), 64)
+		return v.rankFloats(firstFloat, secondFloat)
+	case ref.Complex64, ref.Complex128:
+		var firstComplex, _ = stc.ParseComplex(fmt.Sprintf("%v", firstValue), 128)
+		var secondComplex, _ = stc.ParseComplex(fmt.Sprintf("%v", secondValue), 128)
+		return v.rankComplex(firstComplex, secondComplex)
+	case ref.Int32: // Runes
+		var firstRune, _ = stc.ParseInt(fmt.Sprintf("%v", firstValue), 10, 32)
+		var secondRune, _ = stc.ParseInt(fmt.Sprintf("%v", secondValue), 10, 32)
+		return v.rankRunes(rune(firstRune), rune(secondRune))
+	case ref.String:
+		var firstString = fmt.Sprintf("%v", firstValue)
+		var secondString = fmt.Sprintf("%v", secondValue)
+		return v.rankStrings(firstString, secondString)
+	default:
+		var message = fmt.Sprintf("Attempted to rank %v(%T) and %v(%T)", firstValue, firstValue, secondValue, secondValue)
+		panic(message)
+	}
 }
 
 func (v *collator_) rankReflective(first Value, second Value) int {

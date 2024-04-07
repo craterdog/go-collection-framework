@@ -122,17 +122,28 @@ func (v *sorter_[V]) GetRanker() RankingFunction {
 
 // Private
 
-/*
-This private instance method sorts the values in the specified Go array in place
-using an iterative merge sort along with the ranking function associated with
-this sorter.  The algorithm is documented here:
-  - https://en.wikipedia.org/wiki/Merge_sort#Bottom-up_implementation
+func (v *sorter_[V]) randomizeIndex(size int) int {
+	// Generate a cryptographically secure random index in the range [0..size).
+	var random, err = ran.Int(ran.Reader, big.NewInt(int64(size)))
+	if err != nil {
+		// There was an issue with the underlying OS so time to...
+		panic("Unable to generate a random index:\n" + err.Error())
+	}
+	return int(random.Int64())
+}
 
-This iterative approach saves on memory allocation by swapping between two Go
-arrays of the same size rather than allocating new Go arrays for each sub-array.
-This results in stable O[nlog(n)] time and O[n] space performance.
-*/
 func (v *sorter_[V]) sortValues(values []V) {
+	// NOTE: This method, and the mergeArrays method, together sort the values
+	// in the specified Go array in place using an iterative merge sort along
+	// with the ranking function associated with this sorter.  The algorithm is
+	// documented here:
+	//   - https://en.wikipedia.org/wiki/Merge_sort#Bottom-up_implementation
+	//
+	// This iterative approach saves on memory allocation by swapping between
+	// two Go arrays of the same size rather than allocating new Go arrays for
+	// each sub-array.  This results in stable O[nlog(n)] time and O[n] space
+	// performance.
+
 	// Create a buffer Go array.
 	var length = len(values)
 	var buffer = make([]V, length)
@@ -171,10 +182,6 @@ func (v *sorter_[V]) sortValues(values []V) {
 	copy(values, buffer) // Both Go arrays are now sorted.
 }
 
-/*
-This private instance method is used for the merging part of the merge sort
-algorithm.
-*/
 func (v *sorter_[V]) mergeArrays(left []V, right []V, merged []V) {
 	var leftIndex = 0
 	var leftLength = len(left)
@@ -210,17 +217,4 @@ func (v *sorter_[V]) mergeArrays(left []V, right []V, merged []V) {
 		}
 		mergedIndex++
 	}
-}
-
-/*
-This private instance method generates a cryptographically secure random index in
-the range [0..size).
-*/
-func (v *sorter_[V]) randomizeIndex(size int) int {
-	var random, err = ran.Int(ran.Reader, big.NewInt(int64(size)))
-	if err != nil {
-		// There was an issue with the underlying OS so time to...
-		panic("Unable to generate a random index:\n" + err.Error())
-	}
-	return int(random.Int64())
 }

@@ -12,9 +12,10 @@
 
 !>
 CRATER DOG COLLECTION NOTATION
-This document is a formal definition of Crater Dog Collection Notation™ (CDCN)
-using Crater Dog Syntax Notation™ (CDSN).  A language grammar consists of a set
-of token definitions and rule definitions.
+This document contains a formal definition of the Crater Dog Collection
+Notation™ (CDCN) using Crater Dog Syntax Notation™ (CDSN).
+
+A language grammar consists of a set of rule definitions and token definitions.
 
 The following intrinsic character types are context specific:
  * ANY - Any language specific character.

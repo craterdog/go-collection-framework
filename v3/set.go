@@ -62,7 +62,7 @@ type setClass_[V Value] struct {
 // Constructors
 
 func (c *setClass_[V]) Make() SetLike[V] {
-	var collator = Collator().Make()
+	var collator = Collator[V]().Make()
 	var set = c.MakeWithCollator(collator)
 	return set
 }
@@ -100,7 +100,7 @@ func (c *setClass_[V]) MakeFromSource(
 	return set
 }
 
-func (c *setClass_[V]) MakeWithCollator(collator CollatorLike) SetLike[V] {
+func (c *setClass_[V]) MakeWithCollator(collator CollatorLike[V]) SetLike[V] {
 	var values = List[V]().Make()
 	return &set_[V]{
 		collator_: collator,
@@ -145,13 +145,13 @@ func (c *setClass_[V]) Xor(first, second SetLike[V]) SetLike[V] {
 // Target
 
 type set_[V Value] struct {
-	collator_ CollatorLike
+	collator_ CollatorLike[V]
 	values_   ListLike[V]
 }
 
 // Attributes
 
-func (v *set_[V]) GetCollator() CollatorLike {
+func (v *set_[V]) GetCollator() CollatorLike[V] {
 	return v.collator_
 }
 

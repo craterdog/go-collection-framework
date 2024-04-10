@@ -28,7 +28,7 @@ func TestListConstructor(t *tes.T) {
 func TestListsWithStrings(t *tes.T) {
 	var Array = col.Array[string]()
 	var List = col.List[string]()
-	var collator = col.Collator().Make()
+	var collator = col.Collator[col.ListLike[string]]().Make()
 	var foo = Array.MakeFromArray([]string{"foo"})
 	var bar = Array.MakeFromArray([]string{"bar"})
 	var baz = Array.MakeFromArray([]string{"baz"})
@@ -167,7 +167,7 @@ func TestListsWithTildes(t *tes.T) {
 
 func TestListsWithConcatenate(t *tes.T) {
 	var List = col.List[int]()
-	var collator = col.Collator().Make()
+	var collator = col.Collator[col.ListLike[int]]().Make()
 	var Array = col.Array[int]()
 	var onetwothree = Array.MakeFromArray([]int{1, 2, 3})
 	var fourfivesix = Array.MakeFromArray([]int{4, 5, 6})
@@ -183,7 +183,7 @@ func TestListsWithConcatenate(t *tes.T) {
 }
 
 func TestListsWithEmptyLists(t *tes.T) {
-	var collator = col.Collator().Make()
+	var collator = col.Collator[col.ListLike[int]]().Make()
 	var List = col.List[int]()
 	var empty = List.Make()
 	var list = List.Concatenate(empty, empty)

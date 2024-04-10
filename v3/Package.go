@@ -57,8 +57,9 @@ type Value any
 // Functionals
 
 /*
-RankingFunction defines the signature for any function that can determine
-the relative ordering of two values. The result must be one of the following:
+RankingFunction[V Value] defines the signature for any function that can
+determine the relative ordering of two values. The result must be one of the
+following:
 
 	-1: The first value is less than the second value.
 	 0: The first value is equal to the second value.
@@ -67,9 +68,9 @@ the relative ordering of two values. The result must be one of the following:
 The meaning of "less" and "more" is determined by the specific function that
 implements this signature.
 */
-type RankingFunction func(
-	first Value,
-	second Value,
+type RankingFunction[V Value] func(
+	first V,
+	second V,
 ) int
 
 // Aspects
@@ -210,7 +211,7 @@ type Sortable[V Value] interface {
 	ReverseValues()
 	ShuffleValues()
 	SortValues()
-	SortValuesWithRanker(ranker RankingFunction)
+	SortValuesWithRanker(ranker RankingFunction[V])
 }
 
 /*
@@ -318,16 +319,16 @@ type CatalogClassLike[K comparable, V Value] interface {
 }
 
 /*
-CollatorClassLike defines the set of class constants, constructors and functions
-that must be supported by all collator-class-like classes.
+CollatorClassLike[V Value] defines the set of class constants, constructors and
+functions that must be supported by all collator-class-like classes.
 */
-type CollatorClassLike interface {
+type CollatorClassLike[V Value] interface {
 	// Constants
 	DefaultMaximum() int
 
 	// Constructors
-	Make() CollatorLike
-	MakeWithMaximum(maximum int) CollatorLike
+	Make() CollatorLike[V]
+	MakeWithMaximum(maximum int) CollatorLike[V]
 }
 
 /*
@@ -495,7 +496,7 @@ type SetClassLike[V Value] interface {
 		source string,
 		notation NotationLike,
 	) SetLike[V]
-	MakeWithCollator(collator CollatorLike) SetLike[V]
+	MakeWithCollator(collator CollatorLike[V]) SetLike[V]
 
 	// Functions
 	And(
@@ -522,11 +523,11 @@ functions that must be supported by all sorter-class-like classes.
 */
 type SorterClassLike[V Value] interface {
 	// Constants
-	DefaultRanker() RankingFunction
+	DefaultRanker() RankingFunction[V]
 
 	// Constructors
 	Make() SorterLike[V]
-	MakeWithRanker(ranker RankingFunction) SorterLike[V]
+	MakeWithRanker(ranker RankingFunction[V]) SorterLike[V]
 }
 
 /*
@@ -609,23 +610,23 @@ type CatalogLike[K Key, V Value] interface {
 }
 
 /*
-CollatorLike defines the set of abstractions and methods that must be supported
-by all collator-like instances.  A collator-like class is capable of comparing
-and ranking two values of any type.
+CollatorLike[V Value] defines the set of abstractions and methods that must be
+supported by all collator-like instances.  A collator-like class is capable of
+comparing and ranking two values of any type.
 */
-type CollatorLike interface {
+type CollatorLike[V Value] interface {
 	// Attributes
 	GetDepth() int
 	GetMaximum() int
 
 	// Methods
 	CompareValues(
-		first Value,
-		second Value,
+		first V,
+		second V,
 	) bool
 	RankValues(
-		first Value,
-		second Value,
+		first V,
+		second V,
 	) int
 }
 
@@ -779,11 +780,11 @@ sequence of values which can grow or shrink as needed.
 This type is parameterized as follows:
   - V is any type of value.
 
-The order of the values is determined by a configurable RankingFunction.
+The order of the values is determined by a configurable RankingFunction[V].
 */
 type SetLike[V Value] interface {
 	// Attributes
-	GetCollator() CollatorLike
+	GetCollator() CollatorLike[V]
 
 	// Abstractions
 	Accessible[V]
@@ -805,7 +806,7 @@ function is specified the values are sorted into their natural order.
 */
 type SorterLike[V Value] interface {
 	// Attributes
-	GetRanker() RankingFunction
+	GetRanker() RankingFunction[V]
 
 	// Abstractions
 	Systematic[V]

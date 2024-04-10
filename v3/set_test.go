@@ -34,7 +34,7 @@ func TestSetConstructors(t *tes.T) {
 }
 
 func TestSetsWithStrings(t *tes.T) {
-	var collator = col.Collator().Make()
+	var collator = col.Collator[col.SetLike[string]]().Make()
 	var Array = col.Array[string]()
 	var empty = []string{}
 	var bazbar = Array.MakeFromArray([]string{"baz", "bar"})
@@ -150,7 +150,7 @@ func TestSetsWithSets(t *tes.T) {
 }
 
 func TestSetsWithAnd(t *tes.T) {
-	var collator = col.Collator().Make()
+	var collator = col.Collator[col.SetLike[int]]().Make()
 	var Array = col.Array[int]()
 	var array1 = Array.MakeFromArray([]int{3, 1, 2})
 	var array2 = Array.MakeFromArray([]int{3, 2, 4})
@@ -167,7 +167,7 @@ func TestSetsWithAnd(t *tes.T) {
 }
 
 func TestSetsWithSans(t *tes.T) {
-	var collator = col.Collator().Make()
+	var collator = col.Collator[col.SetLike[int]]().Make()
 	var Array = col.Array[int]()
 	var array1 = Array.MakeFromArray([]int{3, 1, 2})
 	var array2 = Array.MakeFromArray([]int{3, 2, 4})
@@ -184,7 +184,7 @@ func TestSetsWithSans(t *tes.T) {
 }
 
 func TestSetsWithOr(t *tes.T) {
-	var collator = col.Collator().Make()
+	var collator = col.Collator[col.SetLike[int]]().Make()
 	var Array = col.Array[int]()
 	var array1 = Array.MakeFromArray([]int{3, 1, 5})
 	var array2 = Array.MakeFromArray([]int{6, 2, 4})
@@ -203,7 +203,7 @@ func TestSetsWithOr(t *tes.T) {
 }
 
 func TestSetsWithXor(t *tes.T) {
-	var collator = col.Collator().Make()
+	var collator = col.Collator[col.SetLike[int]]().Make()
 	var Array = col.Array[int]()
 	var array1 = Array.MakeFromArray([]int{2, 3, 1, 5})
 	var array2 = Array.MakeFromArray([]int{6, 2, 5, 4})
@@ -220,7 +220,7 @@ func TestSetsWithXor(t *tes.T) {
 }
 
 func TestSetsWithEmptySets(t *tes.T) {
-	var collator = col.Collator().Make()
+	var collator = col.Collator[col.SetLike[int]]().Make()
 	var Set = col.Set[int]()
 	var set1 = Set.Make()
 	var set2 = Set.Make()

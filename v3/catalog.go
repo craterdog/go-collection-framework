@@ -265,7 +265,9 @@ func (v *catalog_[K, V]) SortValues() {
 	v.associations_.SortValues()
 }
 
-func (v *catalog_[K, V]) SortValuesWithRanker(ranker RankingFunction) {
+func (v *catalog_[K, V]) SortValuesWithRanker(
+	ranker RankingFunction[AssociationLike[K, V]],
+) {
 	v.associations_.SortValuesWithRanker(ranker)
 }
 

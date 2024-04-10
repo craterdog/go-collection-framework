@@ -329,7 +329,7 @@ func (v *list_[V]) ContainsValue(value V) bool {
 }
 
 func (v *list_[V]) GetIndex(value V) int {
-	var compare = Collator().Make().CompareValues
+	var compare = Collator[V]().Make().CompareValues
 	for index, candidate := range v.AsArray() {
 		if compare(candidate, value) {
 			// Found the value.
@@ -372,7 +372,7 @@ func (v *list_[V]) SortValues() {
 	v.values_.SortValues()
 }
 
-func (v *list_[V]) SortValuesWithRanker(ranker RankingFunction) {
+func (v *list_[V]) SortValuesWithRanker(ranker RankingFunction[V]) {
 	v.values_.SortValuesWithRanker(ranker)
 }
 

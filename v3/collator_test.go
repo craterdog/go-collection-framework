@@ -20,6 +20,7 @@ import (
 
 // Tilde Types
 type Boolean bool
+type Byte byte
 type Integer int
 type String string
 
@@ -53,12 +54,12 @@ type Fuz struct {
 }
 
 func TestCollatorConstants(t *tes.T) {
-	var Collator = col.Collator()
+	var Collator = col.Collator[any]()
 	ass.Equal(t, 16, Collator.DefaultMaximum())
 }
 
 func TestCompareMaximum(t *tes.T) {
-	var collator = col.Collator().MakeWithMaximum(1)
+	var collator = col.Collator[any]().MakeWithMaximum(1)
 	var array = col.Array[any]().MakeFromArray([]any{"foo", []int{1, 2, 3}})
 	defer func() {
 		if e := recover(); e != nil {
@@ -71,7 +72,7 @@ func TestCompareMaximum(t *tes.T) {
 }
 
 func TestRankMaximum(t *tes.T) {
-	var collator = col.Collator().MakeWithMaximum(1)
+	var collator = col.Collator[any]().MakeWithMaximum(1)
 	var array = col.Array[any]().MakeFromArray([]any{"foo", []int{1, 2, 3}})
 	defer func() {
 		if e := recover(); e != nil {
@@ -84,7 +85,7 @@ func TestRankMaximum(t *tes.T) {
 }
 
 func TestComparison(t *tes.T) {
-	var collator = col.Collator().Make()
+	var collator = col.Collator[any]().Make()
 
 	// Nil
 	var ShouldBeNil any
@@ -253,7 +254,7 @@ func TestComparison(t *tes.T) {
 }
 
 func TestTildeTypes(t *tes.T) {
-	var collator = col.Collator().Make()
+	var collator = col.Collator[any]().Make()
 
 	// Boolean
 	var False = Boolean(false)
@@ -269,6 +270,20 @@ func TestTildeTypes(t *tes.T) {
 	ass.Equal(t, 0, collator.RankValues(False, False))
 	ass.Equal(t, 1, collator.RankValues(True, False))
 	ass.Equal(t, 0, collator.RankValues(True, True))
+
+	// Byte
+	var Zero = Byte(0)
+	var One = Byte(1)
+	var TFF = Byte(255)
+	var ShouldBeZero Byte
+
+	ass.True(t, collator.CompareValues(ShouldBeZero, Zero))
+	ass.False(t, collator.CompareValues(One, ShouldBeZero))
+
+	ass.False(t, collator.CompareValues(One, TFF))
+	ass.True(t, collator.CompareValues(One, One))
+	ass.False(t, collator.CompareValues(TFF, One))
+	ass.True(t, collator.CompareValues(TFF, TFF))
 
 	// Integer
 	var Zilch = Integer(0)
@@ -300,7 +315,7 @@ func TestTildeTypes(t *tes.T) {
 }
 
 func TestCompareRecursiveArrays(t *tes.T) {
-	var collator = col.Collator().Make()
+	var collator = col.Collator[any]().Make()
 	var array = col.Array[any]().MakeFromArray([]any{0})
 	array.SetValue(1, array) // Now it is recursive.
 	defer func() {
@@ -314,7 +329,7 @@ func TestCompareRecursiveArrays(t *tes.T) {
 }
 
 func TestCompareRecursiveMaps(t *tes.T) {
-	var collator = col.Collator().Make()
+	var collator = col.Collator[any]().Make()
 	var m = col.Map[string, any]().MakeFromMap(map[string]any{"first": 1})
 	m.SetValue("first", m) // Now it is recursive.
 	defer func() {
@@ -328,7 +343,7 @@ func TestCompareRecursiveMaps(t *tes.T) {
 }
 
 func TestRanking(t *tes.T) {
-	var collator = col.Collator().Make()
+	var collator = col.Collator[any]().Make()
 
 	// Nil
 	var ShouldBeNil any
@@ -532,7 +547,7 @@ func TestRanking(t *tes.T) {
 }
 
 func TestTildeArrays(t *tes.T) {
-	var collator = col.Collator().Make()
+	var collator = col.Collator[String]().Make()
 	var ranker = collator.RankValues
 	var sorter = col.Sorter[String]().MakeWithRanker(ranker)
 	var alpha = String("alpha")
@@ -548,7 +563,7 @@ func TestTildeArrays(t *tes.T) {
 }
 
 func TestRankRecursiveArrays(t *tes.T) {
-	var collator = col.Collator().Make()
+	var collator = col.Collator[any]().Make()
 	var array = col.Array[any]().MakeFromArray([]any{0})
 	array.SetValue(1, array) // Now it is recursive.
 	defer func() {
@@ -562,7 +577,7 @@ func TestRankRecursiveArrays(t *tes.T) {
 }
 
 func TestRankRecursiveMaps(t *tes.T) {
-	var collator = col.Collator().Make()
+	var collator = col.Collator[any]().Make()
 	var m = col.Map[string, any]().MakeFromMap(map[string]any{"first": 1})
 	m.SetValue("first", m) // Now it is recursive.
 	defer func() {

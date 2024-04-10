@@ -82,7 +82,7 @@ func TestArrayIndexOfZero(t *tes.T) {
 }
 
 func TestArrayWithStrings(t *tes.T) {
-	var collator = col.Collator().Make()
+	var collator = col.Collator[string]().Make()
 	var Array = col.Array[string]()
 	var array = Array.MakeFromArray([]string{"foo", "bar", "baz"})
 	var foobar = Array.MakeFromArray([]string{"foo", "bar"})

@@ -19,7 +19,7 @@ import (
 )
 
 func TestSortingEmpty(t *tes.T) {
-	var collator = col.Collator().Make()
+	var collator = col.Collator[any]().Make()
 	var ranker = collator.RankValues
 	var sorter = col.Sorter[any]().MakeWithRanker(ranker)
 	var empty = []any{}
@@ -27,7 +27,7 @@ func TestSortingEmpty(t *tes.T) {
 }
 
 func TestSortingIntegers(t *tes.T) {
-	var collator = col.Collator().Make()
+	var collator = col.Collator[int]().Make()
 	var ranker = collator.RankValues
 	var sorter = col.Sorter[int]().MakeWithRanker(ranker)
 	var unsorted = []int{4, 3, 1, 5, 2}
@@ -37,7 +37,7 @@ func TestSortingIntegers(t *tes.T) {
 }
 
 func TestSortingStrings(t *tes.T) {
-	var collator = col.Collator().Make()
+	var collator = col.Collator[string]().Make()
 	var ranker = collator.RankValues
 	var sorter = col.Sorter[string]().MakeWithRanker(ranker)
 	var unsorted = []string{"alpha", "beta", "gamma", "delta"}

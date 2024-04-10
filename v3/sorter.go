@@ -43,7 +43,7 @@ func Sorter[V Value]() SorterClassLike[V] {
 	default:
 		// Add a new bound class type.
 		class = &sorterClass_[V]{
-			defaultRanker_: Collator().Make().RankValues,
+			defaultRanker_: Collator[V]().Make().RankValues,
 		}
 		sorterClass[name] = class
 	}
@@ -58,12 +58,12 @@ func Sorter[V Value]() SorterClassLike[V] {
 // Target
 
 type sorterClass_[V Value] struct {
-	defaultRanker_ RankingFunction
+	defaultRanker_ RankingFunction[V]
 }
 
 // Constants
 
-func (c *sorterClass_[V]) DefaultRanker() RankingFunction {
+func (c *sorterClass_[V]) DefaultRanker() RankingFunction[V] {
 	return c.defaultRanker_
 }
 
@@ -75,7 +75,7 @@ func (c *sorterClass_[V]) Make() SorterLike[V] {
 	}
 }
 
-func (c *sorterClass_[V]) MakeWithRanker(ranker RankingFunction) SorterLike[V] {
+func (c *sorterClass_[V]) MakeWithRanker(ranker RankingFunction[V]) SorterLike[V] {
 	return &sorter_[V]{
 		ranker_: ranker,
 	}
@@ -86,7 +86,7 @@ func (c *sorterClass_[V]) MakeWithRanker(ranker RankingFunction) SorterLike[V] {
 // Target
 
 type sorter_[V Value] struct {
-	ranker_ RankingFunction
+	ranker_ RankingFunction[V]
 }
 
 // Systematic
@@ -116,7 +116,7 @@ func (v *sorter_[V]) SortValues(values []V) {
 
 // Public
 
-func (v *sorter_[V]) GetRanker() RankingFunction {
+func (v *sorter_[V]) GetRanker() RankingFunction[V] {
 	return v.ranker_
 }
 

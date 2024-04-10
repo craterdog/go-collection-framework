@@ -160,12 +160,12 @@ func (v array_[V]) ShuffleValues() {
 }
 
 func (v array_[V]) SortValues() {
-	var collator = Collator().Make()
+	var collator = Collator[V]().Make()
 	var ranker = collator.RankValues
 	v.SortValuesWithRanker(ranker)
 }
 
-func (v array_[V]) SortValuesWithRanker(ranker RankingFunction) {
+func (v array_[V]) SortValuesWithRanker(ranker RankingFunction[V]) {
 	if v.GetSize() > 1 {
 		var sorter = Sorter[V]().MakeWithRanker(ranker)
 		sorter.SortValues(v)

@@ -11,19 +11,19 @@
 */
 
 /*
-Package "cdcn" defines a set of classes that provide an implementation of the
+Package "cdcn" provides a set of classes that provide an implementation of the
 notation-like abstract class for parsing and formatting source files containing
 Crater Dog Collection Notation™ (CDCN).  The complete language grammar for CDCN
 is located here:
   - https://github.com/craterdog/go-collection-framework/blob/main/v3/cdcn/Grammar.cdsn
 
-This package follows the Crater Dog Technologies™ (craterdog) Go Coding
-Conventions located here:
+This package follows the Crater Dog Technologies™ Go Coding Conventions located
+here:
   - https://github.com/craterdog/go-model-framework/wiki
 
-Additional implementations of the classes provided by this package can be
-developed and used seamlessly since the interface definitions only depend on
-other interfaces and primitive types; and the class implementations only depend
+Additional concrete implementations of the classes defined by this package can
+be developed and used seamlessly since the interface definitions only depend on
+other interfaces and primitive types—and the class implementations only depend
 on interfaces, not on each other.
 */
 package cdcn
@@ -60,8 +60,66 @@ const (
 // Classes
 
 /*
-ParserClassLike defines the set of class constants, constructors and functions
-that must be supported by all parser-class-like classes.
+AssociationClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete association-like class.
+*/
+type AssociationClassLike interface {
+	// Constructors
+	MakeWithAttributes(
+		key KeyLike,
+		value ValueLike,
+	) AssociationLike
+}
+
+/*
+AssociationsClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete associations-like class.
+*/
+type AssociationsClassLike interface {
+	// Constructors
+	MakeWithAssociations(associations col.ListLike[AssociationLike]) AssociationsLike
+}
+
+/*
+CollectionClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete collection-like class.
+*/
+type CollectionClassLike interface {
+	// Constructors
+	MakeWithAttributes(
+		associations AssociationsLike,
+		values ValuesLike,
+		context string,
+	) CollectionLike
+}
+
+/*
+FormatterClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete formatter-like class.
+*/
+type FormatterClassLike interface {
+	// Constructors
+	Make() FormatterLike
+}
+
+/*
+KeyClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete key-like class.
+*/
+type KeyClassLike interface {
+	// Constructors
+	MakeWithPrimitive(primitive PrimitiveLike) KeyLike
+}
+
+/*
+ParserClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete parser-like class.
 */
 type ParserClassLike interface {
 	// Constructors
@@ -69,9 +127,26 @@ type ParserClassLike interface {
 }
 
 /*
-ScannerClassLike is a class interface that defines the set of class
-constants, constructors and functions that must be supported by each
-scanner-class-like concrete class.  The following functions are supported:
+PrimitiveClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete primitive-like class.
+*/
+type PrimitiveClassLike interface {
+	// Constructors
+	MakeWithBoolean(boolean string) PrimitiveLike
+	MakeWithComplex(complex_ string) PrimitiveLike
+	MakeWithFloat(float string) PrimitiveLike
+	MakeWithHexadecimal(hexadecimal string) PrimitiveLike
+	MakeWithInteger(integer string) PrimitiveLike
+	MakeWithNil(nil_ string) PrimitiveLike
+	MakeWithRune(rune_ string) PrimitiveLike
+	MakeWithString(string_ string) PrimitiveLike
+}
+
+/*
+ScannerClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete scanner-like class.  The following functions are supported:
 
 FormatToken() returns a formatted string containing the attributes of the token.
 
@@ -96,9 +171,9 @@ type ScannerClassLike interface {
 }
 
 /*
-TokenClassLike is a class interface that defines the set of class
-constants, constructors and functions that must be supported by each
-token-class-like concrete class.
+TokenClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete token-like class.
 */
 type TokenClassLike interface {
 	// Constructors
@@ -110,11 +185,96 @@ type TokenClassLike interface {
 	) TokenLike
 }
 
+/*
+ValidatorClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete validator-like class.
+*/
+type ValidatorClassLike interface {
+	// Constructors
+	Make() ValidatorLike
+}
+
+/*
+ValueClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete value-like class.
+*/
+type ValueClassLike interface {
+	// Constructors
+	MakeWithCollection(collection CollectionLike) ValueLike
+	MakeWithPrimitive(primitive PrimitiveLike) ValueLike
+}
+
+/*
+ValuesClassLike is a class interface that defines the complete set of
+class constants, constructors and functions that must be supported by each
+concrete values-like class.
+*/
+type ValuesClassLike interface {
+	// Constructors
+	MakeWithValues(values col.ListLike[ValueLike]) ValuesLike
+}
+
 // Instances
 
 /*
-ParserLike defines the set of abstractions and methods that must be supported by
-all parser-like instances.
+AssociationLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete association-like class.
+*/
+type AssociationLike interface {
+	// Attributes
+	GetKey() KeyLike
+	GetValue() ValueLike
+}
+
+/*
+AssociationsLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete associations-like class.
+*/
+type AssociationsLike interface {
+	// Attributes
+	GetAssociations() col.ListLike[AssociationLike]
+}
+
+/*
+CollectionLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete collection-like class.
+*/
+type CollectionLike interface {
+	// Attributes
+	GetAssociations() AssociationsLike
+	GetValues() ValuesLike
+	GetContext() string
+}
+
+/*
+FormatterLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete formatter-like class.
+*/
+type FormatterLike interface {
+	// Methods
+	FormatCollection(collection CollectionLike) string
+}
+
+/*
+KeyLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete key-like class.
+*/
+type KeyLike interface {
+	// Attributes
+	GetPrimitive() PrimitiveLike
+}
+
+/*
+ParserLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete parser-like class.
 */
 type ParserLike interface {
 	// Methods
@@ -122,16 +282,34 @@ type ParserLike interface {
 }
 
 /*
-ScannerLike defines the set of abstractions and methods that must be supported
-by all scanner-like instances.
+PrimitiveLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete primitive-like class.
+*/
+type PrimitiveLike interface {
+	// Attributes
+	GetBoolean() string
+	GetComplex() string
+	GetFloat() string
+	GetHexadecimal() string
+	GetInteger() string
+	GetNil() string
+	GetRune() string
+	GetString() string
+}
+
+/*
+ScannerLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete scanner-like class.
 */
 type ScannerLike interface {
 }
 
 /*
 TokenLike is an instance interface that defines the complete set of
-abstractions and methods that must be supported by each instance of a
-token-like concrete class.
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete token-like class.
 */
 type TokenLike interface {
 	// Attributes
@@ -139,4 +317,35 @@ type TokenLike interface {
 	GetPosition() int
 	GetType() TokenType
 	GetValue() string
+}
+
+/*
+ValidatorLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete validator-like class.
+*/
+type ValidatorLike interface {
+	// Methods
+	ValidateCollection(collection CollectionLike)
+}
+
+/*
+ValueLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete value-like class.
+*/
+type ValueLike interface {
+	// Attributes
+	GetCollection() CollectionLike
+	GetPrimitive() PrimitiveLike
+}
+
+/*
+ValuesLike is an instance interface that defines the complete set of
+instance attributes, abstractions and methods that must be supported by each
+instance of a concrete values-like class.
+*/
+type ValuesLike interface {
+	// Attributes
+	GetValues() col.ListLike[ValueLike]
 }

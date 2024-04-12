@@ -125,13 +125,13 @@ nil: "nil"
 
 ordinal: '1'..'9' '0'..'9'*
 
-rune: "'" ~CONTROL "'"  ! Any printable character.
+rune: "'" ~[CONTROL] "'"  ! Any single printable character.
 
 scalar: (zero | ordinal) fraction
 
 sign: '+' | '-'
 
-string: '"' (ESCAPE | ~CONTROL)* '"'
+string: '"' (ESCAPE | ~['"' CONTROL])* '"'
 
 unicode: 'x' base16{2} | 'u' base16{4} | 'U' base16{8}
 

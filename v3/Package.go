@@ -6,12 +6,12 @@
 .                                                                              .
 .  This code is free software; you can redistribute it and/or modify it under  .
 .  the terms of The MIT License (MIT), as published by the Open Source         .
-.  Initiative. (See http://opensource.org/licenses/MIT)                        .
+.  Initiative. (See https://opensource.org/license/MIT)                        .
 ................................................................................
 */
 
 /*
-Package "collections" defines a set of simple, pragmatic abstract types and
+Package "collection" defines a set of simple, pragmatic abstract types and
 interfaces for Go based collections of values. It also provide an efficient and
 compact implementation of the following collection classes based on these
 abstractions:
@@ -35,7 +35,7 @@ developed and used seamlessly since the interface definitions only depend on
 other interfaces and primitive types; and the class implementations only depend
 on interfaces, not on each other.
 */
-package collections
+package collection
 
 // Types
 

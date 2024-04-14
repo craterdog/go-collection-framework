@@ -6,11 +6,11 @@
 .                                                                              .
 .  This code is free software; you can redistribute it and/or modify it under  .
 .  the terms of The MIT License (MIT), as published by the Open Source         .
-.  Initiative. (See http://opensource.org/licenses/MIT)                        .
+.  Initiative. (See https://opensource.org/license/MIT)                        .
 ................................................................................
 */
 
-package collections
+package collection
 
 import (
 	fmt "fmt"
@@ -343,39 +343,39 @@ func (v *formatter_) getName(collection ref.Value) string {
 	switch {
 	case sts.HasPrefix(type_, "[]"):
 		return "array"
-	case sts.HasPrefix(type_, "collections.ArrayLike"):
+	case sts.HasPrefix(type_, "collection.ArrayLike"):
 		return "Array"
-	case sts.HasPrefix(type_, "collections.array_"):
+	case sts.HasPrefix(type_, "collection.array_"):
 		return "Array"
 	case sts.HasPrefix(type_, "map["):
 		return "map"
-	case sts.HasPrefix(type_, "collections.MapLike"):
+	case sts.HasPrefix(type_, "collection.MapLike"):
 		return "Map"
-	case sts.HasPrefix(type_, "collections.map_"):
+	case sts.HasPrefix(type_, "collection.map_"):
 		return "Map"
-	case sts.HasPrefix(type_, "*collections.set_"):
+	case sts.HasPrefix(type_, "*collection.set_"):
 		return "Set"
-	case sts.HasPrefix(type_, "collections.SetLike"):
+	case sts.HasPrefix(type_, "collection.SetLike"):
 		return "Set"
-	case sts.HasPrefix(type_, "*collections.queue_"):
+	case sts.HasPrefix(type_, "*collection.queue_"):
 		return "Queue"
-	case sts.HasPrefix(type_, "collections.QueueLike"):
+	case sts.HasPrefix(type_, "collection.QueueLike"):
 		return "Queue"
-	case sts.HasPrefix(type_, "*collections.stack_"):
+	case sts.HasPrefix(type_, "*collection.stack_"):
 		return "Stack"
-	case sts.HasPrefix(type_, "collections.StackLike"):
+	case sts.HasPrefix(type_, "collection.StackLike"):
 		return "Stack"
-	case sts.HasPrefix(type_, "*collections.list_"):
+	case sts.HasPrefix(type_, "*collection.list_"):
 		return "List"
-	case sts.HasPrefix(type_, "collections.ListLike"):
+	case sts.HasPrefix(type_, "collection.ListLike"):
 		return "List"
-	case sts.HasPrefix(type_, "*collections.catalog_"):
+	case sts.HasPrefix(type_, "*collection.catalog_"):
 		return "Catalog"
-	case sts.HasPrefix(type_, "collections.CatalogLike"):
+	case sts.HasPrefix(type_, "collection.CatalogLike"):
 		return "Catalog"
-	case sts.HasPrefix(type_, "*collections.association_"):
+	case sts.HasPrefix(type_, "*collection.association_"):
 		return "Association"
-	case sts.HasPrefix(type_, "collections.AssociationLike"):
+	case sts.HasPrefix(type_, "collection.AssociationLike"):
 		return "Association"
 	default:
 		return "<unknown>"

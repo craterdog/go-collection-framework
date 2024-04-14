@@ -48,9 +48,9 @@ matched by the parser in the order listed.  A rule definition may also be
 directly or indirectly recursive.  The sequence of factors within in a rule
 definition may be separated by spaces which are ignored by the parser.
 <!
-Source: Cdcn EOL* EOF  ! Terminated with an end-of-file marker.
+Cdcn: Collection EOL* EOF  ! Terminated with an end-of-file marker.
 
-Cdcn: "[" (Associations | Values) "]" "(" context ")"
+Collection: "[" (Associations | Values) "]" "(" context ")"
 
 Associations:
     Association ("," Association)*
@@ -61,7 +61,7 @@ Association: Key ":" Value
 
 Key: Primitive
 
-Value: Cdcn | Primitive
+Value: Primitive | Collection
 
 Primitive:
     boolean

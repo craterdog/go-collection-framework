@@ -780,7 +780,7 @@ sequence of values which can grow or shrink as needed.
 This type is parameterized as follows:
   - V is any type of value.
 
-The order of the values is determined by a configurable RankingFunction[V].
+The order of the values is determined by a configurable CollatorLike[V] agent.
 */
 type SetLike[V Value] interface {
 	// Attributes

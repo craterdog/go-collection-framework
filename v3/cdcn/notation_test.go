@@ -14,7 +14,7 @@ package cdcn_test
 
 import (
 	fmt "fmt"
-	not "github.com/craterdog/go-collection-framework/v3/cdcn"
+	cdc "github.com/craterdog/go-collection-framework/v3/cdcn"
 	ass "github.com/stretchr/testify/assert"
 	osx "os"
 	sts "strings"
@@ -24,7 +24,7 @@ import (
 const collectionTests = "./test/"
 
 func TestCollectionRoundtrips(t *tes.T) {
-	var cdcn = not.Notation().Make()
+	var cdcn = cdc.Notation().Make()
 	var files, err = osx.ReadDir(collectionTests)
 	if err != nil {
 		var message = fmt.Sprintf("Could not find the %s directory.", collectionTests)

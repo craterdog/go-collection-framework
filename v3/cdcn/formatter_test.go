@@ -13,14 +13,14 @@
 package cdcn_test
 
 import (
-	col "github.com/craterdog/go-collection-framework/v3"
-	not "github.com/craterdog/go-collection-framework/v3/cdcn"
+	cdc "github.com/craterdog/go-collection-framework/v3/cdcn"
+	col "github.com/craterdog/go-collection-framework/v3/collection"
 	ass "github.com/stretchr/testify/assert"
 	tes "testing"
 )
 
 func TestFormatMaximums(t *tes.T) {
-	var Formatter = not.Formatter()
+	var Formatter = cdc.Formatter()
 	var formatter = Formatter.MakeWithMaximum(0)
 	var array = col.Array[any]().MakeFromArray([]any{1, []any{1, 2, []any{1, 2, 3}}})
 	var s = formatter.FormatCollection(array)
@@ -34,7 +34,7 @@ func TestFormatMaximums(t *tes.T) {
 }
 
 func TestFormatInvalidType(t *tes.T) {
-	var formatter = not.Formatter().MakeWithMaximum(8)
+	var formatter = cdc.Formatter().MakeWithMaximum(8)
 	var s struct{}
 	defer func() {
 		if e := recover(); e != nil {

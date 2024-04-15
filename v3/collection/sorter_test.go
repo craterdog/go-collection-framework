@@ -13,7 +13,7 @@
 package collection_test
 
 import (
-	col "github.com/craterdog/go-collection-framework/v3"
+	col "github.com/craterdog/go-collection-framework/v3/collection"
 	ass "github.com/stretchr/testify/assert"
 	tes "testing"
 )

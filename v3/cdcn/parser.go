@@ -74,8 +74,8 @@ func (v *parser_) ParseSource(source string) col.Collection {
 	var collection, token, ok = v.parseCollection()
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("Collection",
-			"Source",
+		message += v.generateSyntax("Collection",
+			"Cdcn",
 			"Collection",
 		)
 		panic(message)
@@ -90,8 +90,8 @@ func (v *parser_) ParseSource(source string) col.Collection {
 	_, token, ok = v.parseToken(EOFToken, "")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("EOF",
-			"Source",
+		message += v.generateSyntax("EOF",
+			"Cdcn",
 			"Collection",
 		)
 		panic(message)
@@ -145,13 +145,13 @@ func (v *parser_) formatError(token TokenLike) string {
 This private instance method is useful when creating scanner and parser error
 messages that include the required grammatical rules.
 */
-func (v *parser_) generateGrammar(expected string, names ...string) string {
+func (v *parser_) generateSyntax(expected string, names ...string) string {
 	var message = "Was expecting '" + expected + "' from:\n"
 	for _, name := range names {
 		message += fmt.Sprintf(
 			"  \033[32m%v: \033[33m%v\033[0m\n\n",
 			name,
-			grammar[name],
+			syntax[name],
 		)
 	}
 	return message
@@ -205,7 +205,7 @@ func (v *parser_) parseAssociation() (
 	value, token, ok = v.parseValue()
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("Value",
+		message += v.generateSyntax("Value",
 			"Association",
 			"Key",
 			"Value")
@@ -265,7 +265,7 @@ func (v *parser_) parseCollection() (
 		collection, _, ok = v.parseValues()
 		if !ok {
 			var message = v.formatError(token)
-			message += v.generateGrammar("Associations",
+			message += v.generateSyntax("Associations",
 				"Collection",
 				"Associations",
 				"Values",
@@ -278,7 +278,7 @@ func (v *parser_) parseCollection() (
 	_, token, ok = v.parseToken(DelimiterToken, "]")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("]",
+		message += v.generateSyntax("]",
 			"Collection",
 			"Associations",
 			"Values",
@@ -290,7 +290,7 @@ func (v *parser_) parseCollection() (
 	_, token, ok = v.parseToken(DelimiterToken, "(")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("(",
+		message += v.generateSyntax("(",
 			"Collection",
 			"Associations",
 			"Values",
@@ -303,7 +303,7 @@ func (v *parser_) parseCollection() (
 	context, token, ok = v.parseToken(ContextToken, "")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("Context",
+		message += v.generateSyntax("Context",
 			"Collection",
 			"Associations",
 			"Values",
@@ -315,7 +315,7 @@ func (v *parser_) parseCollection() (
 	_, token, ok = v.parseToken(DelimiterToken, ")")
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar(")",
+		message += v.generateSyntax(")",
 			"Collection",
 			"Associations",
 			"Values",
@@ -392,7 +392,7 @@ func (v *parser_) parseInlineAssociations() (
 			association, token, ok = v.parseAssociation()
 			if !ok {
 				var message = v.formatError(token)
-				message += v.generateGrammar("Association",
+				message += v.generateSyntax("Association",
 					"Associations",
 					"Association",
 				)
@@ -424,7 +424,7 @@ func (v *parser_) parseInlineValues() (
 			value, token, ok = v.parseValue()
 			if !ok {
 				var message = v.formatError(token)
-				message += v.generateGrammar("Value",
+				message += v.generateSyntax("Value",
 					"Values",
 					"Value",
 				)
@@ -481,7 +481,7 @@ func (v *parser_) parseMultilineAssociations() (
 		_, eolToken, ok = v.parseToken(EOLToken, "")
 		if !ok {
 			var message = v.formatError(eolToken)
-			message += v.generateGrammar("EOL",
+			message += v.generateSyntax("EOL",
 				"Associations",
 				"Association",
 			)
@@ -513,7 +513,7 @@ func (v *parser_) parseMultilineValues() (
 	value, token, ok = v.parseValue()
 	if !ok {
 		var message = v.formatError(token)
-		message += v.generateGrammar("Value",
+		message += v.generateSyntax("Value",
 			"Values",
 			"Value",
 		)
@@ -525,7 +525,7 @@ func (v *parser_) parseMultilineValues() (
 		_, eolToken, ok = v.parseToken(EOLToken, "")
 		if !ok {
 			var message = v.formatError(eolToken)
-			message += v.generateGrammar("EOL",
+			message += v.generateSyntax("EOL",
 				"Values",
 				"Value",
 			)
@@ -671,8 +671,8 @@ func (v *parser_) putBack(token TokenLike) {
 /*
 This Go map captures the syntax rules for collections of Go primitives.
 */
-var grammar = map[string]string{
-	"Source":     `Collection EOL* EOF  ! Terminated with an end-of-file marker.`,
+var syntax = map[string]string{
+	"Cdcn":       `Collection EOL* EOF  ! Terminated with an end-of-file marker.`,
 	"Collection": `"[" (Associations | Values) "]" "(" context ")"`,
 	"Associations": `
     Association ("," Association)*

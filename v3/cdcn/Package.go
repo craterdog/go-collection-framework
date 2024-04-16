@@ -13,9 +13,9 @@
 /*
 Package "cdcn" provides a set of classes that provide an implementation of the
 notation-like abstract class for parsing and formatting source files containing
-Crater Dog Collection Notation™ (CDCN).  The complete language grammar for CDCN
+Crater Dog Collection Notation™ (CDCN).  The complete language syntax for CDCN
 is located here:
-  - https://github.com/craterdog/go-collection-framework/blob/main/v3/cdcn/Grammar.cdsn
+  - https://github.com/craterdog/go-collection-framework/blob/main/v3/cdcn/Syntax.cdsn
 
 This package follows the Crater Dog Technologies™ Go Coding Conventions located
 here:

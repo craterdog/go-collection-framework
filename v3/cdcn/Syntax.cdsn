@@ -14,9 +14,9 @@
 CRATER DOG COLLECTION NOTATION
 This document contains a formal definition of the Crater Dog Collection
 Notation™ (CDCN) using Crater Dog Syntax Notation™ (CDSN):
- * https://github.com/craterdog/go-grammar-framework/blob/main/v3/cdsn/Grammar.cdsn
+ * https://github.com/craterdog/go-grammar-framework/blob/main/v3/cdsn/Syntax.cdsn
 
-A language grammar consists of a set of rule definitions and token definitions.
+A language syntax consists of a set of rule definitions and token definitions.
 
 The following intrinsic character types are context specific:
  * ANY - Any language specific character.

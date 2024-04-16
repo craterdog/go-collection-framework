@@ -13,7 +13,8 @@
 !>
 CRATER DOG COLLECTION NOTATION
 This document contains a formal definition of the Crater Dog Collection
-Notation™ (CDCN) using Crater Dog Syntax Notation™ (CDSN).
+Notation™ (CDCN) using Crater Dog Syntax Notation™ (CDSN):
+ * https://github.com/craterdog/go-grammar-framework/blob/main/v3/cdsn/Grammar.cdsn
 
 A language grammar consists of a set of rule definitions and token definitions.
 

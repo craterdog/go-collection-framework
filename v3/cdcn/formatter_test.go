@@ -19,7 +19,7 @@ import (
 	tes "testing"
 )
 
-func TestFormatMaximums(t *tes.T) {
+func TestFormatMaximum(t *tes.T) {
 	var Formatter = cdc.Formatter()
 	var formatter = Formatter.MakeWithMaximum(0)
 	var array = col.Array[any]().MakeFromArray([]any{1, []any{1, 2, []any{1, 2, 3}}})

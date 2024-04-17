@@ -21,7 +21,7 @@ import (
 	tes "testing"
 )
 
-const collectionTests = "./test/"
+const collectionTests = "../test/input/"
 
 func TestCollectionRoundtrips(t *tes.T) {
 	var cdcn = cdc.Notation().Make()

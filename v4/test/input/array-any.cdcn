@@ -1,0 +1,19 @@
+[
+    true
+    0xa
+    42
+    0.125
+    (3.0-4.0i)
+    '☺'
+    "Hello World!"
+    [
+        1
+        2
+        3
+    ](array)
+    [
+        [ ](array)
+        [:](map)
+    ](array)
+    ["alpha": 1](map)
+](Array)

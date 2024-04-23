@@ -13,7 +13,7 @@
 package agent_test
 
 import (
-	age "github.com/craterdog/go-collection-framework/v3/agent"
+	age "github.com/craterdog/go-collection-framework/v4/agent"
 	ass "github.com/stretchr/testify/assert"
 	tes "testing"
 )

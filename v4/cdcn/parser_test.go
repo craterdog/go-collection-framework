@@ -13,7 +13,7 @@
 package cdcn_test
 
 import (
-	not "github.com/craterdog/go-collection-framework/v3/cdcn"
+	not "github.com/craterdog/go-collection-framework/v4/cdcn"
 	ass "github.com/stretchr/testify/assert"
 	tes "testing"
 )

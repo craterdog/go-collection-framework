@@ -38,7 +38,7 @@ on interfaces, not on each other.
 package collection
 
 import (
-	age "github.com/craterdog/go-collection-framework/v3/agent"
+	age "github.com/craterdog/go-collection-framework/v4/agent"
 )
 
 // Types

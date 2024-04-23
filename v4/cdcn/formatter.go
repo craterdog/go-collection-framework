@@ -14,7 +14,7 @@ package cdcn
 
 import (
 	fmt "fmt"
-	col "github.com/craterdog/go-collection-framework/v3/collection"
+	col "github.com/craterdog/go-collection-framework/v4/collection"
 	ref "reflect"
 	stc "strconv"
 	sts "strings"

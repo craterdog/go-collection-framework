@@ -14,9 +14,9 @@ package collection_test
 
 import (
 	fmt "fmt"
-	age "github.com/craterdog/go-collection-framework/v3/agent"
-	not "github.com/craterdog/go-collection-framework/v3/cdcn"
-	col "github.com/craterdog/go-collection-framework/v3/collection"
+	age "github.com/craterdog/go-collection-framework/v4/agent"
+	not "github.com/craterdog/go-collection-framework/v4/cdcn"
+	col "github.com/craterdog/go-collection-framework/v4/collection"
 	ass "github.com/stretchr/testify/assert"
 	tes "testing"
 )

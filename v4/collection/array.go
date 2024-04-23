@@ -14,7 +14,7 @@ package collection
 
 import (
 	fmt "fmt"
-	age "github.com/craterdog/go-collection-framework/v3/agent"
+	age "github.com/craterdog/go-collection-framework/v4/agent"
 	sts "strings"
 	syn "sync"
 )

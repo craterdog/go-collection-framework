@@ -1,4 +1,4 @@
-module github.com/craterdog/go-collection-framework/v3
+module github.com/craterdog/go-collection-framework/v4
 
 go 1.22
 

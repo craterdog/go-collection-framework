@@ -14,7 +14,7 @@ package cdcn_test
 
 import (
 	fmt "fmt"
-	not "github.com/craterdog/go-collection-framework/v3/cdcn"
+	not "github.com/craterdog/go-collection-framework/v4/cdcn"
 	ass "github.com/stretchr/testify/assert"
 	osx "os"
 	sts "strings"

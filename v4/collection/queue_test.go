@@ -14,8 +14,8 @@ package collection_test
 
 import (
 	fmt "fmt"
-	not "github.com/craterdog/go-collection-framework/v3/cdcn"
-	col "github.com/craterdog/go-collection-framework/v3/collection"
+	not "github.com/craterdog/go-collection-framework/v4/cdcn"
+	col "github.com/craterdog/go-collection-framework/v4/collection"
 	ass "github.com/stretchr/testify/assert"
 	syn "sync"
 	tes "testing"

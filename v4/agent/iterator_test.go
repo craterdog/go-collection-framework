@@ -13,8 +13,8 @@
 package agent_test
 
 import (
-	not "github.com/craterdog/go-collection-framework/v3/cdcn"
-	col "github.com/craterdog/go-collection-framework/v3/collection"
+	not "github.com/craterdog/go-collection-framework/v4/cdcn"
+	col "github.com/craterdog/go-collection-framework/v4/collection"
 	ass "github.com/stretchr/testify/assert"
 	tes "testing"
 )

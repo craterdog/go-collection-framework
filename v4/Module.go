@@ -25,23 +25,44 @@ Conventions located here:
 Most of the classes defined in this module utilize a notation class to handle
 the parsing and formatting of instances of each class using a specific notation.
 The default notation is Crater Dog Collection Notation™ (CDCN), but others like
-XML and JSON can be supported as well.
+JSON and XML could be supported as well.
 */
 package module
 
 import (
 	age "github.com/craterdog/go-collection-framework/v4/agent"
-	not "github.com/craterdog/go-collection-framework/v4/cdcn"
+	cdc "github.com/craterdog/go-collection-framework/v4/cdcn"
 	col "github.com/craterdog/go-collection-framework/v4/collection"
+	//jso "github.com/craterdog/go-collection-framework/v4/json"
+	//xml "github.com/craterdog/go-collection-framework/v4/xml"
 )
 
 // UNIVERSAL CONSTRUCTORS
+
+// Notations
+
+func CDCN() col.NotationLike {
+	var notation col.NotationLike = cdc.Notation().Make()
+	return notation
+}
+
+func JSON() col.NotationLike {
+	panic("The JSON notation is not yet supported.")
+	//var notation col.NotationLike = jso.Notation().Make()
+	//return notation
+}
+
+func XML() col.NotationLike {
+	panic("The XML notation is not yet supported.")
+	//var notation col.NotationLike = xml.Notation().Make()
+	//return notation
+}
 
 // Collections
 
 func Array[V col.Value](arguments ...any) col.ArrayLike[V] {
 	// Initialize the possible arguments.
-	var notation col.NotationLike = not.Notation().Make()
+	var notation col.NotationLike = cdc.Notation().Make()
 	var values []V
 	var sequence col.Sequential[V]
 	var source string
@@ -89,7 +110,7 @@ func Association[K col.Key, V col.Value](key K, value V) col.AssociationLike[K, 
 
 func Catalog[K comparable, V col.Value](arguments ...any) col.CatalogLike[K, V] {
 	// Initialize the possible arguments.
-	var notation col.NotationLike = not.Notation().Make()
+	var notation col.NotationLike = cdc.Notation().Make()
 	var associations []col.AssociationLike[K, V]
 	var mappings map[K]V
 	var sequence col.Sequential[col.AssociationLike[K, V]]
@@ -131,7 +152,7 @@ func Catalog[K comparable, V col.Value](arguments ...any) col.CatalogLike[K, V] 
 
 func List[V col.Value](arguments ...any) col.ListLike[V] {
 	// Initialize the possible arguments.
-	var notation col.NotationLike = not.Notation().Make()
+	var notation col.NotationLike = cdc.Notation().Make()
 	var values []V
 	var sequence col.Sequential[V]
 	var source string
@@ -168,7 +189,7 @@ func List[V col.Value](arguments ...any) col.ListLike[V] {
 
 func Map[K comparable, V col.Value](arguments ...any) col.MapLike[K, V] {
 	// Initialize the possible arguments.
-	var notation col.NotationLike = not.Notation().Make()
+	var notation col.NotationLike = cdc.Notation().Make()
 	var associations []col.AssociationLike[K, V]
 	var mappings map[K]V
 	var sequence col.Sequential[col.AssociationLike[K, V]]
@@ -210,7 +231,7 @@ func Map[K comparable, V col.Value](arguments ...any) col.MapLike[K, V] {
 
 func Queue[V col.Value](arguments ...any) col.QueueLike[V] {
 	// Initialize the possible arguments.
-	var notation col.NotationLike = not.Notation().Make()
+	var notation col.NotationLike = cdc.Notation().Make()
 	var values []V
 	var sequence col.Sequential[V]
 	var source string
@@ -252,7 +273,7 @@ func Queue[V col.Value](arguments ...any) col.QueueLike[V] {
 
 func Set[V col.Value](arguments ...any) col.SetLike[V] {
 	// Initialize the possible arguments.
-	var notation col.NotationLike = not.Notation().Make()
+	var notation col.NotationLike = cdc.Notation().Make()
 	var values []V
 	var sequence col.Sequential[V]
 	var source string
@@ -304,7 +325,7 @@ func Set[V col.Value](arguments ...any) col.SetLike[V] {
 
 func Stack[V col.Value](arguments ...any) col.StackLike[V] {
 	// Initialize the possible arguments.
-	var notation col.NotationLike = not.Notation().Make()
+	var notation col.NotationLike = cdc.Notation().Make()
 	var values []V
 	var sequence col.Sequential[V]
 	var source string

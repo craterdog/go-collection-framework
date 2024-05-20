@@ -37,45 +37,79 @@ import (
 	//xml "github.com/craterdog/go-collection-framework/v4/xml"
 )
 
+// TYPE PROMOTIONS
+
+// Items
+
+type (
+	Key   col.Key
+	Value col.Value
+)
+
+// Interfaces
+
+type (
+	Sequential[V Value] col.Sequential[V]
+)
+
+// Agents
+
+type (
+	AssociationLike[K Key, V Value] col.AssociationLike[K, V]
+	NotationLike                    col.NotationLike
+)
+
+// Collections
+
+type (
+	ArrayLike[V Value]                 col.ArrayLike[V]
+	MapLike[K comparable, V Value]     col.MapLike[K, V]
+	ListLike[V Value]                  col.ListLike[V]
+	SetLike[V Value]                   col.SetLike[V]
+	CatalogLike[K comparable, V Value] col.CatalogLike[K, V]
+	QueueLike[V Value]                 col.QueueLike[V]
+	StackLike[V Value]                 col.StackLike[V]
+)
+
 // UNIVERSAL CONSTRUCTORS
 
 // Notations
 
-func CDCN() col.NotationLike {
-	var notation col.NotationLike = cdc.Notation().Make()
+func CDCN() NotationLike {
+	var notation NotationLike = cdc.Notation().Make()
 	return notation
 }
 
-func JSON() col.NotationLike {
+func JSON() NotationLike {
 	panic("The JSON notation is not yet supported.")
-	//var notation col.NotationLike = jso.Notation().Make()
+	//var notation NotationLike = jso.Notation().Make()
 	//return notation
 }
 
-func XML() col.NotationLike {
+func XML() NotationLike {
 	panic("The XML notation is not yet supported.")
-	//var notation col.NotationLike = xml.Notation().Make()
+	//var notation NotationLike = xml.Notation().Make()
 	//return notation
 }
 
 // Collections
 
-func Array[V col.Value](arguments ...any) col.ArrayLike[V] {
+func Array[V Value](arguments ...any) ArrayLike[V] {
 	// Initialize the possible arguments.
-	var notation col.NotationLike = cdc.Notation().Make()
+	var notation NotationLike = cdc.Notation().Make()
 	var values []V
-	var sequence col.Sequential[V]
+	var sequence Sequential[V]
 	var source string
 	var size int
 
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
-		case col.NotationLike:
+		case NotationLike:
 			notation = actual
 		case []V:
 			values = actual
-		case col.Sequential[V]:
+		case Sequential[V]:
 			sequence = actual
 		case string:
 			source = actual
@@ -86,7 +120,7 @@ func Array[V col.Value](arguments ...any) col.ArrayLike[V] {
 
 	// Call the right constructor.
 	var class = col.Array[V](notation)
-	var array col.ArrayLike[V]
+	var array ArrayLike[V]
 	switch {
 	case len(values) > 0:
 		array = class.MakeFromArray(values)
@@ -102,30 +136,30 @@ func Array[V col.Value](arguments ...any) col.ArrayLike[V] {
 	return array
 }
 
-func Association[K col.Key, V col.Value](key K, value V) col.AssociationLike[K, V] {
+func Association[K Key, V Value](key K, value V) AssociationLike[K, V] {
 	var class = col.Association[K, V]()
-	var association col.AssociationLike[K, V] = class.MakeWithAttributes(key, value)
+	var association AssociationLike[K, V] = class.MakeWithAttributes(key, value)
 	return association
 }
 
-func Catalog[K comparable, V col.Value](arguments ...any) col.CatalogLike[K, V] {
+func Catalog[K comparable, V Value](arguments ...any) CatalogLike[K, V] {
 	// Initialize the possible arguments.
-	var notation col.NotationLike = cdc.Notation().Make()
+	var notation NotationLike = cdc.Notation().Make()
 	var associations []col.AssociationLike[K, V]
 	var mappings map[K]V
-	var sequence col.Sequential[col.AssociationLike[K, V]]
+	var sequence Sequential[col.AssociationLike[K, V]]
 	var source string
 
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
-		case col.NotationLike:
+		case NotationLike:
 			notation = actual
 		case []col.AssociationLike[K, V]:
 			associations = actual
 		case map[K]V:
 			mappings = actual
-		case col.Sequential[col.AssociationLike[K, V]]:
+		case Sequential[col.AssociationLike[K, V]]:
 			sequence = actual
 		case string:
 			source = actual
@@ -134,7 +168,7 @@ func Catalog[K comparable, V col.Value](arguments ...any) col.CatalogLike[K, V] 
 
 	// Call the right constructor.
 	var class = col.Catalog[K, V](notation)
-	var catalog col.CatalogLike[K, V]
+	var catalog CatalogLike[K, V]
 	switch {
 	case len(associations) > 0:
 		catalog = class.MakeFromArray(associations)
@@ -150,21 +184,21 @@ func Catalog[K comparable, V col.Value](arguments ...any) col.CatalogLike[K, V] 
 	return catalog
 }
 
-func List[V col.Value](arguments ...any) col.ListLike[V] {
+func List[V Value](arguments ...any) ListLike[V] {
 	// Initialize the possible arguments.
-	var notation col.NotationLike = cdc.Notation().Make()
+	var notation NotationLike = cdc.Notation().Make()
 	var values []V
-	var sequence col.Sequential[V]
+	var sequence Sequential[V]
 	var source string
 
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
-		case col.NotationLike:
+		case NotationLike:
 			notation = actual
 		case []V:
 			values = actual
-		case col.Sequential[V]:
+		case Sequential[V]:
 			sequence = actual
 		case string:
 			source = actual
@@ -173,7 +207,7 @@ func List[V col.Value](arguments ...any) col.ListLike[V] {
 
 	// Call the right constructor.
 	var class = col.List[V](notation)
-	var list col.ListLike[V]
+	var list ListLike[V]
 	switch {
 	case len(values) > 0:
 		list = class.MakeFromArray(values)
@@ -187,24 +221,24 @@ func List[V col.Value](arguments ...any) col.ListLike[V] {
 	return list
 }
 
-func Map[K comparable, V col.Value](arguments ...any) col.MapLike[K, V] {
+func Map[K comparable, V Value](arguments ...any) MapLike[K, V] {
 	// Initialize the possible arguments.
-	var notation col.NotationLike = cdc.Notation().Make()
+	var notation NotationLike = cdc.Notation().Make()
 	var associations []col.AssociationLike[K, V]
 	var mappings map[K]V
-	var sequence col.Sequential[col.AssociationLike[K, V]]
+	var sequence Sequential[col.AssociationLike[K, V]]
 	var source string
 
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
-		case col.NotationLike:
+		case NotationLike:
 			notation = actual
 		case []col.AssociationLike[K, V]:
 			associations = actual
 		case map[K]V:
 			mappings = actual
-		case col.Sequential[col.AssociationLike[K, V]]:
+		case Sequential[col.AssociationLike[K, V]]:
 			sequence = actual
 		case string:
 			source = actual
@@ -213,7 +247,7 @@ func Map[K comparable, V col.Value](arguments ...any) col.MapLike[K, V] {
 
 	// Call the right constructor.
 	var class = col.Map[K, V](notation)
-	var map_ col.MapLike[K, V]
+	var map_ MapLike[K, V]
 	switch {
 	case len(associations) > 0:
 		map_ = class.MakeFromArray(associations)
@@ -229,22 +263,22 @@ func Map[K comparable, V col.Value](arguments ...any) col.MapLike[K, V] {
 	return map_
 }
 
-func Queue[V col.Value](arguments ...any) col.QueueLike[V] {
+func Queue[V Value](arguments ...any) QueueLike[V] {
 	// Initialize the possible arguments.
-	var notation col.NotationLike = cdc.Notation().Make()
+	var notation NotationLike = cdc.Notation().Make()
 	var values []V
-	var sequence col.Sequential[V]
+	var sequence Sequential[V]
 	var source string
 	var capacity int
 
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
-		case col.NotationLike:
+		case NotationLike:
 			notation = actual
 		case []V:
 			values = actual
-		case col.Sequential[V]:
+		case Sequential[V]:
 			sequence = actual
 		case string:
 			source = actual
@@ -255,7 +289,7 @@ func Queue[V col.Value](arguments ...any) col.QueueLike[V] {
 
 	// Call the right constructor.
 	var class = col.Queue[V](notation)
-	var queue col.QueueLike[V]
+	var queue QueueLike[V]
 	switch {
 	case len(values) > 0:
 		queue = class.MakeFromArray(values)
@@ -271,22 +305,22 @@ func Queue[V col.Value](arguments ...any) col.QueueLike[V] {
 	return queue
 }
 
-func Set[V col.Value](arguments ...any) col.SetLike[V] {
+func Set[V Value](arguments ...any) SetLike[V] {
 	// Initialize the possible arguments.
-	var notation col.NotationLike = cdc.Notation().Make()
+	var notation NotationLike = cdc.Notation().Make()
 	var values []V
-	var sequence col.Sequential[V]
+	var sequence Sequential[V]
 	var source string
 	var collator age.CollatorLike[V]
 
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
-		case col.NotationLike:
+		case NotationLike:
 			notation = actual
 		case []V:
 			values = actual
-		case col.Sequential[V]:
+		case Sequential[V]:
 			sequence = actual
 		case string:
 			source = actual
@@ -297,7 +331,7 @@ func Set[V col.Value](arguments ...any) col.SetLike[V] {
 
 	// Call the right constructor.
 	var class = col.Set[V](notation)
-	var set col.SetLike[V]
+	var set SetLike[V]
 	switch {
 	case collator != nil:
 		set = class.MakeWithCollator(collator)
@@ -323,22 +357,22 @@ func Set[V col.Value](arguments ...any) col.SetLike[V] {
 	return set
 }
 
-func Stack[V col.Value](arguments ...any) col.StackLike[V] {
+func Stack[V Value](arguments ...any) StackLike[V] {
 	// Initialize the possible arguments.
-	var notation col.NotationLike = cdc.Notation().Make()
+	var notation NotationLike = cdc.Notation().Make()
 	var values []V
-	var sequence col.Sequential[V]
+	var sequence Sequential[V]
 	var source string
 	var capacity int
 
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
-		case col.NotationLike:
+		case NotationLike:
 			notation = actual
 		case []V:
 			values = actual
-		case col.Sequential[V]:
+		case Sequential[V]:
 			sequence = actual
 		case string:
 			source = actual
@@ -349,7 +383,7 @@ func Stack[V col.Value](arguments ...any) col.StackLike[V] {
 
 	// Call the right constructor.
 	var class = col.Stack[V](notation)
-	var stack col.StackLike[V]
+	var stack StackLike[V]
 	switch {
 	case len(values) > 0:
 		stack = class.MakeFromArray(values)

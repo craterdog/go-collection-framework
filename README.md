@@ -11,7 +11,6 @@ replace the use of the native Go array, slice and map types.
 For more information on this project click on the following links:
  * [project documentation](https://github.com/craterdog/go-collection-framework/wiki)
  * [coding conventions](https://github.com/craterdog/go-model-framework/wiki)
- * [release notes](https://github.com/craterdog/go-collection-framework/wiki/releases)
 
 ### Getting Started
 To include the Go packages for this module use the following import statement:

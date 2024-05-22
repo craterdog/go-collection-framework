@@ -28,10 +28,7 @@ var mapMutex syn.Mutex
 
 // Function
 
-// NOTE:
-// The Go language requires the key type here support the "comparable" interface
-// so we must narrow it down from type Key (i.e. ."any").
-func Map[K comparable, V Value](notation NotationLike) MapClassLike[K, V] {
+func Map[K comparable, V any](notation NotationLike) MapClassLike[K, V] {
 	// Validate the notation argument.
 	if notation == nil {
 		panic("A notation must be specified when creating this class.")
@@ -65,10 +62,7 @@ func Map[K comparable, V Value](notation NotationLike) MapClassLike[K, V] {
 
 // Target
 
-// NOTE:
-// The Go language requires the key type here support the "comparable" interface
-// so we must narrow it down from type Key (i.e. ."any").
-type mapClass_[K comparable, V Value] struct {
+type mapClass_[K comparable, V any] struct {
 	notation_ NotationLike
 }
 
@@ -121,7 +115,7 @@ func (c *mapClass_[K, V]) MakeFromSequence(
 
 func (c *mapClass_[K, V]) MakeFromSource(source string) MapLike[K, V] {
 	// First we parse it as a collection of any type value.
-	var collection = c.notation_.ParseSource(source).(Sequential[AssociationLike[Key, Value]])
+	var collection = c.notation_.ParseSource(source).(Sequential[AssociationLike[any, any]])
 
 	// Next we must convert each value explicitly to type AssociationLike[K, V].
 	var anys = collection.AsArray()
@@ -140,10 +134,7 @@ func (c *mapClass_[K, V]) MakeFromSource(source string) MapLike[K, V] {
 
 // Target
 
-// NOTE:
-// The Go language requires the key type here support the "comparable" interface
-// so we must narrow it down from type Key (i.e. ."any").
-type map_[K comparable, V Value] map[K]V
+type map_[K comparable, V any] map[K]V
 
 // Associative
 

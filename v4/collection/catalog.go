@@ -27,10 +27,7 @@ var catalogMutex syn.Mutex
 
 // Function
 
-// NOTE:
-// The Go language requires the key type here support the "comparable" interface
-// so we must narrow it down from type Key (i.e. ."any").
-func Catalog[K comparable, V Value](notation NotationLike) CatalogClassLike[K, V] {
+func Catalog[K comparable, V any](notation NotationLike) CatalogClassLike[K, V] {
 	// Validate the notation argument.
 	if notation == nil {
 		panic("A notation must be specified when creating this class.")
@@ -64,10 +61,7 @@ func Catalog[K comparable, V Value](notation NotationLike) CatalogClassLike[K, V
 
 // Target
 
-// NOTE:
-// The Go language requires the key type here support the "comparable" interface
-// so we must narrow it down from type Key (i.e. ."any").
-type catalogClass_[K comparable, V Value] struct {
+type catalogClass_[K comparable, V any] struct {
 	notation_ NotationLike
 }
 
@@ -122,7 +116,7 @@ func (c *catalogClass_[K, V]) MakeFromSequence(
 
 func (c *catalogClass_[K, V]) MakeFromSource(source string) CatalogLike[K, V] {
 	// First we parse it as a collection of any type value.
-	var collection = c.notation_.ParseSource(source).(Sequential[AssociationLike[Key, Value]])
+	var collection = c.notation_.ParseSource(source).(Sequential[AssociationLike[any, any]])
 
 	// Next we must convert each value explicitly to type AssociationLike[K, V].
 	var anys = collection.AsArray()
@@ -172,10 +166,7 @@ func (c *catalogClass_[K, V]) Merge(
 
 // Target
 
-// NOTE:
-// The Go language requires the key type here support the "comparable" interface
-// so we must narrow it down from type Key (i.e. ."any").
-type catalog_[K comparable, V Value] struct {
+type catalog_[K comparable, V any] struct {
 	class_        CatalogClassLike[K, V]
 	associations_ ListLike[AssociationLike[K, V]]
 	keys_         map[K]AssociationLike[K, V]

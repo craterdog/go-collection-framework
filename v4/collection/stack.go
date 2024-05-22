@@ -27,7 +27,7 @@ var stackMutex syn.Mutex
 
 // Function
 
-func Stack[V Value](notation NotationLike) StackClassLike[V] {
+func Stack[V any](notation NotationLike) StackClassLike[V] {
 	// Validate the notation argument.
 	if notation == nil {
 		panic("A notation must be specified when creating this class.")
@@ -62,7 +62,7 @@ func Stack[V Value](notation NotationLike) StackClassLike[V] {
 
 // Target
 
-type stackClass_[V Value] struct {
+type stackClass_[V any] struct {
 	defaultCapacity_ int
 	notation_        NotationLike
 }
@@ -108,7 +108,7 @@ func (c *stackClass_[V]) MakeFromSequence(values Sequential[V]) StackLike[V] {
 
 func (c *stackClass_[V]) MakeFromSource(source string) StackLike[V] {
 	// First we parse it as a collection of any type value.
-	var collection = c.notation_.ParseSource(source).(Sequential[Value])
+	var collection = c.notation_.ParseSource(source).(Sequential[any])
 
 	// Next we must convert each value explicitly to type V.
 	var anys = collection.AsArray()
@@ -137,7 +137,7 @@ func (c *stackClass_[V]) MakeWithCapacity(capacity int) StackLike[V] {
 
 // Target
 
-type stack_[V Value] struct {
+type stack_[V any] struct {
 	class_    StackClassLike[V]
 	capacity_ int
 	values_   ListLike[V]

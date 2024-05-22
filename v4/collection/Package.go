@@ -48,20 +48,10 @@ Collection is a generic type representing any type of collections of values.
 */
 type Collection any
 
-/*
-Key is a generic type representing any type of associative key.
-*/
-type Key any
-
-/*
-Value is a generic type representing any type of value.
-*/
-type Value any
-
 // Aspects
 
 /*
-Accessible[V Value] defines the set of method signatures that must be
+Accessible[V any] defines the set of method signatures that must be
 supported by all sequences whose values can be accessed using indices. The
 indices of an accessible sequence are ORDINAL rather than ZERO based—which
 never really made sense except for pointer offsets. What is the "zeroth
@@ -77,7 +67,7 @@ sequence, and negative indices starting at the end of the sequence as follows:
 Notice that because the indices are ordinal based, the positive and negative
 indices are symmetrical.
 */
-type Accessible[V Value] interface {
+type Accessible[V any] interface {
 	// Methods
 	GetValue(index int) V
 	GetValues(
@@ -87,10 +77,10 @@ type Accessible[V Value] interface {
 }
 
 /*
-Associative[K Key, V Value] defines the set of method signatures that must be
-supported by all sequences of key-value associations.
+Associative[K comparable, V any] defines the set of method signatures that
+must be supported by all sequences of key-value associations.
 */
-type Associative[K Key, V Value] interface {
+type Associative[K comparable, V any] interface {
 	// Methods
 	GetKeys() Sequential[K]
 	GetValue(key K) V
@@ -115,10 +105,10 @@ type Canonical interface {
 }
 
 /*
-Expandable[V Value] defines the set of method signatures that must be supported
+Expandable[V any] defines the set of method signatures that must be supported
 by all sequences that allow new values to be appended, inserted and removed.
 */
-type Expandable[V Value] interface {
+type Expandable[V any] interface {
 	// Methods
 	AppendValue(value V)
 	AppendValues(values Sequential[V])
@@ -139,11 +129,11 @@ type Expandable[V Value] interface {
 }
 
 /*
-Flexible[V Value] defines the set of method signatures that must be supported by
+Flexible[V any] defines the set of method signatures that must be supported by
 all sequences of values that allow new values to be added and existing values to
 be removed.
 */
-type Flexible[V Value] interface {
+type Flexible[V any] interface {
 	// Methods
 	AddValue(value V)
 	AddValues(values Sequential[V])
@@ -153,21 +143,21 @@ type Flexible[V Value] interface {
 }
 
 /*
-Limited[V Value] defines the set of method signatures that must be supported by
+Limited[V any] defines the set of method signatures that must be supported by
 all sequences of values that allow new values to be added and limit the total
 number of values in the sequence.
 */
-type Limited[V Value] interface {
+type Limited[V any] interface {
 	// Methods
 	AddValue(value V)
 	RemoveAll()
 }
 
 /*
-Searchable[V Value] defines the set of method signatures that must be supported
+Searchable[V any] defines the set of method signatures that must be supported
 by all searchable sequences of values.
 */
-type Searchable[V Value] interface {
+type Searchable[V any] interface {
 	// Methods
 	ContainsAll(values Sequential[V]) bool
 	ContainsAny(values Sequential[V]) bool
@@ -176,10 +166,10 @@ type Searchable[V Value] interface {
 }
 
 /*
-Sequential[V Value] defines the set of method signatures that must be supported
+Sequential[V any] defines the set of method signatures that must be supported
 by all sequences of values.
 */
-type Sequential[V Value] interface {
+type Sequential[V any] interface {
 	// Methods
 	AsArray() []V
 	GetIterator() age.IteratorLike[V]
@@ -188,10 +178,10 @@ type Sequential[V Value] interface {
 }
 
 /*
-Sortable[V Value] defines the set of method signatures that must be supported by
+Sortable[V any] defines the set of method signatures that must be supported by
 all sequences whose values may be reordered using various sorting algorithms.
 */
-type Sortable[V Value] interface {
+type Sortable[V any] interface {
 	// Methods
 	ReverseValues()
 	ShuffleValues()
@@ -211,10 +201,10 @@ type Synchronized interface {
 }
 
 /*
-Updatable[V Value] defines the set of method signatures that must be supported
+Updatable[V any] defines the set of method signatures that must be supported
 by all updatable sequences of values.
 */
-type Updatable[V Value] interface {
+type Updatable[V any] interface {
 	// Methods
 	SetValue(
 		index int,
@@ -229,11 +219,11 @@ type Updatable[V Value] interface {
 // Classes
 
 /*
-ArrayClassLike[V Value] is a class interface that defines the complete set of
+ArrayClassLike[V any] is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
 concrete array-like class.
 */
-type ArrayClassLike[V Value] interface {
+type ArrayClassLike[V any] interface {
 	// Constants
 	Notation() NotationLike
 
@@ -245,11 +235,11 @@ type ArrayClassLike[V Value] interface {
 }
 
 /*
-AssociationClassLike[K Key, V Value] is a class interface that defines the
-complete set of class constants, constructors and functions that must be
+AssociationClassLike[K comparable, V any] is a class interface that defines
+the complete set of class constants, constructors and functions that must be
 supported by each concrete association-like class.
 */
-type AssociationClassLike[K Key, V Value] interface {
+type AssociationClassLike[K comparable, V any] interface {
 	// Constructors
 	MakeWithAttributes(
 		key K,
@@ -258,7 +248,7 @@ type AssociationClassLike[K Key, V Value] interface {
 }
 
 /*
-CatalogClassLike[K comparable, V Value] is a class interface that defines the
+CatalogClassLike[K comparable, V any] is a class interface that defines the
 complete set of class constants, constructors and functions that must be
 supported by each concrete catalog-like class.
 
@@ -273,7 +263,7 @@ the specified Catalogs in the order that they appear in each catalog.  If a
 key is present in both Catalogs, the value of the key from the second
 catalog takes precedence.
 */
-type CatalogClassLike[K comparable, V Value] interface {
+type CatalogClassLike[K comparable, V any] interface {
 	// Constants
 	Notation() NotationLike
 
@@ -296,7 +286,7 @@ type CatalogClassLike[K comparable, V Value] interface {
 }
 
 /*
-ListClassLike[V Value] is a class interface that defines the complete set of
+ListClassLike[V any] is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
 concrete list-like class.
 
@@ -305,7 +295,7 @@ The following functions are supported:
 Concatenate() combines two lists into a new list containing all values in both
 lists.  The order of the values in each list is preserved in the new list.
 */
-type ListClassLike[V Value] interface {
+type ListClassLike[V any] interface {
 	// Constants
 	Notation() NotationLike
 
@@ -323,11 +313,11 @@ type ListClassLike[V Value] interface {
 }
 
 /*
-MapClassLike[K comparable, V Value] is a class interface that defines the
+MapClassLike[K comparable, V any] is a class interface that defines the
 complete set of class constants, constructors and functions that must be
 supported by each concrete map-like class.
 */
-type MapClassLike[K comparable, V Value] interface {
+type MapClassLike[K comparable, V any] interface {
 	// Constants
 	Notation() NotationLike
 
@@ -350,7 +340,7 @@ type NotationClassLike interface {
 }
 
 /*
-QueueClassLike[V Value] is a class interface that defines the complete set of
+QueueClassLike[V any] is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
 concrete queue-like class.
 
@@ -377,7 +367,7 @@ needs to occur for each value and the operation can be done on the values in
 parallel.  The results can then be consolidated later on using the Join()
 function.
 */
-type QueueClassLike[V Value] interface {
+type QueueClassLike[V any] interface {
 	// Constants
 	Notation() NotationLike
 	DefaultCapacity() int
@@ -407,7 +397,7 @@ type QueueClassLike[V Value] interface {
 }
 
 /*
-SetClassLike[V Value] is a class interface that defines the complete set of
+SetClassLike[V any] is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
 concrete set-like class.
 
@@ -425,7 +415,7 @@ set but not in the second specified set.
 Xor() returns a new set containing the values that are in the first specified
 set or the second specified set but not both.
 */
-type SetClassLike[V Value] interface {
+type SetClassLike[V any] interface {
 	// Constants
 	Notation() NotationLike
 
@@ -456,11 +446,11 @@ type SetClassLike[V Value] interface {
 }
 
 /*
-StackClassLike[V Value] is a class interface that defines the complete set of
+StackClassLike[V any] is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
 concrete stack-like class.
 */
-type StackClassLike[V Value] interface {
+type StackClassLike[V any] interface {
 	// Constants
 	Notation() NotationLike
 	DefaultCapacity() int
@@ -476,7 +466,7 @@ type StackClassLike[V Value] interface {
 // Instances
 
 /*
-ArrayLike[V Value] is an instance interface that defines the complete set of
+ArrayLike[V any] is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
 instance of a concrete array-like class.  An array-like class maintains a fixed
 length indexed sequence of values.  Each value is associated with an implicit
@@ -490,7 +480,7 @@ This type is parameterized as follows:
 This type essentially provides a higher level abstraction for the primitive Go
 array type.
 */
-type ArrayLike[V Value] interface {
+type ArrayLike[V any] interface {
 	// Abstractions
 	Accessible[V]
 	Sequential[V]
@@ -499,8 +489,8 @@ type ArrayLike[V Value] interface {
 }
 
 /*
-AssociationLike[K Key, V Value] is an instance interface that defines the
-complete set of instance attributes, abstractions and methods that must be
+AssociationLike[K comparable, V any] is an instance interface that defines
+the complete set of instance attributes, abstractions and methods that must be
 supported by each instance of a concrete association-like class.
 
 This type is parameterized as follows:
@@ -509,7 +499,7 @@ This type is parameterized as follows:
 
 This type is used by catalog-like instances to maintain their associations.
 */
-type AssociationLike[K Key, V Value] interface {
+type AssociationLike[K comparable, V any] interface {
 	// Attributes
 	GetClass() AssociationClassLike[K, V]
 	GetKey() K
@@ -518,7 +508,7 @@ type AssociationLike[K Key, V Value] interface {
 }
 
 /*
-CatalogLike[K comparable, V Value] is an instance interface that defines the
+CatalogLike[K comparable, V any] is an instance interface that defines the
 complete set of instance attributes, abstractions and methods that must be
 supported by each instance of a concrete catalog-like class.
 
@@ -528,7 +518,7 @@ This type is parameterized as follows:
 
 A catalog-like class can use any association-like class key-value association.
 */
-type CatalogLike[K comparable, V Value] interface {
+type CatalogLike[K comparable, V any] interface {
 	// Attributes
 	GetClass() CatalogClassLike[K, V]
 
@@ -539,7 +529,7 @@ type CatalogLike[K comparable, V Value] interface {
 }
 
 /*
-ListLike[V Value] is an instance interface that defines the complete set of
+ListLike[V any] is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
 instance of a concrete list-like class.  A list-like class maintains a dynamic
 sequence of values which can grow or shrink as needed.  Each value is associated
@@ -553,7 +543,7 @@ This type is parameterized as follows:
 All comparison and ranking of values in the sequence is done using the default
 collator.
 */
-type ListLike[V Value] interface {
+type ListLike[V any] interface {
 	// Attributes
 	GetClass() ListClassLike[V]
 
@@ -567,7 +557,7 @@ type ListLike[V Value] interface {
 }
 
 /*
-MapLike[K comparable, V Value] is an instance interface that defines the
+MapLike[K comparable, V any] is an instance interface that defines the
 complete set of instance attributes, abstractions and methods that must be
 supported by each instance of a concrete map-like class.  A map-like class
 extends the primitive Go map type and maintains a sequence of key-value
@@ -580,7 +570,7 @@ This type is parameterized as follows:
 
 A map-like class can use any association-like class key-value association.
 */
-type MapLike[K comparable, V Value] interface {
+type MapLike[K comparable, V any] interface {
 	// Abstractions
 	Associative[K, V]
 	Sequential[AssociationLike[K, V]]
@@ -602,7 +592,7 @@ type NotationLike interface {
 }
 
 /*
-QueueLike[V Value] is an instance interface that defines the complete set of
+QueueLike[V any] is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
 instance of a concrete queue-like class.  A queue-like class implements FIFO
 (i.e. first-in-first-out) semantics.
@@ -615,7 +605,7 @@ and therefore enforces synchronized access.  A queue-like class enforces a
 maximum length and will block on attempts to add a value it is full.  It will
 also block on attempts to remove a value when it is empty.
 */
-type QueueLike[V Value] interface {
+type QueueLike[V any] interface {
 	// Attributes
 	GetClass() QueueClassLike[V]
 	GetCapacity() int
@@ -633,7 +623,7 @@ type QueueLike[V Value] interface {
 }
 
 /*
-SetLike[V Value] is an instance interface that defines the complete set of
+SetLike[V any] is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
 instance of a concrete set-like class.  A set-like class maintains an ordered
 sequence of values which can grow or shrink as needed.
@@ -643,7 +633,7 @@ This type is parameterized as follows:
 
 The order of the values is determined by a configurable CollatorLike[V] agent.
 */
-type SetLike[V Value] interface {
+type SetLike[V any] interface {
 	// Attributes
 	GetClass() SetClassLike[V]
 	GetCollator() age.CollatorLike[V]
@@ -656,7 +646,7 @@ type SetLike[V Value] interface {
 }
 
 /*
-StackLike[V Value] is an instance interface that defines the complete set of
+StackLike[V any] is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
 instance of a concrete stack-like class.  A stack-like class implements LIFO
 (i.e. last-in-first-out) semantics.
@@ -667,7 +657,7 @@ This type is parameterized as follows:
 A stack-like class enforces a maximum depth and will panic if that depth is
 exceeded.  It will also panic on attempts to remove a value when it is empty.
 */
-type StackLike[V Value] interface {
+type StackLike[V any] interface {
 	// Attributes
 	GetClass() StackClassLike[V]
 	GetCapacity() int

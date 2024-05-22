@@ -139,18 +139,18 @@ func (v *sorter_[V]) randomizeIndex(size int) int {
 	return int(random.Int64())
 }
 
+// NOTE:
+// This method, and the mergeArrays method, together sort the values in the
+// specified Go array in place using an iterative merge sort along with the
+// ranking function associated with this sorter.  The algorithm is documented
+// here:
+//   - https://en.wikipedia.org/wiki/Merge_sort#Bottom-up_implementation
+//
+// This iterative approach saves on memory allocation by swapping between
+// two Go arrays of the same size rather than allocating new Go arrays for
+// each sub-array.  This results in stable O[nlog(n)] time and O[n] space
+// performance.
 func (v *sorter_[V]) sortValues(values []V) {
-	// NOTE: This method, and the mergeArrays method, together sort the values
-	// in the specified Go array in place using an iterative merge sort along
-	// with the ranking function associated with this sorter.  The algorithm is
-	// documented here:
-	//   - https://en.wikipedia.org/wiki/Merge_sort#Bottom-up_implementation
-	//
-	// This iterative approach saves on memory allocation by swapping between
-	// two Go arrays of the same size rather than allocating new Go arrays for
-	// each sub-array.  This results in stable O[nlog(n)] time and O[n] space
-	// performance.
-
 	// Create a buffer Go array.
 	var length = len(values)
 	var buffer = make([]V, length)

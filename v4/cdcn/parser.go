@@ -182,12 +182,12 @@ func (v *parser_) getNextToken() TokenLike {
 }
 
 func (v *parser_) parseAssociation() (
-	association col.AssociationLike[col.Key, col.Value],
+	association col.AssociationLike[any, any],
 	token TokenLike,
 	ok bool,
 ) {
 	// Attempt to parse a primitive key.
-	var key col.Key
+	var key any
 	key, token, ok = v.parseKey()
 	if !ok {
 		return association, token, false
@@ -200,7 +200,7 @@ func (v *parser_) parseAssociation() (
 	}
 
 	// Attempt to parse a value.
-	var value col.Value
+	var value any
 	value, token, ok = v.parseValue()
 	if !ok {
 		var message = v.formatError(token)
@@ -212,19 +212,19 @@ func (v *parser_) parseAssociation() (
 	}
 
 	// Found an association.
-	association = col.Association[col.Key, col.Value]().MakeWithAttributes(key, value)
+	association = col.Association[any, any]().MakeWithAttributes(key, value)
 	return association, token, true
 }
 
 func (v *parser_) parseAssociations() (
-	associations col.CatalogLike[col.Key, col.Value],
+	associations col.CatalogLike[any, any],
 	token TokenLike,
 	ok bool,
 ) {
 	// Check for an empty sequence of associations.
 	_, token, ok = v.parseToken(DelimiterToken, ":")
 	if ok {
-		associations = col.Catalog[col.Key, col.Value](v.notation_).Make()
+		associations = col.Catalog[any, any](v.notation_).Make()
 		return associations, token, true
 	}
 
@@ -324,28 +324,28 @@ func (v *parser_) parseCollection() (
 
 	// Found a collection of a specific type.
 	switch sequence := collection.(type) {
-	case col.Sequential[col.Value]:
+	case col.Sequential[any]:
 		switch context {
 		case "array":
 			collection = sequence.AsArray()
 		case "Array":
-			collection = col.Array[col.Value](v.notation_).MakeFromArray(sequence.AsArray())
+			collection = col.Array[any](v.notation_).MakeFromSequence(sequence)
 		case "List":
-			collection = col.List[col.Value](v.notation_).MakeFromSequence(sequence)
+			collection = col.List[any](v.notation_).MakeFromSequence(sequence)
 		case "Queue":
-			collection = col.Queue[col.Value](v.notation_).MakeFromSequence(sequence)
+			collection = col.Queue[any](v.notation_).MakeFromSequence(sequence)
 		case "Set":
-			collection = col.Set[col.Value](v.notation_).MakeFromSequence(sequence)
+			collection = col.Set[any](v.notation_).MakeFromSequence(sequence)
 		case "Stack":
-			collection = col.Stack[col.Value](v.notation_).MakeFromSequence(sequence)
+			collection = col.Stack[any](v.notation_).MakeFromSequence(sequence)
 		default:
 			var message = fmt.Sprintf("Found an unknown collection type: %q", context)
 			panic(message)
 		}
-	case col.Sequential[col.AssociationLike[col.Key, col.Value]]:
+	case col.Sequential[col.AssociationLike[any, any]]:
 		switch context {
 		case "map":
-			var map_ = map[col.Key]col.Value{}
+			var map_ = map[any]any{}
 			var iterator = sequence.GetIterator()
 			for iterator.HasNext() {
 				var association = iterator.GetNext()
@@ -355,9 +355,9 @@ func (v *parser_) parseCollection() (
 			}
 			collection = map_
 		case "Map":
-			collection = col.Map[col.Key, col.Value](v.notation_).MakeFromArray(sequence.AsArray())
+			collection = col.Map[any, any](v.notation_).MakeFromSequence(sequence)
 		case "Catalog":
-			collection = col.Catalog[col.Key, col.Value](v.notation_).MakeFromSequence(sequence)
+			collection = col.Catalog[any, any](v.notation_).MakeFromSequence(sequence)
 		default:
 			var message = fmt.Sprintf("Found an unknown collection type: %q", context)
 			panic(message)
@@ -370,18 +370,18 @@ func (v *parser_) parseCollection() (
 }
 
 func (v *parser_) parseInlineAssociations() (
-	associations col.CatalogLike[col.Key, col.Value],
+	associations col.CatalogLike[any, any],
 	token TokenLike,
 	ok bool,
 ) {
 	// Attempt to parse one or more inline associations.
-	var association col.AssociationLike[col.Key, col.Value]
+	var association col.AssociationLike[any, any]
 	association, token, ok = v.parseAssociation()
 	if !ok {
 		// This is not an inline sequence of associations.
 		return associations, token, false
 	}
-	associations = col.Catalog[col.Key, col.Value](v.notation_).Make()
+	associations = col.Catalog[any, any](v.notation_).Make()
 	for ok {
 		var value = association.GetValue()
 		var key = association.GetKey()
@@ -405,17 +405,17 @@ func (v *parser_) parseInlineAssociations() (
 }
 
 func (v *parser_) parseInlineValues() (
-	values col.ListLike[col.Value],
+	values col.ListLike[any],
 	token TokenLike,
 	ok bool,
 ) {
 	// Attempt to parse one or more inline values.
-	var value col.Value
+	var value any
 	value, token, ok = v.parseValue()
 	if !ok {
 		return values, token, false
 	}
-	values = col.List[col.Value](v.notation_).Make()
+	values = col.List[any](v.notation_).Make()
 	for ok {
 		values.AppendValue(value)
 		_, token, ok = v.parseToken(DelimiterToken, ",")
@@ -437,24 +437,22 @@ func (v *parser_) parseInlineValues() (
 }
 
 func (v *parser_) parseKey() (
-	key col.Key,
+	key any,
 	token TokenLike,
 	ok bool,
 ) {
 	// Attempt to parse a primitive.
-	var primitive any
-	primitive, token, ok = v.parsePrimitive()
+	key, token, ok = v.parsePrimitive()
 	if !ok {
 		return key, token, false
 	}
 
 	// Found a primitive key.
-	key = col.Key(primitive)
 	return key, token, true
 }
 
 func (v *parser_) parseMultilineAssociations() (
-	associations col.CatalogLike[col.Key, col.Value],
+	associations col.CatalogLike[any, any],
 	token TokenLike,
 	ok bool,
 ) {
@@ -465,14 +463,14 @@ func (v *parser_) parseMultilineAssociations() (
 		// This is not a multi-line sequence of associations.
 		return associations, eolToken, false
 	}
-	var association col.AssociationLike[col.Key, col.Value]
+	var association col.AssociationLike[any, any]
 	association, token, ok = v.parseAssociation()
 	if !ok {
 		// This must be a sequence of values instead.
 		v.putBack(eolToken)
 		return associations, token, false
 	}
-	associations = col.Catalog[col.Key, col.Value](v.notation_).Make()
+	associations = col.Catalog[any, any](v.notation_).Make()
 	for ok {
 		var key = association.GetKey()
 		var value = association.GetValue()
@@ -497,7 +495,7 @@ func (v *parser_) parseMultilineAssociations() (
 }
 
 func (v *parser_) parseMultilineValues() (
-	values col.ListLike[col.Value],
+	values col.ListLike[any],
 	token TokenLike,
 	ok bool,
 ) {
@@ -508,7 +506,7 @@ func (v *parser_) parseMultilineValues() (
 		// This is not a multi-line sequence of values.
 		return values, eolToken, false
 	}
-	var value col.Value
+	var value any
 	value, token, ok = v.parseValue()
 	if !ok {
 		var message = v.formatError(token)
@@ -518,7 +516,7 @@ func (v *parser_) parseMultilineValues() (
 		)
 		panic(message)
 	}
-	values = col.List[col.Value](v.notation_).Make()
+	values = col.List[any](v.notation_).Make()
 	for ok {
 		values.AppendValue(value)
 		_, eolToken, ok = v.parseToken(EOLToken, "")
@@ -612,7 +610,7 @@ func (v *parser_) parseToken(expectedType TokenType, expectedValue string) (
 }
 
 func (v *parser_) parseValue() (
-	value col.Value,
+	value any,
 	token TokenLike,
 	ok bool,
 ) {
@@ -635,7 +633,7 @@ func (v *parser_) parseValue() (
 }
 
 func (v *parser_) parseValues() (
-	values col.ListLike[col.Value],
+	values col.ListLike[any],
 	token TokenLike,
 	ok bool,
 ) {
@@ -643,7 +641,7 @@ func (v *parser_) parseValues() (
 	_, token, ok = v.parseToken(DelimiterToken, "]")
 	if ok {
 		v.putBack(token)
-		values = col.List[col.Value](v.notation_).Make()
+		values = col.List[any](v.notation_).Make()
 		return values, token, true
 	}
 

@@ -597,3 +597,56 @@ func TestRankRecursiveMaps(t *tes.T) {
 	}()
 	collator.RankValues(m, m) // This should panic.
 }
+
+func TestIteratorsWithLists(t *tes.T) {
+	var notation = not.Notation().Make()
+	var array = col.Array[int](notation).MakeFromArray([]int{1, 2, 3, 4, 5})
+	var list = col.List[int](notation).MakeFromSequence(array)
+	var iterator = list.GetIterator()
+	ass.False(t, iterator.HasPrevious())
+	ass.True(t, iterator.HasNext())
+	ass.Equal(t, 1, iterator.GetNext())
+	ass.True(t, iterator.HasPrevious())
+	ass.True(t, iterator.HasNext())
+	ass.Equal(t, 1, iterator.GetPrevious())
+	iterator.ToSlot(2)
+	ass.True(t, iterator.HasPrevious())
+	ass.True(t, iterator.HasNext())
+	ass.Equal(t, 3, iterator.GetNext())
+	iterator.ToEnd()
+	ass.True(t, iterator.HasPrevious())
+	ass.False(t, iterator.HasNext())
+	ass.Equal(t, 5, iterator.GetPrevious())
+	iterator.ToStart()
+	ass.False(t, iterator.HasPrevious())
+	ass.True(t, iterator.HasNext())
+	ass.Equal(t, 1, iterator.GetNext())
+}
+
+func TestSortingEmpty(t *tes.T) {
+	var collator = age.Collator[any]().Make()
+	var ranker = collator.RankValues
+	var sorter = age.Sorter[any]().MakeWithRanker(ranker)
+	var empty = []any{}
+	sorter.SortValues(empty)
+}
+
+func TestSortingIntegers(t *tes.T) {
+	var collator = age.Collator[int]().Make()
+	var ranker = collator.RankValues
+	var sorter = age.Sorter[int]().MakeWithRanker(ranker)
+	var unsorted = []int{4, 3, 1, 5, 2}
+	var sorted = []int{1, 2, 3, 4, 5}
+	sorter.SortValues(unsorted)
+	ass.Equal(t, sorted, unsorted)
+}
+
+func TestSortingStrings(t *tes.T) {
+	var collator = age.Collator[string]().Make()
+	var ranker = collator.RankValues
+	var sorter = age.Sorter[string]().MakeWithRanker(ranker)
+	var unsorted = []string{"alpha", "beta", "gamma", "delta"}
+	var sorted = []string{"alpha", "beta", "delta", "gamma"}
+	sorter.SortValues(unsorted)
+	ass.Equal(t, sorted, unsorted)
+}

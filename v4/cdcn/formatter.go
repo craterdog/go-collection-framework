@@ -269,8 +269,9 @@ func (v *formatter_) formatUnsigned(unsigned uint64) {
 }
 
 func (v *formatter_) formatValue(value any) {
-	// NOTE: Because the Go language doesn't handle generic types very well in
-	// type switches, we use reflection to handle all generic types.
+	// NOTE:
+	// Because the Go language doesn't handle generic types very well in type
+	// switches, we use reflection to handle all generic types.
 	switch actual := value.(type) {
 
 	// Handle primitive types.
@@ -335,7 +336,8 @@ func (v *formatter_) formatValue(value any) {
 }
 
 func (v *formatter_) getName(collection ref.Value) string {
-	// NOTE: This hack is necessary since Go does not handle type switches with
+	// NOTE:
+	// This hack is necessary since Go does not handle type switches with
 	// generics very well.
 	var type_ = collection.Type().String()
 	switch {

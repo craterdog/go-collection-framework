@@ -13,10 +13,75 @@
 package cdcn_test
 
 import (
+	fmt "fmt"
 	not "github.com/craterdog/go-collection-framework/v4/cdcn"
+	col "github.com/craterdog/go-collection-framework/v4/collection"
 	ass "github.com/stretchr/testify/assert"
+	osx "os"
+	sts "strings"
 	tes "testing"
 )
+
+const collectionTests = "../test/input/"
+
+func TestFormatMaximum(t *tes.T) {
+	var notation = not.Notation().Make()
+	var Formatter = not.Formatter()
+	var formatter = Formatter.MakeWithMaximum(0)
+	var array = col.Array[any](notation).MakeFromArray([]any{1, []any{1, 2, []any{1, 2, 3}}})
+	var s = formatter.FormatCollection(array)
+	ass.Equal(t, "[...](Array)\n", s)
+	formatter = Formatter.MakeWithMaximum(1)
+	s = formatter.FormatCollection(array)
+	ass.Equal(t, "[\n    1\n    [...](array)\n](Array)\n", s)
+	formatter = Formatter.MakeWithMaximum(2)
+	s = formatter.FormatCollection(array)
+	ass.Equal(t, "[\n    1\n    [\n        1\n        2\n        [...](array)\n    ](array)\n](Array)\n", s)
+}
+
+func TestFormatInvalidType(t *tes.T) {
+	var formatter = not.Formatter().MakeWithMaximum(8)
+	var s struct{}
+	defer func() {
+		if e := recover(); e != nil {
+			ass.Equal(t, "Attempted to format:\n    value: {}\n    type: struct {}\n    kind: struct\n", e)
+		} else {
+			ass.Fail(t, "Test should result in recovered panic.")
+		}
+	}()
+	formatter.FormatCollection(s) // This should panic.
+}
+
+func TestCollectionRoundtrips(t *tes.T) {
+	var notation = not.Notation().Make()
+	var files, err = osx.ReadDir(collectionTests)
+	if err != nil {
+		var message = fmt.Sprintf("Could not find the %s directory.", collectionTests)
+		panic(message)
+	}
+	for _, file := range files {
+		var filename = collectionTests + file.Name()
+		if sts.HasSuffix(filename, ".cdcn") {
+			fmt.Println(filename)
+			var bytes, err = osx.ReadFile(filename)
+			if err != nil {
+				panic(err)
+			}
+			var expected = string(bytes)
+			var collection = notation.ParseSource(expected)
+			var actual = notation.FormatCollection(collection)
+			if !sts.HasPrefix(file.Name(), "map") {
+				// Skip maps since they are non-deterministic.
+				ass.Equal(t, expected, actual)
+				bytes = []byte(actual)
+				err = osx.WriteFile(filename, bytes, 0644)
+				if err != nil {
+					panic(err)
+				}
+			}
+		}
+	}
+}
 
 func TestParseBadFirst(t *tes.T) {
 	var parser = not.Parser().Make()

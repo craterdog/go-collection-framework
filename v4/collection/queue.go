@@ -27,7 +27,7 @@ var queueMutex syn.Mutex
 
 // Function
 
-func Queue[V Value](notation NotationLike) QueueClassLike[V] {
+func Queue[V any](notation NotationLike) QueueClassLike[V] {
 	// Validate the notation argument.
 	if notation == nil {
 		panic("A notation must be specified when creating this class.")
@@ -62,7 +62,7 @@ func Queue[V Value](notation NotationLike) QueueClassLike[V] {
 
 // Target
 
-type queueClass_[V Value] struct {
+type queueClass_[V any] struct {
 	notation_        NotationLike
 	defaultCapacity_ int
 }
@@ -100,7 +100,7 @@ func (c *queueClass_[V]) MakeFromSequence(values Sequential[V]) QueueLike[V] {
 
 func (c *queueClass_[V]) MakeFromSource(source string) QueueLike[V] {
 	// First we parse it as a collection of any type value.
-	var collection = c.notation_.ParseSource(source).(Sequential[Value])
+	var collection = c.notation_.ParseSource(source).(Sequential[any])
 
 	// Next we must convert each value explicitly to type V.
 	var anys = collection.AsArray()
@@ -276,19 +276,18 @@ func (c *queueClass_[V]) Split(
 
 // Target
 
-type queue_[V Value] struct {
+// NOTE:
+// If the Go "chan" type ever supports snapshots of its state, the underlying
+// list can be removed and the channel modified to pass the values instead of
+// the availability. Currently, the underlying list is only required by the
+// "AsArray()" instance method.
+type queue_[V any] struct {
 	class_     QueueClassLike[V]
 	available_ chan bool
 	capacity_  int
 	mutex_     syn.Mutex
 	values_    ListLike[V]
 }
-
-// NOTE:
-// If the Go "chan" type ever supports snapshots of its state, the underlying
-// list can be removed and the channel modified to pass the values instead of
-// the availability. Currently, the underlying list is only required by the
-// "AsArray()" instance method.
 
 // Attributes
 

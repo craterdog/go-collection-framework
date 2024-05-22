@@ -28,7 +28,7 @@ var arrayMutex syn.Mutex
 
 // Function
 
-func Array[V Value](notation NotationLike) ArrayClassLike[V] {
+func Array[V any](notation NotationLike) ArrayClassLike[V] {
 	// Validate the notation argument.
 	if notation == nil {
 		panic("A notation must be specified when creating this class.")
@@ -62,7 +62,7 @@ func Array[V Value](notation NotationLike) ArrayClassLike[V] {
 
 // Target
 
-type arrayClass_[V Value] struct {
+type arrayClass_[V any] struct {
 	notation_ NotationLike
 }
 
@@ -99,7 +99,7 @@ func (c *arrayClass_[V]) MakeFromSize(size int) ArrayLike[V] {
 
 func (c *arrayClass_[V]) MakeFromSource(source string) ArrayLike[V] {
 	// First we parse it as a collection of any type value.
-	var collection = c.notation_.ParseSource(source).(Sequential[Value])
+	var collection = c.notation_.ParseSource(source).(Sequential[any])
 
 	// Next we must convert each value explicitly to type V.
 	var anys = collection.AsArray()
@@ -116,7 +116,7 @@ func (c *arrayClass_[V]) MakeFromSource(source string) ArrayLike[V] {
 
 // Target
 
-type array_[V Value] []V
+type array_[V any] []V
 
 // Accessible
 

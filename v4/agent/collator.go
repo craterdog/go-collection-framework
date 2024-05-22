@@ -449,15 +449,15 @@ func (v *collator_[V]) rankInterfaces(first ref.Value, second ref.Value) int {
 	return 0
 }
 
+// NOTE:
+// Currently the implementation of Go maps is hashtable based. The  order of the
+// keys is random, even for two Go maps with the same keys if the associations
+// were entered in different sequences.  Therefore at this time it is necessary
+// to sort the key arrays for each Go map.  This introduces a circular
+// dependency between the implementation of the collator and the sorter types:
+//
+// rankMaps() -> SortValues() -> RankingFunction
 func (v *collator_[V]) rankMaps(first ref.Value, second ref.Value) int {
-	// NOTE: Currently the implementation of Go maps is hashtable based. The
-	// order of the keys is random, even for two Go maps with the same keys if
-	// the associations were entered in different sequences.  Therefore at this
-	// time it is necessary to sort the key arrays for each Go map.  This
-	// introduces a circular dependency between the implementation of the
-	// collator and the sorter types:
-	//     rankMaps() -> SortValues() -> RankingFunction
-
 	// Check for maximum traversal depth.
 	if v.depth_ == v.maximum_ {
 		panic(fmt.Sprintf("The maximum traversal depth was exceeded: %v", v.depth_))

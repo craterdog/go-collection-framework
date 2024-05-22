@@ -27,7 +27,7 @@ var listMutex syn.Mutex
 
 // Function
 
-func List[V Value](notation NotationLike) ListClassLike[V] {
+func List[V any](notation NotationLike) ListClassLike[V] {
 	// Validate the notation argument.
 	if notation == nil {
 		panic("A notation must be specified when creating this class.")
@@ -61,7 +61,7 @@ func List[V Value](notation NotationLike) ListClassLike[V] {
 
 // Target
 
-type listClass_[V Value] struct {
+type listClass_[V any] struct {
 	notation_ NotationLike
 }
 
@@ -98,7 +98,7 @@ func (c *listClass_[V]) MakeFromSequence(values Sequential[V]) ListLike[V] {
 
 func (c *listClass_[V]) MakeFromSource(source string) ListLike[V] {
 	// First we parse it as a collection of any type value.
-	var collection = c.notation_.ParseSource(source).(Sequential[Value])
+	var collection = c.notation_.ParseSource(source).(Sequential[any])
 
 	// Next we must convert each value explicitly to type V.
 	var anys = collection.AsArray()
@@ -124,7 +124,7 @@ func (c *listClass_[V]) Concatenate(first, second ListLike[V]) ListLike[V] {
 
 // Target
 
-type list_[V Value] struct {
+type list_[V any] struct {
 	class_  ListClassLike[V]
 	values_ ArrayLike[V]
 }

@@ -27,7 +27,7 @@ var setMutex syn.Mutex
 
 // Function
 
-func Set[V Value](notation NotationLike) SetClassLike[V] {
+func Set[V any](notation NotationLike) SetClassLike[V] {
 	// Validate the notation argument.
 	if notation == nil {
 		panic("A notation must be specified when creating this class.")
@@ -61,7 +61,7 @@ func Set[V Value](notation NotationLike) SetClassLike[V] {
 
 // Target
 
-type setClass_[V Value] struct {
+type setClass_[V any] struct {
 	notation_ NotationLike
 }
 
@@ -97,7 +97,7 @@ func (c *setClass_[V]) MakeFromSequence(values Sequential[V]) SetLike[V] {
 
 func (c *setClass_[V]) MakeFromSource(source string) SetLike[V] {
 	// First we parse it as a collection of any type value.
-	var collection = c.notation_.ParseSource(source).(Sequential[Value])
+	var collection = c.notation_.ParseSource(source).(Sequential[any])
 
 	// Next we must convert each value explicitly to type V.
 	var anys = collection.AsArray()
@@ -155,7 +155,7 @@ func (c *setClass_[V]) Xor(first, second SetLike[V]) SetLike[V] {
 
 // Target
 
-type set_[V Value] struct {
+type set_[V any] struct {
 	class_    SetClassLike[V]
 	collator_ age.CollatorLike[V]
 	values_   ListLike[V]

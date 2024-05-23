@@ -13,16 +13,11 @@
 package cdcn_test
 
 import (
-	fmt "fmt"
 	not "github.com/craterdog/go-collection-framework/v4/cdcn"
 	col "github.com/craterdog/go-collection-framework/v4/collection"
 	ass "github.com/stretchr/testify/assert"
-	osx "os"
-	sts "strings"
 	tes "testing"
 )
-
-const collectionTests = "../test/input/"
 
 func TestFormatMaximum(t *tes.T) {
 	var notation = not.Notation().Make()
@@ -50,37 +45,6 @@ func TestFormatInvalidType(t *tes.T) {
 		}
 	}()
 	formatter.FormatCollection(s) // This should panic.
-}
-
-func TestCollectionRoundtrips(t *tes.T) {
-	var notation = not.Notation().Make()
-	var files, err = osx.ReadDir(collectionTests)
-	if err != nil {
-		var message = fmt.Sprintf("Could not find the %s directory.", collectionTests)
-		panic(message)
-	}
-	for _, file := range files {
-		var filename = collectionTests + file.Name()
-		if sts.HasSuffix(filename, ".cdcn") {
-			fmt.Println(filename)
-			var bytes, err = osx.ReadFile(filename)
-			if err != nil {
-				panic(err)
-			}
-			var expected = string(bytes)
-			var collection = notation.ParseSource(expected)
-			var actual = notation.FormatCollection(collection)
-			if !sts.HasPrefix(file.Name(), "map") {
-				// Skip maps since they are non-deterministic.
-				ass.Equal(t, expected, actual)
-				bytes = []byte(actual)
-				err = osx.WriteFile(filename, bytes, 0644)
-				if err != nil {
-					panic(err)
-				}
-			}
-		}
-	}
 }
 
 func TestParseBadFirst(t *tes.T) {
@@ -133,3 +97,217 @@ func TestParseBadEnd(t *tes.T) {
 	}()
 	var _ = parser.ParseSource(source)
 }
+
+func TestCollectionRoundtrip(t *tes.T) {
+	var notation = not.Notation().Make()
+	var collection = notation.ParseSource(data)
+	var actual = notation.FormatCollection(collection)
+	ass.Equal(t, data, actual)
+}
+
+const data = `[
+    [
+        true
+        0xa
+        42
+        0.125
+        (3.0-4.0i)
+        '☺'
+        "Hello World!"
+        [
+            1
+            2
+            3
+        ](array)
+        [
+            [ ](array)
+            [:](map)
+        ](array)
+        ["alpha": 1](map)
+    ](Array)
+    [ ](array)
+    [
+        1
+        2
+        3
+        4
+    ](array)
+    [
+        false: true
+        0x0: 0xa
+        0: 42
+        0.0: 0.125
+        (0.0+0.0i): (1.0+1.0i)
+        '\x00': '☺'
+        "": "Hello World!"
+    ](Catalog)
+    [:](Catalog)
+    [
+        "boolean": true
+        "unsigned": 0xa
+        "integer": 42
+        "float": 0.125
+        "complex": (3.0-4.0i)
+        "rune": '☺'
+        "string": "Hello World!"
+        "empty": [
+            [ ](array)
+            [:](map)
+        ](array)
+        "array": [
+            1
+            2
+            3
+        ](array)
+        "map": ["alpha": 1](map)
+    ](Catalog)
+    [
+        "key1": 1
+        "key2": 2
+        "key3": 3
+        "key4": 4
+        "key5": 5
+        "key6": 6
+        "key7": 7
+    ](Catalog)
+    [
+        true
+        0xa
+        42
+        0.125
+        (1.0+1.0i)
+        '☺'
+        "Hello World!"
+        [
+            1
+            2
+            3
+        ](array)
+    ](List)
+    [
+        false
+        true
+    ](List)
+    [ ](List)
+    [
+        true
+        0xa
+        42
+        0.125
+        1.1E-100
+        2.2E+200
+        (3.0-4.0i)
+        '☺'
+        "Hello World!"
+        [
+            1
+            2
+            3
+        ](array)
+        [
+            [ ](array)
+            [:](map)
+        ](array)
+        ["alpha": 1](map)
+    ](List)
+    [
+        0x0: 0xa
+        '\x00': '☺'
+        "array": [
+            1
+            2
+            3
+        ](array)
+        0.0: 0.125
+        false: true
+        "": "Hello World!"
+        0: 42
+        (0.0+0.0i): (1.0+1.0i)
+    ](Catalog)
+    [:](map)
+    [
+        "second": 2
+        "third": 3
+        "first": 1
+    ](Catalog)
+    [
+        true
+        0xa
+        42
+        0.125
+        (1.0+1.0i)
+        '☺'
+        "Hello World!"
+    ](Queue)
+    [
+        1
+        2
+        3
+        4
+    ](Queue)
+    [
+        [
+            1
+            2
+            3
+        ](array)
+        true
+        (1.0+1.0i)
+        0.125
+        42
+        '☺'
+        "Hello World!"
+        0xa
+    ](Set)
+    [
+        [
+            [
+                1
+                2
+                3
+            ](array)
+            true
+            (1.0+1.0i)
+            0.125
+            42
+            '☺'
+            "Hello World!"
+            0xa
+        ](Set)
+        [
+            false
+            (0.0+0.0i)
+            0.0
+            0
+            '\x00'
+            ""
+            "array"
+            0x0
+        ](Set)
+    ](Set)
+    [
+        "blue"
+        "green"
+        "indigo"
+        "orange"
+        "red"
+        "violet"
+        "yellow"
+    ](Set)
+    [
+        "Hello World!"
+        '☺'
+        (1.0+1.0i)
+        0.125
+        42
+        0xa
+        true
+    ](Stack)
+    [
+        4
+        3
+        2
+        1
+    ](Stack)
+](List)
+`

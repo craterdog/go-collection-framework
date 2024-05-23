@@ -58,7 +58,7 @@ type (
 	StackLike[V any]                 col.StackLike[V]
 )
 
-// UNIVERSAL CONSTRUCTORS
+// FUNCTION EXPORTS
 
 // Notations
 

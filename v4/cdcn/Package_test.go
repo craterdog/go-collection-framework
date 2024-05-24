@@ -61,7 +61,7 @@ func TestParseBadFirst(t *tes.T) {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
-	var _ = parser.ParseSource(source)
+	parser.ParseSource(source)
 }
 
 func TestParseBadMiddle(t *tes.T) {
@@ -78,7 +78,7 @@ func TestParseBadMiddle(t *tes.T) {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
-	var _ = parser.ParseSource(source)
+	parser.ParseSource(source)
 }
 
 func TestParseBadEnd(t *tes.T) {
@@ -95,7 +95,7 @@ func TestParseBadEnd(t *tes.T) {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
-	var _ = parser.ParseSource(source)
+	parser.ParseSource(source)
 }
 
 func TestCollectionRoundtrip(t *tes.T) {

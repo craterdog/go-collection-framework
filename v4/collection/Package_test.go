@@ -147,7 +147,7 @@ func TestAssociations(t *tes.T) {
 func TestCatalogConstructors(t *tes.T) {
 	var notation = not.Notation().Make()
 	var Catalog = col.Catalog[rune, int64](notation)
-	var _ = Catalog.MakeFromArray([]col.AssociationLike[rune, int64]{})
+	Catalog.MakeFromArray([]col.AssociationLike[rune, int64]{})
 	var empty = Catalog.MakeFromSource("[:](Catalog)")
 	ass.Equal(t, "[:](Catalog)\n", fmt.Sprintf("%v", empty))
 	var full = Catalog.MakeFromSource("['a': 1, 'b': 2, 'c': 3](Catalog)")
@@ -157,8 +157,8 @@ func TestCatalogConstructors(t *tes.T) {
     'c': 3
 ](Catalog)
 `, fmt.Sprintf("%v", full))
-	var _ = Catalog.MakeFromMap(map[rune]int64{})
-	var _ = Catalog.MakeFromMap(map[rune]int64{
+	Catalog.MakeFromMap(map[rune]int64{})
+	Catalog.MakeFromMap(map[rune]int64{
 		'a': 1,
 		'b': 2,
 		'c': 3,
@@ -487,10 +487,10 @@ func TestMapConstructors(t *tes.T) {
 	var Map = col.Map[rune, int64](notation)
 	var empty = Map.MakeFromArray([]col.AssociationLike[rune, int64]{})
 	ass.Equal(t, "[:](Map)\n", fmt.Sprintf("%v", empty))
-	var _ = Map.MakeFromMap(map[rune]int64{})
+	Map.MakeFromMap(map[rune]int64{})
 	var sequence = Map.MakeFromMap(map[rune]int64{'a': 1, 'b': 2, 'c': 3})
-	var _ = Map.MakeFromSequence(sequence)
-	var _ = Map.MakeFromSource("['a': 1, 'b': 2, 'c': 3](Map)")
+	Map.MakeFromSequence(sequence)
+	Map.MakeFromSource("['a': 1, 'b': 2, 'c': 3](Map)")
 }
 
 func TestEmptyMaps(t *tes.T) {

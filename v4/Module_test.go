@@ -21,7 +21,15 @@ import (
 )
 
 func TestCDCNConstructor(t *tes.T) {
-	var _ = col.CDCN()
+	col.CDCN()
+	defer func() {
+		if e := recover(); e != nil {
+			ass.Equal(t, "The CDCN constructor does not take any arguments.", e)
+		} else {
+			ass.Fail(t, "Test should result in recovered panic.")
+		}
+	}()
+	col.CDCN("dummy")
 }
 
 func TestXMLConstructor(t *tes.T) {
@@ -32,7 +40,7 @@ func TestXMLConstructor(t *tes.T) {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
-	var _ = col.XML() // This should panic.
+	col.XML() // This should panic.
 }
 
 func TestJSONConstructor(t *tes.T) {
@@ -43,7 +51,7 @@ func TestJSONConstructor(t *tes.T) {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
-	var _ = col.JSON() // This should panic.
+	col.JSON() // This should panic.
 }
 
 func TestModuleExampleCode(t *tes.T) {
@@ -319,7 +327,7 @@ func TestCatalogExampleCode(t *tes.T) {
 	fmt.Println("The value for the \"bar\" key is", value)
 
 	// Remove a value from the catalog.
-	_ = catalog.RemoveValue("foo")
+	catalog.RemoveValue("foo")
 	fmt.Println("The smaller catalog:", catalog)
 
 	// Change an existing value in the catalog.

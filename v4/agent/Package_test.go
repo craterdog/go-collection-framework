@@ -71,7 +71,7 @@ func TestCompareMaximum(t *tes.T) {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
-	_ = collator.CompareValues(array, array)
+	collator.CompareValues(array, array)
 }
 
 func TestRankMaximum(t *tes.T) {
@@ -85,7 +85,7 @@ func TestRankMaximum(t *tes.T) {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
-	_ = collator.RankValues(array, array)
+	collator.RankValues(array, array)
 }
 
 func TestComparison(t *tes.T) {

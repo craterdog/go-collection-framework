@@ -38,9 +38,38 @@ import (
 	//xml "github.com/craterdog/go-collection-framework/v4/xml"
 )
 
+// TYPE ALIASES
+
+// Agents
+
+type (
+	NotationLike = col.NotationLike
+)
+
+/*
+NOTE:
+The Go language does not currently support aliases for generic types.  If it
+ever does, the following lines should be uncommented:
+
+// Collections
+
+type (
+	AssociationLike = col.AssociationLike
+	ArrayLike       = col.ArrayLike
+	MapLike         = col.MapLike
+	ListLike        = col.ListLike
+	SetLike         = col.SetLike
+	CatalogLike     = col.CatalogLike
+	QueueLike       = col.QueueLike
+	StackLike       = col.StackLike
+)
+*/
+
+// UNIVERSAL CONSTRUCTORS
+
 // Notations
 
-func CDCN(arguments ...any) col.NotationLike {
+func CDCN(arguments ...any) NotationLike {
 	if len(arguments) > 0 {
 		panic("The CDCN constructor does not take any arguments.")
 	}
@@ -48,13 +77,13 @@ func CDCN(arguments ...any) col.NotationLike {
 	return notation
 }
 
-func JSON(arguments ...any) col.NotationLike {
+func JSON(arguments ...any) NotationLike {
 	panic("The JSON notation is not yet supported.")
 	//var notation = jso.Notation().Make()
 	//return notation
 }
 
-func XML(arguments ...any) col.NotationLike {
+func XML(arguments ...any) NotationLike {
 	panic("The XML notation is not yet supported.")
 	//var notation = xml.Notation().Make()
 	//return notation
@@ -73,7 +102,7 @@ func Array[V any](arguments ...any) col.ArrayLike[V] {
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
-		case col.NotationLike:
+		case NotationLike:
 			notation = actual
 		case []V:
 			values = actual
@@ -121,7 +150,7 @@ func Catalog[K comparable, V any](arguments ...any) col.CatalogLike[K, V] {
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
-		case col.NotationLike:
+		case NotationLike:
 			notation = actual
 		case []col.AssociationLike[K, V]:
 			associations = actual
@@ -168,7 +197,7 @@ func List[V any](arguments ...any) col.ListLike[V] {
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
-		case col.NotationLike:
+		case NotationLike:
 			notation = actual
 		case []V:
 			values = actual
@@ -212,7 +241,7 @@ func Map[K comparable, V any](arguments ...any) col.MapLike[K, V] {
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
-		case col.NotationLike:
+		case NotationLike:
 			notation = actual
 		case []col.AssociationLike[K, V]:
 			associations = actual
@@ -260,7 +289,7 @@ func Queue[V any](arguments ...any) col.QueueLike[V] {
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
-		case col.NotationLike:
+		case NotationLike:
 			notation = actual
 		case []V:
 			values = actual
@@ -308,7 +337,7 @@ func Set[V any](arguments ...any) col.SetLike[V] {
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
-		case col.NotationLike:
+		case NotationLike:
 			notation = actual
 		case []V:
 			values = actual
@@ -366,7 +395,7 @@ func Stack[V any](arguments ...any) col.StackLike[V] {
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
-		case col.NotationLike:
+		case NotationLike:
 			notation = actual
 		case []V:
 			values = actual

@@ -62,7 +62,7 @@ const (
 /*
 FormatterClassLike is a class interface that defines the complete set of
 class constants, constructors and functions that must be supported by each
-concrete parser-like class.
+concrete formatter-like class.
 */
 type FormatterClassLike interface {
 	// Constants
@@ -130,7 +130,7 @@ type TokenClassLike interface {
 /*
 FormatterLike is an instance interface that defines the complete set of
 instance attributes, abstractions and methods that must be supported by each
-instance of a concrete parser-like class.
+instance of a concrete formatter-like class.
 */
 type FormatterLike interface {
 	// Attributes

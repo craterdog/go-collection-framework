@@ -107,7 +107,7 @@ func (v *formatter_) appendNewline() {
 	for level := 0; level < v.depth_; level++ {
 		separator += "    "
 	}
-	v.result_.WriteString(separator)
+	v.appendString(separator)
 }
 
 func (v *formatter_) appendString(s string) {

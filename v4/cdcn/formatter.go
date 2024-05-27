@@ -104,8 +104,9 @@ func (v *formatter_) FormatCollection(collection col.Collection) string {
 
 func (v *formatter_) appendNewline() {
 	var separator = "\n"
+	var indentation = "    "
 	for level := 0; level < v.depth_; level++ {
-		separator += "    "
+		separator += indentation
 	}
 	v.appendString(separator)
 }

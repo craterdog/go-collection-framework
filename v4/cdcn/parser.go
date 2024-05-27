@@ -86,7 +86,7 @@ func (v *parser_) ParseSource(source string) col.Collection {
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateSyntax("Collection",
-			"Cdcn",
+			"AST",
 			"Collection",
 		)
 		panic(message)
@@ -102,7 +102,7 @@ func (v *parser_) ParseSource(source string) col.Collection {
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateSyntax("EOF",
-			"Cdcn",
+			"AST",
 			"Collection",
 		)
 		panic(message)

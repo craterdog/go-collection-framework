@@ -596,8 +596,8 @@ func (v *parser_) parseToken(expectedType TokenType, expectedValue string) (
 ) {
 	// Attempt to parse a specific token.
 	token = v.getNextToken()
-	value = token.GetValue()
 	if token.GetType() == expectedType {
+		value = token.GetValue()
 		var notConstrained = len(expectedValue) == 0
 		if notConstrained || value == expectedValue {
 			// Found the right token.

@@ -599,7 +599,7 @@ func (v *parser_) parseToken(expectedType TokenType, expectedValue string) (
 	value = token.GetValue()
 	if token.GetType() == expectedType {
 		var notConstrained = len(expectedValue) == 0
-		if notConstrained || expectedValue == value {
+		if notConstrained || value == expectedValue {
 			// Found the right token.
 			return value, token, true
 		}
@@ -667,15 +667,15 @@ func (v *parser_) putBack(token TokenLike) {
 }
 
 var syntax = map[string]string{
-	"Cdcn":       `Collection EOL* EOF  ! Terminated with an end-of-file marker.`,
+	"AST":        `Collection EOL* EOF  ! Terminated with an end-of-file marker.`,
 	"Collection": `"[" (Associations | Values) "]" "(" context ")"`,
 	"Associations": `
     Association ("," Association)*
-    (EOL Association)+ EOL?
+    (EOL Association)+ EOL
     ":"  ! No associations.`,
 	"Association": `Key ":" Value`,
 	"Key":         `Primitive`,
-	"Value":       `Collection | Primitive`,
+	"Value":       `Primitive | Collection`,
 	"Primitive": `
     boolean
     complex
@@ -687,6 +687,6 @@ var syntax = map[string]string{
     string`,
 	"Values": `
     Value ("," Value)*
-    (EOL Value)+ EOL?
+    (EOL Value)+ EOL
     " "  ! No values.`,
 }

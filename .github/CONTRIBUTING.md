@@ -1,6 +1,6 @@
 <img src="https://craterdog.com/images/CraterDog.png" width="50%">
 
-## Contributing to the Go Collections Framework
+## Contributing to the Go Generic Collection Framework
 Thanks for taking time to contribute to this project. We would appreciate help
 with any of the following:
  * Finding and reporting problems

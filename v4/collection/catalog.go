@@ -229,7 +229,7 @@ func (v *catalog_[K, V]) RemoveValue(key K) V {
 
 func (v *catalog_[K, V]) RemoveValues(keys Sequential[K]) Sequential[V] {
 	var values = List[V](v.class_.Notation()).Make()
-	var iterator = age.Iterator[K]().MakeFromArray(keys.AsArray())
+	var iterator = keys.GetIterator()
 	for iterator.HasNext() {
 		var key = iterator.GetNext()
 		values.AppendValue(v.RemoveValue(key))

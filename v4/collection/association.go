@@ -28,8 +28,8 @@ var associationMutex syn.Mutex
 
 func Association[K comparable, V any]() AssociationClassLike[K, V] {
 	// Generate the name of the bound class type.
-	var result_ AssociationClassLike[K, V]
-	var name = fmt.Sprintf("%T", result_)
+	var class AssociationClassLike[K, V]
+	var name = fmt.Sprintf("%T", class)
 
 	// Check for existing bound class type.
 	associationMutex.Lock()
@@ -37,18 +37,18 @@ func Association[K comparable, V any]() AssociationClassLike[K, V] {
 	switch actual := value.(type) {
 	case *associationClass_[K, V]:
 		// This bound class type already exists.
-		result_ = actual
+		class = actual
 	default:
 		// Add a new bound class type.
-		result_ = &associationClass_[K, V]{
+		class = &associationClass_[K, V]{
 			// This class has no private constants to initialize.
 		}
-		associationClass[name] = result_
+		associationClass[name] = class
 	}
 	associationMutex.Unlock()
 
 	// Return a reference to the bound class type.
-	return result_
+	return class
 }
 
 // CLASS METHODS

@@ -28,7 +28,7 @@ var sorterMutex syn.Mutex
 
 // Function
 
-func Sorter[V Value]() SorterClassLike[V] {
+func Sorter[V any]() SorterClassLike[V] {
 	// Generate the name of the bound class type.
 	var class SorterClassLike[V]
 	var name = fmt.Sprintf("%T", class)
@@ -57,7 +57,7 @@ func Sorter[V Value]() SorterClassLike[V] {
 
 // Target
 
-type sorterClass_[V Value] struct {
+type sorterClass_[V any] struct {
 	defaultRanker_ RankingFunction[V]
 }
 
@@ -85,7 +85,7 @@ func (c *sorterClass_[V]) MakeWithRanker(ranker RankingFunction[V]) SorterLike[V
 
 // Target
 
-type sorter_[V Value] struct {
+type sorter_[V any] struct {
 	class_  SorterClassLike[V]
 	ranker_ RankingFunction[V]
 }
@@ -204,7 +204,7 @@ func (v *sorter_[V]) mergeArrays(left []V, right []V, merged []V) {
 		if leftIndex < leftLength && rightIndex < rightLength {
 
 			// Copy the next smallest value to the merged Go array.
-			if v.ranker_(left[leftIndex], right[rightIndex]) < 0 {
+			if v.ranker_(left[leftIndex], right[rightIndex]) == LesserRank {
 				merged[mergedIndex] = left[leftIndex]
 				leftIndex++
 			} else {

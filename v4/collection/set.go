@@ -308,15 +308,15 @@ func (v *set_[V]) findIndex(value V) (index int, found bool) {
 		var middle = first + size/2 // Rounds down to the nearest integer.
 		var candidate = v.GetValue(middle)
 		switch v.collator_.RankValues(value, candidate) {
-		case -1:
+		case age.LesserRank:
 			// The index of the value is less than the middle
 			// index so the first index stays the same.
 			last = middle - 1 // We already tried the middle index.
 			size = middle - first
-		case 0:
+		case age.EqualRank:
 			// The index of the value is the middle index.
 			return middle, true
-		case 1:
+		case age.GreaterRank:
 			// The index of the value is greater than the middle
 			// index so the last index stays the same.
 			first = middle + 1 // We already tried the middle index.

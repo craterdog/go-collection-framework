@@ -28,49 +28,54 @@ package agent
 // Types
 
 /*
-Value is a generic type representing any type of value.
+Rank is a constrained type representing the possible rankings for two values.
 */
-type Value any
+type Rank uint8
+
+const (
+	LesserRank Rank = iota
+	EqualRank
+	GreaterRank
+)
 
 // Functionals
 
 /*
-RankingFunction[V Value] defines the signature for any function that can
-determine the relative ordering of two values. The result must be one of the
-following:
+RankingFunction[V any] defines the signature for any function that can determine
+the relative ordering of two values. The result must be one of the following:
 
-	-1: The first value is less than the second value.
-	 0: The first value is equal to the second value.
-	 1: The first value is more than the second value.
+	LesserRank: The first value is less than the second value.
+	EqualRank: The first value is equal to the second value.
+	GreaterRank: The first value is more than the second value.
 
-The meaning of "less" and "more" is determined by the specific function that
-implements this signature.
+The meaning of "lesser" and "greater" is determined by the specific function
+that implements this signature.
 */
-type RankingFunction[V Value] func(
+type RankingFunction[V any] func(
 	first V,
 	second V,
-) int
+) Rank
 
 // Aspects
 
 /*
-Systematic[V Value] defines the set of method signatures that must be supported
+Systematic[V any] defines the set of method signatures that must be supported
 by all systematic sorting agents.
 */
-type Systematic[V Value] interface {
+type Systematic[V any] interface {
 	// Methods
+	SortValues(values []V)
 	ReverseValues(values []V)
 	ShuffleValues(values []V)
-	SortValues(values []V)
 }
 
 // Classes
 
 /*
-CollatorClassLike[V Value] defines the set of class constants, constructors and
+CollatorClassLike[V any] defines the set of class constants, constructors and
 functions that must be supported by all collator-class-like classes.
 */
-type CollatorClassLike[V Value] interface {
+type CollatorClassLike[V any] interface {
 	// Constants
 	DefaultMaximum() int
 
@@ -80,19 +85,19 @@ type CollatorClassLike[V Value] interface {
 }
 
 /*
-IteratorClassLike[V Value] defines the set of class constants, constructors and
+IteratorClassLike[V any] defines the set of class constants, constructors and
 functions that must be supported by all iterator-class-like classes.
 */
-type IteratorClassLike[V Value] interface {
+type IteratorClassLike[V any] interface {
 	// Constructors
 	MakeFromArray(values []V) IteratorLike[V]
 }
 
 /*
-SorterClassLike[V Value] defines the set of class constants, constructors and
+SorterClassLike[V any] defines the set of class constants, constructors and
 functions that must be supported by all sorter-class-like classes.
 */
-type SorterClassLike[V Value] interface {
+type SorterClassLike[V any] interface {
 	// Constants
 	DefaultRanker() RankingFunction[V]
 
@@ -104,11 +109,11 @@ type SorterClassLike[V Value] interface {
 // Instances
 
 /*
-CollatorLike[V Value] defines the set of abstractions and methods that must be
+CollatorLike[V any] defines the set of abstractions and methods that must be
 supported by all collator-like instances.  A collator-like class is capable of
 comparing and ranking two values of any type.
 */
-type CollatorLike[V Value] interface {
+type CollatorLike[V any] interface {
 	// Attributes
 	GetClass() CollatorClassLike[V]
 	GetDepth() int
@@ -122,11 +127,11 @@ type CollatorLike[V Value] interface {
 	RankValues(
 		first V,
 		second V,
-	) int
+	) Rank
 }
 
 /*
-IteratorLike[V Value] defines the set of abstractions and methods that must be
+IteratorLike[V any] defines the set of abstractions and methods that must be
 supported by all iterator-like instances.  An iterator-like class can be used to
 move forward and backward over the values in a sequence.  It implements the Gang
 of Four (GoF) Iterator Design Pattern:
@@ -150,23 +155,23 @@ This type is parameterized as follows:
 
 An iterator-like class is supported by all collection types.
 */
-type IteratorLike[V Value] interface {
+type IteratorLike[V any] interface {
 	// Attributes
 	GetClass() IteratorClassLike[V]
+	GetSlot() int
 
 	// Methods
+	ToStart()
+	ToSlot(slot int)
+	ToEnd()
 	GetNext() V
 	GetPrevious() V
-	GetSlot() int
 	HasNext() bool
 	HasPrevious() bool
-	ToEnd()
-	ToSlot(slot int)
-	ToStart()
 }
 
 /*
-SorterLike[V Value] defines the set of abstractions and methods that must be
+SorterLike[V any] defines the set of abstractions and methods that must be
 supported by all sorter-like instances.  A sorter-like class implements a
 specific sorting algorithm.
 
@@ -176,7 +181,7 @@ This type is parameterized as follows:
 A sorter-like class uses a ranking function to order the values.  If no ranking
 function is specified the values are sorted into their natural order.
 */
-type SorterLike[V Value] interface {
+type SorterLike[V any] interface {
 	// Attributes
 	GetClass() SorterClassLike[V]
 	GetRanker() RankingFunction[V]

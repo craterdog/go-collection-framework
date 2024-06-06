@@ -29,7 +29,7 @@ var collatorMutex syn.Mutex
 
 // Function
 
-func Collator[V Value]() CollatorClassLike[V] {
+func Collator[V any]() CollatorClassLike[V] {
 	// Generate the name of the bound class type.
 	var class CollatorClassLike[V]
 	var name = fmt.Sprintf("%T", class)
@@ -58,7 +58,7 @@ func Collator[V Value]() CollatorClassLike[V] {
 
 // Target
 
-type collatorClass_[V Value] struct {
+type collatorClass_[V any] struct {
 	defaultMaximum_ int
 }
 
@@ -89,7 +89,7 @@ func (c *collatorClass_[V]) MakeWithMaximum(maximum int) CollatorLike[V] {
 
 // Target
 
-type collator_[V Value] struct {
+type collator_[V any] struct {
 	class_   CollatorClassLike[V]
 	depth_   int
 	maximum_ int
@@ -115,7 +115,7 @@ func (v *collator_[V]) CompareValues(first V, second V) bool {
 	return v.compareValues(ref.ValueOf(first), ref.ValueOf(second))
 }
 
-func (v *collator_[V]) RankValues(first V, second V) int {
+func (v *collator_[V]) RankValues(first V, second V) Rank {
 	return v.rankValues(ref.ValueOf(first), ref.ValueOf(second))
 }
 
@@ -332,7 +332,7 @@ func (v *collator_[V]) getType(type_ ref.Type) string {
 	return result
 }
 
-func (v *collator_[V]) rankArrays(first ref.Value, second ref.Value) int {
+func (v *collator_[V]) rankArrays(first ref.Value, second ref.Value) Rank {
 	// Check for maximum traversal depth.
 	if v.depth_ == v.maximum_ {
 		panic(fmt.Sprintf("The maximum traversal depth was exceeded: %v", v.depth_))
@@ -342,23 +342,25 @@ func (v *collator_[V]) rankArrays(first ref.Value, second ref.Value) int {
 	var firstSize = first.Len()
 	var secondSize = second.Len()
 	if firstSize > secondSize {
-		// Swap the order of the Go arrays and reverse the sign of the result.
-		return -1 * v.rankArrays(second, first)
+		// Swap the order of the Go arrays and reverse the result.
+		switch v.rankArrays(second, first) {
+		case LesserRank:
+			return GreaterRank
+		case GreaterRank:
+			return LesserRank
+		default:
+			return EqualRank
+		}
 	}
 
 	// Iterate through the smallest Go array.
 	for i := 0; i < firstSize; i++ {
 		v.depth_++
 		var rank = v.rankValues(first.Index(i), second.Index(i))
-		if rank < 0 {
-			// The value in the first Go array comes before its matching value.
+		if rank != EqualRank {
+			// The values are different.
 			v.depth_--
-			return -1
-		}
-		if rank > 0 {
-			// The value in the first Go array comes after its matching value.
-			v.depth_--
-			return 1
+			return rank
 		}
 		// The two values match.
 		v.depth_--
@@ -367,70 +369,70 @@ func (v *collator_[V]) rankArrays(first ref.Value, second ref.Value) int {
 	// The Go arrays contain the same initial values.
 	if secondSize > firstSize {
 		// The shorter Go array is ranked before the longer Go array.
-		return -1
+		return LesserRank
 	}
 	// The Go arrays are the same length and contain the same values.
-	return 0
+	return EqualRank
 }
 
-func (v *collator_[V]) rankBooleans(first, second bool) int {
+func (v *collator_[V]) rankBooleans(first, second bool) Rank {
 	if !first && second {
-		return -1
+		return LesserRank
 	}
 	if first && !second {
-		return 1
+		return GreaterRank
 	}
-	return 0
+	return EqualRank
 }
 
-func (v *collator_[V]) rankBytes(first, second byte) int {
+func (v *collator_[V]) rankBytes(first, second byte) Rank {
 	if first < second {
-		return -1
+		return LesserRank
 	}
 	if first > second {
-		return 1
+		return GreaterRank
 	}
-	return 0
+	return EqualRank
 }
 
-func (v *collator_[V]) rankComplex(first, second complex128) int {
+func (v *collator_[V]) rankComplex(first, second complex128) Rank {
 	if first == second {
-		return 0
+		return EqualRank
 	}
 	switch {
 	case cmp.Abs(first) < cmp.Abs(second):
 		// The magnitude of the first vector is less than the second.
-		return -1
+		return LesserRank
 	case cmp.Abs(first) > cmp.Abs(second):
 		// The magnitude of the first vector is greater than the second.
-		return 1
+		return GreaterRank
 	default:
 		// The magnitudes of the vectors are equal.
 		switch {
 		case cmp.Phase(first) < cmp.Phase(second):
 			// The phase of the first vector is less than the second.
-			return -1
+			return LesserRank
 		case cmp.Phase(first) > cmp.Phase(second):
 			// The phase of the first vector is greater than the second.
-			return 1
+			return GreaterRank
 		default:
 			// The phases of the vectors are also equal.
-			return 0
+			return EqualRank
 		}
 	}
 }
 
-func (v *collator_[V]) rankFloats(first, second float64) int {
+func (v *collator_[V]) rankFloats(first, second float64) Rank {
 	if first < second {
-		return -1
+		return LesserRank
 	}
 	if first > second {
-		return 1
+		return GreaterRank
 	}
-	return 0
+	return EqualRank
 }
 
-func (v *collator_[V]) rankInterfaces(first ref.Value, second ref.Value) int {
+func (v *collator_[V]) rankInterfaces(first ref.Value, second ref.Value) Rank {
 	var typeRef = first.Type() // We know the structures are the same type.
 	var count = first.NumMethod()
 	for index := 0; index < count; index++ {
@@ -438,15 +440,15 @@ func (v *collator_[V]) rankInterfaces(first ref.Value, second ref.Value) int {
 		if sts.HasPrefix(method.Name, "Get") {
 			var firstValue = first.Method(index).Call([]ref.Value{})[0]
 			var secondValue = second.Method(index).Call([]ref.Value{})[0]
-			var ranking = v.rankValues(firstValue, secondValue)
-			if ranking != 0 {
+			var rank = v.rankValues(firstValue, secondValue)
+			if rank != EqualRank {
 				// Found a difference.
-				return ranking
+				return rank
 			}
 		}
 	}
 	// All getter values are equal.
-	return 0
+	return EqualRank
 }
 
 // NOTE:
@@ -457,7 +459,7 @@ func (v *collator_[V]) rankInterfaces(first ref.Value, second ref.Value) int {
 // dependency between the implementation of the collator and the sorter types:
 //
 // rankMaps() -> SortValues() -> RankingFunction
-func (v *collator_[V]) rankMaps(first ref.Value, second ref.Value) int {
+func (v *collator_[V]) rankMaps(first ref.Value, second ref.Value) Rank {
 	// Check for maximum traversal depth.
 	if v.depth_ == v.maximum_ {
 		panic(fmt.Sprintf("The maximum traversal depth was exceeded: %v", v.depth_))
@@ -474,8 +476,15 @@ func (v *collator_[V]) rankMaps(first ref.Value, second ref.Value) int {
 	var firstSize = len(firstKeys)
 	var secondSize = len(secondKeys)
 	if firstSize > secondSize {
-		// Swap the order of the Go maps and reverse the sign of the result.
-		return -1 * v.rankMaps(second, first)
+		// Swap the order of the Go maps and reverse the result.
+		switch v.rankMaps(second, first) {
+		case LesserRank:
+			return GreaterRank
+		case GreaterRank:
+			return LesserRank
+		default:
+			return EqualRank
+		}
 	}
 
 	// Iterate through the smallest Go map.
@@ -486,30 +495,20 @@ func (v *collator_[V]) rankMaps(first ref.Value, second ref.Value) int {
 		var firstKey = firstKeys[i]
 		var secondKey = secondKeys[i]
 		var keyRank = v.rankValues(firstKey, secondKey)
-		if keyRank < 0 {
-			// The key in the first Go map comes before its matching key.
+		if keyRank != EqualRank {
+			// The two keys are different.
 			v.depth_--
-			return -1
-		}
-		if keyRank > 0 {
-			// The key in the first Go map comes after its matching key.
-			v.depth_--
-			return 1
+			return keyRank
 		}
 
 		// The two keys match so rank the corresponding values.
 		var firstValue = first.MapIndex(firstKey)
 		var secondValue = second.MapIndex(secondKey)
 		var valueRank = v.rankValues(firstValue, secondValue)
-		if valueRank < 0 {
-			// The value in the first Go map comes before its matching value.
+		if valueRank != EqualRank {
+			// The two values are different.
 			v.depth_--
-			return -1
-		}
-		if valueRank > 0 {
-			// The value in the first Go map comes after its matching value.
-			v.depth_--
-			return 1
+			return valueRank
 		}
 		v.depth_--
 	}
@@ -517,14 +516,14 @@ func (v *collator_[V]) rankMaps(first ref.Value, second ref.Value) int {
 	// The Go maps contain the same initial associations.
 	if secondSize > firstSize {
 		// The shorter Go map is ranked before the longer Go map.
-		return -1
+		return LesserRank
 	}
 
 	// All keys and values match.
-	return 0
+	return EqualRank
 }
 
-func (v *collator_[V]) rankPrimitives(first, second ref.Value) int {
+func (v *collator_[V]) rankPrimitives(first, second ref.Value) Rank {
 	var firstValue = first.Interface()
 	var secondValue = second.Interface()
 	switch first.Kind() {
@@ -566,85 +565,85 @@ func (v *collator_[V]) rankPrimitives(first, second ref.Value) int {
 	}
 }
 
-func (v *collator_[V]) rankRunes(first, second int32) int {
+func (v *collator_[V]) rankRunes(first, second int32) Rank {
 	if first < second {
-		return -1
+		return LesserRank
 	}
 	if first > second {
-		return 1
+		return GreaterRank
 	}
-	return 0
+	return EqualRank
 }
 
-func (v *collator_[V]) rankSequences(first ref.Value, second ref.Value) int {
+func (v *collator_[V]) rankSequences(first ref.Value, second ref.Value) Rank {
 	// Rank the Go arrays for the two sequences.
 	var firstArray = first.MethodByName("AsArray").Call([]ref.Value{})[0]
 	var secondArray = second.MethodByName("AsArray").Call([]ref.Value{})[0]
 	return v.rankArrays(firstArray, secondArray)
 }
 
-func (v *collator_[V]) rankSigned(first, second int64) int {
+func (v *collator_[V]) rankSigned(first, second int64) Rank {
 	if first < second {
-		return -1
+		return LesserRank
 	}
 	if first > second {
-		return 1
+		return GreaterRank
 	}
-	return 0
+	return EqualRank
 }
 
-func (v *collator_[V]) rankStrings(first, second string) int {
+func (v *collator_[V]) rankStrings(first, second string) Rank {
 	if first < second {
 		// The first string comes before the second string alphabetically.
-		return -1
+		return LesserRank
 	}
 	if first > second {
 		// The first string comes after the second string alphabetically.
-		return 1
+		return GreaterRank
 	}
 	// The two strings are the same.
-	return 0
+	return EqualRank
 }
 
-func (v *collator_[V]) rankStructures(first ref.Value, second ref.Value) int {
+func (v *collator_[V]) rankStructures(first ref.Value, second ref.Value) Rank {
 	var count = first.NumField() // The structures are the same type.
 	for index := 0; index < count; index++ {
 		var firstField = first.Field(index)
 		var secondField = second.Field(index)
 		if firstField.CanInterface() {
-			var ranking = v.rankValues(firstField, secondField)
-			if ranking != 0 {
+			var rank = v.rankValues(firstField, secondField)
+			if rank != EqualRank {
 				// Found a difference.
-				return ranking
+				return rank
 			}
 		}
 	}
 	// All fields have matching values.
-	return 0
+	return EqualRank
 }
 
-func (v *collator_[V]) rankUnsigned(first, second uint64) int {
+func (v *collator_[V]) rankUnsigned(first, second uint64) Rank {
 	if first < second {
-		return -1
+		return LesserRank
 	}
 	if first > second {
-		return 1
+		return GreaterRank
 	}
-	return 0
+	return EqualRank
 }
 
-func (v *collator_[V]) rankValues(first ref.Value, second ref.Value) int {
+func (v *collator_[V]) rankValues(first ref.Value, second ref.Value) Rank {
 	// Handle any nil pointers.
 	if !first.IsValid() {
 		if !second.IsValid() {
 			// Both values are nil.
-			return 0
+			return EqualRank
 		}
 		// Only the first value is nil.
-		return -1
+		return LesserRank
 	} else if !second.IsValid() {
 		// Only the second value is nil.
-		return 1
+		return GreaterRank
 	}
 
 	// At this point, neither of the values are nil.
@@ -672,12 +671,12 @@ func (v *collator_[V]) rankValues(first ref.Value, second ref.Value) int {
 		switch {
 		case first.IsNil():
 			if second.IsNil() {
-				return 0
+				return EqualRank
 			}
 			// Only the first value is nil.
-			return -1
+			return LesserRank
 		case second.IsNil():
-			return 1 // We know that first isn't nil.
+			return GreaterRank // We know that first isn't nil.
 		default:
 			return v.rankArrays(first, second)
 		}
@@ -685,12 +684,12 @@ func (v *collator_[V]) rankValues(first ref.Value, second ref.Value) int {
 		switch {
 		case first.IsNil():
 			if second.IsNil() {
-				return 0
+				return EqualRank
 			}
 			// Only the first value is nil.
-			return -1
+			return LesserRank
 		case second.IsNil():
-			return 1 // We know that first isn't nil.
+			return GreaterRank // We know that first isn't nil.
 		default:
 			return v.rankMaps(first, second)
 		}
@@ -700,12 +699,12 @@ func (v *collator_[V]) rankValues(first ref.Value, second ref.Value) int {
 		switch {
 		case first.IsNil():
 			if second.IsNil() {
-				return 0
+				return EqualRank
 			}
 			// Only the first value is nil.
-			return -1
+			return LesserRank
 		case second.IsNil():
-			return 1 // We know that first isn't nil.
+			return GreaterRank // We know that first isn't nil.
 		case first.MethodByName("AsArray").IsValid():
 			// The value is a collection.
 			return v.rankSequences(first, second)
@@ -723,7 +722,7 @@ func (v *collator_[V]) rankValues(first ref.Value, second ref.Value) int {
 	case ref.Struct:
 		// Rank the corresponding fields for each structure.
 		var ranking = v.rankStructures(first, second)
-		if ranking != 0 {
+		if ranking != EqualRank {
 			return ranking
 		}
 		// Rank the corresponding getter values for each structure.

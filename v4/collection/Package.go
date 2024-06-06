@@ -82,16 +82,16 @@ must be supported by all sequences of key-value associations.
 */
 type Associative[K comparable, V any] interface {
 	// Methods
-	GetKeys() Sequential[K]
 	GetValue(key K) V
-	GetValues(keys Sequential[K]) Sequential[V]
-	RemoveAll()
-	RemoveValue(key K) V
-	RemoveValues(keys Sequential[K]) Sequential[V]
 	SetValue(
 		key K,
 		value V,
 	)
+	GetKeys() Sequential[K]
+	GetValues(keys Sequential[K]) Sequential[V]
+	RemoveValue(key K) V
+	RemoveValues(keys Sequential[K]) Sequential[V]
+	RemoveAll()
 }
 
 /*
@@ -100,8 +100,8 @@ canonical notations.
 */
 type Canonical interface {
 	// Methods
-	FormatCollection(collection Collection) string
 	ParseSource(source string) Collection
+	FormatCollection(collection Collection) string
 }
 
 /*
@@ -110,8 +110,6 @@ by all sequences that allow new values to be appended, inserted and removed.
 */
 type Expandable[V any] interface {
 	// Methods
-	AppendValue(value V)
-	AppendValues(values Sequential[V])
 	InsertValue(
 		slot int,
 		value V,
@@ -120,12 +118,14 @@ type Expandable[V any] interface {
 		slot int,
 		values Sequential[V],
 	)
-	RemoveAll()
+	AppendValue(value V)
+	AppendValues(values Sequential[V])
 	RemoveValue(index int) V
 	RemoveValues(
 		first int,
 		last int,
 	) Sequential[V]
+	RemoveAll()
 }
 
 /*
@@ -137,9 +137,9 @@ type Flexible[V any] interface {
 	// Methods
 	AddValue(value V)
 	AddValues(values Sequential[V])
-	RemoveAll()
 	RemoveValue(value V)
 	RemoveValues(values Sequential[V])
+	RemoveAll()
 }
 
 /*
@@ -159,9 +159,9 @@ by all searchable sequences of values.
 */
 type Searchable[V any] interface {
 	// Methods
-	ContainsAll(values Sequential[V]) bool
-	ContainsAny(values Sequential[V]) bool
 	ContainsValue(value V) bool
+	ContainsAny(values Sequential[V]) bool
+	ContainsAll(values Sequential[V]) bool
 	GetIndex(value V) int
 }
 
@@ -171,10 +171,10 @@ by all sequences of values.
 */
 type Sequential[V any] interface {
 	// Methods
+	IsEmpty() bool
+	GetSize() int
 	AsArray() []V
 	GetIterator() age.IteratorLike[V]
-	GetSize() int
-	IsEmpty() bool
 }
 
 /*
@@ -183,10 +183,10 @@ all sequences whose values may be reordered using various sorting algorithms.
 */
 type Sortable[V any] interface {
 	// Methods
-	ReverseValues()
-	ShuffleValues()
 	SortValues()
 	SortValuesWithRanker(ranker age.RankingFunction[V])
+	ReverseValues()
+	ShuffleValues()
 }
 
 /*
@@ -196,8 +196,8 @@ synchronized groups of threads.
 type Synchronized interface {
 	// Methods
 	Add(delta int)
-	Done()
 	Wait()
+	Done()
 }
 
 /*
@@ -228,9 +228,9 @@ type ArrayClassLike[V any] interface {
 	Notation() NotationLike
 
 	// Constructors
+	MakeFromSize(size int) ArrayLike[V]
 	MakeFromArray(values []V) ArrayLike[V]
 	MakeFromSequence(values Sequential[V]) ArrayLike[V]
-	MakeFromSize(size int) ArrayLike[V]
 	MakeFromSource(source string) ArrayLike[V]
 }
 
@@ -353,12 +353,6 @@ to ALL of the output queues. This pattern is useful when a set of DIFFERENT
 operations needs to occur for every value and each operation can be done in
 parallel.
 
-Join() connects the outputs of the specified sequence of input queues with a new
-output queue returns the new output queue. Each value removed from each input
-queue will automatically be added to the output queue.  This pattern is useful
-when the results of the processing with a Split() function need to be
-consolidated into a single queue.
-
 Split() connects the output of the specified input Queue with the number of
 output queues specified by the size parameter and returns a sequence of the new
 output queues. Each value added to the input queue will be added automatically
@@ -366,6 +360,12 @@ to ONE of the output queues. This pattern is useful when a SINGLE operation
 needs to occur for each value and the operation can be done on the values in
 parallel.  The results can then be consolidated later on using the Join()
 function.
+
+Join() connects the outputs of the specified sequence of input queues with a new
+output queue returns the new output queue. Each value removed from each input
+queue will automatically be added to the output queue.  This pattern is useful
+when the results of the processing with a Split() function need to be
+consolidated into a single queue.
 */
 type QueueClassLike[V any] interface {
 	// Constants
@@ -385,15 +385,15 @@ type QueueClassLike[V any] interface {
 		input QueueLike[V],
 		size int,
 	) Sequential[QueueLike[V]]
-	Join(
-		group Synchronized,
-		inputs Sequential[QueueLike[V]],
-	) QueueLike[V]
 	Split(
 		group Synchronized,
 		input QueueLike[V],
 		size int,
 	) Sequential[QueueLike[V]]
+	Join(
+		group Synchronized,
+		inputs Sequential[QueueLike[V]],
+	) QueueLike[V]
 }
 
 /*
@@ -615,11 +615,11 @@ type QueueLike[V any] interface {
 	Sequential[V]
 
 	// Methods
-	CloseQueue()
 	RemoveHead() (
 		head V,
 		ok bool,
 	)
+	CloseQueue()
 }
 
 /*

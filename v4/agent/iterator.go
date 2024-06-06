@@ -26,7 +26,7 @@ var iteratorMutex syn.Mutex
 
 // Function
 
-func Iterator[V Value]() IteratorClassLike[V] {
+func Iterator[V any]() IteratorClassLike[V] {
 	// Generate the name of the bound class type.
 	var class IteratorClassLike[V]
 	var name = fmt.Sprintf("%T", class)
@@ -55,7 +55,7 @@ func Iterator[V Value]() IteratorClassLike[V] {
 
 // Target
 
-type iteratorClass_[V Value] struct {
+type iteratorClass_[V any] struct {
 	// This class does not define any constants.
 }
 
@@ -73,7 +73,7 @@ func (c *iteratorClass_[V]) MakeFromArray(values []V) IteratorLike[V] {
 
 // Target
 
-type iterator_[V Value] struct {
+type iterator_[V any] struct {
 	class_  IteratorClassLike[V]
 	size_   int // So we can safely cache the size.
 	slot_   int // The initial slot is zero.

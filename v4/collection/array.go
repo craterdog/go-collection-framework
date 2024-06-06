@@ -74,6 +74,11 @@ func (c *arrayClass_[V]) Notation() NotationLike {
 
 // Constructors
 
+func (c *arrayClass_[V]) MakeFromSize(size int) ArrayLike[V] {
+	var array = make([]V, size) // All values initialized to zero.
+	return array_[V](array)
+}
+
 func (c *arrayClass_[V]) MakeFromArray(values []V) ArrayLike[V] {
 	var size = len(values)
 	var array = make([]V, size)
@@ -89,11 +94,6 @@ func (c *arrayClass_[V]) MakeFromSequence(values Sequential[V]) ArrayLike[V] {
 		var value = iterator.GetNext()
 		array[index] = value
 	}
-	return array_[V](array)
-}
-
-func (c *arrayClass_[V]) MakeFromSize(size int) ArrayLike[V] {
-	var array = make([]V, size) // All values initialized to zero.
 	return array_[V](array)
 }
 
@@ -137,6 +137,14 @@ func (v array_[V]) GetValues(first int, last int) Sequential[V] {
 
 // Sequential
 
+func (v array_[V]) IsEmpty() bool {
+	return len(v) == 0
+}
+
+func (v array_[V]) GetSize() int {
+	return len(v)
+}
+
 func (v array_[V]) AsArray() []V {
 	var size = len(v)
 	var array = make([]V, size)
@@ -149,25 +157,7 @@ func (v array_[V]) GetIterator() age.IteratorLike[V] {
 	return iterator
 }
 
-func (v array_[V]) GetSize() int {
-	return len(v)
-}
-
-func (v array_[V]) IsEmpty() bool {
-	return len(v) == 0
-}
-
 // Sortable
-
-func (v array_[V]) ReverseValues() {
-	var sorter = age.Sorter[V]().Make()
-	sorter.ReverseValues(v)
-}
-
-func (v array_[V]) ShuffleValues() {
-	var sorter = age.Sorter[V]().Make()
-	sorter.ShuffleValues(v)
-}
 
 func (v array_[V]) SortValues() {
 	var collator = age.Collator[V]().Make()
@@ -180,6 +170,16 @@ func (v array_[V]) SortValuesWithRanker(ranker age.RankingFunction[V]) {
 		var sorter = age.Sorter[V]().MakeWithRanker(ranker)
 		sorter.SortValues(v)
 	}
+}
+
+func (v array_[V]) ReverseValues() {
+	var sorter = age.Sorter[V]().Make()
+	sorter.ReverseValues(v)
+}
+
+func (v array_[V]) ShuffleValues() {
+	var sorter = age.Sorter[V]().Make()
+	sorter.ShuffleValues(v)
 }
 
 // Updatable

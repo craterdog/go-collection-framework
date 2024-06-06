@@ -83,6 +83,20 @@ func (c *queueClass_[V]) Make() QueueLike[V] {
 	return c.MakeWithCapacity(c.defaultCapacity_)
 }
 
+func (c *queueClass_[V]) MakeWithCapacity(capacity int) QueueLike[V] {
+	if capacity < 1 {
+		capacity = c.defaultCapacity_
+	}
+	var available = make(chan bool, capacity)
+	var values = List[V](c.notation_).Make()
+	return &queue_[V]{
+		class_:     c,
+		available_: available,
+		capacity_:  capacity,
+		values_:    values,
+	}
+}
+
 func (c *queueClass_[V]) MakeFromArray(values []V) QueueLike[V] {
 	var array = Array[V](c.notation_).MakeFromArray(values)
 	return c.MakeFromSequence(array)
@@ -111,20 +125,6 @@ func (c *queueClass_[V]) MakeFromSource(source string) QueueLike[V] {
 
 	// Then we can create the stack from the type V array.
 	return c.MakeFromArray(array)
-}
-
-func (c *queueClass_[V]) MakeWithCapacity(capacity int) QueueLike[V] {
-	if capacity < 1 {
-		capacity = c.defaultCapacity_
-	}
-	var available = make(chan bool, capacity)
-	var values = List[V](c.notation_).Make()
-	return &queue_[V]{
-		class_:     c,
-		available_: available,
-		capacity_:  capacity,
-		values_:    values,
-	}
 }
 
 // Functions
@@ -180,47 +180,6 @@ func (c *queueClass_[V]) Fork(
 	return outputs
 }
 
-func (c *queueClass_[V]) Join(
-	group Synchronized,
-	inputs Sequential[QueueLike[V]],
-) QueueLike[V] {
-	// Validate the arguments.
-	if inputs == nil || inputs.IsEmpty() {
-		panic("The number of input queues for a join must be at least one.")
-	}
-
-	// Create the new output queue.
-	var iterator = inputs.GetIterator()
-	var capacity = iterator.GetNext().GetCapacity()
-	var output = c.MakeWithCapacity(capacity)
-
-	// Connect up the input queues to the output queue.
-	group.Add(1)
-	go func() {
-		// Make sure the wait group is decremented on termination.
-		defer group.Done()
-
-		// Take turns reading from each input queue and writing to the output queue.
-		iterator.ToStart()
-		for {
-			var input = iterator.GetNext()
-			var value, ok = input.RemoveHead() // Will block when empty.
-			if !ok {
-				break // The input queue has been closed.
-			}
-			output.AddValue(value) // Will block when full.
-			if !iterator.HasNext() {
-				iterator.ToStart()
-			}
-		}
-
-		// Close the output queue.
-		output.CloseQueue()
-	}()
-
-	return output
-}
-
 func (c *queueClass_[V]) Split(
 	group Synchronized,
 	input QueueLike[V],
@@ -272,6 +231,47 @@ func (c *queueClass_[V]) Split(
 	return outputs
 }
 
+func (c *queueClass_[V]) Join(
+	group Synchronized,
+	inputs Sequential[QueueLike[V]],
+) QueueLike[V] {
+	// Validate the arguments.
+	if inputs == nil || inputs.IsEmpty() {
+		panic("The number of input queues for a join must be at least one.")
+	}
+
+	// Create the new output queue.
+	var iterator = inputs.GetIterator()
+	var capacity = iterator.GetNext().GetCapacity()
+	var output = c.MakeWithCapacity(capacity)
+
+	// Connect up the input queues to the output queue.
+	group.Add(1)
+	go func() {
+		// Make sure the wait group is decremented on termination.
+		defer group.Done()
+
+		// Take turns reading from each input queue and writing to the output queue.
+		iterator.ToStart()
+		for {
+			var input = iterator.GetNext()
+			var value, ok = input.RemoveHead() // Will block when empty.
+			if !ok {
+				break // The input queue has been closed.
+			}
+			output.AddValue(value) // Will block when full.
+			if !iterator.HasNext() {
+				iterator.ToStart()
+			}
+		}
+
+		// Close the output queue.
+		output.CloseQueue()
+	}()
+
+	return output
+}
+
 // INSTANCE METHODS
 
 // Target
@@ -295,6 +295,10 @@ func (v *queue_[V]) GetClass() QueueClassLike[V] {
 	return v.class_
 }
 
+func (v *queue_[V]) GetCapacity() int {
+	return v.capacity_
+}
+
 // Limited
 
 func (v *queue_[V]) AddValue(value V) {
@@ -302,10 +306,6 @@ func (v *queue_[V]) AddValue(value V) {
 	v.values_.AppendValue(value)
 	v.mutex_.Unlock()
 	v.available_ <- true // The queue will block if at capacity.
-}
-
-func (v *queue_[V]) GetCapacity() int {
-	return v.capacity_
 }
 
 func (v *queue_[V]) RemoveAll() {
@@ -316,6 +316,20 @@ func (v *queue_[V]) RemoveAll() {
 }
 
 // Sequential
+
+func (v *queue_[V]) IsEmpty() bool {
+	v.mutex_.Lock()
+	var result = len(v.available_) == 0
+	v.mutex_.Unlock()
+	return result
+}
+
+func (v *queue_[V]) GetSize() int {
+	v.mutex_.Lock()
+	var size = len(v.available_)
+	v.mutex_.Unlock()
+	return size
+}
 
 func (v *queue_[V]) AsArray() []V {
 	v.mutex_.Lock()
@@ -331,20 +345,6 @@ func (v *queue_[V]) GetIterator() age.IteratorLike[V] {
 	return iterator
 }
 
-func (v *queue_[V]) GetSize() int {
-	v.mutex_.Lock()
-	var size = len(v.available_)
-	v.mutex_.Unlock()
-	return size
-}
-
-func (v *queue_[V]) IsEmpty() bool {
-	v.mutex_.Lock()
-	var result = len(v.available_) == 0
-	v.mutex_.Unlock()
-	return result
-}
-
 // Stringer
 
 func (v *queue_[V]) String() string {
@@ -353,13 +353,6 @@ func (v *queue_[V]) String() string {
 }
 
 // Public
-
-func (v *queue_[V]) CloseQueue() {
-	v.mutex_.Lock()
-	close(v.available_)
-	// No more values can be placed on the queue.
-	v.mutex_.Unlock()
-}
 
 func (v *queue_[V]) RemoveHead() (V, bool) {
 	// Default the return value to the zero value for type V.
@@ -376,4 +369,11 @@ func (v *queue_[V]) RemoveHead() (V, bool) {
 
 	// Return the results
 	return head, ok
+}
+
+func (v *queue_[V]) CloseQueue() {
+	v.mutex_.Lock()
+	close(v.available_)
+	// No more values can be placed on the queue.
+	v.mutex_.Unlock()
 }

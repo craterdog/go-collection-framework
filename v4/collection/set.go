@@ -79,6 +79,15 @@ func (c *setClass_[V]) Make() SetLike[V] {
 	return set
 }
 
+func (c *setClass_[V]) MakeWithCollator(collator age.CollatorLike[V]) SetLike[V] {
+	var values = List[V](c.notation_).Make()
+	return &set_[V]{
+		class_:    c,
+		collator_: collator,
+		values_:   values,
+	}
+}
+
 func (c *setClass_[V]) MakeFromArray(values []V) SetLike[V] {
 	var array = Array[V](c.notation_).MakeFromArray(values)
 	var set = c.MakeFromSequence(array)
@@ -108,15 +117,6 @@ func (c *setClass_[V]) MakeFromSource(source string) SetLike[V] {
 
 	// Then we can create the stack from the type V array.
 	return c.MakeFromArray(array)
-}
-
-func (c *setClass_[V]) MakeWithCollator(collator age.CollatorLike[V]) SetLike[V] {
-	var values = List[V](c.notation_).Make()
-	return &set_[V]{
-		class_:    c,
-		collator_: collator,
-		values_:   values,
-	}
 }
 
 // Functions
@@ -199,10 +199,6 @@ func (v *set_[V]) AddValues(values Sequential[V]) {
 	}
 }
 
-func (v *set_[V]) RemoveAll() {
-	v.values_.RemoveAll()
-}
-
 func (v *set_[V]) RemoveValue(value V) {
 	var index, found = v.findIndex(value)
 	if found {
@@ -219,19 +215,15 @@ func (v *set_[V]) RemoveValues(values Sequential[V]) {
 	}
 }
 
+func (v *set_[V]) RemoveAll() {
+	v.values_.RemoveAll()
+}
+
 // Searchable
 
-func (v *set_[V]) ContainsAll(values Sequential[V]) bool {
-	var iterator = values.GetIterator()
-	for iterator.HasNext() {
-		var value = iterator.GetNext()
-		if !v.ContainsValue(value) {
-			// This set is missing at least one of the values.
-			return false
-		}
-	}
-	// This set does contains all of the values.
-	return true
+func (v *set_[V]) ContainsValue(value V) bool {
+	var _, found = v.findIndex(value)
+	return found
 }
 
 func (v *set_[V]) ContainsAny(values Sequential[V]) bool {
@@ -247,9 +239,17 @@ func (v *set_[V]) ContainsAny(values Sequential[V]) bool {
 	return false
 }
 
-func (v *set_[V]) ContainsValue(value V) bool {
-	var _, found = v.findIndex(value)
-	return found
+func (v *set_[V]) ContainsAll(values Sequential[V]) bool {
+	var iterator = values.GetIterator()
+	for iterator.HasNext() {
+		var value = iterator.GetNext()
+		if !v.ContainsValue(value) {
+			// This set is missing at least one of the values.
+			return false
+		}
+	}
+	// This set does contains all of the values.
+	return true
 }
 
 func (v *set_[V]) GetIndex(value V) int {
@@ -262,6 +262,14 @@ func (v *set_[V]) GetIndex(value V) int {
 
 // Sequential
 
+func (v *set_[V]) IsEmpty() bool {
+	return v.values_.IsEmpty()
+}
+
+func (v *set_[V]) GetSize() int {
+	return v.values_.GetSize()
+}
+
 func (v *set_[V]) AsArray() []V {
 	return v.values_.AsArray()
 }
@@ -269,14 +277,6 @@ func (v *set_[V]) AsArray() []V {
 func (v *set_[V]) GetIterator() age.IteratorLike[V] {
 	var iterator = v.values_.GetIterator()
 	return iterator
-}
-
-func (v *set_[V]) GetSize() int {
-	return v.values_.GetSize()
-}
-
-func (v *set_[V]) IsEmpty() bool {
-	return v.values_.IsEmpty()
 }
 
 // Stringer

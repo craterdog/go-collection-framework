@@ -374,10 +374,10 @@ type QueueClassLike[V any] interface {
 
 	// Constructors
 	Make() QueueLike[V]
+	MakeWithCapacity(capacity int) QueueLike[V]
 	MakeFromArray(values []V) QueueLike[V]
 	MakeFromSequence(values Sequential[V]) QueueLike[V]
 	MakeFromSource(source string) QueueLike[V]
-	MakeWithCapacity(capacity int) QueueLike[V]
 
 	// Functions
 	Fork(
@@ -421,10 +421,10 @@ type SetClassLike[V any] interface {
 
 	// Constructors
 	Make() SetLike[V]
+	MakeWithCollator(collator age.CollatorLike[V]) SetLike[V]
 	MakeFromArray(values []V) SetLike[V]
 	MakeFromSequence(values Sequential[V]) SetLike[V]
 	MakeFromSource(source string) SetLike[V]
-	MakeWithCollator(collator age.CollatorLike[V]) SetLike[V]
 
 	// Functions
 	And(
@@ -457,10 +457,10 @@ type StackClassLike[V any] interface {
 
 	// Constructors
 	Make() StackLike[V]
+	MakeWithCapacity(capacity int) StackLike[V]
 	MakeFromArray(values []V) StackLike[V]
 	MakeFromSequence(values Sequential[V]) StackLike[V]
 	MakeFromSource(source string) StackLike[V]
-	MakeWithCapacity(capacity int) StackLike[V]
 }
 
 // Instances

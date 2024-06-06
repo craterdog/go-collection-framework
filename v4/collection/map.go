@@ -138,6 +138,15 @@ type map_[K comparable, V any] map[K]V
 
 // Associative
 
+func (v map_[K, V]) GetValue(key K) V {
+	var value = v[key]
+	return value
+}
+
+func (v map_[K, V]) SetValue(key K, value V) {
+	v[key] = value
+}
+
 func (v map_[K, V]) GetKeys() Sequential[K] {
 	var size = len(v)
 	var array = make([]K, size)
@@ -153,11 +162,6 @@ func (v map_[K, V]) GetKeys() Sequential[K] {
 	return keys
 }
 
-func (v map_[K, V]) GetValue(key K) V {
-	var value = v[key]
-	return value
-}
-
 func (v map_[K, V]) GetValues(keys Sequential[K]) Sequential[V] {
 	var size = keys.GetSize()
 	var array = make([]V, size)
@@ -171,15 +175,6 @@ func (v map_[K, V]) GetValues(keys Sequential[K]) Sequential[V] {
 		index++
 	}
 	return values
-}
-
-func (v map_[K, V]) RemoveAll() {
-	var keys = v.GetKeys()
-	var iterator = keys.GetIterator()
-	for iterator.HasNext() {
-		var key = iterator.GetNext()
-		delete(v, key)
-	}
 }
 
 func (v map_[K, V]) RemoveValue(key K) V {
@@ -205,11 +200,24 @@ func (v map_[K, V]) RemoveValues(keys Sequential[K]) Sequential[V] {
 	return values
 }
 
-func (v map_[K, V]) SetValue(key K, value V) {
-	v[key] = value
+func (v map_[K, V]) RemoveAll() {
+	var keys = v.GetKeys()
+	var iterator = keys.GetIterator()
+	for iterator.HasNext() {
+		var key = iterator.GetNext()
+		delete(v, key)
+	}
 }
 
 // Sequential
+
+func (v map_[K, V]) IsEmpty() bool {
+	return len(v) == 0
+}
+
+func (v map_[K, V]) GetSize() int {
+	return len(v)
+}
 
 func (v map_[K, V]) AsArray() []AssociationLike[K, V] {
 	var size = len(v)
@@ -228,14 +236,6 @@ func (v map_[K, V]) GetIterator() age.IteratorLike[AssociationLike[K, V]] {
 	var associations = array_[AssociationLike[K, V]](array)
 	var iterator = associations.GetIterator()
 	return iterator
-}
-
-func (v map_[K, V]) GetSize() int {
-	return len(v)
-}
-
-func (v map_[K, V]) IsEmpty() bool {
-	return len(v) == 0
 }
 
 // Stringer

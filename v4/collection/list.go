@@ -147,56 +147,6 @@ func (v *list_[V]) GetValues(first int, last int) Sequential[V] {
 
 // Expandable
 
-func (v *list_[V]) AppendValue(value V) {
-
-	// Create a new larger array.
-	var size = v.GetSize() + 1
-	var array = Array[V](v.class_.Notation()).MakeFromSize(size)
-
-	// Copy the existing values into the new array.
-	var index int
-	var iterator = v.GetIterator()
-	for iterator.HasNext() {
-		index++
-		var existing = iterator.GetNext()
-		array.SetValue(index, existing)
-	}
-
-	// Append the new value to the new array.
-	index++
-	array.SetValue(index, value)
-
-	// Update the internal array.
-	v.values_ = array
-}
-
-func (v *list_[V]) AppendValues(values Sequential[V]) {
-
-	// Create a new larger array.
-	var size = v.GetSize() + values.GetSize()
-	var array = Array[V](v.class_.Notation()).MakeFromSize(size)
-
-	// Copy the existing values into the new array.
-	var index int
-	var iterator = v.GetIterator()
-	for iterator.HasNext() {
-		index++
-		var existing = iterator.GetNext()
-		array.SetValue(index, existing)
-	}
-
-	// Append the new values to the new array.
-	iterator = values.GetIterator()
-	for iterator.HasNext() {
-		index++
-		var value = iterator.GetNext()
-		array.SetValue(index, value)
-	}
-
-	// Update the internal array.
-	v.values_ = array
-}
-
 func (v *list_[V]) InsertValue(slot int, value V) {
 
 	// Create a new larger array.
@@ -249,8 +199,54 @@ func (v *list_[V]) InsertValues(slot int, values Sequential[V]) {
 	v.values_ = array
 }
 
-func (v *list_[V]) RemoveAll() {
-	v.values_ = Array[V](v.class_.Notation()).MakeFromSize(0)
+func (v *list_[V]) AppendValue(value V) {
+
+	// Create a new larger array.
+	var size = v.GetSize() + 1
+	var array = Array[V](v.class_.Notation()).MakeFromSize(size)
+
+	// Copy the existing values into the new array.
+	var index int
+	var iterator = v.GetIterator()
+	for iterator.HasNext() {
+		index++
+		var existing = iterator.GetNext()
+		array.SetValue(index, existing)
+	}
+
+	// Append the new value to the new array.
+	index++
+	array.SetValue(index, value)
+
+	// Update the internal array.
+	v.values_ = array
+}
+
+func (v *list_[V]) AppendValues(values Sequential[V]) {
+
+	// Create a new larger array.
+	var size = v.GetSize() + values.GetSize()
+	var array = Array[V](v.class_.Notation()).MakeFromSize(size)
+
+	// Copy the existing values into the new array.
+	var index int
+	var iterator = v.GetIterator()
+	for iterator.HasNext() {
+		index++
+		var existing = iterator.GetNext()
+		array.SetValue(index, existing)
+	}
+
+	// Append the new values to the new array.
+	iterator = values.GetIterator()
+	for iterator.HasNext() {
+		index++
+		var value = iterator.GetNext()
+		array.SetValue(index, value)
+	}
+
+	// Update the internal array.
+	v.values_ = array
 }
 
 func (v *list_[V]) RemoveValue(index int) V {
@@ -314,19 +310,14 @@ func (v *list_[V]) RemoveValues(first int, last int) Sequential[V] {
 	return removed
 }
 
+func (v *list_[V]) RemoveAll() {
+	v.values_ = Array[V](v.class_.Notation()).MakeFromSize(0)
+}
+
 // Searchable
 
-func (v *list_[V]) ContainsAll(values Sequential[V]) bool {
-	var iterator = values.GetIterator()
-	for iterator.HasNext() {
-		var candidate = iterator.GetNext()
-		if v.GetIndex(candidate) == 0 {
-			// Didn't find one of the values.
-			return false
-		}
-	}
-	// Found all of the values.
-	return true
+func (v *list_[V]) ContainsValue(value V) bool {
+	return v.GetIndex(value) > 0
 }
 
 func (v *list_[V]) ContainsAny(values Sequential[V]) bool {
@@ -342,8 +333,17 @@ func (v *list_[V]) ContainsAny(values Sequential[V]) bool {
 	return false
 }
 
-func (v *list_[V]) ContainsValue(value V) bool {
-	return v.GetIndex(value) > 0
+func (v *list_[V]) ContainsAll(values Sequential[V]) bool {
+	var iterator = values.GetIterator()
+	for iterator.HasNext() {
+		var candidate = iterator.GetNext()
+		if v.GetIndex(candidate) == 0 {
+			// Didn't find one of the values.
+			return false
+		}
+	}
+	// Found all of the values.
+	return true
 }
 
 func (v *list_[V]) GetIndex(value V) int {
@@ -360,6 +360,14 @@ func (v *list_[V]) GetIndex(value V) int {
 
 // Sequential
 
+func (v *list_[V]) IsEmpty() bool {
+	return v.values_.IsEmpty()
+}
+
+func (v *list_[V]) GetSize() int {
+	return v.values_.GetSize()
+}
+
 func (v *list_[V]) AsArray() []V {
 	return v.values_.AsArray()
 }
@@ -368,23 +376,7 @@ func (v *list_[V]) GetIterator() age.IteratorLike[V] {
 	return v.values_.GetIterator()
 }
 
-func (v *list_[V]) GetSize() int {
-	return v.values_.GetSize()
-}
-
-func (v *list_[V]) IsEmpty() bool {
-	return v.values_.IsEmpty()
-}
-
 // Sortable
-
-func (v *list_[V]) ReverseValues() {
-	v.values_.ReverseValues()
-}
-
-func (v *list_[V]) ShuffleValues() {
-	v.values_.ShuffleValues()
-}
 
 func (v *list_[V]) SortValues() {
 	v.values_.SortValues()
@@ -392,6 +384,14 @@ func (v *list_[V]) SortValues() {
 
 func (v *list_[V]) SortValuesWithRanker(ranker age.RankingFunction[V]) {
 	v.values_.SortValuesWithRanker(ranker)
+}
+
+func (v *list_[V]) ReverseValues() {
+	v.values_.ReverseValues()
+}
+
+func (v *list_[V]) ShuffleValues() {
+	v.values_.ShuffleValues()
 }
 
 // Updatable

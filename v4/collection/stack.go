@@ -88,6 +88,18 @@ func (c *stackClass_[V]) Make() StackLike[V] {
 	}
 }
 
+func (c *stackClass_[V]) MakeWithCapacity(capacity int) StackLike[V] {
+	if capacity < 1 {
+		panic("A stack must have a capacity greater than zero.")
+	}
+	var list = List[V](c.notation_).Make()
+	return &stack_[V]{
+		class_:    c,
+		capacity_: capacity,
+		values_:   list,
+	}
+}
+
 func (c *stackClass_[V]) MakeFromArray(values []V) StackLike[V] {
 	var list = List[V](c.notation_).MakeFromArray(values)
 	return &stack_[V]{
@@ -121,18 +133,6 @@ func (c *stackClass_[V]) MakeFromSource(source string) StackLike[V] {
 	return c.MakeFromArray(array)
 }
 
-func (c *stackClass_[V]) MakeWithCapacity(capacity int) StackLike[V] {
-	if capacity < 1 {
-		panic("A stack must have a capacity greater than zero.")
-	}
-	var list = List[V](c.notation_).Make()
-	return &stack_[V]{
-		class_:    c,
-		capacity_: capacity,
-		values_:   list,
-	}
-}
-
 // INSTANCE METHODS
 
 // Target
@@ -149,6 +149,10 @@ func (v *stack_[V]) GetClass() StackClassLike[V] {
 	return v.class_
 }
 
+func (v *stack_[V]) GetCapacity() int {
+	return v.capacity_
+}
+
 // Limited
 
 func (v *stack_[V]) AddValue(value V) {
@@ -162,15 +166,19 @@ func (v *stack_[V]) AddValue(value V) {
 	v.values_.InsertValue(0, value)
 }
 
-func (v *stack_[V]) GetCapacity() int {
-	return v.capacity_
-}
-
 func (v *stack_[V]) RemoveAll() {
 	v.values_.RemoveAll()
 }
 
 // Sequential
+
+func (v *stack_[V]) IsEmpty() bool {
+	return v.values_.IsEmpty()
+}
+
+func (v *stack_[V]) GetSize() int {
+	return v.values_.GetSize()
+}
 
 func (v *stack_[V]) AsArray() []V {
 	return v.values_.AsArray()
@@ -178,14 +186,6 @@ func (v *stack_[V]) AsArray() []V {
 
 func (v *stack_[V]) GetIterator() age.IteratorLike[V] {
 	return v.values_.GetIterator()
-}
-
-func (v *stack_[V]) GetSize() int {
-	return v.values_.GetSize()
-}
-
-func (v *stack_[V]) IsEmpty() bool {
-	return v.values_.IsEmpty()
 }
 
 // Stringer

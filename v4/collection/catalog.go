@@ -180,16 +180,6 @@ func (v *catalog_[K, V]) GetClass() CatalogClassLike[K, V] {
 
 // Associative
 
-func (v *catalog_[K, V]) GetKeys() Sequential[K] {
-	var keys = List[K](v.class_.Notation()).Make()
-	var iterator = v.associations_.GetIterator()
-	for iterator.HasNext() {
-		var association = iterator.GetNext()
-		keys.AppendValue(association.GetKey())
-	}
-	return keys
-}
-
 func (v *catalog_[K, V]) GetValue(key K) V {
 	var value V // Set the return value to its zero value.
 	var association, exists = v.keys_[key]
@@ -200,6 +190,29 @@ func (v *catalog_[K, V]) GetValue(key K) V {
 	return value
 }
 
+func (v *catalog_[K, V]) SetValue(key K, value V) {
+	var association, exists = v.keys_[key]
+	if exists {
+		// Set the value of an existing association.
+		association.SetValue(value)
+	} else {
+		// Add a new association.
+		association = Association[K, V]().MakeWithAttributes(key, value)
+		v.associations_.AppendValue(association)
+		v.keys_[key] = association
+	}
+}
+
+func (v *catalog_[K, V]) GetKeys() Sequential[K] {
+	var keys = List[K](v.class_.Notation()).Make()
+	var iterator = v.associations_.GetIterator()
+	for iterator.HasNext() {
+		var association = iterator.GetNext()
+		keys.AppendValue(association.GetKey())
+	}
+	return keys
+}
+
 func (v *catalog_[K, V]) GetValues(keys Sequential[K]) Sequential[V] {
 	var values = List[V](v.class_.Notation()).Make()
 	var iterator = keys.GetIterator()
@@ -208,11 +221,6 @@ func (v *catalog_[K, V]) GetValues(keys Sequential[K]) Sequential[V] {
 		values.AppendValue(v.GetValue(key))
 	}
 	return values
-}
-
-func (v *catalog_[K, V]) RemoveAll() {
-	v.keys_ = map[K]AssociationLike[K, V]{}
-	v.associations_.RemoveAll()
 }
 
 func (v *catalog_[K, V]) RemoveValue(key K) V {
@@ -237,20 +245,20 @@ func (v *catalog_[K, V]) RemoveValues(keys Sequential[K]) Sequential[V] {
 	return values
 }
 
-func (v *catalog_[K, V]) SetValue(key K, value V) {
-	var association, exists = v.keys_[key]
-	if exists {
-		// Set the value of an existing association.
-		association.SetValue(value)
-	} else {
-		// Add a new association.
-		association = Association[K, V]().MakeWithAttributes(key, value)
-		v.associations_.AppendValue(association)
-		v.keys_[key] = association
-	}
+func (v *catalog_[K, V]) RemoveAll() {
+	v.keys_ = map[K]AssociationLike[K, V]{}
+	v.associations_.RemoveAll()
 }
 
 // Sequential
+
+func (v *catalog_[K, V]) IsEmpty() bool {
+	return v.associations_.IsEmpty()
+}
+
+func (v *catalog_[K, V]) GetSize() int {
+	return v.associations_.GetSize()
+}
 
 func (v *catalog_[K, V]) AsArray() []AssociationLike[K, V] {
 	return v.associations_.AsArray()
@@ -260,23 +268,7 @@ func (v *catalog_[K, V]) GetIterator() age.IteratorLike[AssociationLike[K, V]] {
 	return v.associations_.GetIterator()
 }
 
-func (v *catalog_[K, V]) GetSize() int {
-	return v.associations_.GetSize()
-}
-
-func (v *catalog_[K, V]) IsEmpty() bool {
-	return v.associations_.IsEmpty()
-}
-
 // Sortable
-
-func (v *catalog_[K, V]) ReverseValues() {
-	v.associations_.ReverseValues()
-}
-
-func (v *catalog_[K, V]) ShuffleValues() {
-	v.associations_.ShuffleValues()
-}
 
 func (v *catalog_[K, V]) SortValues() {
 	v.associations_.SortValues()
@@ -286,6 +278,14 @@ func (v *catalog_[K, V]) SortValuesWithRanker(
 	ranker age.RankingFunction[AssociationLike[K, V]],
 ) {
 	v.associations_.SortValuesWithRanker(ranker)
+}
+
+func (v *catalog_[K, V]) ReverseValues() {
+	v.associations_.ReverseValues()
+}
+
+func (v *catalog_[K, V]) ShuffleValues() {
+	v.associations_.ShuffleValues()
 }
 
 // Stringer

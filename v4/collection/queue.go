@@ -64,7 +64,7 @@ func Queue[V any](notation NotationLike) QueueClassLike[V] {
 
 type queueClass_[V any] struct {
 	notation_        NotationLike
-	defaultCapacity_ int
+	defaultCapacity_ uint
 }
 
 // Constants
@@ -73,7 +73,7 @@ func (c *queueClass_[V]) Notation() NotationLike {
 	return c.notation_
 }
 
-func (c *queueClass_[V]) DefaultCapacity() int {
+func (c *queueClass_[V]) DefaultCapacity() uint {
 	return c.defaultCapacity_
 }
 
@@ -83,7 +83,7 @@ func (c *queueClass_[V]) Make() QueueLike[V] {
 	return c.MakeWithCapacity(c.defaultCapacity_)
 }
 
-func (c *queueClass_[V]) MakeWithCapacity(capacity int) QueueLike[V] {
+func (c *queueClass_[V]) MakeWithCapacity(capacity uint) QueueLike[V] {
 	if capacity < 1 {
 		capacity = c.defaultCapacity_
 	}
@@ -132,7 +132,7 @@ func (c *queueClass_[V]) MakeFromSource(source string) QueueLike[V] {
 func (c *queueClass_[V]) Fork(
 	group Synchronized,
 	input QueueLike[V],
-	size int,
+	size uint,
 ) Sequential[QueueLike[V]] {
 	// Validate the arguments.
 	if size < 2 {
@@ -142,7 +142,8 @@ func (c *queueClass_[V]) Fork(
 	// Create the new output queues.
 	var capacity = input.GetCapacity()
 	var outputs = List[QueueLike[V]](c.notation_).Make()
-	for i := 0; i < size; i++ {
+	var i uint
+	for ; i < size; i++ {
 		outputs.AppendValue(c.MakeWithCapacity(capacity))
 	}
 
@@ -183,7 +184,7 @@ func (c *queueClass_[V]) Fork(
 func (c *queueClass_[V]) Split(
 	group Synchronized,
 	input QueueLike[V],
-	size int,
+	size uint,
 ) Sequential[QueueLike[V]] {
 	// Validate the arguments.
 	if size < 2 {
@@ -193,7 +194,8 @@ func (c *queueClass_[V]) Split(
 	// Create the new output queues.
 	var capacity = input.GetCapacity()
 	var outputs = List[QueueLike[V]](c.notation_).Make()
-	for i := 0; i < size; i++ {
+	var i uint
+	for ; i < size; i++ {
 		outputs.AppendValue(c.MakeWithCapacity(capacity))
 	}
 
@@ -284,7 +286,7 @@ func (c *queueClass_[V]) Join(
 type queue_[V any] struct {
 	class_     QueueClassLike[V]
 	available_ chan bool
-	capacity_  int
+	capacity_  uint
 	mutex_     syn.Mutex
 	values_    ListLike[V]
 }
@@ -295,7 +297,7 @@ func (v *queue_[V]) GetClass() QueueClassLike[V] {
 	return v.class_
 }
 
-func (v *queue_[V]) GetCapacity() int {
+func (v *queue_[V]) GetCapacity() uint {
 	return v.capacity_
 }
 

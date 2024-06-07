@@ -40,8 +40,8 @@ func Parser() ParserClassLike {
 // Target
 
 type parserClass_ struct {
-	queueSize_ int
-	stackSize_ int
+	queueSize_ uint
+	stackSize_ uint
 }
 
 // Constructors

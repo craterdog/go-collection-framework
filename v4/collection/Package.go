@@ -111,11 +111,11 @@ by all sequences that allow new values to be appended, inserted and removed.
 type Expandable[V any] interface {
 	// Methods
 	InsertValue(
-		slot int,
+		slot uint,
 		value V,
 	)
 	InsertValues(
-		slot int,
+		slot uint,
 		values Sequential[V],
 	)
 	AppendValue(value V)
@@ -167,7 +167,9 @@ type Searchable[V any] interface {
 
 /*
 Sequential[V any] defines the set of method signatures that must be supported
-by all sequences of values.
+by all sequences of values.  Note that sizes should be of type "uint" but the Go
+language does not allow arithmetic and comparison operations between "int" and
+"uint" so we us "int" for the return type to make it easier to use.
 */
 type Sequential[V any] interface {
 	// Methods
@@ -228,7 +230,7 @@ type ArrayClassLike[V any] interface {
 	Notation() NotationLike
 
 	// Constructors
-	MakeFromSize(size int) ArrayLike[V]
+	MakeWithSize(size uint) ArrayLike[V]
 	MakeFromArray(values []V) ArrayLike[V]
 	MakeFromSequence(values Sequential[V]) ArrayLike[V]
 	MakeFromSource(source string) ArrayLike[V]
@@ -370,11 +372,11 @@ consolidated into a single queue.
 type QueueClassLike[V any] interface {
 	// Constants
 	Notation() NotationLike
-	DefaultCapacity() int
+	DefaultCapacity() uint
 
 	// Constructors
 	Make() QueueLike[V]
-	MakeWithCapacity(capacity int) QueueLike[V]
+	MakeWithCapacity(capacity uint) QueueLike[V]
 	MakeFromArray(values []V) QueueLike[V]
 	MakeFromSequence(values Sequential[V]) QueueLike[V]
 	MakeFromSource(source string) QueueLike[V]
@@ -383,12 +385,12 @@ type QueueClassLike[V any] interface {
 	Fork(
 		group Synchronized,
 		input QueueLike[V],
-		size int,
+		size uint,
 	) Sequential[QueueLike[V]]
 	Split(
 		group Synchronized,
 		input QueueLike[V],
-		size int,
+		size uint,
 	) Sequential[QueueLike[V]]
 	Join(
 		group Synchronized,
@@ -453,11 +455,11 @@ concrete stack-like class.
 type StackClassLike[V any] interface {
 	// Constants
 	Notation() NotationLike
-	DefaultCapacity() int
+	DefaultCapacity() uint
 
 	// Constructors
 	Make() StackLike[V]
-	MakeWithCapacity(capacity int) StackLike[V]
+	MakeWithCapacity(capacity uint) StackLike[V]
 	MakeFromArray(values []V) StackLike[V]
 	MakeFromSequence(values Sequential[V]) StackLike[V]
 	MakeFromSource(source string) StackLike[V]
@@ -608,7 +610,7 @@ also block on attempts to remove a value when it is empty.
 type QueueLike[V any] interface {
 	// Attributes
 	GetClass() QueueClassLike[V]
-	GetCapacity() int
+	GetCapacity() uint
 
 	// Abstractions
 	Limited[V]
@@ -660,7 +662,7 @@ exceeded.  It will also panic on attempts to remove a value when it is empty.
 type StackLike[V any] interface {
 	// Attributes
 	GetClass() StackClassLike[V]
-	GetCapacity() int
+	GetCapacity() uint
 
 	// Abstractions
 	Limited[V]

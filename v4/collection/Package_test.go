@@ -34,7 +34,7 @@ func TestArrayConstructors(t *tes.T) {
 
 func TestEmptyArray(t *tes.T) {
 	var notation = not.Notation().Make()
-	var array = col.Array[string](notation).MakeFromSize(0)
+	var array = col.Array[string](notation).MakeWithSize(0)
 	ass.Equal(t, "[ ](Array)\n", fmt.Sprintf("%v", array))
 	ass.True(t, array.IsEmpty())
 	ass.Equal(t, 0, array.GetSize())
@@ -57,7 +57,7 @@ func TestEmptyArray(t *tes.T) {
 
 func TestArrayWithSize(t *tes.T) {
 	var notation = not.Notation().Make()
-	var array = col.Array[string](notation).MakeFromSize(3)
+	var array = col.Array[string](notation).MakeWithSize(3)
 	ass.False(t, array.IsEmpty())
 	ass.Equal(t, 3, array.GetSize())
 	ass.Equal(t, []string{"", "", ""}, array.AsArray())
@@ -285,7 +285,7 @@ func TestCatalogsWithExtract(t *tes.T) {
 func TestCatalogsWithEmptyCatalogs(t *tes.T) {
 	var notation = not.Notation().Make()
 	var collator = age.Collator[col.CatalogLike[int, string]]().Make()
-	var keys = col.Array[int](notation).MakeFromSize(0)
+	var keys = col.Array[int](notation).MakeWithSize(0)
 	var Catalog = col.Catalog[int, string](notation)
 	var catalog1 = Catalog.Make()
 	var catalog2 = Catalog.Make()
@@ -572,7 +572,7 @@ func TestQueueWithConcurrency(t *tes.T) {
 
 	// Create a new queue with a specific capacity.
 	var queue = col.Queue[int](notation).MakeWithCapacity(12)
-	ass.Equal(t, 12, queue.GetCapacity())
+	ass.Equal(t, uint(12), queue.GetCapacity())
 	ass.True(t, queue.IsEmpty())
 	ass.Equal(t, 0, queue.GetSize())
 

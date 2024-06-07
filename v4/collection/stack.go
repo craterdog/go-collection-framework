@@ -63,7 +63,7 @@ func Stack[V any](notation NotationLike) StackClassLike[V] {
 // Target
 
 type stackClass_[V any] struct {
-	defaultCapacity_ int
+	defaultCapacity_ uint
 	notation_        NotationLike
 }
 
@@ -73,7 +73,7 @@ func (c *stackClass_[V]) Notation() NotationLike {
 	return c.notation_
 }
 
-func (c *stackClass_[V]) DefaultCapacity() int {
+func (c *stackClass_[V]) DefaultCapacity() uint {
 	return c.defaultCapacity_
 }
 
@@ -88,7 +88,7 @@ func (c *stackClass_[V]) Make() StackLike[V] {
 	}
 }
 
-func (c *stackClass_[V]) MakeWithCapacity(capacity int) StackLike[V] {
+func (c *stackClass_[V]) MakeWithCapacity(capacity uint) StackLike[V] {
 	if capacity < 1 {
 		panic("A stack must have a capacity greater than zero.")
 	}
@@ -139,7 +139,7 @@ func (c *stackClass_[V]) MakeFromSource(source string) StackLike[V] {
 
 type stack_[V any] struct {
 	class_    StackClassLike[V]
-	capacity_ int
+	capacity_ uint
 	values_   ListLike[V]
 }
 
@@ -149,14 +149,14 @@ func (v *stack_[V]) GetClass() StackClassLike[V] {
 	return v.class_
 }
 
-func (v *stack_[V]) GetCapacity() int {
+func (v *stack_[V]) GetCapacity() uint {
 	return v.capacity_
 }
 
 // Limited
 
 func (v *stack_[V]) AddValue(value V) {
-	if v.values_.GetSize() == v.capacity_ {
+	if uint(v.values_.GetSize()) == v.capacity_ {
 		panic(fmt.Sprintf(
 			"Attempted to add a value onto a stack that has reached its capacity: %v\nvalue: %v\nstack: %v",
 			v.capacity_,

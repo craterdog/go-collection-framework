@@ -74,7 +74,7 @@ func (c *arrayClass_[V]) Notation() NotationLike {
 
 // Constructors
 
-func (c *arrayClass_[V]) MakeFromSize(size int) ArrayLike[V] {
+func (c *arrayClass_[V]) MakeWithSize(size uint) ArrayLike[V] {
 	var array = make([]V, size) // All values initialized to zero.
 	return array_[V](array)
 }

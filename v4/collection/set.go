@@ -187,7 +187,7 @@ func (v *set_[V]) AddValue(value V) {
 	var slot, found = v.findIndex(value)
 	if !found {
 		// The value is not already a member, so add it.
-		v.values_.InsertValue(slot, value)
+		v.values_.InsertValue(uint(slot), value)
 	}
 }
 

@@ -94,24 +94,26 @@ func XML(arguments ...any) NotationLike {
 func Array[V any](arguments ...any) col.ArrayLike[V] {
 	// Initialize the possible arguments.
 	var notation = cdc.Notation().Make()
+	var size uint
 	var values []V
 	var sequence col.Sequential[V]
 	var source string
-	var size int
 
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
 		case NotationLike:
 			notation = actual
+		case int:
+			size = uint(actual)
+		case uint:
+			size = actual
 		case []V:
 			values = actual
 		case col.Sequential[V]:
 			sequence = actual
 		case string:
 			source = actual
-		case int:
-			size = actual
 		default:
 			var message = fmt.Sprintf(
 				"Unknown argument type passed into the array constructor: %T\n",
@@ -125,14 +127,14 @@ func Array[V any](arguments ...any) col.ArrayLike[V] {
 	var class = col.Array[V](notation)
 	var array col.ArrayLike[V]
 	switch {
+	case size > 0:
+		array = class.MakeWithSize(size)
 	case len(values) > 0:
 		array = class.MakeFromArray(values)
 	case sequence != nil:
 		array = class.MakeFromSequence(sequence)
 	case len(source) > 0:
 		array = class.MakeFromSource(source)
-	case size > 0:
-		array = class.MakeFromSize(size)
 	default:
 		panic("The constructor for an array requires an argument.")
 	}
@@ -281,24 +283,26 @@ func Map[K comparable, V any](arguments ...any) col.MapLike[K, V] {
 func Queue[V any](arguments ...any) col.QueueLike[V] {
 	// Initialize the possible arguments.
 	var notation = cdc.Notation().Make()
+	var capacity uint
 	var values []V
 	var sequence col.Sequential[V]
 	var source string
-	var capacity int
 
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
 		case NotationLike:
 			notation = actual
+		case int:
+			capacity = uint(actual)
+		case uint:
+			capacity = actual
 		case []V:
 			values = actual
 		case col.Sequential[V]:
 			sequence = actual
 		case string:
 			source = actual
-		case int:
-			capacity = actual
 		default:
 			var message = fmt.Sprintf(
 				"Unknown argument type passed into the queue constructor: %T\n",
@@ -312,14 +316,14 @@ func Queue[V any](arguments ...any) col.QueueLike[V] {
 	var class = col.Queue[V](notation)
 	var queue col.QueueLike[V]
 	switch {
+	case capacity > 0:
+		queue = class.MakeWithCapacity(capacity)
 	case len(values) > 0:
 		queue = class.MakeFromArray(values)
 	case sequence != nil:
 		queue = class.MakeFromSequence(sequence)
 	case len(source) > 0:
 		queue = class.MakeFromSource(source)
-	case capacity > 0:
-		queue = class.MakeWithCapacity(capacity)
 	default:
 		queue = class.Make()
 	}
@@ -387,24 +391,26 @@ func Set[V any](arguments ...any) col.SetLike[V] {
 func Stack[V any](arguments ...any) col.StackLike[V] {
 	// Initialize the possible arguments.
 	var notation = cdc.Notation().Make()
+	var capacity uint
 	var values []V
 	var sequence col.Sequential[V]
 	var source string
-	var capacity int
 
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
 		case NotationLike:
 			notation = actual
+		case int:
+			capacity = uint(actual)
+		case uint:
+			capacity = actual
 		case []V:
 			values = actual
 		case col.Sequential[V]:
 			sequence = actual
 		case string:
 			source = actual
-		case int:
-			capacity = actual
 		default:
 			var message = fmt.Sprintf(
 				"Unknown argument type passed into the stack constructor: %T\n",
@@ -418,14 +424,14 @@ func Stack[V any](arguments ...any) col.StackLike[V] {
 	var class = col.Stack[V](notation)
 	var stack col.StackLike[V]
 	switch {
+	case capacity > 0:
+		stack = class.MakeWithCapacity(capacity)
 	case len(values) > 0:
 		stack = class.MakeFromArray(values)
 	case sequence != nil:
 		stack = class.MakeFromSequence(sequence)
 	case len(source) > 0:
 		stack = class.MakeFromSource(source)
-	case capacity > 0:
-		stack = class.MakeWithCapacity(capacity)
 	default:
 		stack = class.Make()
 	}

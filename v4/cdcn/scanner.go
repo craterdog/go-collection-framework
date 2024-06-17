@@ -24,12 +24,10 @@ import (
 // Reference
 
 var scannerClass = &scannerClass_{
-	notation_: Notation().Make(),
 	tokens_: map[TokenType]string{
 		ErrorToken:       "error",
 		BooleanToken:     "boolean",
 		ComplexToken:     "complex",
-		ContextToken:     "context",
 		DelimiterToken:   "delimiter",
 		EOFToken:         "EOF",
 		EOLToken:         "EOL",
@@ -40,11 +38,11 @@ var scannerClass = &scannerClass_{
 		RuneToken:        "rune",
 		SpaceToken:       "space",
 		StringToken:      "string",
+		TypeToken:        "type",
 	},
 	matchers_: map[TokenType]*reg.Regexp{
 		BooleanToken:     reg.MustCompile(`^(?:` + boolean_ + `)`),
 		ComplexToken:     reg.MustCompile(`^(?:` + complex_ + `)`),
-		ContextToken:     reg.MustCompile(`^(?:` + context_ + `)`),
 		DelimiterToken:   reg.MustCompile(`^(?:` + delimiter_ + `)`),
 		EOLToken:         reg.MustCompile(`^(?:` + eol_ + `)`),
 		FloatToken:       reg.MustCompile(`^(?:` + float_ + `)`),
@@ -54,6 +52,7 @@ var scannerClass = &scannerClass_{
 		RuneToken:        reg.MustCompile(`^(?:` + rune_ + `)`),
 		SpaceToken:       reg.MustCompile(`^(?:` + space_ + `)`),
 		StringToken:      reg.MustCompile(`^(?:` + string_ + `)`),
+		TypeToken:        reg.MustCompile(`^(?:` + type_ + `)`),
 	},
 }
 
@@ -68,7 +67,6 @@ func Scanner() ScannerClassLike {
 // Target
 
 type scannerClass_ struct {
-	notation_ col.NotationLike
 	tokens_   map[TokenType]string
 	matchers_ map[TokenType]*reg.Regexp
 }
@@ -111,9 +109,10 @@ func (c *scannerClass_) MatchToken(
 	type_ TokenType,
 	text string,
 ) col.ListLike[string] {
+	var notation = Notation().Make()
 	var matcher = c.matchers_[type_]
 	var matches = matcher.FindStringSubmatch(text)
-	return col.List[string](c.notation_).MakeFromArray(matches)
+	return col.List[string](notation).MakeFromArray(matches)
 }
 
 // INSTANCE METHODS
@@ -212,7 +211,6 @@ loop:
 		switch {
 		case v.foundToken(BooleanToken):
 		case v.foundToken(ComplexToken):
-		case v.foundToken(ContextToken):
 		case v.foundToken(DelimiterToken):
 		case v.foundToken(EOLToken):
 		case v.foundToken(FloatToken):
@@ -222,6 +220,7 @@ loop:
 		case v.foundToken(RuneToken):
 		case v.foundToken(SpaceToken):
 		case v.foundToken(StringToken):
+		case v.foundToken(TypeToken):
 		default:
 			v.foundError()
 			break loop
@@ -243,7 +242,6 @@ const (
 	base16_      = `[0-9a-f]`
 	boolean_     = `false|true`
 	complex_     = `\((` + float_ + `)` + sign_ + `(` + float_ + `)i\)`
-	context_     = `[Aa]rray|Catalog|List|[Mm]ap|Queue|Set|Stack`
 	delimiter_   = `\[|\]|\(|\)|:|,`
 	eol_         = `\n`
 	escape_      = `\\(?:(?:` + unicode_ + `)|[abfnrtv'"\\])`
@@ -259,6 +257,7 @@ const (
 	sign_        = `[+-]`
 	space_       = `[ ]+`
 	string_      = `"(` + escape_ + `|[^"` + eol_ + `])*"`
+	type_        = `Array|Catalog|List|Map|Queue|Set|Stack`
 	unicode_     = `x` + base16_ + `{2}|u` + base16_ + `{4}|U` + base16_ + `{8}`
 	zero_        = `0`
 )

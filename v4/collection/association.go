@@ -26,9 +26,9 @@ var associationMutex syn.Mutex
 
 // Function
 
-func Association[K comparable, V any]() AssociationClassLike[K, V] {
+func Association[K comparable, V any](notation NotationLike) AssociationClassLike[K, V] {
 	// Generate the name of the bound class type.
-	var class AssociationClassLike[K, V]
+	var class *associationClass_[K, V]
 	var name = fmt.Sprintf("%T", class)
 
 	// Check for existing bound class type.
@@ -41,7 +41,8 @@ func Association[K comparable, V any]() AssociationClassLike[K, V] {
 	default:
 		// Add a new bound class type.
 		class = &associationClass_[K, V]{
-			// This class has no private constants to initialize.
+			// Initialize the class constants.
+			notation_: notation,
 		}
 		associationClass[name] = class
 	}
@@ -56,10 +57,15 @@ func Association[K comparable, V any]() AssociationClassLike[K, V] {
 // Target
 
 type associationClass_[K comparable, V any] struct {
-	// This class has no private constants.
+	// Define the class constants.
+	notation_ NotationLike
 }
 
 // Constants
+
+func (c *associationClass_[K, V]) Notation() NotationLike {
+	return c.notation_
+}
 
 // Constructors
 
@@ -73,8 +79,6 @@ func (c *associationClass_[K, V]) MakeWithAttributes(
 		value_: value,
 	}
 }
-
-// Functions
 
 // INSTANCE METHODS
 
@@ -107,5 +111,5 @@ func (v *association_[K, V]) SetValue(value V) {
 // Stringer
 
 func (v *association_[K, V]) String() string {
-	return fmt.Sprintf("%#v: %#v", v.key_, v.value_)
+	return v.GetClass().Notation().FormatValue(v)
 }

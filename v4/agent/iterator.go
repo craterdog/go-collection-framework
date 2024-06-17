@@ -28,7 +28,7 @@ var iteratorMutex syn.Mutex
 
 func Iterator[V any]() IteratorClassLike[V] {
 	// Generate the name of the bound class type.
-	var class IteratorClassLike[V]
+	var class *iteratorClass_[V]
 	var name = fmt.Sprintf("%T", class)
 
 	// Check for existing bound class type.

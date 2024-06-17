@@ -44,7 +44,6 @@ const (
 	ErrorToken TokenType = iota
 	BooleanToken
 	ComplexToken
-	ContextToken
 	DelimiterToken
 	EOFToken
 	EOLToken
@@ -55,6 +54,7 @@ const (
 	RuneToken
 	SpaceToken
 	StringToken
+	TypeToken
 )
 
 // Classes
@@ -139,7 +139,7 @@ type FormatterLike interface {
 	GetMaximum() int
 
 	// Methods
-	FormatCollection(collection col.Collection) string
+	FormatValue(value any) (source string)
 }
 
 /*
@@ -152,7 +152,7 @@ type ParserLike interface {
 	GetClass() ParserClassLike
 
 	// Methods
-	ParseSource(source string) col.Collection
+	ParseSource(source string) (value any)
 }
 
 /*

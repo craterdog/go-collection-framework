@@ -57,21 +57,67 @@ func TestJSONConstructor(t *tes.T) {
 func TestModuleExampleCode(t *tes.T) {
 	fmt.Println("MODULE EXAMPLE:")
 
-	// Create a new array collection of size 3 from a primitive array.
-	var array = col.Array[int64](3, []int64{1, 2, 3})
+	// Create a new association.
+	var association = col.Association[string, int]("A", 1)
+	fmt.Println(association)
+
+	// Create a new array collection of size 3 with an explicit notation.
+	var notation = col.CDCN()
+	var array = col.Array[int64](notation, 3)
 	fmt.Println(array)
 
-	// Create a new map collection from a CDCN source string.
-	var notation = col.CDCN()
-	var map_ = col.Map[string, int64](notation, `["alpha": 1, "beta": 2, "gamma": 3](Map)`)
+	// Create a new array collection from a primitive Go array of values.
+	array = col.Array[int64]([]int64{1, 2, 3})
+	fmt.Println(array)
+
+	// Create a new array collection from a sequence of values.
+	array = col.Array[int64](array)
+	fmt.Println(array)
+
+	// Create a new empty map collection.
+	var map_ = col.Map[string, int64]()
 	fmt.Println(map_)
 
-	// Create a new list collection using an array collection.
-	var list = col.List[int64](array)
+	// Create a new map collection from a primitive Go map of associations.
+	map_ = col.Map[string, int64](map[string]int64{
+		"one": 1,
+		"two": 2,
+	})
+	fmt.Println(map_)
+
+	// Create a new map collection from a primitive Go array of associations.
+	map_ = col.Map[string, int64](map_.AsArray())
+	fmt.Println(map_)
+
+	// Create a new map collection from a CDCN source string.
+	map_ = col.Map[string, int64](`["alpha": 1, "beta": 2, "gamma": 3](Map)`)
+	fmt.Println(map_)
+
+	// Create a new map collection from a sequence of associations.
+	map_ = col.Map[string, int64](map_)
+	fmt.Println(map_)
+
+	// Create a new empty list collection.
+	var list = col.List[string]()
 	fmt.Println(list)
 
+	// Create a new list collection using a primitive Go array of values.
+	list = col.List[string]([]string{
+		"Hello",
+		"World",
+	})
+	fmt.Println(list)
+
+	// Create a new list collection using a sequence of values.
+	list = col.List[string](map_.GetKeys())
+	fmt.Println(list)
+
+	// Create a new empty catalog collection.
+	var catalog = col.Catalog[string, int64]()
+	fmt.Println(catalog)
+
 	// Create a new catalog collection from a map collection.
-	var catalog = col.Catalog[string, int64](map_)
+	catalog = col.Catalog[string, int64](map_)
 	catalog.SetValue("delta", 4)
 	catalog.SortValues()
 	fmt.Println(catalog)
@@ -80,20 +126,36 @@ func TestModuleExampleCode(t *tes.T) {
 	var iterator = catalog.GetIterator()
 	for iterator.HasNext() {
 		var association = iterator.GetNext()
-		fmt.Println(association.GetKey(), association.GetValue())
+		fmt.Println(association)
 	}
 	fmt.Println()
 
-	// Create a new set collection from the keys in a catalog collection.
-	var set = col.Set[string](catalog.GetKeys())
+	// Create a new empty set collection.
+	var set = col.Set[string]()
 	fmt.Println(set)
 
-	// Create a new stack collection with a capacity of 4 from a list collection.
-	var stack = col.Stack[int64](4, list)
+	// Create a new set collection from a primitive Go array of values.
+	set = col.Set[string]([]string{"c", "a", "b"})
+	fmt.Println(set)
+
+	// Create a new set collection from the keys in a catalog collection.
+	set = col.Set[string](catalog.GetKeys())
+	fmt.Println(set)
+
+	// Create a new empty stack collection with a capacity of 4.
+	var stack = col.Stack[string](4)
 	fmt.Println(stack)
 
-	// Create a new queue collection with a capacity of 5 from a set collection.
-	var queue = col.Queue[string](notation, 5, set)
+	// Create a new stack collection from a list collection.
+	stack = col.Stack[string](list)
+	fmt.Println(stack)
+
+	// Create a new empty queue collection with a capacity of 5.
+	var queue = col.Queue[string](5)
+	fmt.Println(queue)
+
+	// Create a new queue collection from a set collection.
+	queue = col.Queue[string](set)
 	fmt.Println(queue)
 }
 
@@ -381,12 +443,12 @@ func TestCDCNImportExampleCode(t *tes.T) {
         1
         2
         3
-    ](array)
+    ](Array)
     "map": [
         "alpha": 1
         "beta": 2
         "gamma": 3
-    ](map)
+    ](Map)
 ](Catalog)`
 
 	// Parse the source string containing the CDCN for the catalog.
@@ -416,7 +478,7 @@ func TestCDCNExportExampleCode(t *tes.T) {
 
 	// Print the list using the canonical CDCN format.
 	var cdcn = col.CDCN()
-	var source = cdcn.FormatCollection(collection)
+	var source = cdcn.FormatValue(collection)
 	fmt.Println(source)
 
 	// Attempt to print the list using the canonical JSON format.
@@ -427,6 +489,6 @@ func TestCDCNExportExampleCode(t *tes.T) {
 		}
 	}()
 	var json = col.JSON()
-	source = json.FormatCollection(collection)
+	source = json.FormatValue(collection)
 	fmt.Println(source)
 }

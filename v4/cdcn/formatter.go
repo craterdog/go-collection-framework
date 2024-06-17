@@ -39,6 +39,7 @@ func Formatter() FormatterClassLike {
 // Target
 
 type formatterClass_ struct {
+	// Define the class constants.
 	defaultMaximum_ int
 }
 
@@ -93,11 +94,11 @@ func (v *formatter_) GetMaximum() int {
 
 // Public
 
-func (v *formatter_) FormatCollection(collection col.Collection) string {
-	var reflected = ref.ValueOf(collection)
-	v.formatCollection(reflected)
+func (v *formatter_) FormatValue(value any) (source string) {
+	v.formatValue(value)
 	v.appendNewline()
-	return v.getResult()
+	source = v.getResult()
+	return source
 }
 
 // Private
@@ -115,60 +116,72 @@ func (v *formatter_) appendString(s string) {
 	v.result_.WriteString(s)
 }
 
-func (v *formatter_) formatArray(array ref.Value) {
-	var size = array.Len()
+func (v *formatter_) formatArray(array any) {
+	var reflected = ref.ValueOf(array)
+	var size = reflected.Len()
 	switch {
 	case v.depth_ == v.maximum_:
 		// Truncate the recursion.
 		v.appendString("...")
 	case size == 0:
+		// This is an empty sequence of values.
 		v.appendString(" ")
 	case size == 1:
-		var value = array.Index(0)
-		v.formatValue(value.Interface())
+		var value = reflected.Index(0).Interface()
+		v.formatValue(value)
 	default:
+		// This is a multiline sequence of values.
 		v.depth_++
 		for i := 0; i < size; i++ {
 			v.appendNewline()
-			var value = array.Index(i)
-			v.formatValue(value.Interface())
+			var value = reflected.Index(i).Interface()
+			v.formatValue(value)
 		}
 		v.depth_--
 		v.appendNewline()
 	}
 }
 
-func (v *formatter_) formatAssociation(association ref.Value) {
-	var key = association.MethodByName("GetKey").Call([]ref.Value{})[0]
-	v.formatValue(key.Interface())
+func (v *formatter_) formatAssociation(key any, value any) {
+	v.formatPrimitive(key)
 	v.appendString(": ")
-	var value = association.MethodByName("GetValue").Call([]ref.Value{})[0]
-	v.formatValue(value.Interface())
+	v.formatValue(value)
+}
+
+func (v *formatter_) formatAssociations(associations any) {
+	var sequence = ref.ValueOf(associations)
+	var iterator = sequence.MethodByName("GetIterator").Call([]ref.Value{})[0]
+	var size = sequence.MethodByName("GetSize").Call([]ref.Value{})[0].Interface()
+	switch {
+	case v.depth_ == v.maximum_:
+		// Truncate the recursion.
+		v.appendString("...")
+	case size == 0:
+		// This is an empty sequence of associations.
+		v.appendString(":")
+	case size == 1:
+		var value = iterator.MethodByName("GetNext").Call([]ref.Value{})[0].Interface()
+		v.formatValue(value)
+	default:
+		// This is a multiline sequence of associations.
+		v.depth_++
+		for iterator.MethodByName("HasNext").Call([]ref.Value{})[0].Interface().(bool) {
+			v.appendNewline()
+			var value = iterator.MethodByName("GetNext").Call([]ref.Value{})[0].Interface()
+			v.formatValue(value)
+		}
+		v.depth_--
+		v.appendNewline()
+	}
 }
 
 func (v *formatter_) formatBoolean(boolean bool) {
 	v.appendString(stc.FormatBool(boolean))
 }
 
-func (v *formatter_) formatCollection(collection ref.Value) {
-	v.appendString("[")
-	var type_ = v.getName(collection)
-	switch collection.Kind() {
-	case ref.Array, ref.Slice:
-		v.formatArray(collection)
-	case ref.Map:
-		v.formatMap(collection)
-	case ref.Interface, ref.Pointer:
-		v.formatSequence(collection)
-	default:
-		panic(fmt.Sprintf(
-			"Attempted to format:\n    value: %v\n    type: %v\n    kind: %v\n",
-			collection.Interface(),
-			collection.Type(),
-			collection.Kind(),
-		))
-	}
-	v.appendString("](" + type_ + ")")
+func (v *formatter_) formatCollection(collection any) {
+	v.formatSequence(collection)
+	v.formatContext(collection)
 }
 
 func (v *formatter_) formatComplex(complex_ complex128) {
@@ -183,6 +196,65 @@ func (v *formatter_) formatComplex(complex_ complex128) {
 	v.appendString("i)")
 }
 
+func (v *formatter_) formatContext(collection any) {
+	var type_ string
+	var reflectedType = ref.TypeOf(collection)
+	var reflectedString = reflectedType.String()
+	var arrayType = ref.TypeOf((*col.ArrayLike[any])(nil)).Elem()
+	var catalogType = ref.TypeOf((*col.CatalogLike[any, any])(nil)).Elem()
+	var listType = ref.TypeOf((*col.ListLike[any])(nil)).Elem()
+	var mapType = ref.TypeOf((*col.MapLike[any, any])(nil)).Elem()
+	var queueType = ref.TypeOf((*col.QueueLike[any])(nil)).Elem()
+	var setType = ref.TypeOf((*col.SetLike[any])(nil)).Elem()
+	var stackType = ref.TypeOf((*col.StackLike[any])(nil)).Elem()
+	switch {
+	// First try the implemented interface.  NOTE: These will not match any
+	// generic types other than of type "any" as defined above.
+	case reflectedType.Implements(catalogType):
+		type_ = "Catalog"
+	case reflectedType.Implements(listType):
+		type_ = "List"
+	case reflectedType.Implements(queueType):
+		type_ = "Queue"
+	case reflectedType.Implements(setType):
+		type_ = "Set"
+	case reflectedType.Implements(stackType):
+		type_ = "Stack"
+	// These two must come last since they implement a subset of the list
+	// and catalog interfaces respectively.
+	case reflectedType.Implements(arrayType):
+		type_ = "Array"
+	case reflectedType.Implements(mapType):
+		type_ = "Map"
+
+	// Next try the actual value type.  This will catch generic types other
+	// than "any" but is specific to these class implementations.
+	case sts.HasPrefix(reflectedString, "collection.array_"):
+		type_ = "Array"
+	case sts.HasPrefix(reflectedString, "*collection.catalog_"):
+		type_ = "Catalog"
+	case sts.HasPrefix(reflectedString, "*collection.list_"):
+		type_ = "List"
+	case sts.HasPrefix(reflectedString, "collection.map_"):
+		type_ = "Map"
+	case sts.HasPrefix(reflectedString, "*collection.queue_"):
+		type_ = "Queue"
+	case sts.HasPrefix(reflectedString, "*collection.set_"):
+		type_ = "Set"
+	case sts.HasPrefix(reflectedString, "*collection.stack_"):
+		type_ = "Stack"
+
+	// And finally look for primitive arrays and maps.
+	case sts.HasPrefix(reflectedString, "[]"):
+		type_ = "Array"
+	case sts.HasPrefix(reflectedString, "map["):
+		type_ = "Map"
+	default:
+		type_ = reflectedString
+	}
+	v.appendString("(" + type_ + ")")
+}
+
 func (v *formatter_) formatFloat(float float64) {
 	var str = stc.FormatFloat(float, 'G', -1, 64)
 	if !sts.Contains(str, ".") && !sts.Contains(str, "E") {
@@ -195,30 +267,55 @@ func (v *formatter_) formatInteger(integer int64) {
 	v.appendString(stc.FormatInt(integer, 10))
 }
 
-func (v *formatter_) formatMap(map_ ref.Value) {
-	var keys = map_.MapKeys()
-	var size = len(keys)
+func (v *formatter_) formatItems(items any) {
+	var reflected = ref.ValueOf(items)
+	var kind = reflected.Kind()
+	switch kind {
+	case ref.Map:
+		v.formatMap(items)
+	case ref.Array, ref.Slice:
+		v.formatArray(items)
+	case ref.Interface, ref.Pointer:
+		switch {
+		case reflected.MethodByName("GetKeys").IsValid():
+			v.formatAssociations(items)
+		default:
+			v.formatValues(items)
+		}
+	default:
+		var message = fmt.Sprintf(
+			"Attempted to format:\n    value: %v\n    type: %v\n    kind: %v\n",
+			reflected.Interface(),
+			reflected.Type(),
+			reflected.Kind(),
+		)
+		panic(message)
+	}
+}
+
+func (v *formatter_) formatMap(map_ any) {
+	var reflected = ref.ValueOf(map_)
+	var size = reflected.Len()
+	var keys = reflected.MapKeys()
 	switch {
 	case v.depth_ == v.maximum_:
 		// Truncate the recursion.
 		v.appendString("...")
 	case size == 0:
+		// This is an empty map of associations.
 		v.appendString(":")
 	case size == 1:
-		var key = keys[0]
-		var value = map_.MapIndex(key)
-		v.formatValue(key.Interface())
-		v.appendString(": ")
-		v.formatValue(value.Interface())
+		var key = keys[0].Interface()
+		var value = reflected.MapIndex(keys[0]).Interface()
+		v.formatAssociation(key, value)
 	default:
+		// This is a multiline map of associations.
 		v.depth_++
 		for i := 0; i < size; i++ {
 			v.appendNewline()
-			var key = keys[i]
-			var value = map_.MapIndex(key)
-			v.formatValue(key.Interface())
-			v.appendString(": ")
-			v.formatValue(value.Interface())
+			var key = keys[i].Interface()
+			var value = reflected.MapIndex(keys[i]).Interface()
+			v.formatAssociation(key, value)
 		}
 		v.depth_--
 		v.appendNewline()
@@ -226,56 +323,11 @@ func (v *formatter_) formatMap(map_ ref.Value) {
 }
 
 func (v *formatter_) formatNil(value any) {
-	v.appendString("<nil>")
+	v.appendString("nil")
 }
 
-func (v *formatter_) formatRune(rune_ rune) {
-	v.appendString(stc.QuoteRune(rune_))
-}
-
-func (v *formatter_) formatSequence(sequence ref.Value) {
-	var iterator = sequence.MethodByName("GetIterator").Call([]ref.Value{})[0]
-	var size = sequence.MethodByName("GetSize").Call([]ref.Value{})[0].Interface()
-	switch {
-	case v.depth_ == v.maximum_:
-		// Truncate the recursion.
-		v.appendString("...")
-	case size == 0:
-		if sequence.MethodByName("GetKeys").IsValid() {
-			v.appendString(":") // This is an empty sequence of associations.
-		} else {
-			v.appendString(" ") // This is an empty sequence of values.
-		}
-	case size == 1:
-		var value = iterator.MethodByName("GetNext").Call([]ref.Value{})[0]
-		v.formatValue(value.Interface())
-	default:
-		v.depth_++
-		for iterator.MethodByName("HasNext").Call([]ref.Value{})[0].Interface().(bool) {
-			v.appendNewline()
-			var value = iterator.MethodByName("GetNext").Call([]ref.Value{})[0]
-			v.formatValue(value.Interface())
-		}
-		v.depth_--
-		v.appendNewline()
-	}
-}
-
-func (v *formatter_) formatString(string_ string) {
-	v.appendString(stc.Quote(string_))
-}
-
-func (v *formatter_) formatUnsigned(unsigned uint64) {
-	v.appendString("0x" + stc.FormatUint(unsigned, 16))
-}
-
-func (v *formatter_) formatValue(value any) {
-	// NOTE:
-	// Because the Go language doesn't handle generic types very well in type
-	// switches, we use reflection to handle all generic types.
-	switch actual := value.(type) {
-
-	// Handle primitive types.
+func (v *formatter_) formatPrimitive(primitive any) {
+	switch actual := primitive.(type) {
 	case nil:
 		v.formatNil(actual)
 	case bool:
@@ -312,74 +364,76 @@ func (v *formatter_) formatValue(value any) {
 		v.formatRune(rune(actual))
 	case string:
 		v.formatString(actual)
-
-	// Handle generic types.
 	default:
-		var reflected = ref.ValueOf(value)
-		if reflected.MethodByName("GetKey").IsValid() {
-			v.formatAssociation(reflected)
-		} else if reflected.MethodByName("AsArray").IsValid() {
-			v.formatCollection(reflected)
-		} else {
-			switch reflected.Kind() {
-			case ref.Array, ref.Slice, ref.Map:
-				v.formatCollection(reflected)
-			default:
-				panic(fmt.Sprintf(
-					"Attempted to format:\n    value: %v\n    type: %v\n    kind: %v\n",
-					reflected.Interface(),
-					reflected.Type(),
-					reflected.Kind(),
-				))
-			}
-		}
+		var message = fmt.Sprintf(
+			"Attempted to format unknown primitive: %T",
+			primitive,
+		)
+		panic(message)
 	}
 }
 
-func (v *formatter_) getName(collection ref.Value) string {
-	// NOTE:
-	// This hack is necessary since Go does not handle type switches with
-	// generics very well.
-	var type_ = collection.Type().String()
-	switch {
-	case sts.HasPrefix(type_, "[]"):
-		return "array"
-	case sts.HasPrefix(type_, "collection.ArrayLike"):
-		return "Array"
-	case sts.HasPrefix(type_, "collection.array_"):
-		return "Array"
-	case sts.HasPrefix(type_, "map["):
-		return "map"
-	case sts.HasPrefix(type_, "collection.MapLike"):
-		return "Map"
-	case sts.HasPrefix(type_, "collection.map_"):
-		return "Map"
-	case sts.HasPrefix(type_, "*collection.set_"):
-		return "Set"
-	case sts.HasPrefix(type_, "collection.SetLike"):
-		return "Set"
-	case sts.HasPrefix(type_, "*collection.queue_"):
-		return "Queue"
-	case sts.HasPrefix(type_, "collection.QueueLike"):
-		return "Queue"
-	case sts.HasPrefix(type_, "*collection.stack_"):
-		return "Stack"
-	case sts.HasPrefix(type_, "collection.StackLike"):
-		return "Stack"
-	case sts.HasPrefix(type_, "*collection.list_"):
-		return "List"
-	case sts.HasPrefix(type_, "collection.ListLike"):
-		return "List"
-	case sts.HasPrefix(type_, "*collection.catalog_"):
-		return "Catalog"
-	case sts.HasPrefix(type_, "collection.CatalogLike"):
-		return "Catalog"
-	case sts.HasPrefix(type_, "*collection.association_"):
-		return "Association"
-	case sts.HasPrefix(type_, "collection.AssociationLike"):
-		return "Association"
+func (v *formatter_) formatRune(rune_ rune) {
+	v.appendString(stc.QuoteRune(rune_))
+}
+
+func (v *formatter_) formatSequence(sequence any) {
+	v.appendString("[")
+	v.formatItems(sequence)
+	v.appendString("]")
+}
+
+func (v *formatter_) formatString(string_ string) {
+	v.appendString(stc.Quote(string_))
+}
+
+func (v *formatter_) formatUnsigned(unsigned uint64) {
+	v.appendString("0x" + stc.FormatUint(unsigned, 16))
+}
+
+func (v *formatter_) formatValue(value any) {
+	var reflected = ref.ValueOf(value)
+	var kind = reflected.Kind()
+	switch kind {
+	case ref.Array, ref.Slice, ref.Map:
+		v.formatCollection(value)
+	case ref.Interface, ref.Pointer:
+		if reflected.MethodByName("GetKey").IsValid() {
+			var key = reflected.MethodByName("GetKey").Call([]ref.Value{})[0].Interface()
+			var value = reflected.MethodByName("GetValue").Call([]ref.Value{})[0].Interface()
+			v.formatAssociation(key, value)
+		} else {
+			v.formatCollection(value)
+		}
 	default:
-		return "<unknown>"
+		v.formatPrimitive(value)
+	}
+}
+
+func (v *formatter_) formatValues(values any) {
+	var sequence = ref.ValueOf(values)
+	var iterator = sequence.MethodByName("GetIterator").Call([]ref.Value{})[0]
+	var size = sequence.MethodByName("GetSize").Call([]ref.Value{})[0].Interface()
+	switch {
+	case v.depth_ == v.maximum_:
+		// Truncate the recursion.
+		v.appendString("...")
+	case size == 0:
+		// This is an empty sequence of values.
+		v.appendString(" ")
+	case size == 1:
+		var value = iterator.MethodByName("GetNext").Call([]ref.Value{})[0].Interface()
+		v.formatValue(value)
+	default:
+		// This is a multiline sequence of values.
+		v.depth_++
+		for iterator.MethodByName("HasNext").Call([]ref.Value{})[0].Interface().(bool) {
+			v.appendNewline()
+			var value = iterator.MethodByName("GetNext").Call([]ref.Value{})[0].Interface()
+			v.formatValue(value)
+		}
+		v.depth_--
+		v.appendNewline()
 	}
 }
 

@@ -31,7 +31,7 @@ var collatorMutex syn.Mutex
 
 func Collator[V any]() CollatorClassLike[V] {
 	// Generate the name of the bound class type.
-	var class CollatorClassLike[V]
+	var class *collatorClass_[V]
 	var name = fmt.Sprintf("%T", class)
 
 	// Check for existing bound class type.

@@ -15,7 +15,6 @@ package collection
 import (
 	fmt "fmt"
 	age "github.com/craterdog/go-collection-framework/v4/agent"
-	sts "strings"
 	syn "sync"
 )
 
@@ -29,14 +28,9 @@ var arrayMutex syn.Mutex
 // Function
 
 func Array[V any](notation NotationLike) ArrayClassLike[V] {
-	// Validate the notation argument.
-	if notation == nil {
-		panic("A notation must be specified when creating this class.")
-	}
-
 	// Generate the name of the bound class type.
-	var class ArrayClassLike[V]
-	var name = fmt.Sprintf("%T-%T", class, notation)
+	var class *arrayClass_[V]
+	var name = fmt.Sprintf("%T", class)
 
 	// Check for existing bound class type.
 	arrayMutex.Lock()
@@ -48,6 +42,7 @@ func Array[V any](notation NotationLike) ArrayClassLike[V] {
 	default:
 		// Add a new bound class type.
 		class = &arrayClass_[V]{
+			// Initialize the class constants.
 			notation_: notation,
 		}
 		arrayClass[name] = class
@@ -63,6 +58,7 @@ func Array[V any](notation NotationLike) ArrayClassLike[V] {
 // Target
 
 type arrayClass_[V any] struct {
+	// Define the class constants.
 	notation_ NotationLike
 }
 
@@ -97,26 +93,17 @@ func (c *arrayClass_[V]) MakeFromSequence(values Sequential[V]) ArrayLike[V] {
 	return array_[V](array)
 }
 
-func (c *arrayClass_[V]) MakeFromSource(source string) ArrayLike[V] {
-	// First we parse it as a collection of any type value.
-	var collection = c.notation_.ParseSource(source).(Sequential[any])
-
-	// Next we must convert each value explicitly to type V.
-	var anys = collection.AsArray()
-	var array = make([]V, len(anys))
-	for index, value := range anys {
-		array[index] = value.(V)
-	}
-
-	// Then we can create the stack from the type V array.
-	return c.MakeFromArray(array)
-}
-
 // INSTANCE METHODS
 
 // Target
 
 type array_[V any] []V
+
+// Attributes
+
+func (v array_[V]) GetClass() ArrayClassLike[V] {
+	return Array[V](nil)
+}
 
 // Accessible
 
@@ -199,30 +186,8 @@ func (v array_[V]) SetValues(index int, values Sequential[V]) {
 
 // Stringer
 
-// NOTE:
-// Since this class only extends the primitive array type it cannot have any
-// attributes assigned to it.  This means that we have no way of accessing its
-// notation.  So we cannot use the notation specific formatter to generate the
-// string value for this array and must generate it manually.  This is only a
-// problem when this method is called directly—as done by the fmt.Sprintf()
-// method.  The formatters themselves can handle the formatting of arrays just
-// fine.
 func (v array_[V]) String() string {
-	var string_ = "["
-	if v.IsEmpty() {
-		string_ += (" ")
-	} else {
-		var builder sts.Builder
-		var iterator = v.GetIterator()
-		for iterator.HasNext() {
-			var value = iterator.GetNext()
-			builder.WriteString(fmt.Sprintf("%#v, ", value))
-		}
-		var last = builder.Len() - 2
-		string_ += builder.String()[:last]
-	}
-	string_ += "](Array)\n"
-	return string_
+	return v.GetClass().Notation().FormatValue(v)
 }
 
 // Private

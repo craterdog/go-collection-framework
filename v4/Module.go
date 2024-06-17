@@ -36,6 +36,7 @@ import (
 	col "github.com/craterdog/go-collection-framework/v4/collection"
 	//jso "github.com/craterdog/go-collection-framework/v4/json"
 	//xml "github.com/craterdog/go-collection-framework/v4/xml"
+	ref "reflect"
 )
 
 // TYPE ALIASES
@@ -91,9 +92,47 @@ func XML(arguments ...any) NotationLike {
 
 // Collections
 
+func Association[K comparable, V any](arguments ...any) col.AssociationLike[K, V] {
+	// Initialize the possible arguments.
+	var notation = CDCN()
+	var key K
+	var value V
+
+	// Process the actual arguments.
+	for _, argument := range arguments {
+		switch actual := argument.(type) {
+		case K:
+			key = actual
+		case V:
+			value = actual
+		default:
+			var notationType = ref.TypeOf((*col.NotationLike)(nil)).Elem()
+			var reflectedType = ref.TypeOf(argument)
+			switch {
+			case reflectedType.Implements(notationType):
+				notation = argument.(col.NotationLike)
+			default:
+				var message = fmt.Sprintf(
+					"Unknown argument type passed into the association constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
+		}
+	}
+
+	// Call the right constructor.
+	var class = col.Association[K, V](notation)
+	if !ref.ValueOf(key).IsValid() || !ref.ValueOf(value).IsValid() {
+		panic("The constructor for an association requires a key and value.")
+	}
+	var association = class.MakeWithAttributes(key, value)
+	return association
+}
+
 func Array[V any](arguments ...any) col.ArrayLike[V] {
 	// Initialize the possible arguments.
-	var notation = cdc.Notation().Make()
+	var notation = CDCN()
 	var size uint
 	var values []V
 	var sequence col.Sequential[V]
@@ -102,24 +141,30 @@ func Array[V any](arguments ...any) col.ArrayLike[V] {
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
-		case NotationLike:
-			notation = actual
 		case int:
 			size = uint(actual)
 		case uint:
 			size = actual
 		case []V:
 			values = actual
-		case col.Sequential[V]:
-			sequence = actual
 		case string:
 			source = actual
 		default:
-			var message = fmt.Sprintf(
-				"Unknown argument type passed into the array constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			var notationType = ref.TypeOf((*col.NotationLike)(nil)).Elem()
+			var sequenceType = ref.TypeOf((*col.Sequential[V])(nil)).Elem()
+			var reflectedType = ref.TypeOf(argument)
+			switch {
+			case reflectedType.Implements(notationType):
+				notation = argument.(col.NotationLike)
+			case reflectedType.Implements(sequenceType):
+				sequence = argument.(col.Sequential[V])
+			default:
+				var message = fmt.Sprintf(
+					"Unknown argument type passed into the array constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -134,7 +179,17 @@ func Array[V any](arguments ...any) col.ArrayLike[V] {
 	case sequence != nil:
 		array = class.MakeFromSequence(sequence)
 	case len(source) > 0:
-		array = class.MakeFromSource(source)
+		var collection = notation.ParseSource(source).(col.Sequential[any])
+		// Convert the values to their real type.
+		size = uint(collection.GetSize())
+		array = class.MakeWithSize(size)
+		var index int = 0
+		var iterator = collection.GetIterator()
+		for iterator.HasNext() {
+			var value = iterator.GetNext().(V)
+			array.SetValue(index, value)
+			index++
+		}
 	default:
 		panic("The constructor for an array requires an argument.")
 	}
@@ -143,7 +198,7 @@ func Array[V any](arguments ...any) col.ArrayLike[V] {
 
 func Catalog[K comparable, V any](arguments ...any) col.CatalogLike[K, V] {
 	// Initialize the possible arguments.
-	var notation = cdc.Notation().Make()
+	var notation = CDCN()
 	var associations []col.AssociationLike[K, V]
 	var mappings map[K]V
 	var sequence col.Sequential[col.AssociationLike[K, V]]
@@ -152,22 +207,28 @@ func Catalog[K comparable, V any](arguments ...any) col.CatalogLike[K, V] {
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
-		case NotationLike:
-			notation = actual
 		case []col.AssociationLike[K, V]:
 			associations = actual
 		case map[K]V:
 			mappings = actual
-		case col.Sequential[col.AssociationLike[K, V]]:
-			sequence = actual
 		case string:
 			source = actual
 		default:
-			var message = fmt.Sprintf(
-				"Unknown argument type passed into the catalog constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			var notationType = ref.TypeOf((*col.NotationLike)(nil)).Elem()
+			var sequenceType = ref.TypeOf((*col.Sequential[col.AssociationLike[K, V]])(nil)).Elem()
+			var reflectedType = ref.TypeOf(argument)
+			switch {
+			case reflectedType.Implements(notationType):
+				notation = argument.(col.NotationLike)
+			case reflectedType.Implements(sequenceType):
+				sequence = argument.(col.Sequential[col.AssociationLike[K, V]])
+			default:
+				var message = fmt.Sprintf(
+					"Unknown argument type passed into the catalog constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -182,7 +243,16 @@ func Catalog[K comparable, V any](arguments ...any) col.CatalogLike[K, V] {
 	case sequence != nil:
 		catalog = class.MakeFromSequence(sequence)
 	case len(source) > 0:
-		catalog = class.MakeFromSource(source)
+		catalog = class.Make()
+		var collection = notation.ParseSource(source).(col.Sequential[col.AssociationLike[any, any]])
+		// Convert the values to their real type.
+		var iterator = collection.GetIterator()
+		for iterator.HasNext() {
+			var association = iterator.GetNext()
+			var key = association.GetKey().(K)
+			var value = association.GetValue().(V)
+			catalog.SetValue(key, value)
+		}
 	default:
 		catalog = class.Make()
 	}
@@ -191,7 +261,7 @@ func Catalog[K comparable, V any](arguments ...any) col.CatalogLike[K, V] {
 
 func List[V any](arguments ...any) col.ListLike[V] {
 	// Initialize the possible arguments.
-	var notation = cdc.Notation().Make()
+	var notation = CDCN()
 	var values []V
 	var sequence col.Sequential[V]
 	var source string
@@ -199,20 +269,26 @@ func List[V any](arguments ...any) col.ListLike[V] {
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
-		case NotationLike:
-			notation = actual
 		case []V:
 			values = actual
-		case col.Sequential[V]:
-			sequence = actual
 		case string:
 			source = actual
 		default:
-			var message = fmt.Sprintf(
-				"Unknown argument type passed into the list constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			var notationType = ref.TypeOf((*col.NotationLike)(nil)).Elem()
+			var sequenceType = ref.TypeOf((*col.Sequential[V])(nil)).Elem()
+			var reflectedType = ref.TypeOf(argument)
+			switch {
+			case reflectedType.Implements(notationType):
+				notation = argument.(col.NotationLike)
+			case reflectedType.Implements(sequenceType):
+				sequence = argument.(col.Sequential[V])
+			default:
+				var message = fmt.Sprintf(
+					"Unknown argument type passed into the list constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -225,7 +301,14 @@ func List[V any](arguments ...any) col.ListLike[V] {
 	case sequence != nil:
 		list = class.MakeFromSequence(sequence)
 	case len(source) > 0:
-		list = class.MakeFromSource(source)
+		list = class.Make()
+		var collection = notation.ParseSource(source).(col.Sequential[any])
+		// Convert the values to their real type.
+		var iterator = collection.GetIterator()
+		for iterator.HasNext() {
+			var value = iterator.GetNext().(V)
+			list.AppendValue(value)
+		}
 	default:
 		list = class.Make()
 	}
@@ -234,7 +317,7 @@ func List[V any](arguments ...any) col.ListLike[V] {
 
 func Map[K comparable, V any](arguments ...any) col.MapLike[K, V] {
 	// Initialize the possible arguments.
-	var notation = cdc.Notation().Make()
+	var notation = CDCN()
 	var associations []col.AssociationLike[K, V]
 	var mappings map[K]V
 	var sequence col.Sequential[col.AssociationLike[K, V]]
@@ -243,22 +326,28 @@ func Map[K comparable, V any](arguments ...any) col.MapLike[K, V] {
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
-		case NotationLike:
-			notation = actual
 		case []col.AssociationLike[K, V]:
 			associations = actual
 		case map[K]V:
 			mappings = actual
-		case col.Sequential[col.AssociationLike[K, V]]:
-			sequence = actual
 		case string:
 			source = actual
 		default:
-			var message = fmt.Sprintf(
-				"Unknown argument type passed into the map constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			var notationType = ref.TypeOf((*col.NotationLike)(nil)).Elem()
+			var sequenceType = ref.TypeOf((*col.Sequential[col.AssociationLike[K, V]])(nil)).Elem()
+			var reflectedType = ref.TypeOf(argument)
+			switch {
+			case reflectedType.Implements(notationType):
+				notation = argument.(col.NotationLike)
+			case reflectedType.Implements(sequenceType):
+				sequence = argument.(col.Sequential[col.AssociationLike[K, V]])
+			default:
+				var message = fmt.Sprintf(
+					"Unknown argument type passed into the map constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -273,7 +362,16 @@ func Map[K comparable, V any](arguments ...any) col.MapLike[K, V] {
 	case sequence != nil:
 		map_ = class.MakeFromSequence(sequence)
 	case len(source) > 0:
-		map_ = class.MakeFromSource(source)
+		map_ = class.Make()
+		var collection = notation.ParseSource(source).(col.Sequential[col.AssociationLike[any, any]])
+		// Convert the values to their real type.
+		var iterator = collection.GetIterator()
+		for iterator.HasNext() {
+			var association = iterator.GetNext()
+			var key = association.GetKey().(K)
+			var value = association.GetValue().(V)
+			map_.SetValue(key, value)
+		}
 	default:
 		map_ = class.Make()
 	}
@@ -282,7 +380,7 @@ func Map[K comparable, V any](arguments ...any) col.MapLike[K, V] {
 
 func Queue[V any](arguments ...any) col.QueueLike[V] {
 	// Initialize the possible arguments.
-	var notation = cdc.Notation().Make()
+	var notation = CDCN()
 	var capacity uint
 	var values []V
 	var sequence col.Sequential[V]
@@ -291,24 +389,30 @@ func Queue[V any](arguments ...any) col.QueueLike[V] {
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
-		case NotationLike:
-			notation = actual
 		case int:
 			capacity = uint(actual)
 		case uint:
 			capacity = actual
 		case []V:
 			values = actual
-		case col.Sequential[V]:
-			sequence = actual
 		case string:
 			source = actual
 		default:
-			var message = fmt.Sprintf(
-				"Unknown argument type passed into the queue constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			var notationType = ref.TypeOf((*col.NotationLike)(nil)).Elem()
+			var sequenceType = ref.TypeOf((*col.Sequential[V])(nil)).Elem()
+			var reflectedType = ref.TypeOf(argument)
+			switch {
+			case reflectedType.Implements(notationType):
+				notation = argument.(col.NotationLike)
+			case reflectedType.Implements(sequenceType):
+				sequence = argument.(col.Sequential[V])
+			default:
+				var message = fmt.Sprintf(
+					"Unknown argument type passed into the queue constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -323,7 +427,14 @@ func Queue[V any](arguments ...any) col.QueueLike[V] {
 	case sequence != nil:
 		queue = class.MakeFromSequence(sequence)
 	case len(source) > 0:
-		queue = class.MakeFromSource(source)
+		queue = class.Make()
+		var collection = notation.ParseSource(source).(col.Sequential[any])
+		// Convert the values to their real type.
+		var iterator = collection.GetIterator()
+		for iterator.HasNext() {
+			var value = iterator.GetNext().(V)
+			queue.AddValue(value)
+		}
 	default:
 		queue = class.Make()
 	}
@@ -332,7 +443,7 @@ func Queue[V any](arguments ...any) col.QueueLike[V] {
 
 func Set[V any](arguments ...any) col.SetLike[V] {
 	// Initialize the possible arguments.
-	var notation = cdc.Notation().Make()
+	var notation = CDCN()
 	var values []V
 	var sequence col.Sequential[V]
 	var source string
@@ -341,22 +452,28 @@ func Set[V any](arguments ...any) col.SetLike[V] {
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
-		case NotationLike:
-			notation = actual
 		case []V:
 			values = actual
-		case col.Sequential[V]:
-			sequence = actual
 		case string:
 			source = actual
 		case age.CollatorLike[V]:
 			collator = actual
 		default:
-			var message = fmt.Sprintf(
-				"Unknown argument type passed into the set constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			var notationType = ref.TypeOf((*col.NotationLike)(nil)).Elem()
+			var sequenceType = ref.TypeOf((*col.Sequential[V])(nil)).Elem()
+			var reflectedType = ref.TypeOf(argument)
+			switch {
+			case reflectedType.Implements(notationType):
+				notation = argument.(col.NotationLike)
+			case reflectedType.Implements(sequenceType):
+				sequence = argument.(col.Sequential[V])
+			default:
+				var message = fmt.Sprintf(
+					"Unknown argument type passed into the set constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -374,14 +491,27 @@ func Set[V any](arguments ...any) col.SetLike[V] {
 		case sequence != nil:
 			set.AddValues(sequence)
 		case len(source) > 0:
-			set.AddValues(class.MakeFromSource(source))
+			var collection = notation.ParseSource(source).(col.Sequential[any])
+			// Convert the values to their real type.
+			var iterator = collection.GetIterator()
+			for iterator.HasNext() {
+				var value = iterator.GetNext().(V)
+				set.AddValue(value)
+			}
 		}
 	case len(values) > 0:
 		set = class.MakeFromArray(values)
 	case sequence != nil:
 		set = class.MakeFromSequence(sequence)
 	case len(source) > 0:
-		set = class.MakeFromSource(source)
+		set = class.Make()
+		var collection = notation.ParseSource(source).(col.Sequential[any])
+		// Convert the values to their real type.
+		var iterator = collection.GetIterator()
+		for iterator.HasNext() {
+			var value = iterator.GetNext().(V)
+			set.AddValue(value)
+		}
 	default:
 		set = class.Make()
 	}
@@ -390,7 +520,7 @@ func Set[V any](arguments ...any) col.SetLike[V] {
 
 func Stack[V any](arguments ...any) col.StackLike[V] {
 	// Initialize the possible arguments.
-	var notation = cdc.Notation().Make()
+	var notation = CDCN()
 	var capacity uint
 	var values []V
 	var sequence col.Sequential[V]
@@ -399,24 +529,30 @@ func Stack[V any](arguments ...any) col.StackLike[V] {
 	// Process the actual arguments.
 	for _, argument := range arguments {
 		switch actual := argument.(type) {
-		case NotationLike:
-			notation = actual
 		case int:
 			capacity = uint(actual)
 		case uint:
 			capacity = actual
 		case []V:
 			values = actual
-		case col.Sequential[V]:
-			sequence = actual
 		case string:
 			source = actual
 		default:
-			var message = fmt.Sprintf(
-				"Unknown argument type passed into the stack constructor: %T\n",
-				actual,
-			)
-			panic(message)
+			var notationType = ref.TypeOf((*col.NotationLike)(nil)).Elem()
+			var sequenceType = ref.TypeOf((*col.Sequential[V])(nil)).Elem()
+			var reflectedType = ref.TypeOf(argument)
+			switch {
+			case reflectedType.Implements(notationType):
+				notation = argument.(col.NotationLike)
+			case reflectedType.Implements(sequenceType):
+				sequence = argument.(col.Sequential[V])
+			default:
+				var message = fmt.Sprintf(
+					"Unknown argument type passed into the stack constructor: %T\n",
+					actual,
+				)
+				panic(message)
+			}
 		}
 	}
 
@@ -431,7 +567,14 @@ func Stack[V any](arguments ...any) col.StackLike[V] {
 	case sequence != nil:
 		stack = class.MakeFromSequence(sequence)
 	case len(source) > 0:
-		stack = class.MakeFromSource(source)
+		stack = class.Make()
+		var collection = notation.ParseSource(source).(col.Sequential[any])
+		// Convert the values to their real type.
+		var iterator = collection.GetIterator()
+		for iterator.HasNext() {
+			var value = iterator.GetNext().(V)
+			stack.AddValue(value)
+		}
 	default:
 		stack = class.Make()
 	}

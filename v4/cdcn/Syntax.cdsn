@@ -51,18 +51,28 @@ definition may be separated by spaces which are ignored by the parser.
 <!
 AST: Collection EOL* EOF  ! Terminated with an end-of-file marker.
 
-Collection: "[" (Associations | Values) "]" "(" context ")"
+Collection: Sequence Context
 
-Associations:
-    Association ("," Association)*
-    (EOL Association)+ EOL
-    ":"  ! No associations.
+Sequence: "[" Items "]"
 
-Association: Key ":" Value
+Context: "(" type ")"
 
-Key: Primitive
+Items:
+    Values
+    Associations
 
-Value: Primitive | Collection
+Values:
+    Value AdditionalValue*
+    MultilineValue+ EOL
+    " "  ! No values.
+
+AdditionalValue: "," Value
+
+MultilineValue: EOL Value
+
+Value:
+    Primitive
+    Collection
 
 Primitive:
     boolean
@@ -74,10 +84,16 @@ Primitive:
     rune
     string
 
-Values:
-    Value ("," Value)*
-    (EOL Value)+ EOL
-    " "  ! No values.
+Associations:
+    Association AdditionalAssociation*
+    MultilineAssociation+ EOL
+    ":"  ! No associations.
+
+AdditionalAssociation: "," Association
+
+MultilineAssociation: EOL Association
+
+Association: Primitive ":" Value
 
 !>
 TOKEN DEFINITIONS
@@ -96,17 +112,6 @@ base16: '0'..'9' | 'a'..'f'
 boolean: "false" | "true"
 
 complex: "(" float sign float "i)"
-
-context:
-    "array"
-    "Array"
-    "Catalog"
-    "List"
-    "map"
-    "Map"
-    "Queue"
-    "Set"
-    "Stack"
 
 delimiter: "[" | "]" | "(" | ")" | ":" | ","
 
@@ -133,6 +138,8 @@ scalar: (zero | ordinal) fraction
 sign: '+' | '-'
 
 string: '"' (ESCAPE | ~['"' CONTROL])* '"'
+
+type: "Array" | "Catalog" | "List" | "Map" | "Queue" | "Set" | "Stack"
 
 unicode: 'x' base16{2} | 'u' base16{4} | 'U' base16{8}
 

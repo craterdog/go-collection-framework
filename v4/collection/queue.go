@@ -28,14 +28,9 @@ var queueMutex syn.Mutex
 // Function
 
 func Queue[V any](notation NotationLike) QueueClassLike[V] {
-	// Validate the notation argument.
-	if notation == nil {
-		panic("A notation must be specified when creating this class.")
-	}
-
 	// Generate the name of the bound class type.
-	var class QueueClassLike[V]
-	var name = fmt.Sprintf("%T-%T", class, notation)
+	var class *queueClass_[V]
+	var name = fmt.Sprintf("%T", class)
 
 	// Check for existing bound class type.
 	queueMutex.Lock()
@@ -47,6 +42,7 @@ func Queue[V any](notation NotationLike) QueueClassLike[V] {
 	default:
 		// Add a new bound class type.
 		class = &queueClass_[V]{
+			// Initialize the class constants.
 			notation_:        notation,
 			defaultCapacity_: 16,
 		}
@@ -63,6 +59,7 @@ func Queue[V any](notation NotationLike) QueueClassLike[V] {
 // Target
 
 type queueClass_[V any] struct {
+	// Define the class constants.
 	notation_        NotationLike
 	defaultCapacity_ uint
 }
@@ -110,21 +107,6 @@ func (c *queueClass_[V]) MakeFromSequence(values Sequential[V]) QueueLike[V] {
 		queue.AddValue(value) // This call handles the synchronization.
 	}
 	return queue
-}
-
-func (c *queueClass_[V]) MakeFromSource(source string) QueueLike[V] {
-	// First we parse it as a collection of any type value.
-	var collection = c.notation_.ParseSource(source).(Sequential[any])
-
-	// Next we must convert each value explicitly to type V.
-	var anys = collection.AsArray()
-	var array = make([]V, len(anys))
-	for index, value := range anys {
-		array[index] = value.(V)
-	}
-
-	// Then we can create the stack from the type V array.
-	return c.MakeFromArray(array)
 }
 
 // Functions
@@ -313,7 +295,7 @@ func (v *queue_[V]) AddValue(value V) {
 func (v *queue_[V]) RemoveAll() {
 	v.mutex_.Lock()
 	v.available_ = make(chan bool, v.capacity_)
-	v.values_ = List[V](v.class_.Notation()).Make()
+	v.values_ = List[V](v.GetClass().Notation()).Make()
 	v.mutex_.Unlock()
 }
 
@@ -350,8 +332,7 @@ func (v *queue_[V]) GetIterator() age.IteratorLike[V] {
 // Stringer
 
 func (v *queue_[V]) String() string {
-	var notation = v.class_.Notation()
-	return notation.FormatCollection(v)
+	return v.GetClass().Notation().FormatValue(v)
 }
 
 // Public

@@ -21,7 +21,7 @@ import (
 // Reference
 
 var notationClass = &notationClass_{
-	// This class defines no constants.
+	// Initialize the class constants.
 }
 
 // Function
@@ -35,7 +35,7 @@ func Notation() col.NotationClassLike {
 // Target
 
 type notationClass_ struct {
-	// This class defines no constants.
+	// Define the class constants.
 }
 
 // Constructors
@@ -66,10 +66,12 @@ func (v *notation_) GetClass() col.NotationClassLike {
 
 // Canonical
 
-func (v *notation_) FormatCollection(collection col.Collection) string {
-	return v.formatter_.FormatCollection(collection)
+func (v *notation_) FormatValue(value any) (source string) {
+	source = v.formatter_.FormatValue(value)
+	return source
 }
 
-func (v *notation_) ParseSource(source string) col.Collection {
-	return v.parser_.ParseSource(source)
+func (v *notation_) ParseSource(source string) (value any) {
+	value = v.parser_.ParseSource(source)
+	return value
 }

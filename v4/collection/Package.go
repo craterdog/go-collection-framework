@@ -41,13 +41,6 @@ import (
 	age "github.com/craterdog/go-collection-framework/v4/agent"
 )
 
-// Types
-
-/*
-Collection is a generic type representing any type of collections of values.
-*/
-type Collection any
-
 // Aspects
 
 /*
@@ -100,8 +93,8 @@ canonical notations.
 */
 type Canonical interface {
 	// Methods
-	ParseSource(source string) Collection
-	FormatCollection(collection Collection) string
+	ParseSource(source string) (value any)
+	FormatValue(value any) (source string)
 }
 
 /*
@@ -233,7 +226,6 @@ type ArrayClassLike[V any] interface {
 	MakeWithSize(size uint) ArrayLike[V]
 	MakeFromArray(values []V) ArrayLike[V]
 	MakeFromSequence(values Sequential[V]) ArrayLike[V]
-	MakeFromSource(source string) ArrayLike[V]
 }
 
 /*
@@ -242,6 +234,9 @@ the complete set of class constants, constructors and functions that must be
 supported by each concrete association-like class.
 */
 type AssociationClassLike[K comparable, V any] interface {
+	// Constants
+	Notation() NotationLike
+
 	// Constructors
 	MakeWithAttributes(
 		key K,
@@ -274,7 +269,6 @@ type CatalogClassLike[K comparable, V any] interface {
 	MakeFromArray(associations []AssociationLike[K, V]) CatalogLike[K, V]
 	MakeFromMap(associations map[K]V) CatalogLike[K, V]
 	MakeFromSequence(associations Sequential[AssociationLike[K, V]]) CatalogLike[K, V]
-	MakeFromSource(source string) CatalogLike[K, V]
 
 	// Functions
 	Extract(
@@ -305,7 +299,6 @@ type ListClassLike[V any] interface {
 	Make() ListLike[V]
 	MakeFromArray(values []V) ListLike[V]
 	MakeFromSequence(values Sequential[V]) ListLike[V]
-	MakeFromSource(source string) ListLike[V]
 
 	// Functions
 	Concatenate(
@@ -328,13 +321,12 @@ type MapClassLike[K comparable, V any] interface {
 	MakeFromArray(associations []AssociationLike[K, V]) MapLike[K, V]
 	MakeFromMap(associations map[K]V) MapLike[K, V]
 	MakeFromSequence(associations Sequential[AssociationLike[K, V]]) MapLike[K, V]
-	MakeFromSource(source string) MapLike[K, V]
 }
 
 /*
-NotationClassLike is a class interface that defines the complete set of
-class constants, constructors and functions that must be supported by each
-concrete notation-like class.
+NotationClassLike is a class interface that defines the complete set of class
+constants, constructors and functions that must be supported by each concrete
+notation-like class.
 */
 type NotationClassLike interface {
 	// Constructors
@@ -379,7 +371,6 @@ type QueueClassLike[V any] interface {
 	MakeWithCapacity(capacity uint) QueueLike[V]
 	MakeFromArray(values []V) QueueLike[V]
 	MakeFromSequence(values Sequential[V]) QueueLike[V]
-	MakeFromSource(source string) QueueLike[V]
 
 	// Functions
 	Fork(
@@ -426,7 +417,6 @@ type SetClassLike[V any] interface {
 	MakeWithCollator(collator age.CollatorLike[V]) SetLike[V]
 	MakeFromArray(values []V) SetLike[V]
 	MakeFromSequence(values Sequential[V]) SetLike[V]
-	MakeFromSource(source string) SetLike[V]
 
 	// Functions
 	And(
@@ -462,7 +452,6 @@ type StackClassLike[V any] interface {
 	MakeWithCapacity(capacity uint) StackLike[V]
 	MakeFromArray(values []V) StackLike[V]
 	MakeFromSequence(values Sequential[V]) StackLike[V]
-	MakeFromSource(source string) StackLike[V]
 }
 
 // Instances
@@ -582,8 +571,8 @@ type MapLike[K comparable, V any] interface {
 NotationLike is an instance interface that defines the complete set of instance
 attributes, abstractions and methods that must be supported by each instance of
 a concrete notation-like class.  A notation-like class can be used to parse and
-format collections using a canonical notation like XML, JSON and  CDCN
-(Crater Dog Collection Notation™).
+format collections using a canonical notation like XML, JSON and CDCN (Crater
+Dog Collection Notation™).
 */
 type NotationLike interface {
 	// Attributes

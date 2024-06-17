@@ -25,6 +25,7 @@ import (
 // Reference
 
 var parserClass = &parserClass_{
+	// Initialize the class constants.
 	queueSize_: 16,
 	stackSize_: 4,
 }
@@ -40,6 +41,7 @@ func Parser() ParserClassLike {
 // Target
 
 type parserClass_ struct {
+	// Define the class constants.
 	queueSize_ uint
 	stackSize_ uint
 }
@@ -48,6 +50,7 @@ type parserClass_ struct {
 
 func (c *parserClass_) Make() ParserLike {
 	return &parser_{
+		// Initialize the instance attributes.
 		class_: c,
 	}
 }
@@ -57,11 +60,11 @@ func (c *parserClass_) Make() ParserLike {
 // Target
 
 type parser_ struct {
-	class_    ParserClassLike
-	notation_ col.NotationLike
-	source_   string                   // The original source code.
-	tokens_   col.QueueLike[TokenLike] // A queue of unread tokens from the scanner.
-	next_     col.StackLike[TokenLike] // A stack of read, but unprocessed tokens.
+	// Define the instance attributes.
+	class_  ParserClassLike
+	source_ string                   // The original source code.
+	tokens_ col.QueueLike[TokenLike] // A queue of unread tokens from the scanner.
+	next_   col.StackLike[TokenLike] // A stack of read, but unprocessed tokens.
 }
 
 // Attributes
@@ -72,17 +75,21 @@ func (v *parser_) GetClass() ParserClassLike {
 
 // Public
 
-func (v *parser_) ParseSource(source string) col.Collection {
+func (v *parser_) ParseSource(source string) (collection any) {
+	var notation = Notation().Make()
+
+	// (Re)Initialize the instance attributes.
 	v.source_ = source
-	v.notation_ = Notation().Make()
-	v.tokens_ = col.Queue[TokenLike](v.notation_).MakeWithCapacity(parserClass.queueSize_)
-	v.next_ = col.Stack[TokenLike](v.notation_).MakeWithCapacity(parserClass.stackSize_)
+	v.tokens_ = col.Queue[TokenLike](notation).MakeWithCapacity(parserClass.queueSize_)
+	v.next_ = col.Stack[TokenLike](notation).MakeWithCapacity(parserClass.stackSize_)
 
 	// The scanner runs in a separate Go routine.
 	Scanner().Make(v.source_, v.tokens_)
 
 	// Attempt to parse a collection.
-	var collection, token, ok = v.parseCollection()
+	var token TokenLike
+	var ok bool
+	collection, token, ok = v.parseCollection()
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateSyntax("Collection",
@@ -206,25 +213,27 @@ func (v *parser_) parseAssociation() (
 		var message = v.formatError(token)
 		message += v.generateSyntax("Value",
 			"Association",
-			"Key",
+			"Primitive",
 			"Value")
 		panic(message)
 	}
 
 	// Found an association.
-	association = col.Association[any, any]().MakeWithAttributes(key, value)
+	var notation = Notation().Make()
+	association = col.Association[any, any](notation).MakeWithAttributes(key, value)
 	return association, token, true
 }
 
 func (v *parser_) parseAssociations() (
-	associations col.CatalogLike[any, any],
+	associations col.Sequential[col.AssociationLike[any, any]],
 	token TokenLike,
 	ok bool,
 ) {
 	// Check for an empty sequence of associations.
 	_, token, ok = v.parseToken(DelimiterToken, ":")
 	if ok {
-		associations = col.Catalog[any, any](v.notation_).Make()
+		var notation = Notation().Make()
+		associations = col.Catalog[any, any](notation).Make()
 		return associations, token, true
 	}
 
@@ -245,67 +254,87 @@ func (v *parser_) parseAssociations() (
 }
 
 func (v *parser_) parseCollection() (
-	collection col.Collection,
+	collection any,
 	token TokenLike,
 	ok bool,
 ) {
-	// Attempt to parse the opening bracket of the collection.
-	_, token, ok = v.parseToken(DelimiterToken, "[")
+	// Attempt to parse a sequence of items.
+	var sequence col.Sequential[any]
+	sequence, token, ok = v.parseSequence()
 	if !ok {
-		return collection, token, false
+		// This is not a sequence of items.
+		return sequence, token, false
 	}
 
-	// Attempt to parse a sequence of associations.
-	collection, _, ok = v.parseAssociations()
-	if !ok {
-		// Attempt to parse a sequence of values. The values must be
-		// attempted second since it may start with a component which
-		// cannot be put back as a single token.
-		collection, _, ok = v.parseValues()
-		if !ok {
-			var message = v.formatError(token)
-			message += v.generateSyntax("Associations",
-				"Collection",
-				"Associations",
-				"Values",
-			)
-			panic(message)
-		}
-	}
-
-	// Attempt to parse the closing bracket of the collection.
-	_, token, ok = v.parseToken(DelimiterToken, "]")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("]",
-			"Collection",
-			"Associations",
-			"Values",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse the opening bracket of the context.
-	_, token, ok = v.parseToken(DelimiterToken, "(")
-	if !ok {
-		var message = v.formatError(token)
-		message += v.generateSyntax("(",
-			"Collection",
-			"Associations",
-			"Values",
-		)
-		panic(message)
-	}
-
-	// Attempt to parse the context for the collection.
+	// Attempt to parse the context for the sequence.
 	var context string
-	context, token, ok = v.parseToken(ContextToken, "")
+	context, token, ok = v.parseContext()
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateSyntax("Context",
 			"Collection",
-			"Associations",
-			"Values",
+			"Sequence",
+			"Context")
+		panic(message)
+	}
+
+	// Create the correct type of collection.
+	var notation = Notation().Make()
+	switch context {
+	case "Array":
+		collection = col.Array[any](notation).MakeFromSequence(sequence)
+	case "Catalog":
+		var catalog = col.Catalog[any, any](notation).Make()
+		for _, item := range sequence.AsArray() {
+			var association = item.(col.AssociationLike[any, any])
+			var key = association.GetKey()
+			var value = association.GetValue()
+			catalog.SetValue(key, value)
+		}
+		collection = catalog
+	case "Map":
+		var map_ = col.Map[any, any](notation).Make()
+		for _, item := range sequence.AsArray() {
+			var association = item.(col.AssociationLike[any, any])
+			var key = association.GetKey()
+			var value = association.GetValue()
+			map_.SetValue(key, value)
+		}
+		collection = map_
+	case "List":
+		collection = col.List[any](notation).MakeFromSequence(sequence)
+	case "Queue":
+		collection = col.Queue[any](notation).MakeFromSequence(sequence)
+	case "Set":
+		collection = col.Set[any](notation).MakeFromSequence(sequence)
+	case "Stack":
+		collection = col.Stack[any](notation).MakeFromSequence(sequence)
+	default:
+		var message = fmt.Sprintf("Found an unknown collection type: %q", context)
+		panic(message)
+	}
+
+	return collection, token, ok
+}
+
+func (v *parser_) parseContext() (
+	context string,
+	token TokenLike,
+	ok bool,
+) {
+	// Attempt to parse the opening bracket of the context.
+	_, token, ok = v.parseToken(DelimiterToken, "(")
+	if !ok {
+		// This is not a context.
+		return context, token, false
+	}
+
+	// Attempt to parse the type of the context.
+	context, token, ok = v.parseToken(TypeToken, "")
+	if !ok {
+		var message = v.formatError(token)
+		message += v.generateSyntax("type",
+			"Context",
 		)
 		panic(message)
 	}
@@ -315,62 +344,16 @@ func (v *parser_) parseCollection() (
 	if !ok {
 		var message = v.formatError(token)
 		message += v.generateSyntax(")",
-			"Collection",
-			"Associations",
-			"Values",
+			"Context",
 		)
 		panic(message)
 	}
 
-	// Found a collection of a specific type.
-	switch sequence := collection.(type) {
-	case col.Sequential[any]:
-		switch context {
-		case "array":
-			collection = sequence.AsArray()
-		case "Array":
-			collection = col.Array[any](v.notation_).MakeFromSequence(sequence)
-		case "List":
-			collection = col.List[any](v.notation_).MakeFromSequence(sequence)
-		case "Queue":
-			collection = col.Queue[any](v.notation_).MakeFromSequence(sequence)
-		case "Set":
-			collection = col.Set[any](v.notation_).MakeFromSequence(sequence)
-		case "Stack":
-			collection = col.Stack[any](v.notation_).MakeFromSequence(sequence)
-		default:
-			var message = fmt.Sprintf("Found an unknown collection type: %q", context)
-			panic(message)
-		}
-	case col.Sequential[col.AssociationLike[any, any]]:
-		switch context {
-		case "map":
-			var map_ = map[any]any{}
-			var iterator = sequence.GetIterator()
-			for iterator.HasNext() {
-				var association = iterator.GetNext()
-				var key = association.GetKey()
-				var value = association.GetValue()
-				map_[key] = value
-			}
-			collection = map_
-		case "Map":
-			collection = col.Map[any, any](v.notation_).MakeFromSequence(sequence)
-		case "Catalog":
-			collection = col.Catalog[any, any](v.notation_).MakeFromSequence(sequence)
-		default:
-			var message = fmt.Sprintf("Found an unknown collection type: %q", context)
-			panic(message)
-		}
-	default:
-		var message = fmt.Sprintf("Found an unknown sequence type: %T", sequence)
-		panic(message)
-	}
-	return collection, token, true
+	return context, token, ok
 }
 
 func (v *parser_) parseInlineAssociations() (
-	associations col.CatalogLike[any, any],
+	associations col.Sequential[col.AssociationLike[any, any]],
 	token TokenLike,
 	ok bool,
 ) {
@@ -381,11 +364,12 @@ func (v *parser_) parseInlineAssociations() (
 		// This is not an inline sequence of associations.
 		return associations, token, false
 	}
-	associations = col.Catalog[any, any](v.notation_).Make()
+	var notation = Notation().Make()
+	var catalog = col.Catalog[any, any](notation).Make()
 	for ok {
-		var value = association.GetValue()
 		var key = association.GetKey()
-		associations.SetValue(key, value)
+		var value = association.GetValue()
+		catalog.SetValue(key, value)
 		_, token, ok = v.parseToken(DelimiterToken, ",")
 		if ok {
 			association, token, ok = v.parseAssociation()
@@ -394,6 +378,7 @@ func (v *parser_) parseInlineAssociations() (
 				message += v.generateSyntax("Association",
 					"Associations",
 					"Association",
+					"AdditionalAssociation",
 				)
 				panic(message)
 			}
@@ -401,11 +386,12 @@ func (v *parser_) parseInlineAssociations() (
 	}
 
 	// Found an inline sequence of associations.
+	associations = catalog
 	return associations, token, true
 }
 
 func (v *parser_) parseInlineValues() (
-	values col.ListLike[any],
+	values col.Sequential[any],
 	token TokenLike,
 	ok bool,
 ) {
@@ -415,9 +401,10 @@ func (v *parser_) parseInlineValues() (
 	if !ok {
 		return values, token, false
 	}
-	values = col.List[any](v.notation_).Make()
+	var notation = Notation().Make()
+	var list = col.List[any](notation).Make()
 	for ok {
-		values.AppendValue(value)
+		list.AppendValue(value)
 		_, token, ok = v.parseToken(DelimiterToken, ",")
 		if ok {
 			value, token, ok = v.parseValue()
@@ -426,6 +413,7 @@ func (v *parser_) parseInlineValues() (
 				message += v.generateSyntax("Value",
 					"Values",
 					"Value",
+					"AdditionalValue",
 				)
 				panic(message)
 			}
@@ -433,6 +421,7 @@ func (v *parser_) parseInlineValues() (
 	}
 
 	// Found an inline sequence of values.
+	values = list
 	return values, token, true
 }
 
@@ -452,7 +441,7 @@ func (v *parser_) parseKey() (
 }
 
 func (v *parser_) parseMultilineAssociations() (
-	associations col.CatalogLike[any, any],
+	associations col.Sequential[col.AssociationLike[any, any]],
 	token TokenLike,
 	ok bool,
 ) {
@@ -470,16 +459,18 @@ func (v *parser_) parseMultilineAssociations() (
 		v.putBack(eolToken)
 		return associations, token, false
 	}
-	associations = col.Catalog[any, any](v.notation_).Make()
+	var notation = Notation().Make()
+	var catalog = col.Catalog[any, any](notation).Make()
 	for ok {
 		var key = association.GetKey()
 		var value = association.GetValue()
-		associations.SetValue(key, value)
+		catalog.SetValue(key, value)
 		_, eolToken, ok = v.parseToken(EOLToken, "")
 		if !ok {
 			var message = v.formatError(eolToken)
 			message += v.generateSyntax("EOL",
 				"Associations",
+				"MultilineAssociation",
 				"Association",
 			)
 			panic(message)
@@ -491,11 +482,12 @@ func (v *parser_) parseMultilineAssociations() (
 	}
 
 	// Found a multi-line sequence of associations.
+	associations = catalog
 	return associations, token, true
 }
 
 func (v *parser_) parseMultilineValues() (
-	values col.ListLike[any],
+	values col.Sequential[any],
 	token TokenLike,
 	ok bool,
 ) {
@@ -512,18 +504,21 @@ func (v *parser_) parseMultilineValues() (
 		var message = v.formatError(token)
 		message += v.generateSyntax("Value",
 			"Values",
+			"MultilineValue",
 			"Value",
 		)
 		panic(message)
 	}
-	values = col.List[any](v.notation_).Make()
+	var notation = Notation().Make()
+	var list = col.List[any](notation).Make()
 	for ok {
-		values.AppendValue(value)
+		list.AppendValue(value)
 		_, eolToken, ok = v.parseToken(EOLToken, "")
 		if !ok {
 			var message = v.formatError(eolToken)
 			message += v.generateSyntax("EOL",
 				"Values",
+				"MultilineValue",
 				"Value",
 			)
 			panic(message)
@@ -535,6 +530,7 @@ func (v *parser_) parseMultilineValues() (
 	}
 
 	// Found a multi-line sequence of values.
+	values = list
 	return values, token, true
 }
 
@@ -586,7 +582,79 @@ func (v *parser_) parsePrimitive() (
 		primitive, _ = stc.Unquote(matches.GetValue(1))
 		return primitive, token, true
 	}
+
+	// NOTE: ok may be true or false.
 	return primitive, token, ok
+}
+
+func (v *parser_) parseItems() (
+	items col.Sequential[any],
+	token TokenLike,
+	ok bool,
+) {
+	// Attempt to parse a sequence of associations.
+	var associations col.Sequential[col.AssociationLike[any, any]]
+	associations, _, ok = v.parseAssociations()
+	if ok {
+		var notation = Notation().Make()
+		var list = col.List[any](notation).Make()
+		for _, association := range associations.AsArray() {
+			var value = association.(any)
+			list.AppendValue(value)
+		}
+		items = list
+
+		// Found a sequence of associations.
+		return items, token, true
+	}
+	// Attempt to parse a sequence of values. NOTE: The values must be attempted
+	// second since it may start with a component which cannot be put back as a
+	// single token.
+	items, _, ok = v.parseValues()
+	if ok {
+		// Found a sequence of values.
+		return items, token, true
+	}
+
+	// This is not a sequence of items.
+	return items, token, false
+}
+
+func (v *parser_) parseSequence() (
+	sequence col.Sequential[any],
+	token TokenLike,
+	ok bool,
+) {
+	// Attempt to parse the opening bracket of the sequence.
+	_, token, ok = v.parseToken(DelimiterToken, "[")
+	if !ok {
+		return sequence, token, false
+	}
+
+	// Attempt to parse a sequence of items.
+	sequence, token, ok = v.parseItems()
+	if !ok {
+		var message = v.formatError(token)
+		message += v.generateSyntax("Items",
+			"Sequence",
+			"Items",
+		)
+		panic(message)
+	}
+
+	// Attempt to parse the closing bracket of the sequence.
+	_, token, ok = v.parseToken(DelimiterToken, "]")
+	if !ok {
+		var message = v.formatError(token)
+		message += v.generateSyntax("]",
+			"Sequence",
+			"Items",
+		)
+		panic(message)
+	}
+
+	// Found a sequence.
+	return sequence, token, true
 }
 
 func (v *parser_) parseToken(expectedType TokenType, expectedValue string) (
@@ -634,7 +702,7 @@ func (v *parser_) parseValue() (
 }
 
 func (v *parser_) parseValues() (
-	values col.ListLike[any],
+	values col.Sequential[any],
 	token TokenLike,
 	ok bool,
 ) {
@@ -642,7 +710,8 @@ func (v *parser_) parseValues() (
 	_, token, ok = v.parseToken(DelimiterToken, "]")
 	if ok {
 		v.putBack(token)
-		values = col.List[any](v.notation_).Make()
+		var notation = Notation().Make()
+		values = col.List[any](notation).Make()
 		return values, token, true
 	}
 
@@ -668,14 +737,21 @@ func (v *parser_) putBack(token TokenLike) {
 
 var syntax = map[string]string{
 	"AST":        `Collection EOL* EOF  ! Terminated with an end-of-file marker.`,
-	"Collection": `"[" (Associations | Values) "]" "(" context ")"`,
-	"Associations": `
-    Association ("," Association)*
-    (EOL Association)+ EOL
-    ":"  ! No associations.`,
-	"Association": `Key ":" Value`,
-	"Key":         `Primitive`,
-	"Value":       `Primitive | Collection`,
+	"Collection": `Sequence Context`,
+	"Sequence":   `"[" Items "]"`,
+	"Context":    `"(" type ")"`,
+	"Items": `
+    Values
+    Associations`,
+	"Values": `
+    Value AdditionalValue*
+    MultilineValue+ EOL
+    " "  ! No values.`,
+	"AdditionalValue": `"," Value`,
+	"MultilineValue":  `EOL Value`,
+	"Value": `
+    Primitive
+    Collection`,
 	"Primitive": `
     boolean
     complex
@@ -685,8 +761,11 @@ var syntax = map[string]string{
     nil
     rune
     string`,
-	"Values": `
-    Value ("," Value)*
-    (EOL Value)+ EOL
-    " "  ! No values.`,
+	"Associations": `
+    Association AdditionalAssociation*
+    MultilineAssociation+ EOL
+    ":"  ! No associations.`,
+	"AdditionalAssociation": `"," Association`,
+	"MultilineAssociation":  `EOL Association`,
+	"Association":           `Primitive ":" Value`,
 }

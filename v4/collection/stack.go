@@ -28,14 +28,9 @@ var stackMutex syn.Mutex
 // Function
 
 func Stack[V any](notation NotationLike) StackClassLike[V] {
-	// Validate the notation argument.
-	if notation == nil {
-		panic("A notation must be specified when creating this class.")
-	}
-
 	// Generate the name of the bound class type.
-	var class StackClassLike[V]
-	var name = fmt.Sprintf("%T-%T", class, notation)
+	var class *stackClass_[V]
+	var name = fmt.Sprintf("%T", class)
 
 	// Check for existing bound class type.
 	stackMutex.Lock()
@@ -47,6 +42,7 @@ func Stack[V any](notation NotationLike) StackClassLike[V] {
 	default:
 		// Add a new bound class type.
 		class = &stackClass_[V]{
+			// Initialize the class constants.
 			notation_:        notation,
 			defaultCapacity_: 16,
 		}
@@ -63,8 +59,9 @@ func Stack[V any](notation NotationLike) StackClassLike[V] {
 // Target
 
 type stackClass_[V any] struct {
-	defaultCapacity_ uint
+	// Define the class constants.
 	notation_        NotationLike
+	defaultCapacity_ uint
 }
 
 // Constants
@@ -118,21 +115,6 @@ func (c *stackClass_[V]) MakeFromSequence(values Sequential[V]) StackLike[V] {
 	}
 }
 
-func (c *stackClass_[V]) MakeFromSource(source string) StackLike[V] {
-	// First we parse it as a collection of any type value.
-	var collection = c.notation_.ParseSource(source).(Sequential[any])
-
-	// Next we must convert each value explicitly to type V.
-	var anys = collection.AsArray()
-	var array = make([]V, len(anys))
-	for index, value := range anys {
-		array[index] = value.(V)
-	}
-
-	// Then we can create the stack from the type V array.
-	return c.MakeFromArray(array)
-}
-
 // INSTANCE METHODS
 
 // Target
@@ -157,11 +139,7 @@ func (v *stack_[V]) GetCapacity() uint {
 
 func (v *stack_[V]) AddValue(value V) {
 	if uint(v.values_.GetSize()) == v.capacity_ {
-		panic(fmt.Sprintf(
-			"Attempted to add a value onto a stack that has reached its capacity: %v\nvalue: %v\nstack: %v",
-			v.capacity_,
-			value,
-			v))
+		panic("Attempted to add a value onto a stack that has reached its capacity.")
 	}
 	v.values_.InsertValue(0, value)
 }
@@ -191,8 +169,7 @@ func (v *stack_[V]) GetIterator() age.IteratorLike[V] {
 // Stringer
 
 func (v *stack_[V]) String() string {
-	var notation = v.class_.Notation()
-	return notation.FormatCollection(v)
+	return v.GetClass().Notation().FormatValue(v)
 }
 
 // Public

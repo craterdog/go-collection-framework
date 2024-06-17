@@ -13,7 +13,6 @@
 package collection_test
 
 import (
-	fmt "fmt"
 	age "github.com/craterdog/go-collection-framework/v4/agent"
 	not "github.com/craterdog/go-collection-framework/v4/cdcn"
 	col "github.com/craterdog/go-collection-framework/v4/collection"
@@ -27,15 +26,15 @@ type Integer int
 func TestArrayConstructors(t *tes.T) {
 	var notation = not.Notation().Make()
 	var Array = col.Array[int64](notation)
+	Array.MakeWithSize(5)
 	var sequence = Array.MakeFromArray([]int64{1, 2, 3})
-	var full = Array.MakeFromSequence(sequence)
-	ass.Equal(t, "[1, 2, 3](Array)\n", fmt.Sprintf("%v", full))
+	var array = Array.MakeFromSequence(sequence)
+	ass.Equal(t, sequence.AsArray(), array.AsArray())
 }
 
 func TestEmptyArray(t *tes.T) {
 	var notation = not.Notation().Make()
 	var array = col.Array[string](notation).MakeWithSize(0)
-	ass.Equal(t, "[ ](Array)\n", fmt.Sprintf("%v", array))
 	ass.True(t, array.IsEmpty())
 	ass.Equal(t, 0, array.GetSize())
 	ass.Equal(t, []string{}, array.AsArray())
@@ -94,7 +93,6 @@ func TestArrayWithStrings(t *tes.T) {
 	var collator = age.Collator[string]().Make()
 	var Array = col.Array[string](notation)
 	var array = Array.MakeFromArray([]string{"foo", "bar", "baz"})
-	ass.Equal(t, "[\"foo\", \"bar\", \"baz\"](Array)\n", fmt.Sprintf("%v", array))
 	var foobar = Array.MakeFromArray([]string{"foo", "bar"})
 	ass.False(t, array.IsEmpty())
 	ass.Equal(t, 3, array.GetSize())
@@ -136,8 +134,8 @@ func TestArrayWithIntegers(t *tes.T) {
 }
 
 func TestAssociations(t *tes.T) {
-	var association = col.Association[string, int]().MakeWithAttributes("foo", 1)
-	ass.Equal(t, `"foo": 1`, fmt.Sprintf("%v", association))
+	var notation = not.Notation().Make()
+	var association = col.Association[string, int](notation).MakeWithAttributes("foo", 1)
 	ass.Equal(t, "foo", association.GetKey())
 	ass.Equal(t, 1, association.GetValue())
 	association.SetValue(2)
@@ -147,29 +145,23 @@ func TestAssociations(t *tes.T) {
 func TestCatalogConstructors(t *tes.T) {
 	var notation = not.Notation().Make()
 	var Catalog = col.Catalog[rune, int64](notation)
+	Catalog.Make()
 	Catalog.MakeFromArray([]col.AssociationLike[rune, int64]{})
-	var empty = Catalog.MakeFromSource("[:](Catalog)")
-	ass.Equal(t, "[:](Catalog)\n", fmt.Sprintf("%v", empty))
-	var full = Catalog.MakeFromSource("['a': 1, 'b': 2, 'c': 3](Catalog)")
-	ass.Equal(t, `[
-    'a': 1
-    'b': 2
-    'c': 3
-](Catalog)
-`, fmt.Sprintf("%v", full))
 	Catalog.MakeFromMap(map[rune]int64{})
-	Catalog.MakeFromMap(map[rune]int64{
+	var sequence = Catalog.MakeFromMap(map[rune]int64{
 		'a': 1,
 		'b': 2,
 		'c': 3,
 	})
+	var catalog = Catalog.MakeFromSequence(sequence)
+	ass.Equal(t, sequence.AsArray(), catalog.AsArray())
 }
 
 func TestCatalogsWithStringsAndIntegers(t *tes.T) {
 	var notation = not.Notation().Make()
 	var catalogCollator = age.Collator[col.CatalogLike[string, int]]().Make()
 	var keys = col.Array[string](notation).MakeFromArray([]string{"foo", "bar"})
-	var Association = col.Association[string, int]()
+	var Association = col.Association[string, int](notation)
 	var association1 = Association.MakeWithAttributes("foo", 1)
 	var association2 = Association.MakeWithAttributes("bar", 2)
 	var association3 = Association.MakeWithAttributes("baz", 3)
@@ -237,7 +229,7 @@ func TestCatalogsWithStringsAndIntegers(t *tes.T) {
 func TestCatalogsWithMerge(t *tes.T) {
 	var notation = not.Notation().Make()
 	var collator = age.Collator[col.CatalogLike[string, int]]().Make()
-	var Association = col.Association[string, int]()
+	var Association = col.Association[string, int](notation)
 	var association1 = Association.MakeWithAttributes("foo", 1)
 	var association2 = Association.MakeWithAttributes("bar", 2)
 	var association3 = Association.MakeWithAttributes("baz", 3)
@@ -260,7 +252,7 @@ func TestCatalogsWithExtract(t *tes.T) {
 	var notation = not.Notation().Make()
 	var collator = age.Collator[col.CatalogLike[string, int]]().Make()
 	var keys = col.Array[string](notation).MakeFromArray([]string{"foo", "baz"})
-	var Association = col.Association[string, int]()
+	var Association = col.Association[string, int](notation)
 	var association1 = Association.MakeWithAttributes("foo", 1)
 	var association2 = Association.MakeWithAttributes("bar", 2)
 	var association3 = Association.MakeWithAttributes("baz", 3)
@@ -297,17 +289,13 @@ func TestCatalogsWithEmptyCatalogs(t *tes.T) {
 	ass.True(t, collator.CompareValues(catalog4, catalog1))
 }
 
-func TestListConstructor(t *tes.T) {
+func TestListConstructors(t *tes.T) {
 	var notation = not.Notation().Make()
-	var empty = col.List[int64](notation).MakeFromSource("[ ](List)")
-	ass.Equal(t, "[ ](List)\n", fmt.Sprintf("%v", empty))
-	var full = col.List[int64](notation).MakeFromSource("[1, 2, 3](List)")
-	ass.Equal(t, `[
-    1
-    2
-    3
-](List)
-`, fmt.Sprintf("%v", full))
+	var List = col.List[int64](notation)
+	List.Make()
+	var sequence = List.MakeFromArray([]int64{1, 2, 3})
+	var list = List.MakeFromSequence(sequence)
+	ass.Equal(t, sequence.AsArray(), list.AsArray())
 }
 
 func TestListsWithStrings(t *tes.T) {
@@ -485,12 +473,11 @@ func TestListsWithEmptyLists(t *tes.T) {
 func TestMapConstructors(t *tes.T) {
 	var notation = not.Notation().Make()
 	var Map = col.Map[rune, int64](notation)
-	var empty = Map.MakeFromArray([]col.AssociationLike[rune, int64]{})
-	ass.Equal(t, "[:](Map)\n", fmt.Sprintf("%v", empty))
+	Map.Make()
+	Map.MakeFromArray([]col.AssociationLike[rune, int64]{})
 	Map.MakeFromMap(map[rune]int64{})
 	var sequence = Map.MakeFromMap(map[rune]int64{'a': 1, 'b': 2, 'c': 3})
 	Map.MakeFromSequence(sequence)
-	Map.MakeFromSource("['a': 1, 'b': 2, 'c': 3](Map)")
 }
 
 func TestEmptyMaps(t *tes.T) {
@@ -510,7 +497,7 @@ func TestEmptyMaps(t *tes.T) {
 
 func TestMapsWithStringsAndIntegers(t *tes.T) {
 	var notation = not.Notation().Make()
-	var Association = col.Association[string, int]()
+	var Association = col.Association[string, int](notation)
 	var association1 = Association.MakeWithAttributes("foo", 1)
 	var association2 = Association.MakeWithAttributes("bar", 2)
 	var association3 = Association.MakeWithAttributes("baz", 3)
@@ -541,31 +528,18 @@ func TestMapsWithStringsAndIntegers(t *tes.T) {
 	ass.Equal(t, 0, m.GetSize())
 }
 
-func TestQueueConstructor(t *tes.T) {
-	var notation = not.Notation().Make()
-	var Queue = col.Queue[int64](notation)
-	var empty = Queue.MakeFromSource("[ ](Queue)")
-	ass.Equal(t, "[ ](Queue)\n", fmt.Sprintf("%v", empty))
-	var full = Queue.MakeFromSource("[1, 2, 3](Queue)")
-	ass.Equal(t, `[
-    1
-    2
-    3
-](Queue)
-`, fmt.Sprintf("%v", full))
-}
-
 func TestQueueConstructors(t *tes.T) {
 	var notation = not.Notation().Make()
-	var Queue = col.Queue[int](notation)
-	var queue1 = Queue.MakeFromArray([]int{1, 2, 3})
-	var queue2 = Queue.MakeFromSequence(queue1)
-	ass.Equal(t, queue1.AsArray(), queue2.AsArray())
+	var Queue = col.Queue[int64](notation)
+	Queue.Make()
+	Queue.MakeWithCapacity(5)
+	var sequence = Queue.MakeFromArray([]int64{1, 2, 3})
+	var queue = Queue.MakeFromSequence(sequence)
+	ass.Equal(t, sequence.AsArray(), queue.AsArray())
 }
 
 func TestQueueWithConcurrency(t *tes.T) {
 	var notation = not.Notation().Make()
-
 	// Create a wait group for synchronization.
 	var group = new(syn.WaitGroup)
 	defer group.Wait()
@@ -606,7 +580,6 @@ func TestQueueWithConcurrency(t *tes.T) {
 
 func TestQueueWithFork(t *tes.T) {
 	var notation = not.Notation().Make()
-
 	// Create a wait group for synchronization.
 	var group = new(syn.WaitGroup)
 	defer group.Wait()
@@ -644,7 +617,6 @@ func TestQueueWithFork(t *tes.T) {
 
 func TestQueueWithInvalidFanOut(t *tes.T) {
 	var notation = not.Notation().Make()
-
 	// Create a wait group for synchronization.
 	var group = new(syn.WaitGroup)
 	defer group.Wait()
@@ -664,7 +636,6 @@ func TestQueueWithInvalidFanOut(t *tes.T) {
 
 func TestQueueWithSplitAndJoin(t *tes.T) {
 	var notation = not.Notation().Make()
-
 	// Create a wait group for synchronization.
 	var group = new(syn.WaitGroup)
 	defer group.Wait()
@@ -698,7 +669,6 @@ func TestQueueWithSplitAndJoin(t *tes.T) {
 
 func TestQueueWithInvalidSplit(t *tes.T) {
 	var notation = not.Notation().Make()
-
 	// Create a wait group for synchronization.
 	var group = new(syn.WaitGroup)
 	defer group.Wait()
@@ -718,7 +688,6 @@ func TestQueueWithInvalidSplit(t *tes.T) {
 
 func TestQueueWithInvalidJoin(t *tes.T) {
 	var notation = not.Notation().Make()
-
 	// Create a wait group for synchronization.
 	var group = new(syn.WaitGroup)
 	defer group.Wait()
@@ -737,26 +706,15 @@ func TestQueueWithInvalidJoin(t *tes.T) {
 	defer group.Done()
 }
 
-func TestSetConstructor(t *tes.T) {
-	var notation = not.Notation().Make()
-	var Set = col.Set[int64](notation)
-	var empty = Set.MakeFromSource("[ ](Set)")
-	ass.Equal(t, "[ ](Set)\n", fmt.Sprintf("%v", empty))
-	var full = Set.MakeFromSource("[1, 2, 3](Set)")
-	ass.Equal(t, `[
-    1
-    2
-    3
-](Set)
-`, fmt.Sprintf("%v", full))
-}
-
 func TestSetConstructors(t *tes.T) {
 	var notation = not.Notation().Make()
-	var Set = col.Set[int](notation)
-	var set1 = Set.MakeFromArray([]int{1, 2, 3})
-	var set2 = Set.MakeFromSequence(set1)
-	ass.Equal(t, set1.AsArray(), set2.AsArray())
+	var Collator = age.Collator[int64]()
+	var Set = col.Set[int64](notation)
+	Set.Make()
+	Set.MakeWithCollator(Collator.Make())
+	var sequence = Set.MakeFromArray([]int64{1, 2, 3})
+	var set = Set.MakeFromSequence(sequence)
+	ass.Equal(t, sequence.AsArray(), set.AsArray())
 }
 
 func TestSetsWithStrings(t *tes.T) {
@@ -969,26 +927,14 @@ func TestSetsWithEmptySets(t *tes.T) {
 	ass.True(t, collator.CompareValues(set6, set1))
 }
 
-func TestStackConstructor(t *tes.T) {
-	var notation = not.Notation().Make()
-	var Stack = col.Stack[int64](notation)
-	var empty = Stack.MakeFromSource("[ ](Stack)")
-	ass.Equal(t, "[ ](Stack)\n", fmt.Sprintf("%v", empty))
-	var full = Stack.MakeFromSource("[1, 2, 3](Stack)")
-	ass.Equal(t, `[
-    1
-    2
-    3
-](Stack)
-`, fmt.Sprintf("%v", full))
-}
-
 func TestStackConstructors(t *tes.T) {
 	var notation = not.Notation().Make()
 	var Stack = col.Stack[int64](notation)
-	var stack1 = Stack.MakeFromArray([]int64{1, 2, 3})
-	var stack2 = Stack.MakeFromSequence(stack1)
-	ass.Equal(t, stack1.AsArray(), stack2.AsArray())
+	Stack.Make()
+	Stack.MakeWithCapacity(5)
+	var sequence = Stack.MakeFromArray([]int64{1, 2, 3})
+	var stack = Stack.MakeFromSequence(sequence)
+	ass.Equal(t, sequence.AsArray(), stack.AsArray())
 }
 
 func TestStackWithSmallCapacity(t *tes.T) {
@@ -997,7 +943,7 @@ func TestStackWithSmallCapacity(t *tes.T) {
 	stack.AddValue(1)
 	defer func() {
 		if e := recover(); e != nil {
-			ass.Equal(t, "Attempted to add a value onto a stack that has reached its capacity: 1\nvalue: 2\nstack: [1](Stack)\n", e)
+			ass.Equal(t, "Attempted to add a value onto a stack that has reached its capacity.", e)
 		} else {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}

@@ -15,7 +15,6 @@ package collection
 import (
 	fmt "fmt"
 	age "github.com/craterdog/go-collection-framework/v4/agent"
-	sts "strings"
 	syn "sync"
 )
 
@@ -29,14 +28,9 @@ var mapMutex syn.Mutex
 // Function
 
 func Map[K comparable, V any](notation NotationLike) MapClassLike[K, V] {
-	// Validate the notation argument.
-	if notation == nil {
-		panic("A notation must be specified when creating this class.")
-	}
-
 	// Generate the name of the bound class type.
-	var class MapClassLike[K, V]
-	var name = fmt.Sprintf("%T-%T", class, notation)
+	var class *mapClass_[K, V]
+	var name = fmt.Sprintf("%T", class)
 
 	// Check for existing bound class type.
 	mapMutex.Lock()
@@ -48,6 +42,7 @@ func Map[K comparable, V any](notation NotationLike) MapClassLike[K, V] {
 	default:
 		// Add a new bound class type.
 		class = &mapClass_[K, V]{
+			// Initialize the class constants.
 			notation_: notation,
 		}
 		mapClass[name] = class
@@ -63,6 +58,7 @@ func Map[K comparable, V any](notation NotationLike) MapClassLike[K, V] {
 // Target
 
 type mapClass_[K comparable, V any] struct {
+	// Define the class constants.
 	notation_ NotationLike
 }
 
@@ -113,28 +109,17 @@ func (c *mapClass_[K, V]) MakeFromSequence(
 	return map_[K, V](duplicate)
 }
 
-func (c *mapClass_[K, V]) MakeFromSource(source string) MapLike[K, V] {
-	// First we parse it as a collection of any type value.
-	var collection = c.notation_.ParseSource(source).(Sequential[AssociationLike[any, any]])
-
-	// Next we must convert each value explicitly to type AssociationLike[K, V].
-	var anys = collection.AsArray()
-	var array = make([]AssociationLike[K, V], len(anys))
-	for index, association := range anys {
-		var key = association.GetKey().(K)
-		var value = association.GetValue().(V)
-		array[index] = Association[K, V]().MakeWithAttributes(key, value)
-	}
-
-	// Then we can create the stack from the type AssociationLike[K, V] array.
-	return c.MakeFromArray(array)
-}
-
 // INSTANCE METHODS
 
 // Target
 
 type map_[K comparable, V any] map[K]V
+
+// Attributes
+
+func (v map_[K, V]) GetClass() MapClassLike[K, V] {
+	return Map[K, V](nil)
+}
 
 // Associative
 
@@ -224,7 +209,7 @@ func (v map_[K, V]) AsArray() []AssociationLike[K, V] {
 	var array = make([]AssociationLike[K, V], size)
 	var index = 0
 	for key, value := range v {
-		var association = Association[K, V]().MakeWithAttributes(key, value)
+		var association = Association[K, V](v.GetClass().Notation()).MakeWithAttributes(key, value)
 		array[index] = association
 		index++
 	}
@@ -240,30 +225,6 @@ func (v map_[K, V]) GetIterator() age.IteratorLike[AssociationLike[K, V]] {
 
 // Stringer
 
-// NOTE:
-// Since this class only extends the primitive map type it cannot have any
-// attributes assigned to it.  This means that we have no way of accessing its
-// notation.  So we cannot use the notation specific formatter to generate the
-// string value for this map and must generate it manually.  This is only a
-// problem when this method is called directly—as done by the fmt.Sprintf()
-// method.  The formatters themselves can handle the formatting of maps just
-// fine.
 func (v map_[K, V]) String() string {
-	var string_ = "["
-	if v.IsEmpty() {
-		string_ += (":")
-	} else {
-		var builder sts.Builder
-		var iterator = v.GetIterator()
-		for iterator.HasNext() {
-			var association = iterator.GetNext()
-			var key = association.GetKey()
-			var value = association.GetValue()
-			builder.WriteString(fmt.Sprintf("%#v: %#v, ", key, value))
-		}
-		var last = builder.Len() - 2
-		string_ += builder.String()[:last]
-	}
-	string_ += "](Map)\n"
-	return string_
+	return v.GetClass().Notation().FormatValue(v)
 }

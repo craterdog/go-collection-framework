@@ -28,14 +28,9 @@ var setMutex syn.Mutex
 // Function
 
 func Set[V any](notation NotationLike) SetClassLike[V] {
-	// Validate the notation argument.
-	if notation == nil {
-		panic("A notation must be specified when creating this class.")
-	}
-
 	// Generate the name of the bound class type.
-	var class SetClassLike[V]
-	var name = fmt.Sprintf("%T-%T", class, notation)
+	var class *setClass_[V]
+	var name = fmt.Sprintf("%T", class)
 
 	// Check for existing bound class type.
 	setMutex.Lock()
@@ -47,6 +42,7 @@ func Set[V any](notation NotationLike) SetClassLike[V] {
 	default:
 		// Add a new bound class type.
 		class = &setClass_[V]{
+			// Initialize the class constants.
 			notation_: notation,
 		}
 		setClass[name] = class
@@ -62,6 +58,7 @@ func Set[V any](notation NotationLike) SetClassLike[V] {
 // Target
 
 type setClass_[V any] struct {
+	// Define the class constants.
 	notation_ NotationLike
 }
 
@@ -102,21 +99,6 @@ func (c *setClass_[V]) MakeFromSequence(values Sequential[V]) SetLike[V] {
 		set.AddValue(value)
 	}
 	return set
-}
-
-func (c *setClass_[V]) MakeFromSource(source string) SetLike[V] {
-	// First we parse it as a collection of any type value.
-	var collection = c.notation_.ParseSource(source).(Sequential[any])
-
-	// Next we must convert each value explicitly to type V.
-	var anys = collection.AsArray()
-	var array = make([]V, len(anys))
-	for index, value := range anys {
-		array[index] = value.(V)
-	}
-
-	// Then we can create the stack from the type V array.
-	return c.MakeFromArray(array)
 }
 
 // Functions
@@ -282,8 +264,7 @@ func (v *set_[V]) GetIterator() age.IteratorLike[V] {
 // Stringer
 
 func (v *set_[V]) String() string {
-	var notation = v.class_.Notation()
-	return notation.FormatCollection(v)
+	return v.GetClass().Notation().FormatValue(v)
 }
 
 // Private

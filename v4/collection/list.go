@@ -28,14 +28,9 @@ var listMutex syn.Mutex
 // Function
 
 func List[V any](notation NotationLike) ListClassLike[V] {
-	// Validate the notation argument.
-	if notation == nil {
-		panic("A notation must be specified when creating this class.")
-	}
-
 	// Generate the name of the bound class type.
-	var class ListClassLike[V]
-	var name = fmt.Sprintf("%T-%T", class, notation)
+	var class *listClass_[V]
+	var name = fmt.Sprintf("%T", class)
 
 	// Check for existing bound class type.
 	listMutex.Lock()
@@ -47,6 +42,7 @@ func List[V any](notation NotationLike) ListClassLike[V] {
 	default:
 		// Add a new bound class type.
 		class = &listClass_[V]{
+			// Initialize the class constants.
 			notation_: notation,
 		}
 		listClass[name] = class
@@ -62,6 +58,7 @@ func List[V any](notation NotationLike) ListClassLike[V] {
 // Target
 
 type listClass_[V any] struct {
+	// Define the class constants.
 	notation_ NotationLike
 }
 
@@ -94,21 +91,6 @@ func (c *listClass_[V]) MakeFromSequence(values Sequential[V]) ListLike[V] {
 		list.AppendValue(value)
 	}
 	return list
-}
-
-func (c *listClass_[V]) MakeFromSource(source string) ListLike[V] {
-	// First we parse it as a collection of any type value.
-	var collection = c.notation_.ParseSource(source).(Sequential[any])
-
-	// Next we must convert each value explicitly to type V.
-	var anys = collection.AsArray()
-	var array = make([]V, len(anys))
-	for index, value := range anys {
-		array[index] = value.(V)
-	}
-
-	// Then we can create the stack from the type V array.
-	return c.MakeFromArray(array)
 }
 
 // Functions
@@ -151,7 +133,7 @@ func (v *list_[V]) InsertValue(slot uint, value V) {
 
 	// Create a new larger array.
 	var size = uint(v.GetSize() + 1)
-	var array = Array[V](v.class_.Notation()).MakeWithSize(size)
+	var array = Array[V](v.GetClass().Notation()).MakeWithSize(size)
 
 	// Copy the values into the new array.
 	var iterator = v.GetIterator()
@@ -175,7 +157,7 @@ func (v *list_[V]) InsertValues(slot uint, values Sequential[V]) {
 
 	// Create a new larger array.
 	var size = uint(v.GetSize() + values.GetSize())
-	var array = Array[V](v.class_.Notation()).MakeWithSize(size)
+	var array = Array[V](v.GetClass().Notation()).MakeWithSize(size)
 
 	// Copy the values into the new array.
 	var iterator = v.GetIterator()
@@ -203,7 +185,7 @@ func (v *list_[V]) AppendValue(value V) {
 
 	// Create a new larger array.
 	var size = uint(v.GetSize() + 1)
-	var array = Array[V](v.class_.Notation()).MakeWithSize(size)
+	var array = Array[V](v.GetClass().Notation()).MakeWithSize(size)
 
 	// Copy the existing values into the new array.
 	var index int
@@ -226,7 +208,7 @@ func (v *list_[V]) AppendValues(values Sequential[V]) {
 
 	// Create a new larger array.
 	var size = uint(v.GetSize() + values.GetSize())
-	var array = Array[V](v.class_.Notation()).MakeWithSize(size)
+	var array = Array[V](v.GetClass().Notation()).MakeWithSize(size)
 
 	// Copy the existing values into the new array.
 	var index int
@@ -254,7 +236,7 @@ func (v *list_[V]) RemoveValue(index int) V {
 	// Create a new smaller array.
 	var removed = v.GetValue(index)
 	var size = uint(v.GetSize() - 1)
-	var array = Array[V](v.class_.Notation()).MakeWithSize(size)
+	var array = Array[V](v.GetClass().Notation()).MakeWithSize(size)
 
 	// Copy the remaining values into the new array.
 	var counter = v.toNormalized(index)
@@ -283,7 +265,7 @@ func (v *list_[V]) RemoveValues(first int, last int) Sequential[V] {
 	last = v.toNormalized(last)
 	var delta = uint(last - first + 1)
 	var size = uint(v.GetSize()) - delta
-	var Array = Array[V](v.class_.Notation())
+	var Array = Array[V](v.GetClass().Notation())
 	var removed = Array.MakeWithSize(delta)
 	var array = Array.MakeWithSize(size)
 
@@ -311,7 +293,7 @@ func (v *list_[V]) RemoveValues(first int, last int) Sequential[V] {
 }
 
 func (v *list_[V]) RemoveAll() {
-	v.values_ = Array[V](v.class_.Notation()).MakeWithSize(0)
+	v.values_ = Array[V](v.GetClass().Notation()).MakeWithSize(0)
 }
 
 // Searchable
@@ -407,8 +389,7 @@ func (v *list_[V]) SetValues(index int, values Sequential[V]) {
 // Stringer
 
 func (v *list_[V]) String() string {
-	var notation = v.class_.Notation()
-	return notation.FormatCollection(v)
+	return v.GetClass().Notation().FormatValue(v)
 }
 
 // Private

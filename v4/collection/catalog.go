@@ -28,14 +28,9 @@ var catalogMutex syn.Mutex
 // Function
 
 func Catalog[K comparable, V any](notation NotationLike) CatalogClassLike[K, V] {
-	// Validate the notation argument.
-	if notation == nil {
-		panic("A notation must be specified when creating this class.")
-	}
-
 	// Generate the name of the bound class type.
-	var class CatalogClassLike[K, V]
-	var name = fmt.Sprintf("%T-%T", class, notation)
+	var class *catalogClass_[K, V]
+	var name = fmt.Sprintf("%T", class)
 
 	// Check for existing bound class type.
 	catalogMutex.Lock()
@@ -47,6 +42,7 @@ func Catalog[K comparable, V any](notation NotationLike) CatalogClassLike[K, V] 
 	default:
 		// Add a new bound class type.
 		class = &catalogClass_[K, V]{
+			// Initialize the class constants.
 			notation_: notation,
 		}
 		catalogClass[name] = class
@@ -62,6 +58,7 @@ func Catalog[K comparable, V any](notation NotationLike) CatalogClassLike[K, V] 
 // Target
 
 type catalogClass_[K comparable, V any] struct {
+	// Define the class constants.
 	notation_ NotationLike
 }
 
@@ -112,23 +109,6 @@ func (c *catalogClass_[K, V]) MakeFromSequence(
 		catalog.SetValue(key, value)
 	}
 	return catalog
-}
-
-func (c *catalogClass_[K, V]) MakeFromSource(source string) CatalogLike[K, V] {
-	// First we parse it as a collection of any type value.
-	var collection = c.notation_.ParseSource(source).(Sequential[AssociationLike[any, any]])
-
-	// Next we must convert each value explicitly to type AssociationLike[K, V].
-	var anys = collection.AsArray()
-	var array = make([]AssociationLike[K, V], len(anys))
-	for index, association := range anys {
-		var key = association.GetKey().(K)
-		var value = association.GetValue().(V)
-		array[index] = Association[K, V]().MakeWithAttributes(key, value)
-	}
-
-	// Then we can create the stack from the type AssociationLike[K, V] array.
-	return c.MakeFromArray(array)
 }
 
 // Functions
@@ -197,14 +177,14 @@ func (v *catalog_[K, V]) SetValue(key K, value V) {
 		association.SetValue(value)
 	} else {
 		// Add a new association.
-		association = Association[K, V]().MakeWithAttributes(key, value)
+		association = Association[K, V](v.GetClass().Notation()).MakeWithAttributes(key, value)
 		v.associations_.AppendValue(association)
 		v.keys_[key] = association
 	}
 }
 
 func (v *catalog_[K, V]) GetKeys() Sequential[K] {
-	var keys = List[K](v.class_.Notation()).Make()
+	var keys = List[K](v.GetClass().Notation()).Make()
 	var iterator = v.associations_.GetIterator()
 	for iterator.HasNext() {
 		var association = iterator.GetNext()
@@ -214,7 +194,7 @@ func (v *catalog_[K, V]) GetKeys() Sequential[K] {
 }
 
 func (v *catalog_[K, V]) GetValues(keys Sequential[K]) Sequential[V] {
-	var values = List[V](v.class_.Notation()).Make()
+	var values = List[V](v.GetClass().Notation()).Make()
 	var iterator = keys.GetIterator()
 	for iterator.HasNext() {
 		var key = iterator.GetNext()
@@ -236,7 +216,7 @@ func (v *catalog_[K, V]) RemoveValue(key K) V {
 }
 
 func (v *catalog_[K, V]) RemoveValues(keys Sequential[K]) Sequential[V] {
-	var values = List[V](v.class_.Notation()).Make()
+	var values = List[V](v.GetClass().Notation()).Make()
 	var iterator = keys.GetIterator()
 	for iterator.HasNext() {
 		var key = iterator.GetNext()
@@ -291,6 +271,5 @@ func (v *catalog_[K, V]) ShuffleValues() {
 // Stringer
 
 func (v *catalog_[K, V]) String() string {
-	var notation = v.class_.Notation()
-	return notation.FormatCollection(v)
+	return v.GetClass().Notation().FormatValue(v)
 }

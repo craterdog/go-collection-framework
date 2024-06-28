@@ -64,8 +64,8 @@ type iteratorClass_[V any] struct {
 func (c *iteratorClass_[V]) MakeFromArray(values []V) IteratorLike[V] {
 	var size = len(values)
 	return &iterator_[V]{
-		size_:   size,
 		values_: values,
+		size_:   size,
 	}
 }
 
@@ -75,9 +75,9 @@ func (c *iteratorClass_[V]) MakeFromArray(values []V) IteratorLike[V] {
 
 type iterator_[V any] struct {
 	class_  IteratorClassLike[V]
+	values_ []V // The Go array of values is immutable.
 	size_   int // So we can safely cache the size.
 	slot_   int // The initial slot is zero.
-	values_ []V // The Go array of values is immutable.
 }
 
 // Attributes
@@ -86,7 +86,19 @@ func (v *iterator_[V]) GetClass() IteratorClassLike[V] {
 	return v.class_
 }
 
+func (v *iterator_[V]) GetSize() int {
+	return v.size_
+}
+
+func (v *iterator_[V]) GetSlot() int {
+	return v.slot_
+}
+
 // Public
+
+func (v *iterator_[V]) IsEmpty() bool {
+	return v.size_ == 0
+}
 
 func (v *iterator_[V]) GetNext() V {
 	var result V
@@ -104,10 +116,6 @@ func (v *iterator_[V]) GetPrevious() V {
 		v.slot_ = v.slot_ - 1
 	}
 	return result
-}
-
-func (v *iterator_[V]) GetSlot() int {
-	return v.slot_
 }
 
 func (v *iterator_[V]) HasNext() bool {

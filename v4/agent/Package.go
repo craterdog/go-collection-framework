@@ -158,9 +158,11 @@ An iterator-like class is supported by all collection types.
 type IteratorLike[V any] interface {
 	// Attributes
 	GetClass() IteratorClassLike[V]
+	GetSize() int
 	GetSlot() int
 
 	// Methods
+	IsEmpty() bool
 	ToStart()
 	ToSlot(slot int)
 	ToEnd()

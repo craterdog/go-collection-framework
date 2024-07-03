@@ -41,176 +41,6 @@ import (
 	age "github.com/craterdog/go-collection-framework/v4/agent"
 )
 
-// Aspects
-
-/*
-Accessible[V any] defines the set of method signatures that must be
-supported by all sequences whose values can be accessed using indices. The
-indices of an accessible sequence are ORDINAL rather than ZERO based—which
-never really made sense except for pointer offsets. What is the "zeroth
-value" anyway? It's the "first value", right?  So we start fresh...
-
-This approach allows for positive indices starting at the beginning of the
-sequence, and negative indices starting at the end of the sequence as follows:
-
-	    1           2           3             N
-	[value 1] . [value 2] . [value 3] ... [value N]
-	   -N        -(N-1)      -(N-2)          -1
-
-Notice that because the indices are ordinal based, the positive and negative
-indices are symmetrical.
-*/
-type Accessible[V any] interface {
-	// Methods
-	GetValue(index int) V
-	GetValues(
-		first int,
-		last int,
-	) Sequential[V]
-}
-
-/*
-Associative[K comparable, V any] defines the set of method signatures that
-must be supported by all sequences of key-value associations.
-*/
-type Associative[K comparable, V any] interface {
-	// Methods
-	GetValue(key K) V
-	SetValue(
-		key K,
-		value V,
-	)
-	GetKeys() Sequential[K]
-	GetValues(keys Sequential[K]) Sequential[V]
-	RemoveValue(key K) V
-	RemoveValues(keys Sequential[K]) Sequential[V]
-	RemoveAll()
-}
-
-/*
-Canonical defines the set of method signatures that must be supported by all
-canonical notations.
-*/
-type Canonical interface {
-	// Methods
-	ParseSource(source string) (value any)
-	FormatValue(value any) (source string)
-}
-
-/*
-Expandable[V any] defines the set of method signatures that must be supported
-by all sequences that allow new values to be appended, inserted and removed.
-*/
-type Expandable[V any] interface {
-	// Methods
-	InsertValue(
-		slot uint,
-		value V,
-	)
-	InsertValues(
-		slot uint,
-		values Sequential[V],
-	)
-	AppendValue(value V)
-	AppendValues(values Sequential[V])
-	RemoveValue(index int) V
-	RemoveValues(
-		first int,
-		last int,
-	) Sequential[V]
-	RemoveAll()
-}
-
-/*
-Flexible[V any] defines the set of method signatures that must be supported by
-all sequences of values that allow new values to be added and existing values to
-be removed.
-*/
-type Flexible[V any] interface {
-	// Methods
-	AddValue(value V)
-	AddValues(values Sequential[V])
-	RemoveValue(value V)
-	RemoveValues(values Sequential[V])
-	RemoveAll()
-}
-
-/*
-Limited[V any] defines the set of method signatures that must be supported by
-all sequences of values that allow new values to be added and limit the total
-number of values in the sequence.
-*/
-type Limited[V any] interface {
-	// Methods
-	AddValue(value V)
-	RemoveAll()
-}
-
-/*
-Searchable[V any] defines the set of method signatures that must be supported
-by all searchable sequences of values.
-*/
-type Searchable[V any] interface {
-	// Methods
-	ContainsValue(value V) bool
-	ContainsAny(values Sequential[V]) bool
-	ContainsAll(values Sequential[V]) bool
-	GetIndex(value V) int
-}
-
-/*
-Sequential[V any] defines the set of method signatures that must be supported
-by all sequences of values.  Note that sizes should be of type "uint" but the Go
-language does not allow arithmetic and comparison operations between "int" and
-"uint" so we us "int" for the return type to make it easier to use.
-*/
-type Sequential[V any] interface {
-	// Methods
-	IsEmpty() bool
-	GetSize() int
-	AsArray() []V
-	GetIterator() age.IteratorLike[V]
-}
-
-/*
-Sortable[V any] defines the set of method signatures that must be supported by
-all sequences whose values may be reordered using various sorting algorithms.
-*/
-type Sortable[V any] interface {
-	// Methods
-	SortValues()
-	SortValuesWithRanker(ranker age.RankingFunction[V])
-	ReverseValues()
-	ShuffleValues()
-}
-
-/*
-Synchronized defines the set of method signatures that must be supported by all
-synchronized groups of threads.
-*/
-type Synchronized interface {
-	// Methods
-	Add(delta int)
-	Wait()
-	Done()
-}
-
-/*
-Updatable[V any] defines the set of method signatures that must be supported
-by all updatable sequences of values.
-*/
-type Updatable[V any] interface {
-	// Methods
-	SetValue(
-		index int,
-		value V,
-	)
-	SetValues(
-		index int,
-		values Sequential[V],
-	)
-}
-
 // Classes
 
 /*
@@ -659,4 +489,174 @@ type StackLike[V any] interface {
 
 	// Methods
 	RemoveTop() V
+}
+
+// Aspects
+
+/*
+Accessible[V any] defines the set of method signatures that must be
+supported by all sequences whose values can be accessed using indices. The
+indices of an accessible sequence are ORDINAL rather than ZERO based—which
+never really made sense except for pointer offsets. What is the "zeroth
+value" anyway? It's the "first value", right?  So we start fresh...
+
+This approach allows for positive indices starting at the beginning of the
+sequence, and negative indices starting at the end of the sequence as follows:
+
+	    1           2           3             N
+	[value 1] . [value 2] . [value 3] ... [value N]
+	   -N        -(N-1)      -(N-2)          -1
+
+Notice that because the indices are ordinal based, the positive and negative
+indices are symmetrical.
+*/
+type Accessible[V any] interface {
+	// Methods
+	GetValue(index int) V
+	GetValues(
+		first int,
+		last int,
+	) Sequential[V]
+}
+
+/*
+Associative[K comparable, V any] defines the set of method signatures that
+must be supported by all sequences of key-value associations.
+*/
+type Associative[K comparable, V any] interface {
+	// Methods
+	GetValue(key K) V
+	SetValue(
+		key K,
+		value V,
+	)
+	GetKeys() Sequential[K]
+	GetValues(keys Sequential[K]) Sequential[V]
+	RemoveValue(key K) V
+	RemoveValues(keys Sequential[K]) Sequential[V]
+	RemoveAll()
+}
+
+/*
+Canonical defines the set of method signatures that must be supported by all
+canonical notations.
+*/
+type Canonical interface {
+	// Methods
+	ParseSource(source string) (value any)
+	FormatValue(value any) (source string)
+}
+
+/*
+Expandable[V any] defines the set of method signatures that must be supported
+by all sequences that allow new values to be appended, inserted and removed.
+*/
+type Expandable[V any] interface {
+	// Methods
+	InsertValue(
+		slot uint,
+		value V,
+	)
+	InsertValues(
+		slot uint,
+		values Sequential[V],
+	)
+	AppendValue(value V)
+	AppendValues(values Sequential[V])
+	RemoveValue(index int) V
+	RemoveValues(
+		first int,
+		last int,
+	) Sequential[V]
+	RemoveAll()
+}
+
+/*
+Flexible[V any] defines the set of method signatures that must be supported by
+all sequences of values that allow new values to be added and existing values to
+be removed.
+*/
+type Flexible[V any] interface {
+	// Methods
+	AddValue(value V)
+	AddValues(values Sequential[V])
+	RemoveValue(value V)
+	RemoveValues(values Sequential[V])
+	RemoveAll()
+}
+
+/*
+Limited[V any] defines the set of method signatures that must be supported by
+all sequences of values that allow new values to be added and limit the total
+number of values in the sequence.
+*/
+type Limited[V any] interface {
+	// Methods
+	AddValue(value V)
+	RemoveAll()
+}
+
+/*
+Searchable[V any] defines the set of method signatures that must be supported
+by all searchable sequences of values.
+*/
+type Searchable[V any] interface {
+	// Methods
+	ContainsValue(value V) bool
+	ContainsAny(values Sequential[V]) bool
+	ContainsAll(values Sequential[V]) bool
+	GetIndex(value V) int
+}
+
+/*
+Sequential[V any] defines the set of method signatures that must be supported
+by all sequences of values.  Note that sizes should be of type "uint" but the Go
+language does not allow arithmetic and comparison operations between "int" and
+"uint" so we us "int" for the return type to make it easier to use.
+*/
+type Sequential[V any] interface {
+	// Methods
+	IsEmpty() bool
+	GetSize() int
+	AsArray() []V
+	GetIterator() age.IteratorLike[V]
+}
+
+/*
+Sortable[V any] defines the set of method signatures that must be supported by
+all sequences whose values may be reordered using various sorting algorithms.
+*/
+type Sortable[V any] interface {
+	// Methods
+	SortValues()
+	SortValuesWithRanker(ranker age.RankingFunction[V])
+	ReverseValues()
+	ShuffleValues()
+}
+
+/*
+Synchronized defines the set of method signatures that must be supported by all
+synchronized groups of threads.
+*/
+type Synchronized interface {
+	// Methods
+	Add(delta int)
+	Wait()
+	Done()
+}
+
+/*
+Updatable[V any] defines the set of method signatures that must be supported
+by all updatable sequences of values.
+*/
+type Updatable[V any] interface {
+	// Methods
+	SetValue(
+		index int,
+		value V,
+	)
+	SetValues(
+		index int,
+		values Sequential[V],
+	)
 }

@@ -56,19 +56,6 @@ type RankingFunction[V any] func(
 	second V,
 ) Rank
 
-// Aspects
-
-/*
-Systematic[V any] defines the set of method signatures that must be supported
-by all systematic sorting agents.
-*/
-type Systematic[V any] interface {
-	// Methods
-	SortValues(values []V)
-	ReverseValues(values []V)
-	ShuffleValues(values []V)
-}
-
 // Classes
 
 /*
@@ -190,4 +177,17 @@ type SorterLike[V any] interface {
 
 	// Abstractions
 	Systematic[V]
+}
+
+// Aspects
+
+/*
+Systematic[V any] defines the set of method signatures that must be supported
+by all systematic sorting agents.
+*/
+type Systematic[V any] interface {
+	// Methods
+	SortValues(values []V)
+	ReverseValues(values []V)
+	ShuffleValues(values []V)
 }

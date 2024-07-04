@@ -49,13 +49,13 @@ class constants, constructors and functions that must be supported by each
 concrete array-like class.
 */
 type ArrayClassLike[V any] interface {
-	// Constants
-	Notation() NotationLike
-
 	// Constructors
 	MakeWithSize(size uint) ArrayLike[V]
 	MakeFromArray(values []V) ArrayLike[V]
 	MakeFromSequence(values Sequential[V]) ArrayLike[V]
+
+	// Constants
+	Notation() NotationLike
 }
 
 /*
@@ -64,14 +64,14 @@ the complete set of class constants, constructors and functions that must be
 supported by each concrete association-like class.
 */
 type AssociationClassLike[K comparable, V any] interface {
-	// Constants
-	Notation() NotationLike
-
 	// Constructors
 	MakeWithAttributes(
 		key K,
 		value V,
 	) AssociationLike[K, V]
+
+	// Constants
+	Notation() NotationLike
 }
 
 /*
@@ -91,14 +91,14 @@ key is present in both Catalogs, the value of the key from the second
 catalog takes precedence.
 */
 type CatalogClassLike[K comparable, V any] interface {
-	// Constants
-	Notation() NotationLike
-
 	// Constructors
 	Make() CatalogLike[K, V]
 	MakeFromArray(associations []AssociationLike[K, V]) CatalogLike[K, V]
 	MakeFromMap(associations map[K]V) CatalogLike[K, V]
 	MakeFromSequence(associations Sequential[AssociationLike[K, V]]) CatalogLike[K, V]
+
+	// Constants
+	Notation() NotationLike
 
 	// Functions
 	Extract(
@@ -122,13 +122,13 @@ Concatenate() combines two lists into a new list containing all values in both
 lists.  The order of the values in each list is preserved in the new list.
 */
 type ListClassLike[V any] interface {
-	// Constants
-	Notation() NotationLike
-
 	// Constructors
 	Make() ListLike[V]
 	MakeFromArray(values []V) ListLike[V]
 	MakeFromSequence(values Sequential[V]) ListLike[V]
+
+	// Constants
+	Notation() NotationLike
 
 	// Functions
 	Concatenate(
@@ -143,14 +143,14 @@ complete set of class constants, constructors and functions that must be
 supported by each concrete map-like class.
 */
 type MapClassLike[K comparable, V any] interface {
-	// Constants
-	Notation() NotationLike
-
 	// Constructors
 	Make() MapLike[K, V]
 	MakeFromArray(associations []AssociationLike[K, V]) MapLike[K, V]
 	MakeFromMap(associations map[K]V) MapLike[K, V]
 	MakeFromSequence(associations Sequential[AssociationLike[K, V]]) MapLike[K, V]
+
+	// Constants
+	Notation() NotationLike
 }
 
 /*
@@ -192,15 +192,15 @@ when the results of the processing with a Split() function need to be
 consolidated into a single queue.
 */
 type QueueClassLike[V any] interface {
-	// Constants
-	Notation() NotationLike
-	DefaultCapacity() uint
-
 	// Constructors
 	Make() QueueLike[V]
 	MakeWithCapacity(capacity uint) QueueLike[V]
 	MakeFromArray(values []V) QueueLike[V]
 	MakeFromSequence(values Sequential[V]) QueueLike[V]
+
+	// Constants
+	Notation() NotationLike
+	DefaultCapacity() uint
 
 	// Functions
 	Fork(
@@ -239,14 +239,14 @@ Xor() returns a new set containing the values that are in the first specified
 set or the second specified set but not both.
 */
 type SetClassLike[V any] interface {
-	// Constants
-	Notation() NotationLike
-
 	// Constructors
 	Make() SetLike[V]
 	MakeWithCollator(collator age.CollatorLike[V]) SetLike[V]
 	MakeFromArray(values []V) SetLike[V]
 	MakeFromSequence(values Sequential[V]) SetLike[V]
+
+	// Constants
+	Notation() NotationLike
 
 	// Functions
 	And(
@@ -273,15 +273,15 @@ class constants, constructors and functions that must be supported by each
 concrete stack-like class.
 */
 type StackClassLike[V any] interface {
-	// Constants
-	Notation() NotationLike
-	DefaultCapacity() uint
-
 	// Constructors
 	Make() StackLike[V]
 	MakeWithCapacity(capacity uint) StackLike[V]
 	MakeFromArray(values []V) StackLike[V]
 	MakeFromSequence(values Sequential[V]) StackLike[V]
+
+	// Constants
+	Notation() NotationLike
+	DefaultCapacity() uint
 }
 
 // Instances
@@ -302,6 +302,9 @@ This type essentially provides a higher level abstraction for the primitive Go
 array type.
 */
 type ArrayLike[V any] interface {
+	// Attributes
+	GetClass() ArrayClassLike[V]
+
 	// Abstractions
 	Accessible[V]
 	Sequential[V]
@@ -392,6 +395,9 @@ This type is parameterized as follows:
 A map-like class can use any association-like class key-value association.
 */
 type MapLike[K comparable, V any] interface {
+	// Attributes
+	GetClass() MapClassLike[K, V]
+
 	// Abstractions
 	Associative[K, V]
 	Sequential[AssociationLike[K, V]]

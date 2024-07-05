@@ -63,7 +63,10 @@ AssociationClassLike[K comparable, V any] is a class interface that defines
 the complete set of class constants, constructors and functions that must be
 supported by each concrete association-like class.
 */
-type AssociationClassLike[K comparable, V any] interface {
+type AssociationClassLike[
+	K comparable,
+	V any,
+] interface {
 	// Constructors
 	MakeWithAttributes(
 		key K,
@@ -90,7 +93,10 @@ the specified Catalogs in the order that they appear in each catalog.  If a
 key is present in both Catalogs, the value of the key from the second
 catalog takes precedence.
 */
-type CatalogClassLike[K comparable, V any] interface {
+type CatalogClassLike[
+	K comparable,
+	V any,
+] interface {
 	// Constructors
 	Make() CatalogLike[K, V]
 	MakeFromArray(associations []AssociationLike[K, V]) CatalogLike[K, V]
@@ -142,7 +148,10 @@ MapClassLike[K comparable, V any] is a class interface that defines the
 complete set of class constants, constructors and functions that must be
 supported by each concrete map-like class.
 */
-type MapClassLike[K comparable, V any] interface {
+type MapClassLike[
+	K comparable,
+	V any,
+] interface {
 	// Constructors
 	Make() MapLike[K, V]
 	MakeFromArray(associations []AssociationLike[K, V]) MapLike[K, V]
@@ -323,7 +332,10 @@ This type is parameterized as follows:
 
 This type is used by catalog-like instances to maintain their associations.
 */
-type AssociationLike[K comparable, V any] interface {
+type AssociationLike[
+	K comparable,
+	V any,
+] interface {
 	// Attributes
 	GetClass() AssociationClassLike[K, V]
 	GetKey() K
@@ -342,7 +354,10 @@ This type is parameterized as follows:
 
 A catalog-like class can use any association-like class key-value association.
 */
-type CatalogLike[K comparable, V any] interface {
+type CatalogLike[
+	K comparable,
+	V any,
+] interface {
 	// Attributes
 	GetClass() CatalogClassLike[K, V]
 
@@ -394,7 +409,10 @@ This type is parameterized as follows:
 
 A map-like class can use any association-like class key-value association.
 */
-type MapLike[K comparable, V any] interface {
+type MapLike[
+	K comparable,
+	V any,
+] interface {
 	// Attributes
 	GetClass() MapClassLike[K, V]
 
@@ -529,7 +547,10 @@ type Accessible[V any] interface {
 Associative[K comparable, V any] defines the set of method signatures that
 must be supported by all sequences of key-value associations.
 */
-type Associative[K comparable, V any] interface {
+type Associative[
+	K comparable,
+	V any,
+] interface {
 	// Methods
 	GetValue(key K) V
 	SetValue(

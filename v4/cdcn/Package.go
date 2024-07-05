@@ -65,12 +65,12 @@ class constants, constructors and functions that must be supported by each
 concrete formatter-like class.
 */
 type FormatterClassLike interface {
-	// Constants
-	DefaultMaximum() int
-
 	// Constructors
 	Make() FormatterLike
 	MakeWithMaximum(maximum int) FormatterLike
+
+	// Constants
+	DefaultMaximum() int
 }
 
 /*

@@ -63,12 +63,12 @@ CollatorClassLike[V any] defines the set of class constants, constructors and
 functions that must be supported by all collator-class-like classes.
 */
 type CollatorClassLike[V any] interface {
-	// Constants
-	DefaultMaximum() int
-
 	// Constructors
 	Make() CollatorLike[V]
 	MakeWithMaximum(maximum int) CollatorLike[V]
+
+	// Constants
+	DefaultMaximum() int
 }
 
 /*
@@ -85,12 +85,12 @@ SorterClassLike[V any] defines the set of class constants, constructors and
 functions that must be supported by all sorter-class-like classes.
 */
 type SorterClassLike[V any] interface {
-	// Constants
-	DefaultRanker() RankingFunction[V]
-
 	// Constructors
 	Make() SorterLike[V]
 	MakeWithRanker(ranker RankingFunction[V]) SorterLike[V]
+
+	// Constants
+	DefaultRanker() RankingFunction[V]
 }
 
 // Instances

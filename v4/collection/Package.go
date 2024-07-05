@@ -535,7 +535,6 @@ Notice that because the indices are ordinal based, the positive and negative
 indices are symmetrical.
 */
 type Accessible[V any] interface {
-	// Methods
 	GetValue(index int) V
 	GetValues(
 		first int,
@@ -551,7 +550,6 @@ type Associative[
 	K comparable,
 	V any,
 ] interface {
-	// Methods
 	GetValue(key K) V
 	SetValue(
 		key K,
@@ -569,7 +567,6 @@ Canonical defines the set of method signatures that must be supported by all
 canonical notations.
 */
 type Canonical interface {
-	// Methods
 	ParseSource(source string) (value any)
 	FormatValue(value any) (source string)
 }
@@ -579,7 +576,6 @@ Expandable[V any] defines the set of method signatures that must be supported
 by all sequences that allow new values to be appended, inserted and removed.
 */
 type Expandable[V any] interface {
-	// Methods
 	InsertValue(
 		slot uint,
 		value V,
@@ -604,7 +600,6 @@ all sequences of values that allow new values to be added and existing values to
 be removed.
 */
 type Flexible[V any] interface {
-	// Methods
 	AddValue(value V)
 	AddValues(values Sequential[V])
 	RemoveValue(value V)
@@ -618,7 +613,6 @@ all sequences of values that allow new values to be added and limit the total
 number of values in the sequence.
 */
 type Limited[V any] interface {
-	// Methods
 	AddValue(value V)
 	RemoveAll()
 }
@@ -628,7 +622,6 @@ Searchable[V any] defines the set of method signatures that must be supported
 by all searchable sequences of values.
 */
 type Searchable[V any] interface {
-	// Methods
 	ContainsValue(value V) bool
 	ContainsAny(values Sequential[V]) bool
 	ContainsAll(values Sequential[V]) bool
@@ -642,7 +635,6 @@ language does not allow arithmetic and comparison operations between "int" and
 "uint" so we us "int" for the return type to make it easier to use.
 */
 type Sequential[V any] interface {
-	// Methods
 	IsEmpty() bool
 	GetSize() int
 	AsArray() []V
@@ -654,7 +646,6 @@ Sortable[V any] defines the set of method signatures that must be supported by
 all sequences whose values may be reordered using various sorting algorithms.
 */
 type Sortable[V any] interface {
-	// Methods
 	SortValues()
 	SortValuesWithRanker(ranker age.RankingFunction[V])
 	ReverseValues()
@@ -666,7 +657,6 @@ Synchronized defines the set of method signatures that must be supported by all
 synchronized groups of threads.
 */
 type Synchronized interface {
-	// Methods
 	Add(delta int)
 	Wait()
 	Done()
@@ -677,7 +667,6 @@ Updatable[V any] defines the set of method signatures that must be supported
 by all updatable sequences of values.
 */
 type Updatable[V any] interface {
-	// Methods
 	SetValue(
 		index int,
 		value V,

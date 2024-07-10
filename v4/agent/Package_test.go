@@ -60,6 +60,22 @@ func TestCollatorConstants(t *tes.T) {
 	ass.Equal(t, 16, Collator.DefaultMaximum())
 }
 
+func TestIsUndefined(t *tes.T) {
+	var notation = not.Notation().Make()
+	var collator = age.Collator[any]().Make()
+	var array = col.Array[any](notation).MakeFromArray([]any{"foo", []int{1, 2, 3}})
+	var empty = col.List[any](notation).Make()
+	var name = "foobar"
+	var undefined string
+	var integer int
+	ass.False(t, collator.IsUndefined(array))
+	ass.False(t, collator.IsUndefined(empty))
+	ass.False(t, collator.IsUndefined(name))
+	ass.True(t, collator.IsUndefined(""))
+	ass.True(t, collator.IsUndefined(undefined))
+	ass.False(t, collator.IsUndefined(integer))
+}
+
 func TestCompareMaximum(t *tes.T) {
 	var notation = not.Notation().Make()
 	var collator = age.Collator[any]().MakeWithMaximum(1)

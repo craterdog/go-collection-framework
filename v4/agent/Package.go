@@ -107,6 +107,7 @@ type CollatorLike[V any] interface {
 	GetMaximum() int
 
 	// Methods
+	IsUndefined(value any) bool
 	CompareValues(
 		first V,
 		second V,

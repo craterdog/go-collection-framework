@@ -66,6 +66,27 @@ type (
 )
 */
 
+// GLOBAL FUNCTIONS
+
+// Notations
+
+func ParseSource(source string) (value any) {
+	var notation = cdc.Notation().Make()
+	return notation.ParseSource(source)
+}
+
+func FormatValue(value any) (source string) {
+	var notation = cdc.Notation().Make()
+	return notation.FormatValue(value)
+}
+
+// Agents
+
+func IsUndefined(value any) bool {
+	var collator = age.Collator[any]().Make()
+	return collator.IsUndefined(value)
+}
+
 // UNIVERSAL CONSTRUCTORS
 
 // Notations

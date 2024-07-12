@@ -14,6 +14,7 @@ package cdcn
 
 import (
 	fmt "fmt"
+	age "github.com/craterdog/go-collection-framework/v4/agent"
 	col "github.com/craterdog/go-collection-framework/v4/collection"
 	ref "reflect"
 	stc "strconv"
@@ -198,33 +199,27 @@ func (v *formatter_) formatComplex(complex_ complex128) {
 
 func (v *formatter_) formatContext(collection any) {
 	var type_ string
-	var reflectedType = ref.TypeOf(collection)
-	var reflectedString = reflectedType.String()
-	var arrayType = ref.TypeOf((*col.ArrayLike[any])(nil)).Elem()
-	var catalogType = ref.TypeOf((*col.CatalogLike[any, any])(nil)).Elem()
-	var listType = ref.TypeOf((*col.ListLike[any])(nil)).Elem()
-	var mapType = ref.TypeOf((*col.MapLike[any, any])(nil)).Elem()
-	var queueType = ref.TypeOf((*col.QueueLike[any])(nil)).Elem()
-	var setType = ref.TypeOf((*col.SetLike[any])(nil)).Elem()
-	var stackType = ref.TypeOf((*col.StackLike[any])(nil)).Elem()
+	var reflectedString = ref.TypeOf(collection).String()
+	var inspector = age.Inspector().Make()
 	switch {
 	// First try the implemented interface.  NOTE: These will not match any
 	// generic types other than of type "any" as defined above.
-	case reflectedType.Implements(catalogType):
+	case inspector.ImplementsAspect(collection, (*col.CatalogLike[any, any])(nil)):
 		type_ = "Catalog"
-	case reflectedType.Implements(listType):
+	case inspector.ImplementsAspect(collection, (*col.ListLike[any])(nil)):
 		type_ = "List"
-	case reflectedType.Implements(queueType):
+	case inspector.ImplementsAspect(collection, (*col.QueueLike[any])(nil)):
 		type_ = "Queue"
-	case reflectedType.Implements(setType):
+	case inspector.ImplementsAspect(collection, (*col.SetLike[any])(nil)):
 		type_ = "Set"
-	case reflectedType.Implements(stackType):
+	case inspector.ImplementsAspect(collection, (*col.StackLike[any])(nil)):
 		type_ = "Stack"
+
 	// These two must come last since they implement a subset of the list
 	// and catalog interfaces respectively.
-	case reflectedType.Implements(arrayType):
+	case inspector.ImplementsAspect(collection, (*col.ArrayLike[any])(nil)):
 		type_ = "Array"
-	case reflectedType.Implements(mapType):
+	case inspector.ImplementsAspect(collection, (*col.MapLike[any, any])(nil)):
 		type_ = "Map"
 
 	// Next try the actual value type.  This will catch generic types other

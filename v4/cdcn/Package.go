@@ -61,7 +61,7 @@ const (
 
 /*
 FormatterClassLike is a class interface that defines the complete set of
-class constants, constructors and functions that must be supported by each
+class constructors, constants and functions that must be supported by each
 concrete formatter-like class.
 */
 type FormatterClassLike interface {
@@ -75,7 +75,7 @@ type FormatterClassLike interface {
 
 /*
 ParserClassLike is a class interface that defines the complete set of
-class constants, constructors and functions that must be supported by each
+class constructors, constants and functions that must be supported by each
 concrete parser-like class.
 */
 type ParserClassLike interface {
@@ -85,7 +85,7 @@ type ParserClassLike interface {
 
 /*
 ScannerClassLike is a class interface that defines the complete set of
-class constants, constructors and functions that must be supported by each
+class constructors, constants and functions that must be supported by each
 concrete scanner-like class.  The following functions are supported:
 
 FormatToken() returns a formatted string containing the attributes of the token.
@@ -112,7 +112,7 @@ type ScannerClassLike interface {
 
 /*
 TokenClassLike is a class interface that defines the complete set of
-class constants, constructors and functions that must be supported by each
+class constructors, constants and functions that must be supported by each
 concrete token-like class.
 */
 type TokenClassLike interface {

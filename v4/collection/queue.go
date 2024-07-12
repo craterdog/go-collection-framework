@@ -220,7 +220,8 @@ func (c *queueClass_[V]) Join(
 	inputs Sequential[QueueLike[V]],
 ) QueueLike[V] {
 	// Validate the arguments.
-	if inputs == nil || inputs.IsEmpty() {
+	var inspector = age.Inspector().Make()
+	if inspector.IsUndefined(inputs) || inputs.IsEmpty() {
 		panic("The number of input queues for a join must be at least one.")
 	}
 

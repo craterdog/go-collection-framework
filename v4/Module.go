@@ -70,11 +70,19 @@ type (
 
 // Notations
 
+/*
+ParseSource parses a source string for a collection defined using CDCN.  It
+returns the corresponding collection value.
+*/
 func ParseSource(source string) (value any) {
 	var notation = cdc.Notation().Make()
 	return notation.ParseSource(source)
 }
 
+/*
+FormatValue returns the CDCN formatted source string for the specified
+collection value.
+*/
 func FormatValue(value any) (source string) {
 	var notation = cdc.Notation().Make()
 	return notation.FormatValue(value)
@@ -82,15 +90,44 @@ func FormatValue(value any) (source string) {
 
 // Agents
 
+/*
+ImplementsAspect determines whether or not the specified value implements the
+specified aspect.  Since the aspect is a Go interface it must be passed into
+this function as follows:
+
+	ImplementAspect(value, (*AnAspect)(nil))
+
+This passes a nil valued argument with the aspect type as the second argument.
+*/
+func ImplementsAspect(value any, aspect any) bool {
+	var inspector = age.Inspector().Make()
+	return inspector.ImplementsAspect(value, aspect)
+}
+
+/*
+IsUndefined determines whether of not the specified value is defined.  The Go
+language does not provide an easy way to test this so we provide this function
+to make it easier.  The result of the function is determined logically as:
+  - The value is a pointer and set to nil; or
+  - The value is not a pointer and has an invalid value.
+
+An empty string, for example, is determined to be undefined; while an integer
+with a value of zero is defined.
+*/
 func IsUndefined(value any) bool {
-	var collator = age.Collator[any]().Make()
-	return collator.IsUndefined(value)
+	var inspector = age.Inspector().Make()
+	return inspector.IsUndefined(value)
 }
 
 // UNIVERSAL CONSTRUCTORS
 
 // Notations
 
+/*
+CDCN returns a notation class supporting the Crater Dog Technologies™ collection
+notation.  It allows collections to be formatted using CDCN and then parsed to
+reconstruct the collections.
+*/
 func CDCN(arguments ...any) NotationLike {
 	if len(arguments) > 0 {
 		panic("The CDCN constructor does not take any arguments.")
@@ -99,12 +136,26 @@ func CDCN(arguments ...any) NotationLike {
 	return notation
 }
 
+/*
+JSON returns a notation class supporting the JavaScript Object Notation.  It
+allows collections to be formatted using JSON and then parsed to reconstruct the
+collections.
+
+NOTE: This notation is not yet supported.
+*/
 func JSON(arguments ...any) NotationLike {
 	panic("The JSON notation is not yet supported.")
 	//var notation = jso.Notation().Make()
 	//return notation
 }
 
+/*
+XML returns a notation class supporting the eXtensible Markup Language.  It
+allows collections to be formatted using XML and then parsed to reconstruct the
+collections.
+
+NOTE: This notation is not yet supported.
+*/
 func XML(arguments ...any) NotationLike {
 	panic("The XML notation is not yet supported.")
 	//var notation = xml.Notation().Make()
@@ -113,6 +164,10 @@ func XML(arguments ...any) NotationLike {
 
 // Collections
 
+/*
+Association[K, V] returns a new instance of an association between a key and
+value pair.  The key and value are passed as arguments into this function.
+*/
 func Association[K comparable, V any](arguments ...any) col.AssociationLike[K, V] {
 	// Initialize the possible arguments.
 	var notation = CDCN()
@@ -151,6 +206,15 @@ func Association[K comparable, V any](arguments ...any) col.AssociationLike[K, V
 	return association
 }
 
+/*
+Array[V] returns a new instance of an array collection of values.
+Any of the following argument types may be passed to this function:
+  - NotationLike
+  - uint representing the size of the array
+  - []V
+  - Sequential[V]
+  - string containing CDCN source code
+*/
 func Array[V any](arguments ...any) col.ArrayLike[V] {
 	// Initialize the possible arguments.
 	var notation = CDCN()
@@ -217,6 +281,15 @@ func Array[V any](arguments ...any) col.ArrayLike[V] {
 	return array
 }
 
+/*
+Catalog[K, V] returns a new instance of a catalog collection of key-value pairs.
+Any of the following argument types may be passed to this function:
+  - NotationLike
+  - map[K]V
+  - []AssociationLike[K, V]
+  - Sequential[AssociationLike[K, V]]
+  - string containing CDCN source code
+*/
 func Catalog[K comparable, V any](arguments ...any) col.CatalogLike[K, V] {
 	// Initialize the possible arguments.
 	var notation = CDCN()
@@ -280,6 +353,14 @@ func Catalog[K comparable, V any](arguments ...any) col.CatalogLike[K, V] {
 	return catalog
 }
 
+/*
+List[V] returns a new instance of a list collection of values.
+Any of the following argument types may be passed to this function:
+  - NotationLike
+  - []V
+  - Sequential[V]
+  - string containing CDCN source code
+*/
 func List[V any](arguments ...any) col.ListLike[V] {
 	// Initialize the possible arguments.
 	var notation = CDCN()
@@ -336,6 +417,15 @@ func List[V any](arguments ...any) col.ListLike[V] {
 	return list
 }
 
+/*
+Map[K, V] returns a new instance of a map collection of key-value pairs.
+Any of the following argument types may be passed to this function:
+  - NotationLike
+  - map[K]V
+  - []AssociationLike[K, V]
+  - Sequential[AssociationLike[K, V]]
+  - string containing CDCN source code
+*/
 func Map[K comparable, V any](arguments ...any) col.MapLike[K, V] {
 	// Initialize the possible arguments.
 	var notation = CDCN()
@@ -399,6 +489,15 @@ func Map[K comparable, V any](arguments ...any) col.MapLike[K, V] {
 	return map_
 }
 
+/*
+Queue[V] returns a new instance of a queue collection of values.
+Any of the following argument types may be passed to this function:
+  - NotationLike
+  - uint representing the capacity of the queue
+  - []V
+  - Sequential[V]
+  - string containing CDCN source code
+*/
 func Queue[V any](arguments ...any) col.QueueLike[V] {
 	// Initialize the possible arguments.
 	var notation = CDCN()
@@ -462,6 +561,15 @@ func Queue[V any](arguments ...any) col.QueueLike[V] {
 	return queue
 }
 
+/*
+Set[V] returns a new instance of a set collection of values.
+Any of the following argument types may be passed to this function:
+  - NotationLike
+  - []V
+  - Sequential[V]
+  - string containing CDCN source code
+  - CollatorLike for ordering the set values
+*/
 func Set[V any](arguments ...any) col.SetLike[V] {
 	// Initialize the possible arguments.
 	var notation = CDCN()
@@ -539,6 +647,15 @@ func Set[V any](arguments ...any) col.SetLike[V] {
 	return set
 }
 
+/*
+Stack[V] returns a new instance of a stack collection of values.
+Any of the following argument types may be passed to this function:
+  - NotationLike
+  - uint representing the capacity of the stack
+  - []V
+  - Sequential[V]
+  - string containing CDCN source code
+*/
 func Stack[V any](arguments ...any) col.StackLike[V] {
 	// Initialize the possible arguments.
 	var notation = CDCN()

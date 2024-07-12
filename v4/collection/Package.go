@@ -45,7 +45,7 @@ import (
 
 /*
 ArrayClassLike[V any] is a class interface that defines the complete set of
-class constants, constructors and functions that must be supported by each
+class constructors, constants and functions that must be supported by each
 concrete array-like class.
 */
 type ArrayClassLike[V any] interface {
@@ -60,7 +60,7 @@ type ArrayClassLike[V any] interface {
 
 /*
 AssociationClassLike[K comparable, V any] is a class interface that defines
-the complete set of class constants, constructors and functions that must be
+the complete set of class constructors, constants and functions that must be
 supported by each concrete association-like class.
 */
 type AssociationClassLike[
@@ -79,7 +79,7 @@ type AssociationClassLike[
 
 /*
 CatalogClassLike[K comparable, V any] is a class interface that defines the
-complete set of class constants, constructors and functions that must be
+complete set of class constructors, constants and functions that must be
 supported by each concrete catalog-like class.
 
 The following functions are supported:
@@ -119,7 +119,7 @@ type CatalogClassLike[
 
 /*
 ListClassLike[V any] is a class interface that defines the complete set of
-class constants, constructors and functions that must be supported by each
+class constructors, constants and functions that must be supported by each
 concrete list-like class.
 
 The following functions are supported:
@@ -145,7 +145,7 @@ type ListClassLike[V any] interface {
 
 /*
 MapClassLike[K comparable, V any] is a class interface that defines the
-complete set of class constants, constructors and functions that must be
+complete set of class constructors, constants and functions that must be
 supported by each concrete map-like class.
 */
 type MapClassLike[
@@ -164,7 +164,7 @@ type MapClassLike[
 
 /*
 NotationClassLike is a class interface that defines the complete set of class
-constants, constructors and functions that must be supported by each concrete
+constructors, constants and functions that must be supported by each concrete
 notation-like class.
 */
 type NotationClassLike interface {
@@ -174,7 +174,7 @@ type NotationClassLike interface {
 
 /*
 QueueClassLike[V any] is a class interface that defines the complete set of
-class constants, constructors and functions that must be supported by each
+class constructors, constants and functions that must be supported by each
 concrete queue-like class.
 
 The following functions are supported:
@@ -230,7 +230,7 @@ type QueueClassLike[V any] interface {
 
 /*
 SetClassLike[V any] is a class interface that defines the complete set of
-class constants, constructors and functions that must be supported by each
+class constructors, constants and functions that must be supported by each
 concrete set-like class.
 
 The following functions are supported:
@@ -278,7 +278,7 @@ type SetClassLike[V any] interface {
 
 /*
 StackClassLike[V any] is a class interface that defines the complete set of
-class constants, constructors and functions that must be supported by each
+class constructors, constants and functions that must be supported by each
 concrete stack-like class.
 */
 type StackClassLike[V any] interface {

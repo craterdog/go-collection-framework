@@ -59,7 +59,7 @@ type RankingFunction[V any] func(
 // Classes
 
 /*
-CollatorClassLike[V any] defines the set of class constants, constructors and
+CollatorClassLike[V any] defines the set of class constructors, constants and
 functions that must be supported by all collator-class-like classes.
 */
 type CollatorClassLike[V any] interface {
@@ -72,7 +72,16 @@ type CollatorClassLike[V any] interface {
 }
 
 /*
-IteratorClassLike[V any] defines the set of class constants, constructors and
+InspectorClassLike defines the set of class constructors, constants and
+functions that must be supported by all inspector-class-like classes.
+*/
+type InspectorClassLike interface {
+	// Constructors
+	Make() InspectorLike
+}
+
+/*
+IteratorClassLike[V any] defines the set of class constructors, constants and
 functions that must be supported by all iterator-class-like classes.
 */
 type IteratorClassLike[V any] interface {
@@ -81,7 +90,7 @@ type IteratorClassLike[V any] interface {
 }
 
 /*
-SorterClassLike[V any] defines the set of class constants, constructors and
+SorterClassLike[V any] defines the set of class constructors, constants and
 functions that must be supported by all sorter-class-like classes.
 */
 type SorterClassLike[V any] interface {
@@ -107,7 +116,6 @@ type CollatorLike[V any] interface {
 	GetMaximum() int
 
 	// Methods
-	IsUndefined(value any) bool
 	CompareValues(
 		first V,
 		second V,
@@ -116,6 +124,23 @@ type CollatorLike[V any] interface {
 		first V,
 		second V,
 	) Rank
+}
+
+/*
+InspectorLike[V any] defines the set of abstractions and methods that must be
+supported by all inspector-like instances.  An inspector-like class is capable
+of determining whether or not values possess certain properties.
+*/
+type InspectorLike interface {
+	// Attributes
+	GetClass() InspectorClassLike
+
+	// Methods
+	ImplementsAspect(
+		value any,
+		aspect any,
+	) bool
+	IsUndefined(value any) bool
 }
 
 /*

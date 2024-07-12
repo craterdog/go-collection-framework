@@ -55,25 +55,56 @@ type Fuz struct {
 	Bar string
 }
 
-func TestCollatorConstants(t *tes.T) {
-	var Collator = age.Collator[any]()
-	ass.Equal(t, 16, Collator.DefaultMaximum())
+func TestImplementsAspect(t *tes.T) {
+	var inspector = age.Inspector().Make()
+	var aspect Foolish
+	var value any
+	ass.False(t, inspector.ImplementsAspect(value, (*Foolish)(nil)))
+	value = "foolish"
+	ass.False(t, inspector.ImplementsAspect(value, (*Foolish)(nil)))
+	value = FooBar(5, "five", aspect)
+	ass.True(t, inspector.ImplementsAspect(value, (*Foolish)(nil)))
 }
 
 func TestIsUndefined(t *tes.T) {
-	var notation = not.Notation().Make()
-	var collator = age.Collator[any]().Make()
-	var array = col.Array[any](notation).MakeFromArray([]any{"foo", []int{1, 2, 3}})
-	var empty = col.List[any](notation).Make()
-	var name = "foobar"
-	var undefined string
+	var inspector = age.Inspector().Make()
+
 	var integer int
-	ass.False(t, collator.IsUndefined(array))
-	ass.False(t, collator.IsUndefined(empty))
-	ass.False(t, collator.IsUndefined(name))
-	ass.True(t, collator.IsUndefined(""))
-	ass.True(t, collator.IsUndefined(undefined))
-	ass.False(t, collator.IsUndefined(integer))
+	ass.False(t, inspector.IsUndefined(integer))
+	integer = 5
+	ass.False(t, inspector.IsUndefined(integer))
+
+	var name string
+	ass.True(t, inspector.IsUndefined(name))
+	name = ""
+	ass.True(t, inspector.IsUndefined(name))
+	name = "foobar"
+	ass.False(t, inspector.IsUndefined(name))
+
+	var slice []int
+	ass.True(t, inspector.IsUndefined(slice))
+	slice = []int{}
+	ass.False(t, inspector.IsUndefined(slice))
+	slice = []int{1, 2, 3}
+	ass.False(t, inspector.IsUndefined(slice))
+
+	var list col.ListLike[string]
+	ass.True(t, inspector.IsUndefined(list))
+	var notation = not.Notation().Make()
+	list = col.List[string](notation).Make()
+	ass.False(t, inspector.IsUndefined(list))
+	list.AppendValue(name)
+	ass.False(t, inspector.IsUndefined(list))
+
+	var sequence col.Sequential[string]
+	ass.True(t, inspector.IsUndefined(sequence))
+	sequence = list
+	ass.False(t, inspector.IsUndefined(sequence))
+}
+
+func TestCollatorConstants(t *tes.T) {
+	var Collator = age.Collator[any]()
+	ass.Equal(t, 16, Collator.DefaultMaximum())
 }
 
 func TestCompareMaximum(t *tes.T) {

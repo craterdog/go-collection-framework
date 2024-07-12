@@ -140,7 +140,7 @@ type InspectorLike interface {
 		value any,
 		aspect any,
 	) bool
-	IsUndefined(value any) bool
+	IsDefined(value any) bool
 }
 
 /*

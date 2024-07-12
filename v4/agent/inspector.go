@@ -67,8 +67,8 @@ func (v *inspector_) ImplementsAspect(
 	return v.implementsAspect(value, aspect)
 }
 
-func (v *inspector_) IsUndefined(value any) bool {
-	return v.isUndefined(value)
+func (v *inspector_) IsDefined(value any) bool {
+	return v.isDefined(value)
 }
 
 // Private
@@ -77,15 +77,15 @@ func (v *inspector_) implementsAspect(
 	value any,
 	aspect any,
 ) bool {
-	if v.isUndefined(value) {
-		return false
+	if v.isDefined(value) {
+		var reflectedType = ref.TypeOf(value)
+		var aspectType = ref.TypeOf(aspect).Elem()
+		return reflectedType.Implements(aspectType)
 	}
-	var reflectedType = ref.TypeOf(value)
-	var aspectType = ref.TypeOf(aspect).Elem()
-	return reflectedType.Implements(aspectType)
+	return false
 }
 
-func (v *inspector_) isUndefined(value any) bool {
+func (v *inspector_) isDefined(value any) bool {
 	// This method addresses the inconsistencies in the Go language with respect
 	// to whether or not a value is defined or not.  Go handles interfaces,
 	// pointers and various primitive types differently.  This makes consistent
@@ -93,7 +93,7 @@ func (v *inspector_) isUndefined(value any) bool {
 	// place (hopefully correctly).
 	switch actual := value.(type) {
 	case string:
-		return len(actual) == 0
+		return len(actual) > 0
 	default:
 		var meta = ref.ValueOf(actual)
 		var isPointer = meta.Kind() == ref.Ptr ||
@@ -103,7 +103,6 @@ func (v *inspector_) isUndefined(value any) bool {
 			meta.Kind() == ref.Chan ||
 			meta.Kind() == ref.Func
 		var isNil = isPointer && meta.IsNil()
-		var isInvalid = !isNil && !meta.IsValid()
-		return isNil || isInvalid
+		return !isNil && meta.IsValid()
 	}
 }

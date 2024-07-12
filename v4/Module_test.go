@@ -24,7 +24,7 @@ func TestGlobalFunctions(t *tes.T) {
 	var array = col.Array[int]([]int{1, 2, 3})
 	var source = col.FormatValue(array)
 	var notNil = col.ParseSource(source)
-	ass.False(t, col.IsUndefined(notNil))
+	ass.True(t, col.IsDefined(notNil))
 }
 
 func TestCDCNConstructor(t *tes.T) {

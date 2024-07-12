@@ -66,40 +66,40 @@ func TestImplementsAspect(t *tes.T) {
 	ass.True(t, inspector.ImplementsAspect(value, (*Foolish)(nil)))
 }
 
-func TestIsUndefined(t *tes.T) {
+func TestIsDefined(t *tes.T) {
 	var inspector = age.Inspector().Make()
 
 	var integer int
-	ass.False(t, inspector.IsUndefined(integer))
+	ass.True(t, inspector.IsDefined(integer))
 	integer = 5
-	ass.False(t, inspector.IsUndefined(integer))
+	ass.True(t, inspector.IsDefined(integer))
 
 	var name string
-	ass.True(t, inspector.IsUndefined(name))
+	ass.False(t, inspector.IsDefined(name))
 	name = ""
-	ass.True(t, inspector.IsUndefined(name))
+	ass.False(t, inspector.IsDefined(name))
 	name = "foobar"
-	ass.False(t, inspector.IsUndefined(name))
+	ass.True(t, inspector.IsDefined(name))
 
 	var slice []int
-	ass.True(t, inspector.IsUndefined(slice))
+	ass.False(t, inspector.IsDefined(slice))
 	slice = []int{}
-	ass.False(t, inspector.IsUndefined(slice))
+	ass.True(t, inspector.IsDefined(slice))
 	slice = []int{1, 2, 3}
-	ass.False(t, inspector.IsUndefined(slice))
+	ass.True(t, inspector.IsDefined(slice))
 
 	var list col.ListLike[string]
-	ass.True(t, inspector.IsUndefined(list))
+	ass.False(t, inspector.IsDefined(list))
 	var notation = not.Notation().Make()
 	list = col.List[string](notation).Make()
-	ass.False(t, inspector.IsUndefined(list))
+	ass.True(t, inspector.IsDefined(list))
 	list.AppendValue(name)
-	ass.False(t, inspector.IsUndefined(list))
+	ass.True(t, inspector.IsDefined(list))
 
 	var sequence col.Sequential[string]
-	ass.True(t, inspector.IsUndefined(sequence))
+	ass.False(t, inspector.IsDefined(sequence))
 	sequence = list
-	ass.False(t, inspector.IsUndefined(sequence))
+	ass.True(t, inspector.IsDefined(sequence))
 }
 
 func TestCollatorConstants(t *tes.T) {

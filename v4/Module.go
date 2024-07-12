@@ -105,7 +105,7 @@ func ImplementsAspect(value any, aspect any) bool {
 }
 
 /*
-IsUndefined determines whether of not the specified value is defined.  The Go
+IsDefined determines whether of not the specified value is defined.  The Go
 language does not provide an easy way to test this so we provide this function
 to make it easier.  The result of the function is determined logically as:
   - The value is a pointer and set to nil; or
@@ -114,9 +114,9 @@ to make it easier.  The result of the function is determined logically as:
 An empty string, for example, is determined to be undefined; while an integer
 with a value of zero is defined.
 */
-func IsUndefined(value any) bool {
+func IsDefined(value any) bool {
 	var inspector = age.Inspector().Make()
-	return inspector.IsUndefined(value)
+	return inspector.IsDefined(value)
 }
 
 // UNIVERSAL CONSTRUCTORS

@@ -44,6 +44,18 @@ import (
 // Agents
 
 type (
+	Rank = age.Rank
+)
+
+const (
+	LesserRank  = age.LesserRank
+	EqualRank   = age.EqualRank
+	GreaterRank = age.GreaterRank
+)
+
+// Collections
+
+type (
 	NotationLike = col.NotationLike
 )
 
@@ -51,8 +63,6 @@ type (
 NOTE:
 The Go language does not currently support aliases for generic types.  If it
 ever does, the following lines should be uncommented:
-
-// Collections
 
 type (
 	AssociationLike = col.AssociationLike

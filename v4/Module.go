@@ -108,15 +108,28 @@ func ImplementsAspect(value any, aspect any) bool {
 IsDefined determines whether of not the specified value is defined.  The Go
 language does not provide an easy way to test this so we provide this function
 to make it easier.  The result of the function is determined logically as:
-  - The value is a pointer and set to nil; or
-  - The value is not a pointer and has an invalid value.
+  - The value is a pointer and not set to nil; or
+  - The value is not a pointer and has a valid value.
 
-An empty string, for example, is determined to be undefined; while an integer
-with a value of zero is defined.
+An integer with a value of zero, for example is defined.
 */
 func IsDefined(value any) bool {
 	var inspector = age.Inspector().Make()
 	return inspector.IsDefined(value)
+}
+
+/*
+IsUndefined determines whether of not the specified value is undefined.  The Go
+language does not provide an easy way to test this so we provide this function
+to make it easier.  The result of the function is determined logically as:
+  - The value is a pointer and set to nil; or
+  - The value is not a pointer and has an invalid value.
+
+An empty string, for example, is undefined.
+*/
+func IsUndefined(value any) bool {
+	var inspector = age.Inspector().Make()
+	return !inspector.IsDefined(value)
 }
 
 // UNIVERSAL CONSTRUCTORS

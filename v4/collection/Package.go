@@ -50,7 +50,7 @@ concrete array-like class.
 */
 type ArrayClassLike[V any] interface {
 	// Constructors
-	MakeWithSize(size uint) ArrayLike[V]
+	Make(size uint) ArrayLike[V]
 	MakeFromArray(values []V) ArrayLike[V]
 	MakeFromSequence(values Sequential[V]) ArrayLike[V]
 
@@ -68,7 +68,7 @@ type AssociationClassLike[
 	V any,
 ] interface {
 	// Constructors
-	MakeWithAttributes(
+	Make(
 		key K,
 		value V,
 	) AssociationLike[K, V]

@@ -69,7 +69,7 @@ func (c *associationClass_[K, V]) Notation() NotationLike {
 
 // Constructors
 
-func (c *associationClass_[K, V]) MakeWithAttributes(
+func (c *associationClass_[K, V]) Make(
 	key K,
 	value V,
 ) AssociationLike[K, V] {

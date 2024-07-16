@@ -177,7 +177,7 @@ func (v *catalog_[K, V]) SetValue(key K, value V) {
 		association.SetValue(value)
 	} else {
 		// Add a new association.
-		association = Association[K, V](v.GetClass().Notation()).MakeWithAttributes(key, value)
+		association = Association[K, V](v.GetClass().Notation()).Make(key, value)
 		v.associations_.AppendValue(association)
 		v.keys_[key] = association
 	}

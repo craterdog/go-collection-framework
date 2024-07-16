@@ -220,7 +220,7 @@ func (v *parser_) parseAssociation() (
 
 	// Found an association.
 	var notation = Notation().Make()
-	association = col.Association[any, any](notation).MakeWithAttributes(key, value)
+	association = col.Association[any, any](notation).Make(key, value)
 	return association, token, true
 }
 

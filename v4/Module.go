@@ -225,7 +225,7 @@ func Association[K comparable, V any](arguments ...any) col.AssociationLike[K, V
 	if !ref.ValueOf(key).IsValid() || !ref.ValueOf(value).IsValid() {
 		panic("The constructor for an association requires a key and value.")
 	}
-	var association = class.MakeWithAttributes(key, value)
+	var association = class.Make(key, value)
 	return association
 }
 
@@ -281,7 +281,7 @@ func Array[V any](arguments ...any) col.ArrayLike[V] {
 	var array col.ArrayLike[V]
 	switch {
 	case size > 0:
-		array = class.MakeWithSize(size)
+		array = class.Make(size)
 	case len(values) > 0:
 		array = class.MakeFromArray(values)
 	case sequence != nil:
@@ -290,7 +290,7 @@ func Array[V any](arguments ...any) col.ArrayLike[V] {
 		var collection = notation.ParseSource(source).(col.Sequential[any])
 		// Convert the values to their real type.
 		size = uint(collection.GetSize())
-		array = class.MakeWithSize(size)
+		array = class.Make(size)
 		var index int = 0
 		var iterator = collection.GetIterator()
 		for iterator.HasNext() {

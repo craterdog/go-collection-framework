@@ -71,7 +71,7 @@ func (c *listClass_[V]) Notation() NotationLike {
 // Constructors
 
 func (c *listClass_[V]) Make() ListLike[V] {
-	var values = Array[V](c.notation_).MakeWithSize(0)
+	var values = Array[V](c.notation_).Make(0)
 	return &list_[V]{
 		class_:  c,
 		values_: values,
@@ -133,7 +133,7 @@ func (v *list_[V]) InsertValue(slot uint, value V) {
 
 	// Create a new larger array.
 	var size = uint(v.GetSize() + 1)
-	var array = Array[V](v.GetClass().Notation()).MakeWithSize(size)
+	var array = Array[V](v.GetClass().Notation()).Make(size)
 
 	// Copy the values into the new array.
 	var iterator = v.GetIterator()
@@ -157,7 +157,7 @@ func (v *list_[V]) InsertValues(slot uint, values Sequential[V]) {
 
 	// Create a new larger array.
 	var size = uint(v.GetSize() + values.GetSize())
-	var array = Array[V](v.GetClass().Notation()).MakeWithSize(size)
+	var array = Array[V](v.GetClass().Notation()).Make(size)
 
 	// Copy the values into the new array.
 	var iterator = v.GetIterator()
@@ -185,7 +185,7 @@ func (v *list_[V]) AppendValue(value V) {
 
 	// Create a new larger array.
 	var size = uint(v.GetSize() + 1)
-	var array = Array[V](v.GetClass().Notation()).MakeWithSize(size)
+	var array = Array[V](v.GetClass().Notation()).Make(size)
 
 	// Copy the existing values into the new array.
 	var index int
@@ -208,7 +208,7 @@ func (v *list_[V]) AppendValues(values Sequential[V]) {
 
 	// Create a new larger array.
 	var size = uint(v.GetSize() + values.GetSize())
-	var array = Array[V](v.GetClass().Notation()).MakeWithSize(size)
+	var array = Array[V](v.GetClass().Notation()).Make(size)
 
 	// Copy the existing values into the new array.
 	var index int
@@ -236,7 +236,7 @@ func (v *list_[V]) RemoveValue(index int) V {
 	// Create a new smaller array.
 	var removed = v.GetValue(index)
 	var size = uint(v.GetSize() - 1)
-	var array = Array[V](v.GetClass().Notation()).MakeWithSize(size)
+	var array = Array[V](v.GetClass().Notation()).Make(size)
 
 	// Copy the remaining values into the new array.
 	var counter = v.toNormalized(index)
@@ -266,8 +266,8 @@ func (v *list_[V]) RemoveValues(first int, last int) Sequential[V] {
 	var delta = uint(last - first + 1)
 	var size = uint(v.GetSize()) - delta
 	var Array = Array[V](v.GetClass().Notation())
-	var removed = Array.MakeWithSize(delta)
-	var array = Array.MakeWithSize(size)
+	var removed = Array.Make(delta)
+	var array = Array.Make(size)
 
 	// Split the existing values into the two new arrays.
 	var counter int
@@ -293,7 +293,7 @@ func (v *list_[V]) RemoveValues(first int, last int) Sequential[V] {
 }
 
 func (v *list_[V]) RemoveAll() {
-	v.values_ = Array[V](v.GetClass().Notation()).MakeWithSize(0)
+	v.values_ = Array[V](v.GetClass().Notation()).Make(0)
 }
 
 // Searchable

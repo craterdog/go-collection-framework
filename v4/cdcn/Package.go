@@ -117,7 +117,7 @@ concrete token-like class.
 */
 type TokenClassLike interface {
 	// Constructors
-	MakeWithAttributes(
+	Make(
 		line int,
 		position int,
 		type_ TokenType,

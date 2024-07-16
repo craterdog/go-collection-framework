@@ -26,7 +26,7 @@ type Integer int
 func TestArrayConstructors(t *tes.T) {
 	var notation = not.Notation().Make()
 	var Array = col.Array[int64](notation)
-	Array.MakeWithSize(5)
+	Array.Make(5)
 	var sequence = Array.MakeFromArray([]int64{1, 2, 3})
 	var array = Array.MakeFromSequence(sequence)
 	ass.Equal(t, sequence.AsArray(), array.AsArray())
@@ -34,7 +34,7 @@ func TestArrayConstructors(t *tes.T) {
 
 func TestEmptyArray(t *tes.T) {
 	var notation = not.Notation().Make()
-	var array = col.Array[string](notation).MakeWithSize(0)
+	var array = col.Array[string](notation).Make(0)
 	ass.True(t, array.IsEmpty())
 	ass.Equal(t, 0, array.GetSize())
 	ass.Equal(t, []string{}, array.AsArray())
@@ -56,7 +56,7 @@ func TestEmptyArray(t *tes.T) {
 
 func TestArrayWithSize(t *tes.T) {
 	var notation = not.Notation().Make()
-	var array = col.Array[string](notation).MakeWithSize(3)
+	var array = col.Array[string](notation).Make(3)
 	ass.False(t, array.IsEmpty())
 	ass.Equal(t, 3, array.GetSize())
 	ass.Equal(t, []string{"", "", ""}, array.AsArray())
@@ -135,7 +135,7 @@ func TestArrayWithIntegers(t *tes.T) {
 
 func TestAssociations(t *tes.T) {
 	var notation = not.Notation().Make()
-	var association = col.Association[string, int](notation).MakeWithAttributes("foo", 1)
+	var association = col.Association[string, int](notation).Make("foo", 1)
 	ass.Equal(t, "foo", association.GetKey())
 	ass.Equal(t, 1, association.GetValue())
 	association.SetValue(2)
@@ -162,9 +162,9 @@ func TestCatalogsWithStringsAndIntegers(t *tes.T) {
 	var catalogCollator = age.Collator[col.CatalogLike[string, int]]().Make()
 	var keys = col.Array[string](notation).MakeFromArray([]string{"foo", "bar"})
 	var Association = col.Association[string, int](notation)
-	var association1 = Association.MakeWithAttributes("foo", 1)
-	var association2 = Association.MakeWithAttributes("bar", 2)
-	var association3 = Association.MakeWithAttributes("baz", 3)
+	var association1 = Association.Make("foo", 1)
+	var association2 = Association.Make("bar", 2)
+	var association3 = Association.Make("baz", 3)
 	var Catalog = col.Catalog[string, int](notation)
 	var catalog = Catalog.Make()
 	ass.True(t, catalog.IsEmpty())
@@ -230,9 +230,9 @@ func TestCatalogsWithMerge(t *tes.T) {
 	var notation = not.Notation().Make()
 	var collator = age.Collator[col.CatalogLike[string, int]]().Make()
 	var Association = col.Association[string, int](notation)
-	var association1 = Association.MakeWithAttributes("foo", 1)
-	var association2 = Association.MakeWithAttributes("bar", 2)
-	var association3 = Association.MakeWithAttributes("baz", 3)
+	var association1 = Association.Make("foo", 1)
+	var association2 = Association.Make("bar", 2)
+	var association3 = Association.Make("baz", 3)
 	var Catalog = col.Catalog[string, int](notation)
 	var catalog1 = Catalog.Make()
 	catalog1.SetValue(association1.GetKey(), association1.GetValue())
@@ -253,9 +253,9 @@ func TestCatalogsWithExtract(t *tes.T) {
 	var collator = age.Collator[col.CatalogLike[string, int]]().Make()
 	var keys = col.Array[string](notation).MakeFromArray([]string{"foo", "baz"})
 	var Association = col.Association[string, int](notation)
-	var association1 = Association.MakeWithAttributes("foo", 1)
-	var association2 = Association.MakeWithAttributes("bar", 2)
-	var association3 = Association.MakeWithAttributes("baz", 3)
+	var association1 = Association.Make("foo", 1)
+	var association2 = Association.Make("bar", 2)
+	var association3 = Association.Make("baz", 3)
 	var Catalog = col.Catalog[string, int](notation)
 	var catalog1 = Catalog.Make()
 	catalog1.SetValue(association1.GetKey(), association1.GetValue())
@@ -277,7 +277,7 @@ func TestCatalogsWithExtract(t *tes.T) {
 func TestCatalogsWithEmptyCatalogs(t *tes.T) {
 	var notation = not.Notation().Make()
 	var collator = age.Collator[col.CatalogLike[int, string]]().Make()
-	var keys = col.Array[int](notation).MakeWithSize(0)
+	var keys = col.Array[int](notation).Make(0)
 	var Catalog = col.Catalog[int, string](notation)
 	var catalog1 = Catalog.Make()
 	var catalog2 = Catalog.Make()
@@ -498,9 +498,9 @@ func TestEmptyMaps(t *tes.T) {
 func TestMapsWithStringsAndIntegers(t *tes.T) {
 	var notation = not.Notation().Make()
 	var Association = col.Association[string, int](notation)
-	var association1 = Association.MakeWithAttributes("foo", 1)
-	var association2 = Association.MakeWithAttributes("bar", 2)
-	var association3 = Association.MakeWithAttributes("baz", 3)
+	var association1 = Association.Make("foo", 1)
+	var association2 = Association.Make("bar", 2)
+	var association3 = Association.Make("baz", 3)
 	var Map = col.Map[string, int](notation)
 	var m = Map.MakeFromArray([]col.AssociationLike[string, int]{
 		association1,

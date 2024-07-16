@@ -36,7 +36,7 @@ type tokenClass_ struct {
 
 // Constructors
 
-func (c *tokenClass_) MakeWithAttributes(
+func (c *tokenClass_) Make(
 	line int,
 	position int,
 	type_ TokenType,

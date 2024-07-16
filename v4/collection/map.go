@@ -209,7 +209,7 @@ func (v map_[K, V]) AsArray() []AssociationLike[K, V] {
 	var array = make([]AssociationLike[K, V], size)
 	var index = 0
 	for key, value := range v {
-		var association = Association[K, V](v.GetClass().Notation()).MakeWithAttributes(key, value)
+		var association = Association[K, V](v.GetClass().Notation()).Make(key, value)
 		array[index] = association
 		index++
 	}

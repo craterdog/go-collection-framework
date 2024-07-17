@@ -41,18 +41,18 @@ var scannerClass = &scannerClass_{
 		TypeToken:        "type",
 	},
 	matchers_: map[TokenType]*reg.Regexp{
-		BooleanToken:     reg.MustCompile(`^(?:` + boolean_ + `)`),
-		ComplexToken:     reg.MustCompile(`^(?:` + complex_ + `)`),
-		DelimiterToken:   reg.MustCompile(`^(?:` + delimiter_ + `)`),
-		EOLToken:         reg.MustCompile(`^(?:` + eol_ + `)`),
-		FloatToken:       reg.MustCompile(`^(?:` + float_ + `)`),
-		HexadecimalToken: reg.MustCompile(`^(?:` + hexadecimal_ + `)`),
-		IntegerToken:     reg.MustCompile(`^(?:` + integer_ + `)`),
-		NilToken:         reg.MustCompile(`^(?:` + nil_ + `)`),
-		RuneToken:        reg.MustCompile(`^(?:` + rune_ + `)`),
-		SpaceToken:       reg.MustCompile(`^(?:` + space_ + `)`),
-		StringToken:      reg.MustCompile(`^(?:` + string_ + `)`),
-		TypeToken:        reg.MustCompile(`^(?:` + type_ + `)`),
+		BooleanToken:     reg.MustCompile("^(?:" + boolean_ + ")"),
+		ComplexToken:     reg.MustCompile("^(?:" + complex_ + ")"),
+		DelimiterToken:   reg.MustCompile("^(?:" + delimiter_ + ")"),
+		EOLToken:         reg.MustCompile("^(?:" + eol_ + ")"),
+		FloatToken:       reg.MustCompile("^(?:" + float_ + ")"),
+		HexadecimalToken: reg.MustCompile("^(?:" + hexadecimal_ + ")"),
+		IntegerToken:     reg.MustCompile("^(?:" + integer_ + ")"),
+		NilToken:         reg.MustCompile("^(?:" + nil_ + ")"),
+		RuneToken:        reg.MustCompile("^(?:" + rune_ + ")"),
+		SpaceToken:       reg.MustCompile("^(?:" + space_ + ")"),
+		StringToken:      reg.MustCompile("^(?:" + string_ + ")"),
+		TypeToken:        reg.MustCompile("^(?:" + type_ + ")"),
 	},
 }
 
@@ -238,26 +238,26 @@ way.  We append an underscore to each name to lessen the chance of a name
 collision with other private Go class constants in this package.
 */
 const (
-	base10_      = `[0-9]`
-	base16_      = `[0-9a-f]`
-	boolean_     = `false|true`
-	complex_     = `\((` + float_ + `)` + sign_ + `(` + float_ + `)i\)`
-	delimiter_   = `\[|\]|\(|\)|:|,`
-	eol_         = `\n`
-	escape_      = `\\(?:(?:` + unicode_ + `)|[abfnrtv'"\\])`
-	exponent_    = `[eE]` + sign_ + ordinal_
-	float_       = sign_ + `?(?:` + scalar_ + `)(?:` + exponent_ + `)?`
-	fraction_    = `\.` + base10_ + `+`
-	hexadecimal_ = `0x` + base16_ + `+`
-	integer_     = zero_ + `|` + sign_ + `?` + ordinal_
-	nil_         = `nil`
-	ordinal_     = `[1-9][0-9]*`
-	rune_        = `'(` + escape_ + `|[^'` + eol_ + `])'`
-	scalar_      = `(?:` + zero_ + `|` + ordinal_ + `)` + fraction_
-	sign_        = `[+-]`
-	space_       = `[ ]+`
-	string_      = `"(` + escape_ + `|[^"` + eol_ + `])*"`
-	type_        = `Array|Catalog|List|Map|Queue|Set|Stack`
-	unicode_     = `x` + base16_ + `{2}|u` + base16_ + `{4}|U` + base16_ + `{8}`
-	zero_        = `0`
+	base10_      = "[0-9]"
+	base16_      = "[0-9a-f]"
+	boolean_     = "false|true"
+	complex_     = "\\((" + float_ + ")" + sign_ + "(" + float_ + ")i\\)"
+	delimiter_   = "\\[|\\]|\\(|\\)|:|,"
+	eol_         = "\\n"
+	escape_      = "\\\\(?:(?:" + unicode_ + ")|[abfnrtv'\"\\\\])"
+	exponent_    = "[eE]" + sign_ + ordinal_
+	float_       = sign_ + "?(?:" + scalar_ + ")(?:" + exponent_ + ")?"
+	fraction_    = "\\." + base10_ + "+"
+	hexadecimal_ = "0x" + base16_ + "+"
+	integer_     = zero_ + "|" + sign_ + "?" + ordinal_
+	nil_         = "nil"
+	ordinal_     = "[1-9][0-9]*"
+	rune_        = "'(" + escape_ + "|[^'" + eol_ + "])'"
+	scalar_      = "(?:" + zero_ + "|" + ordinal_ + ")" + fraction_
+	sign_        = "[+-]"
+	space_       = "[ ]+"
+	string_      = "\"(" + escape_ + "|[^\"" + eol_ + "])*\""
+	type_        = "Array|Catalog|List|Map|Queue|Set|Stack"
+	unicode_     = "x" + base16_ + "{2}|u" + base16_ + "{4}|U" + base16_ + "{8}"
+	zero_        = "0"
 )

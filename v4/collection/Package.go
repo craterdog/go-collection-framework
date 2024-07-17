@@ -32,7 +32,7 @@ Conventions located here:
 
 Additional implementations of the classes provided by this package can be
 developed and used seamlessly since the interface definitions only depend on
-other interfaces and primitive types; and the class implementations only depend
+other interfaces and intrinsic types; and the class implementations only depend
 on interfaces, not on each other.
 */
 package collection
@@ -307,7 +307,7 @@ description of what this means in the Accessible interface definition).
 This type is parameterized as follows:
   - V is any type of value.
 
-This type essentially provides a higher level abstraction for the primitive Go
+This type essentially provides a higher level abstraction for the intrinsic Go
 array type.
 */
 type ArrayLike[V any] interface {
@@ -327,7 +327,7 @@ the complete set of instance attributes, abstractions and methods that must be
 supported by each instance of a concrete association-like class.
 
 This type is parameterized as follows:
-  - K is a primitive type of key.
+  - K is an intrinsic type of key.
   - V is any type of value.
 
 This type is used by catalog-like instances to maintain their associations.
@@ -349,7 +349,7 @@ complete set of instance attributes, abstractions and methods that must be
 supported by each instance of a concrete catalog-like class.
 
 This type is parameterized as follows:
-  - K is a primitive type of key.
+  - K is an intrinsic type of key.
   - V is any type of entity.
 
 A catalog-like class can use any association-like class key-value association.
@@ -399,12 +399,12 @@ type ListLike[V any] interface {
 MapLike[K comparable, V any] is an instance interface that defines the
 complete set of instance attributes, abstractions and methods that must be
 supported by each instance of a concrete map-like class.  A map-like class
-extends the primitive Go map type and maintains a sequence of key-value
-associations.  The order of the key-value associations in a primitive Go map is
+extends the intrinsic Go map type and maintains a sequence of key-value
+associations.  The order of the key-value associations in an intrinsic Go map is
 random, even for two Go maps containing the same key-value associations.
 
 This type is parameterized as follows:
-  - K is a primitive type of key.
+  - K is an intrinsic type of key.
   - V is any type of entity.
 
 A map-like class can use any association-like class key-value association.

@@ -73,7 +73,7 @@ func TestModuleExampleCode(t *tes.T) {
 	var array = col.Array[int64](notation, 3)
 	fmt.Println(array)
 
-	// Create a new array collection from a primitive Go array of values.
+	// Create a new array collection from an intrinsic Go array of values.
 	array = col.Array[int64]([]int64{1, 2, 3})
 	fmt.Println(array)
 
@@ -85,14 +85,14 @@ func TestModuleExampleCode(t *tes.T) {
 	var map_ = col.Map[string, int64]()
 	fmt.Println(map_)
 
-	// Create a new map collection from a primitive Go map of associations.
+	// Create a new map collection from an intrinsic Go map of associations.
 	map_ = col.Map[string, int64](map[string]int64{
 		"one": 1,
 		"two": 2,
 	})
 	fmt.Println(map_)
 
-	// Create a new map collection from a primitive Go array of associations.
+	// Create a new map collection from an intrinsic Go array of associations.
 	map_ = col.Map[string, int64](map_.AsArray())
 	fmt.Println(map_)
 
@@ -108,7 +108,7 @@ func TestModuleExampleCode(t *tes.T) {
 	var list = col.List[string]()
 	fmt.Println(list)
 
-	// Create a new list collection using a primitive Go array of values.
+	// Create a new list collection using an intrinsic Go array of values.
 	list = col.List[string]([]string{
 		"Hello",
 		"World",
@@ -141,7 +141,7 @@ func TestModuleExampleCode(t *tes.T) {
 	var set = col.Set[string]()
 	fmt.Println(set)
 
-	// Create a new set collection from a primitive Go array of values.
+	// Create a new set collection from an intrinsic Go array of values.
 	set = col.Set[string]([]string{"c", "a", "b"})
 	fmt.Println(set)
 
@@ -437,7 +437,7 @@ func TestIteratorExampleCode(t *tes.T) {
 func TestCDCNImportExampleCode(t *tes.T) {
 	fmt.Println("CDCN IMPORT EXAMPLE:")
 
-	// Define the source string for a catalog collection containing all the Go primitive types.
+	// Define the source string for a catalog collection containing all the Go intrinsic types.
 	var source = `[
     "boolean": true
     "unsigned": 0xa
@@ -469,7 +469,7 @@ func TestCDCNImportExampleCode(t *tes.T) {
 func TestCDCNExportExampleCode(t *tes.T) {
 	fmt.Println("CDCN EXPORT EXAMPLE:")
 
-	// Define "zero" values for each primitive Go type.
+	// Define "zero" values for each intrinsic Go type.
 	var v1 bool
 	var v2 uint
 	var v3 int

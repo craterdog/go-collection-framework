@@ -195,7 +195,7 @@ func (v *collator_[V]) compareMaps(first ref.Value, second ref.Value) bool {
 	return true
 }
 
-func (v *collator_[V]) comparePrimitives(first, second ref.Value) bool {
+func (v *collator_[V]) compareIntrinsics(first, second ref.Value) bool {
 	return first.Interface() == second.Interface()
 }
 
@@ -227,15 +227,15 @@ func (v *collator_[V]) compareValues(first ref.Value, second ref.Value) bool {
 	// the values is invalid.
 	switch first.Kind() {
 
-	// Handle all primitive types.
+	// Handle all intrinsic primitive types.
 	case ref.Bool,
 		ref.Uint8, ref.Uint16, ref.Uint32, ref.Uint64, ref.Uint,
 		ref.Int8, ref.Int16, ref.Int32, ref.Int64, ref.Int,
 		ref.Float32, ref.Float64, ref.Complex64, ref.Complex128,
 		ref.String:
-		return v.comparePrimitives(first, second)
+		return v.compareIntrinsics(first, second)
 
-	// Handle all primitive collection types.
+	// Handle all intrinsic collection types.
 	case ref.Array, ref.Slice:
 		switch {
 		case first.IsNil():
@@ -523,7 +523,7 @@ func (v *collator_[V]) rankMaps(first ref.Value, second ref.Value) Rank {
 	return EqualRank
 }
 
-func (v *collator_[V]) rankPrimitives(first, second ref.Value) Rank {
+func (v *collator_[V]) rankIntrinsics(first, second ref.Value) Rank {
 	var firstValue = first.Interface()
 	var secondValue = second.Interface()
 	switch first.Kind() {
@@ -658,15 +658,15 @@ func (v *collator_[V]) rankValues(first ref.Value, second ref.Value) Rank {
 	// the values is nil.
 	switch first.Kind() {
 
-	// Handle all primitive types.
+	// Handle all intrinsic primitive types.
 	case ref.Bool,
 		ref.Uint8, ref.Uint16, ref.Uint32, ref.Uint64, ref.Uint,
 		ref.Int8, ref.Int16, ref.Int32, ref.Int64, ref.Int,
 		ref.Float32, ref.Float64, ref.Complex64, ref.Complex128,
 		ref.String:
-		return v.rankPrimitives(first, second)
+		return v.rankIntrinsics(first, second)
 
-	// Handle all primitive collection types.
+	// Handle all intrinsic collection types.
 	case ref.Array, ref.Slice:
 		switch {
 		case first.IsNil():

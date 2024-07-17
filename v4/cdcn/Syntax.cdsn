@@ -71,10 +71,10 @@ AdditionalValue: "," Value
 MultilineValue: EOL Value
 
 Value:
-    Primitive
+    Intrinsic
     Collection
 
-Primitive:
+Intrinsic:
     boolean
     complex
     float
@@ -93,7 +93,7 @@ AdditionalAssociation: "," Association
 
 MultilineAssociation: EOL Association
 
-Association: Primitive ":" Value
+Association: Intrinsic ":" Value
 
 !>
 TOKEN DEFINITIONS

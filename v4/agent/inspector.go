@@ -88,7 +88,7 @@ func (v *inspector_) implementsAspect(
 func (v *inspector_) isDefined(value any) bool {
 	// This method addresses the inconsistencies in the Go language with respect
 	// to whether or not a value is defined or not.  Go handles interfaces,
-	// pointers and various primitive types differently.  This makes consistent
+	// pointers and various intrinsic types differently.  This makes consistent
 	// checking across different types problematic.  We handle it here in one
 	// place (hopefully correctly).
 	switch actual := value.(type) {

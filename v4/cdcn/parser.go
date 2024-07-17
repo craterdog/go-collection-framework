@@ -193,7 +193,7 @@ func (v *parser_) parseAssociation() (
 	token TokenLike,
 	ok bool,
 ) {
-	// Attempt to parse a primitive key.
+	// Attempt to parse an intrinsic key.
 	var key any
 	key, token, ok = v.parseKey()
 	if !ok {
@@ -201,7 +201,7 @@ func (v *parser_) parseAssociation() (
 	}
 	_, _, ok = v.parseToken(DelimiterToken, ":")
 	if !ok {
-		// The primitive token is not a key.
+		// The intrinsic token is not a key.
 		v.putBack(token)
 		return association, token, false
 	}
@@ -213,7 +213,7 @@ func (v *parser_) parseAssociation() (
 		var message = v.formatError(token)
 		message += v.generateSyntax("Value",
 			"Association",
-			"Primitive",
+			"Intrinsic",
 			"Value")
 		panic(message)
 	}
@@ -430,13 +430,13 @@ func (v *parser_) parseKey() (
 	token TokenLike,
 	ok bool,
 ) {
-	// Attempt to parse a primitive.
-	key, token, ok = v.parsePrimitive()
+	// Attempt to parse an intrinsic.
+	key, token, ok = v.parseIntrinsic()
 	if !ok {
 		return key, token, false
 	}
 
-	// Found a primitive key.
+	// Found an intrinsic key.
 	return key, token, true
 }
 
@@ -534,57 +534,57 @@ func (v *parser_) parseMultilineValues() (
 	return values, token, true
 }
 
-func (v *parser_) parsePrimitive() (
-	primitive any,
+func (v *parser_) parseIntrinsic() (
+	intrinsic any,
 	token TokenLike,
 	ok bool,
 ) {
 	_, token, ok = v.parseToken(BooleanToken, "")
 	if ok {
-		primitive, _ = stc.ParseBool(token.GetValue())
-		return primitive, token, true
+		intrinsic, _ = stc.ParseBool(token.GetValue())
+		return intrinsic, token, true
 	}
 	_, token, ok = v.parseToken(ComplexToken, "")
 	if ok {
-		primitive, _ = stc.ParseComplex(token.GetValue(), 128)
-		return primitive, token, true
+		intrinsic, _ = stc.ParseComplex(token.GetValue(), 128)
+		return intrinsic, token, true
 	}
 	_, token, ok = v.parseToken(FloatToken, "")
 	if ok {
-		primitive, _ = stc.ParseFloat(token.GetValue(), 64)
-		return primitive, token, true
+		intrinsic, _ = stc.ParseFloat(token.GetValue(), 64)
+		return intrinsic, token, true
 	}
 	_, token, ok = v.parseToken(HexadecimalToken, "")
 	if ok {
-		primitive, _ = stc.ParseUint(token.GetValue()[2:], 16, 64)
-		return primitive, token, true
+		intrinsic, _ = stc.ParseUint(token.GetValue()[2:], 16, 64)
+		return intrinsic, token, true
 	}
 	_, token, ok = v.parseToken(IntegerToken, "")
 	if ok {
-		primitive, _ = stc.ParseInt(token.GetValue(), 10, 64)
-		return primitive, token, true
+		intrinsic, _ = stc.ParseInt(token.GetValue(), 10, 64)
+		return intrinsic, token, true
 	}
 	_, token, ok = v.parseToken(NilToken, "")
 	if ok {
-		primitive = nil
-		return primitive, token, true
+		intrinsic = nil
+		return intrinsic, token, true
 	}
 	_, token, ok = v.parseToken(RuneToken, "")
 	if ok {
 		var matches = Scanner().MatchToken(RuneToken, token.GetValue())
 		var match, _ = stc.Unquote(matches.GetValue(1))
-		primitive, _ = utf.DecodeRuneInString(match)
-		return primitive, token, true
+		intrinsic, _ = utf.DecodeRuneInString(match)
+		return intrinsic, token, true
 	}
 	_, token, ok = v.parseToken(StringToken, "")
 	if ok {
 		var matches = Scanner().MatchToken(StringToken, token.GetValue())
-		primitive, _ = stc.Unquote(matches.GetValue(1))
-		return primitive, token, true
+		intrinsic, _ = stc.Unquote(matches.GetValue(1))
+		return intrinsic, token, true
 	}
 
 	// NOTE: ok may be true or false.
-	return primitive, token, ok
+	return intrinsic, token, ok
 }
 
 func (v *parser_) parseItems() (
@@ -683,10 +683,10 @@ func (v *parser_) parseValue() (
 	token TokenLike,
 	ok bool,
 ) {
-	// Attempt to parse a primitive.
-	value, token, ok = v.parsePrimitive()
+	// Attempt to parse an intrinsic.
+	value, token, ok = v.parseIntrinsic()
 	if ok {
-		// Found a primitive value.
+		// Found an intrinsic value.
 		return value, token, true
 	}
 
@@ -750,9 +750,9 @@ var syntax = map[string]string{
 	"AdditionalValue": `"," Value`,
 	"MultilineValue":  `EOL Value`,
 	"Value": `
-    Primitive
+    Intrinsic
     Collection`,
-	"Primitive": `
+	"Intrinsic": `
     boolean
     complex
     float
@@ -767,5 +767,5 @@ var syntax = map[string]string{
     ":"  ! No associations.`,
 	"AdditionalAssociation": `"," Association`,
 	"MultilineAssociation":  `EOL Association`,
-	"Association":           `Primitive ":" Value`,
+	"Association":           `Intrinsic ":" Value`,
 }

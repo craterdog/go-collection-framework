@@ -144,7 +144,7 @@ func (v *formatter_) formatArray(array any) {
 }
 
 func (v *formatter_) formatAssociation(key any, value any) {
-	v.formatPrimitive(key)
+	v.formatIntrinsic(key)
 	v.appendString(": ")
 	v.formatValue(value)
 }
@@ -239,7 +239,7 @@ func (v *formatter_) formatContext(collection any) {
 	case sts.HasPrefix(reflectedString, "*collection.stack_"):
 		type_ = "Stack"
 
-	// And finally look for primitive arrays and maps.
+	// And finally look for intrinsic arrays and maps.
 	case sts.HasPrefix(reflectedString, "[]"):
 		type_ = "Array"
 	case sts.HasPrefix(reflectedString, "map["):
@@ -321,8 +321,8 @@ func (v *formatter_) formatNil(value any) {
 	v.appendString("nil")
 }
 
-func (v *formatter_) formatPrimitive(primitive any) {
-	switch actual := primitive.(type) {
+func (v *formatter_) formatIntrinsic(intrinsic any) {
+	switch actual := intrinsic.(type) {
 	case nil:
 		v.formatNil(actual)
 	case bool:
@@ -361,8 +361,8 @@ func (v *formatter_) formatPrimitive(primitive any) {
 		v.formatString(actual)
 	default:
 		var message = fmt.Sprintf(
-			"Attempted to format unknown primitive: %T",
-			primitive,
+			"Attempted to format unknown intrinsic: %T",
+			intrinsic,
 		)
 		panic(message)
 	}
@@ -401,7 +401,7 @@ func (v *formatter_) formatValue(value any) {
 			v.formatCollection(value)
 		}
 	default:
-		v.formatPrimitive(value)
+		v.formatIntrinsic(value)
 	}
 }
 

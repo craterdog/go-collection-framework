@@ -14,18 +14,18 @@
 Package "agent" defines a set of agents that operate on values of a generic
 type.
 
-This package follows the Crater Dog Technologies™ (craterdog) Go Coding
-Conventions located here:
+This package follows the Crater Dog Technologies™ Go Coding Conventions located
+here:
   - https://github.com/craterdog/go-model-framework/wiki
 
-Additional implementations of the classes provided by this package can be
-developed and used seamlessly since the interface definitions only depend on
-other interfaces and intrinsic types; and the class implementations only depend
+Additional concrete implementations of the classes defined by this package can
+be developed and used seamlessly since the interface definitions only depend on
+other interfaces and intrinsic types—and the class implementations only depend
 on interfaces, not on each other.
 */
 package agent
 
-// Types
+// Type Definitions
 
 /*
 Rank is a constrained type representing the possible rankings for two values.
@@ -38,7 +38,7 @@ const (
 	GreaterRank
 )
 
-// Functionals
+// Functional Definitions
 
 /*
 RankingFunction[V any] defines the signature for any function that can determine
@@ -56,18 +56,20 @@ type RankingFunction[V any] func(
 	second V,
 ) Rank
 
-// Classes
+// Class Definitions
 
 /*
 CollatorClassLike[V any] defines the set of class constructors, constants and
 functions that must be supported by all collator-class-like classes.
 */
 type CollatorClassLike[V any] interface {
-	// Constructors
+	// Constructor Methods
 	Make() CollatorLike[V]
-	MakeWithMaximum(maximum int) CollatorLike[V]
+	MakeWithMaximum(
+		maximum int,
+	) CollatorLike[V]
 
-	// Constants
+	// Constant Methods
 	DefaultMaximum() int
 }
 
@@ -76,7 +78,7 @@ InspectorClassLike defines the set of class constructors, constants and
 functions that must be supported by all inspector-class-like classes.
 */
 type InspectorClassLike interface {
-	// Constructors
+	// Constructor Methods
 	Make() InspectorLike
 }
 
@@ -85,8 +87,10 @@ IteratorClassLike[V any] defines the set of class constructors, constants and
 functions that must be supported by all iterator-class-like classes.
 */
 type IteratorClassLike[V any] interface {
-	// Constructors
-	MakeFromArray(values []V) IteratorLike[V]
+	// Constructor Methods
+	MakeFromArray(
+		values []V,
+	) IteratorLike[V]
 }
 
 /*
@@ -94,15 +98,17 @@ SorterClassLike[V any] defines the set of class constructors, constants and
 functions that must be supported by all sorter-class-like classes.
 */
 type SorterClassLike[V any] interface {
-	// Constructors
+	// Constructor Methods
 	Make() SorterLike[V]
-	MakeWithRanker(ranker RankingFunction[V]) SorterLike[V]
+	MakeWithRanker(
+		ranker RankingFunction[V],
+	) SorterLike[V]
 
-	// Constants
+	// Constant Methods
 	DefaultRanker() RankingFunction[V]
 }
 
-// Instances
+// Instance Definitions
 
 /*
 CollatorLike[V any] defines the set of abstractions and methods that must be
@@ -110,12 +116,8 @@ supported by all collator-like instances.  A collator-like class is capable of
 comparing and ranking two values of any type.
 */
 type CollatorLike[V any] interface {
-	// Attributes
+	// Public Methods
 	GetClass() CollatorClassLike[V]
-	GetDepth() int
-	GetMaximum() int
-
-	// Methods
 	CompareValues(
 		first V,
 		second V,
@@ -124,6 +126,10 @@ type CollatorLike[V any] interface {
 		first V,
 		second V,
 	) Rank
+
+	// Attribute Methods
+	GetDepth() int
+	GetMaximum() int
 }
 
 /*
@@ -132,15 +138,15 @@ supported by all inspector-like instances.  An inspector-like class is capable
 of determining whether or not values possess certain properties.
 */
 type InspectorLike interface {
-	// Attributes
+	// Public Methods
 	GetClass() InspectorClassLike
-
-	// Methods
 	ImplementsAspect(
 		value any,
 		aspect any,
 	) bool
-	IsDefined(value any) bool
+	IsDefined(
+		value any,
+	) bool
 }
 
 /*
@@ -169,20 +175,22 @@ This type is parameterized as follows:
 An iterator-like class is supported by all collection types.
 */
 type IteratorLike[V any] interface {
-	// Attributes
+	// Public Methods
 	GetClass() IteratorClassLike[V]
-	GetSize() int
-	GetSlot() int
-
-	// Methods
 	IsEmpty() bool
 	ToStart()
-	ToSlot(slot int)
+	ToSlot(
+		slot int,
+	)
 	ToEnd()
 	GetNext() V
 	GetPrevious() V
 	HasNext() bool
 	HasPrevious() bool
+
+	// Attribute Methods
+	GetSize() int
+	GetSlot() int
 }
 
 /*
@@ -197,22 +205,30 @@ A sorter-like class uses a ranking function to order the values.  If no ranking
 function is specified the values are sorted into their natural order.
 */
 type SorterLike[V any] interface {
-	// Attributes
+	// Public Methods
 	GetClass() SorterClassLike[V]
+
+	// Attribute Methods
 	GetRanker() RankingFunction[V]
 
-	// Abstractions
+	// Aspect Methods
 	Systematic[V]
 }
 
-// Aspects
+// Aspect Definitions
 
 /*
 Systematic[V any] defines the set of method signatures that must be supported
 by all systematic sorting agents.
 */
 type Systematic[V any] interface {
-	SortValues(values []V)
-	ReverseValues(values []V)
-	ShuffleValues(values []V)
+	SortValues(
+		values []V,
+	)
+	ReverseValues(
+		values []V,
+	)
+	ShuffleValues(
+		values []V,
+	)
 }

@@ -32,7 +32,7 @@ import (
 	col "github.com/craterdog/go-collection-framework/v4/collection"
 )
 
-// Types
+// Type Definitions
 
 /*
 TokenType is a constrained type representing any token type recognized by a
@@ -57,7 +57,7 @@ const (
 	TypeToken
 )
 
-// Classes
+// Class Definitions
 
 /*
 FormatterClassLike is a class interface that defines the complete set of
@@ -65,11 +65,13 @@ class constructors, constants and functions that must be supported by each
 concrete formatter-like class.
 */
 type FormatterClassLike interface {
-	// Constructors
+	// Constructor Methods
 	Make() FormatterLike
-	MakeWithMaximum(maximum int) FormatterLike
+	MakeWithMaximum(
+		maximum int,
+	) FormatterLike
 
-	// Constants
+	// Constant Methods
 	DefaultMaximum() int
 }
 
@@ -79,7 +81,7 @@ class constructors, constants and functions that must be supported by each
 concrete parser-like class.
 */
 type ParserClassLike interface {
-	// Constructors
+	// Constructor Methods
 	Make() ParserLike
 }
 
@@ -96,14 +98,16 @@ token type.  If the regular expression contains submatch patterns the matching
 substrings are returned as additional values in the list.
 */
 type ScannerClassLike interface {
-	// Constructors
+	// Constructor Methods
 	Make(
 		source string,
 		tokens col.QueueLike[TokenLike],
 	) ScannerLike
 
-	// Functions
-	FormatToken(token TokenLike) string
+	// Function Methods
+	FormatToken(
+		token TokenLike,
+	) string
 	MatchToken(
 		type_ TokenType,
 		text string,
@@ -116,7 +120,7 @@ class constructors, constants and functions that must be supported by each
 concrete token-like class.
 */
 type TokenClassLike interface {
-	// Constructors
+	// Constructor Methods
 	Make(
 		line int,
 		position int,
@@ -125,7 +129,7 @@ type TokenClassLike interface {
 	) TokenLike
 }
 
-// Instances
+// Instance Definitions
 
 /*
 FormatterLike is an instance interface that defines the complete set of
@@ -133,13 +137,17 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete formatter-like class.
 */
 type FormatterLike interface {
-	// Attributes
+	// Public Methods
 	GetClass() FormatterClassLike
+	FormatValue(
+		value any,
+	) (
+		source string,
+	)
+
+	// Attribute Methods
 	GetDepth() int
 	GetMaximum() int
-
-	// Methods
-	FormatValue(value any) (source string)
 }
 
 /*
@@ -148,11 +156,13 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete parser-like class.
 */
 type ParserLike interface {
-	// Attributes
+	// Public Methods
 	GetClass() ParserClassLike
-
-	// Methods
-	ParseSource(source string) (value any)
+	ParseSource(
+		source string,
+	) (
+		value any,
+	)
 }
 
 /*
@@ -161,7 +171,7 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete scanner-like class.
 */
 type ScannerLike interface {
-	// Attributes
+	// Public Methods
 	GetClass() ScannerClassLike
 }
 
@@ -171,8 +181,10 @@ instance attributes, abstractions and methods that must be supported by each
 instance of a concrete token-like class.
 */
 type TokenLike interface {
-	// Attributes
+	// Public Methods
 	GetClass() TokenClassLike
+
+	// Attribute Methods
 	GetLine() int
 	GetPosition() int
 	GetType() TokenType

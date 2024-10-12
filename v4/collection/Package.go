@@ -26,13 +26,13 @@ abstractions:
 For detailed documentation on this package refer to the wiki:
   - https://github.com/craterdog/go-collection-framework/wiki
 
-This package follows the Crater Dog Technologies™ (craterdog) Go Coding
-Conventions located here:
+This package follows the Crater Dog Technologies™ Go Coding Conventions located
+here:
   - https://github.com/craterdog/go-model-framework/wiki
 
-Additional implementations of the classes provided by this package can be
-developed and used seamlessly since the interface definitions only depend on
-other interfaces and intrinsic types; and the class implementations only depend
+Additional concrete implementations of the classes defined by this package can
+be developed and used seamlessly since the interface definitions only depend on
+other interfaces and intrinsic types—and the class implementations only depend
 on interfaces, not on each other.
 */
 package collection
@@ -41,7 +41,7 @@ import (
 	age "github.com/craterdog/go-collection-framework/v4/agent"
 )
 
-// Classes
+// Class Definitions
 
 /*
 ArrayClassLike[V any] is a class interface that defines the complete set of
@@ -49,12 +49,18 @@ class constructors, constants and functions that must be supported by each
 concrete array-like class.
 */
 type ArrayClassLike[V any] interface {
-	// Constructors
-	Make(size uint) ArrayLike[V]
-	MakeFromArray(values []V) ArrayLike[V]
-	MakeFromSequence(values Sequential[V]) ArrayLike[V]
+	// Constructor Methods
+	Make(
+		size uint,
+	) ArrayLike[V]
+	MakeFromArray(
+		values []V,
+	) ArrayLike[V]
+	MakeFromSequence(
+		values Sequential[V],
+	) ArrayLike[V]
 
-	// Constants
+	// Constant Methods
 	Notation() NotationLike
 }
 
@@ -63,17 +69,14 @@ AssociationClassLike[K comparable, V any] is a class interface that defines
 the complete set of class constructors, constants and functions that must be
 supported by each concrete association-like class.
 */
-type AssociationClassLike[
-	K comparable,
-	V any,
-] interface {
-	// Constructors
+type AssociationClassLike[K comparable, V any] interface {
+	// Constructor Methods
 	Make(
 		key K,
 		value V,
 	) AssociationLike[K, V]
 
-	// Constants
+	// Constant Methods
 	Notation() NotationLike
 }
 
@@ -93,20 +96,23 @@ the specified Catalogs in the order that they appear in each catalog.  If a
 key is present in both Catalogs, the value of the key from the second
 catalog takes precedence.
 */
-type CatalogClassLike[
-	K comparable,
-	V any,
-] interface {
-	// Constructors
+type CatalogClassLike[K comparable, V any] interface {
+	// Constructor Methods
 	Make() CatalogLike[K, V]
-	MakeFromArray(associations []AssociationLike[K, V]) CatalogLike[K, V]
-	MakeFromMap(associations map[K]V) CatalogLike[K, V]
-	MakeFromSequence(associations Sequential[AssociationLike[K, V]]) CatalogLike[K, V]
+	MakeFromArray(
+		associations []AssociationLike[K, V],
+	) CatalogLike[K, V]
+	MakeFromMap(
+		associations map[K]V,
+	) CatalogLike[K, V]
+	MakeFromSequence(
+		associations Sequential[AssociationLike[K, V]],
+	) CatalogLike[K, V]
 
-	// Constants
+	// Constant Methods
 	Notation() NotationLike
 
-	// Functions
+	// Function Methods
 	Extract(
 		catalog CatalogLike[K, V],
 		keys Sequential[K],
@@ -128,15 +134,19 @@ Concatenate() combines two lists into a new list containing all values in both
 lists.  The order of the values in each list is preserved in the new list.
 */
 type ListClassLike[V any] interface {
-	// Constructors
+	// Constructor Methods
 	Make() ListLike[V]
-	MakeFromArray(values []V) ListLike[V]
-	MakeFromSequence(values Sequential[V]) ListLike[V]
+	MakeFromArray(
+		values []V,
+	) ListLike[V]
+	MakeFromSequence(
+		values Sequential[V],
+	) ListLike[V]
 
-	// Constants
+	// Constant Methods
 	Notation() NotationLike
 
-	// Functions
+	// Function Methods
 	Concatenate(
 		first ListLike[V],
 		second ListLike[V],
@@ -148,17 +158,20 @@ MapClassLike[K comparable, V any] is a class interface that defines the
 complete set of class constructors, constants and functions that must be
 supported by each concrete map-like class.
 */
-type MapClassLike[
-	K comparable,
-	V any,
-] interface {
-	// Constructors
+type MapClassLike[K comparable, V any] interface {
+	// Constructor Methods
 	Make() MapLike[K, V]
-	MakeFromArray(associations []AssociationLike[K, V]) MapLike[K, V]
-	MakeFromMap(associations map[K]V) MapLike[K, V]
-	MakeFromSequence(associations Sequential[AssociationLike[K, V]]) MapLike[K, V]
+	MakeFromArray(
+		associations []AssociationLike[K, V],
+	) MapLike[K, V]
+	MakeFromMap(
+		associations map[K]V,
+	) MapLike[K, V]
+	MakeFromSequence(
+		associations Sequential[AssociationLike[K, V]],
+	) MapLike[K, V]
 
-	// Constants
+	// Constant Methods
 	Notation() NotationLike
 }
 
@@ -168,7 +181,7 @@ constructors, constants and functions that must be supported by each concrete
 notation-like class.
 */
 type NotationClassLike interface {
-	// Constructors
+	// Constructor Methods
 	Make() NotationLike
 }
 
@@ -201,17 +214,23 @@ when the results of the processing with a Split() function need to be
 consolidated into a single queue.
 */
 type QueueClassLike[V any] interface {
-	// Constructors
+	// Constructor Methods
 	Make() QueueLike[V]
-	MakeWithCapacity(capacity uint) QueueLike[V]
-	MakeFromArray(values []V) QueueLike[V]
-	MakeFromSequence(values Sequential[V]) QueueLike[V]
+	MakeWithCapacity(
+		capacity uint,
+	) QueueLike[V]
+	MakeFromArray(
+		values []V,
+	) QueueLike[V]
+	MakeFromSequence(
+		values Sequential[V],
+	) QueueLike[V]
 
-	// Constants
+	// Constant Methods
 	Notation() NotationLike
 	DefaultCapacity() uint
 
-	// Functions
+	// Function Methods
 	Fork(
 		group Synchronized,
 		input QueueLike[V],
@@ -248,16 +267,22 @@ Xor() returns a new set containing the values that are in the first specified
 set or the second specified set but not both.
 */
 type SetClassLike[V any] interface {
-	// Constructors
+	// Constructor Methods
 	Make() SetLike[V]
-	MakeWithCollator(collator age.CollatorLike[V]) SetLike[V]
-	MakeFromArray(values []V) SetLike[V]
-	MakeFromSequence(values Sequential[V]) SetLike[V]
+	MakeWithCollator(
+		collator age.CollatorLike[V],
+	) SetLike[V]
+	MakeFromArray(
+		values []V,
+	) SetLike[V]
+	MakeFromSequence(
+		values Sequential[V],
+	) SetLike[V]
 
-	// Constants
+	// Constant Methods
 	Notation() NotationLike
 
-	// Functions
+	// Function Methods
 	And(
 		first SetLike[V],
 		second SetLike[V],
@@ -282,18 +307,24 @@ class constructors, constants and functions that must be supported by each
 concrete stack-like class.
 */
 type StackClassLike[V any] interface {
-	// Constructors
+	// Constructor Methods
 	Make() StackLike[V]
-	MakeWithCapacity(capacity uint) StackLike[V]
-	MakeFromArray(values []V) StackLike[V]
-	MakeFromSequence(values Sequential[V]) StackLike[V]
+	MakeWithCapacity(
+		capacity uint,
+	) StackLike[V]
+	MakeFromArray(
+		values []V,
+	) StackLike[V]
+	MakeFromSequence(
+		values Sequential[V],
+	) StackLike[V]
 
-	// Constants
+	// Constant Methods
 	Notation() NotationLike
 	DefaultCapacity() uint
 }
 
-// Instances
+// Instance Definitions
 
 /*
 ArrayLike[V any] is an instance interface that defines the complete set of
@@ -311,10 +342,10 @@ This type essentially provides a higher level abstraction for the intrinsic Go
 array type.
 */
 type ArrayLike[V any] interface {
-	// Attributes
+	// Public Methods
 	GetClass() ArrayClassLike[V]
 
-	// Abstractions
+	// Aspect Methods
 	Accessible[V]
 	Sequential[V]
 	Sortable[V]
@@ -332,15 +363,16 @@ This type is parameterized as follows:
 
 This type is used by catalog-like instances to maintain their associations.
 */
-type AssociationLike[
-	K comparable,
-	V any,
-] interface {
-	// Attributes
+type AssociationLike[K comparable, V any] interface {
+	// Public Methods
 	GetClass() AssociationClassLike[K, V]
+
+	// Attribute Methods
 	GetKey() K
 	GetValue() V
-	SetValue(value V)
+	SetValue(
+		value V,
+	)
 }
 
 /*
@@ -354,14 +386,11 @@ This type is parameterized as follows:
 
 A catalog-like class can use any association-like class key-value association.
 */
-type CatalogLike[
-	K comparable,
-	V any,
-] interface {
-	// Attributes
+type CatalogLike[K comparable, V any] interface {
+	// Public Methods
 	GetClass() CatalogClassLike[K, V]
 
-	// Abstractions
+	// Aspect Methods
 	Associative[K, V]
 	Sequential[AssociationLike[K, V]]
 	Sortable[AssociationLike[K, V]]
@@ -383,10 +412,10 @@ All comparison and ranking of values in the sequence is done using the default
 collator.
 */
 type ListLike[V any] interface {
-	// Attributes
+	// Public Methods
 	GetClass() ListClassLike[V]
 
-	// Abstractions
+	// Aspect Methods
 	Accessible[V]
 	Expandable[V]
 	Searchable[V]
@@ -409,14 +438,11 @@ This type is parameterized as follows:
 
 A map-like class can use any association-like class key-value association.
 */
-type MapLike[
-	K comparable,
-	V any,
-] interface {
-	// Attributes
+type MapLike[K comparable, V any] interface {
+	// Public Methods
 	GetClass() MapClassLike[K, V]
 
-	// Abstractions
+	// Aspect Methods
 	Associative[K, V]
 	Sequential[AssociationLike[K, V]]
 }
@@ -429,10 +455,10 @@ format collections using a canonical notation like XML, JSON and CDCN (Crater
 Dog Collection Notation™).
 */
 type NotationLike interface {
-	// Attributes
+	// Public Methods
 	GetClass() NotationClassLike
 
-	// Abstractions
+	// Aspect Methods
 	Canonical
 }
 
@@ -451,20 +477,20 @@ maximum length and will block on attempts to add a value it is full.  It will
 also block on attempts to remove a value when it is empty.
 */
 type QueueLike[V any] interface {
-	// Attributes
+	// Public Methods
 	GetClass() QueueClassLike[V]
-	GetCapacity() uint
-
-	// Abstractions
-	Limited[V]
-	Sequential[V]
-
-	// Methods
 	RemoveHead() (
 		head V,
 		ok bool,
 	)
 	CloseQueue()
+
+	// Attribute Methods
+	GetCapacity() uint
+
+	// Aspect Methods
+	Limited[V]
+	Sequential[V]
 }
 
 /*
@@ -479,11 +505,13 @@ This type is parameterized as follows:
 The order of the values is determined by a configurable CollatorLike[V] agent.
 */
 type SetLike[V any] interface {
-	// Attributes
+	// Public Methods
 	GetClass() SetClassLike[V]
+
+	// Attribute Methods
 	GetCollator() age.CollatorLike[V]
 
-	// Abstractions
+	// Aspect Methods
 	Accessible[V]
 	Flexible[V]
 	Searchable[V]
@@ -503,19 +531,19 @@ A stack-like class enforces a maximum depth and will panic if that depth is
 exceeded.  It will also panic on attempts to remove a value when it is empty.
 */
 type StackLike[V any] interface {
-	// Attributes
+	// Public Methods
 	GetClass() StackClassLike[V]
+	RemoveTop() V
+
+	// Attribute Methods
 	GetCapacity() uint
 
-	// Abstractions
+	// Aspect Methods
 	Limited[V]
 	Sequential[V]
-
-	// Methods
-	RemoveTop() V
 }
 
-// Aspects
+// Aspect Definitions
 
 /*
 Accessible[V any] defines the set of method signatures that must be
@@ -535,7 +563,9 @@ Notice that because the indices are ordinal based, the positive and negative
 indices are symmetrical.
 */
 type Accessible[V any] interface {
-	GetValue(index int) V
+	GetValue(
+		index int,
+	) V
 	GetValues(
 		first int,
 		last int,
@@ -546,19 +576,24 @@ type Accessible[V any] interface {
 Associative[K comparable, V any] defines the set of method signatures that
 must be supported by all sequences of key-value associations.
 */
-type Associative[
-	K comparable,
-	V any,
-] interface {
-	GetValue(key K) V
+type Associative[K comparable, V any] interface {
+	GetValue(
+		key K,
+	) V
 	SetValue(
 		key K,
 		value V,
 	)
 	GetKeys() Sequential[K]
-	GetValues(keys Sequential[K]) Sequential[V]
-	RemoveValue(key K) V
-	RemoveValues(keys Sequential[K]) Sequential[V]
+	GetValues(
+		keys Sequential[K],
+	) Sequential[V]
+	RemoveValue(
+		key K,
+	) V
+	RemoveValues(
+		keys Sequential[K],
+	) Sequential[V]
 	RemoveAll()
 }
 
@@ -567,8 +602,16 @@ Canonical defines the set of method signatures that must be supported by all
 canonical notations.
 */
 type Canonical interface {
-	ParseSource(source string) (value any)
-	FormatValue(value any) (source string)
+	ParseSource(
+		source string,
+	) (
+		value any,
+	)
+	FormatValue(
+		value any,
+	) (
+		source string,
+	)
 }
 
 /*
@@ -584,9 +627,15 @@ type Expandable[V any] interface {
 		slot uint,
 		values Sequential[V],
 	)
-	AppendValue(value V)
-	AppendValues(values Sequential[V])
-	RemoveValue(index int) V
+	AppendValue(
+		value V,
+	)
+	AppendValues(
+		values Sequential[V],
+	)
+	RemoveValue(
+		index int,
+	) V
 	RemoveValues(
 		first int,
 		last int,
@@ -600,10 +649,18 @@ all sequences of values that allow new values to be added and existing values to
 be removed.
 */
 type Flexible[V any] interface {
-	AddValue(value V)
-	AddValues(values Sequential[V])
-	RemoveValue(value V)
-	RemoveValues(values Sequential[V])
+	AddValue(
+		value V,
+	)
+	AddValues(
+		values Sequential[V],
+	)
+	RemoveValue(
+		value V,
+	)
+	RemoveValues(
+		values Sequential[V],
+	)
 	RemoveAll()
 }
 
@@ -613,7 +670,9 @@ all sequences of values that allow new values to be added and limit the total
 number of values in the sequence.
 */
 type Limited[V any] interface {
-	AddValue(value V)
+	AddValue(
+		value V,
+	)
 	RemoveAll()
 }
 
@@ -622,10 +681,18 @@ Searchable[V any] defines the set of method signatures that must be supported
 by all searchable sequences of values.
 */
 type Searchable[V any] interface {
-	ContainsValue(value V) bool
-	ContainsAny(values Sequential[V]) bool
-	ContainsAll(values Sequential[V]) bool
-	GetIndex(value V) int
+	ContainsValue(
+		value V,
+	) bool
+	ContainsAny(
+		values Sequential[V],
+	) bool
+	ContainsAll(
+		values Sequential[V],
+	) bool
+	GetIndex(
+		value V,
+	) int
 }
 
 /*
@@ -647,7 +714,9 @@ all sequences whose values may be reordered using various sorting algorithms.
 */
 type Sortable[V any] interface {
 	SortValues()
-	SortValuesWithRanker(ranker age.RankingFunction[V])
+	SortValuesWithRanker(
+		ranker age.RankingFunction[V],
+	)
 	ReverseValues()
 	ShuffleValues()
 }
@@ -657,7 +726,9 @@ Synchronized defines the set of method signatures that must be supported by all
 synchronized groups of threads.
 */
 type Synchronized interface {
-	Add(delta int)
+	Add(
+		delta int,
+	)
 	Wait()
 	Done()
 }

@@ -1,0 +1,6 @@
+# Ignore any test directories
+test*/
+
+# Ignore any test files
+*_test.go
+

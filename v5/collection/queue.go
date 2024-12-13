@@ -325,9 +325,9 @@ func (v *queue_[V]) String() string {
 
 // NOTE:
 // If the Go "chan" type ever supports snapshots of its state, the underlying
-// list can be removed and the channel modified to pass the values instead of
-// the availability. Currently, the underlying list is only required by the
-// "AsArray()" instance method.
+// list and mutex can be removed and the channel modified to pass the values
+// instead of the availability. Currently, the underlying list is only required
+// by the "AsArray()" instance method.
 type queue_[V any] struct {
 	// Declare the instance attributes.
 	available_ chan bool

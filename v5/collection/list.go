@@ -178,7 +178,7 @@ func (v *list_[V]) AppendValue(
 	var arrayClass = ArrayClass[V]()
 	var array = arrayClass.Make(size)
 
-	// Copy the values into the new array.
+	// Copy the existing values into the new array.
 	var existingValues = v.GetIterator()
 	var index Index
 	for existingValues.HasNext() {
@@ -186,6 +186,8 @@ func (v *list_[V]) AppendValue(
 		var existingValue = existingValues.GetNext()
 		array.SetValue(index, existingValue)
 	}
+
+	// Copy the new value to the end of the new array.
 	index++
 	array.SetValue(index, value)
 

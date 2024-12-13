@@ -68,8 +68,13 @@ ArrayClassLike[V any] is a class interface that declares the complete set of
 class constructors, constants and functions that must be supported by each
 concrete array-like class.
 
-An array-like class extends the native Go array data type by adding useful
-methods to it.
+An array-like class maintains a fixed length indexed sequence of values.  Each
+value is associated with an implicit positive integer index.  An array-like
+class uses ORDINAL based indexing rather than the more common—and
+nonsensical—ZERO based indexing scheme (see the description of what this means
+in the Accessible[V] aspect definition).
+
+This type provides a higher level abstraction for the intrinsic Go array type.
 */
 type ArrayClassLike[V any] interface {
 	// Constructor Methods
@@ -105,7 +110,8 @@ CatalogClassLike[K comparable, V any] is a class interface that declares the
 complete set of class constructors, constants and functions that must be
 supported by each concrete catalog-like class.
 
-A catalog-like class maintains a set of ordered key-value associations.
+A catalog-like class maintains an ordered set of generic typed key-value
+associations.
 
 The following class functions are supported:
 
@@ -147,7 +153,11 @@ ListClassLike[V any] is a class interface that declares the complete set of
 class constructors, constants and functions that must be supported by each
 concrete list-like class.
 
-A list-like class maintains an extensible sequence of generic typed values.
+A list-like class maintains a dynamic sequence of values which can grow or
+shrink as needed.  Each value is associated with an implicit positive integer
+index.  It uses ORDINAL based indexing rather than the more common—and
+nonsensical—ZERO based indexing scheme (see the description of what
+this means in the Accessible[V] interface definition).
 
 The following class functions are supported:
 
@@ -176,8 +186,10 @@ MapClassLike[K comparable, V any] is a class interface that declares the
 complete set of class constructors, constants and functions that must be
 supported by each concrete map-like class.
 
-A map-like class extends the native Go map data type by adding useful methods
-to it.
+A map-like class extends the intrinsic Go map data type and maintains a
+sequence of generic typed key-value associations.  The ordering of the
+key-value associations in an intrinsic Go map is random, even for two Go maps
+containing the same key-value associations.
 */
 type MapClassLike[K comparable, V any] interface {
 	// Constructor Methods
@@ -198,10 +210,12 @@ QueueClassLike[V any] is a class interface that declares the complete set of
 class constructors, constants and functions that must be supported by each
 concrete queue-like class.
 
-A queue-like class supports synchronized first-in-first-out (FIFO) symantics
-for generic typed values.  An optional queue capacity may be specified.  The
-default capacity is 16 values.  A full queue will block until a value has been
-removed before allowing a new value to be added.
+A queue-like class is generally used by multiple go-routines at the same time
+and therefore enforces synchronized, first-in-first-out (FIFO) symantics for
+generic typed values.  An optional queue capacity may be specified.  A request
+to add a value to a queue will block when the queue has reached its maximum
+capacity.  It will also block on attempts to remove a value when it is empty.
+The default capacity for a queue-like class is 16 values.
 
 The following class functions are supported:
 
@@ -261,7 +275,9 @@ SetClassLike[V any] is a class interface that declares the complete set of
 class constructors, constants and functions that must be supported by each
 concrete set-like class.
 
-A set-like class maintains an ordered, unique set of generic typed values.
+A set-like class maintains an ordered sequence of unique generic typed
+values—which can grow or shrink as needed.  The order of the values is
+determined by a configurable collator agent.
 
 The following class functions are supported:
 
@@ -338,14 +354,6 @@ type StackClassLike[V any] interface {
 ArrayLike[V any] is an instance interface that declares the complete set of
 principal, attribute and aspect methods that must be supported by each
 instance of a concrete array-like class.
-
-An array-like class maintains a fixed length indexed sequence of values.  Each
-value is associated with an implicit positive integer index.  An array-like
-class uses ORDINAL based indexing rather than the more common—and
-nonsensical—ZERO based indexing scheme (see the description of what this means
-in the Accessible[V] aspect definition).
-
-This type provides a higher level abstraction for the intrinsic Go array type.
 */
 type ArrayLike[V any] interface {
 	// Principal Methods
@@ -362,9 +370,6 @@ type ArrayLike[V any] interface {
 AssociationLike[K comparable, V any] is an instance interface that declares
 the complete set of principal, attribute and aspect methods that must be
 supported by each instance of a concrete association-like class.
-
-An association-like class is used by catalog-like instances to maintain their
-generic typed key-value associations.
 */
 type AssociationLike[K comparable, V any] interface {
 	// Principal Methods
@@ -382,8 +387,6 @@ type AssociationLike[K comparable, V any] interface {
 CatalogLike[K comparable, V any] is an instance interface that declares
 the complete set of principal, attribute and aspect methods that must be
 supported by each instance of a concrete catalog-like class.
-
-A catalog-like class maintains a set of generic typed key-value associations.
 */
 type CatalogLike[K comparable, V any] interface {
 	// Principal Methods
@@ -399,15 +402,6 @@ type CatalogLike[K comparable, V any] interface {
 ListLike[V any] is an instance interface that declares the complete set of
 principal, attribute and aspect methods that must be supported by each
 instance of a concrete list-like class.
-
-A list-like class maintains a dynamic sequence of values which can grow or
-shrink as needed.  Each value is associated with an implicit positive integer
-index. An array-like class uses ORDINAL based indexing rather than the more
-common—and nonsensical—ZERO based indexing scheme (see the description of what
-this means in the Accessible[V] interface definition).
-
-All comparison and ranking of values in the sequence during sorting is done
-using a collator and a ranking function.
 */
 type ListLike[V any] interface {
 	// Principal Methods
@@ -426,11 +420,6 @@ type ListLike[V any] interface {
 MapLike[K comparable, V any] is an instance interface that declares
 the complete set of principal, attribute and aspect methods that must be
 supported by each instance of a concrete map-like class.
-
-A map-like class extends the intrinsic Go map data type and maintains a
-sequence of generic typed key-value associations.  The ordering of the
-key-value associations in an intrinsic Go map is random, even for two Go maps
-containing the same key-value associations.
 */
 type MapLike[K comparable, V any] interface {
 	// Principal Methods
@@ -445,11 +434,6 @@ type MapLike[K comparable, V any] interface {
 QueueLike[V any] is an instance interface that declares the complete set of
 principal, attribute and aspect methods that must be supported by each
 instance of a concrete queue-like class.
-
-A queue-like class is generally used by multiple go-routines at the same time
-and therefore enforces synchronized access.  A queue-like class enforces a
-maximum length and will block on attempts to add a value it is full.  It will
-also block on attempts to remove a value when it is empty.
 */
 type QueueLike[V any] interface {
 	// Principal Methods
@@ -467,10 +451,6 @@ type QueueLike[V any] interface {
 SetLike[V any] is an instance interface that declares the complete set of
 principal, attribute and aspect methods that must be supported by each
 instance of a concrete set-like class.
-
-A set-like class maintains an ordered sequence of unique values which can grow
-or shrink as needed.  The order of the values is determined by a configurable
-collator agent.
 */
 type SetLike[V any] interface {
 	// Principal Methods
@@ -490,9 +470,6 @@ type SetLike[V any] interface {
 StackLike[V any] is an instance interface that declares the complete set of
 principal, attribute and aspect methods that must be supported by each
 instance of a concrete stack-like class.
-
-A stack-like class enforces a maximum depth and will panic if that depth is
-exceeded.  It will also panic on attempts to remove a value when it is empty.
 */
 type StackLike[V any] interface {
 	// Principal Methods

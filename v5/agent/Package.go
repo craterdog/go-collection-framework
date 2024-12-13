@@ -72,8 +72,10 @@ CollatorClassLike[V any] is a class interface that declares the complete set
 of class constructors, constants and functions that must be supported by each
 concrete collator-like class.
 
-An optional maximum depth may be specified that limits the depth of the
-structures being collated in a way that avoids possible infinite recursion.
+A collator-like class is capable of recursively comparing and ranking two values
+of any type.  An optional maximum depth may be specified that limits the depth
+of the structures being collated to avoid possible infinite recursion.
+
 The default maximum depth is 16.
 */
 type CollatorClassLike[V any] interface {
@@ -89,8 +91,22 @@ IteratorClassLike[V any] is a class interface that declares the complete set
 of class constructors, constants and functions that must be supported by each
 concrete iterator-like class.
 
-An iterator-like class can be used to iterate over the specified array of
-values.  The size of an array is static so that its values can be modified
+An iterator-like class can be used to move forward and backward over the values
+in an array.  It implements the Gang of Four (GoF) Iterator Design Pattern:
+  - https://en.wikipedia.org/wiki/Iterator_pattern
+
+An iterator agent locks into the slots that reside between each value in the
+sequence:
+
+	  . [value 1] . [value 2] . [value 3] ... [value N] .
+	  ^           ^           ^                         ^
+	slot 0      slot 1      slot 2                    slot N
+
+It moves from slot to slot and has access to the values (if they exist) on each
+side of the slot.  At each slot an iterator has access to the previous value
+and next value in the array (assuming they exist). The slot at the start of
+the array has no PREVIOUS value, and the slot at the end of the array has no
+NEXT value.  The size of the array is static so that its values can be modified
 during iteration.
 */
 type IteratorClassLike[V any] interface {
@@ -105,9 +121,9 @@ SorterClassLike[V any] is a class interface that declares the complete set
 of class constructors, constants and functions that must be supported by each
 concrete sorter-like class.
 
-An optional ranking function may be specified that is used to compare values.
-The default ranking function uses the value's "natural" ordering based on its
-type.
+A sorter-like class implements a specific sorting algorithm.  It uses a ranking
+function to correlate the values.  If no ranking function is specified the
+values are sorted into their "natural" ordering by type of value.
 */
 type SorterClassLike[V any] interface {
 	// Constructor Methods
@@ -123,10 +139,6 @@ type SorterClassLike[V any] interface {
 CollatorLike[V any] is an instance interface that declares the complete set of
 principal, attribute and aspect methods that must be supported by each
 instance of a concrete collator-like class.
-
-A collator-like class is capable of recursively comparing and ranking two values
-of any type.  The maximum depth attribute removes the possibility of infinite
-recursion in the case of cycles.
 */
 type CollatorLike[V any] interface {
 	// Principal Methods
@@ -148,23 +160,6 @@ type CollatorLike[V any] interface {
 IteratorLike[V any] is an instance interface that declares the complete set of
 principal, attribute and aspect methods that must be supported by each
 instance of a concrete iterator-like class.
-
-An iterator-like class can be used to move forward and backward over the values
-in an array.  It implements the Gang of Four (GoF) Iterator Design Pattern:
-  - https://en.wikipedia.org/wiki/Iterator_pattern
-
-An iterator agent locks into the slots that reside between each value in the
-sequence:
-
-	  . [value 1] . [value 2] . [value 3] ... [value N] .
-	  ^           ^           ^                         ^
-	slot 0      slot 1      slot 2                    slot N
-
-It moves from slot to slot and has access to the values (if they exist) on each
-side of the slot.  At each slot an iterator has access to the previous value
-and next value in the array (assuming they exist). The slot at the start of
-the array has no PREVIOUS value, and the slot at the end of the array has no
-NEXT value.
 */
 type IteratorLike[V any] interface {
 	// Principal Methods
@@ -189,10 +184,6 @@ type IteratorLike[V any] interface {
 SorterLike[V any] is an instance interface that declares the complete set of
 principal, attribute and aspect methods that must be supported by each
 instance of a concrete sorter-like class.
-
-A sorter-like class implements a specific sorting algorithm.  It uses a ranking
-function to correlate the values.  If no ranking function is specified the
-values are sorted into their "natural" ordering by type of value.
 */
 type SorterLike[V any] interface {
 	// Principal Methods

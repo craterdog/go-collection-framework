@@ -106,7 +106,7 @@ func (v map_[K, V]) SetValue(
 }
 
 func (v map_[K, V]) GetKeys() Sequential[K] {
-	var size = age.Size(len(v))
+	var size = v.GetSize()
 	var arrayClass = ArrayClass[K]()
 	var keys = arrayClass.Make(size)
 	var index Index
@@ -120,12 +120,15 @@ func (v map_[K, V]) GetKeys() Sequential[K] {
 func (v map_[K, V]) GetValues(
 	keys Sequential[K],
 ) Sequential[V] {
-	var size = age.Size(len(v))
+	var size = keys.GetSize()
 	var arrayClass = ArrayClass[V]()
 	var values = arrayClass.Make(size)
 	var index Index
-	for _, value := range v {
+	var iterator = keys.GetIterator()
+	for iterator.HasNext() {
 		index++
+		var key = iterator.GetNext()
+		var value = v.GetValue(key)
 		values.SetValue(index, value)
 	}
 	return values
@@ -144,7 +147,7 @@ func (v map_[K, V]) RemoveValue(
 func (v map_[K, V]) RemoveValues(
 	keys Sequential[K],
 ) Sequential[V] {
-	var size = age.Size(len(v))
+	var size = keys.GetSize()
 	var arrayClass = ArrayClass[V]()
 	var values = arrayClass.Make(size)
 	var index Index

@@ -13,9 +13,8 @@
 package agent_test
 
 import (
-	age "github.com/craterdog/go-collection-framework/v4/agent"
-	not "github.com/craterdog/go-collection-framework/v4/cdcn"
-	col "github.com/craterdog/go-collection-framework/v4/collection"
+	age "github.com/craterdog/go-collection-framework/v5/agent"
+	col "github.com/craterdog/go-collection-framework/v5/collection"
 	ass "github.com/stretchr/testify/assert"
 	tes "testing"
 )
@@ -55,62 +54,9 @@ type Fuz struct {
 	Bar string
 }
 
-func TestImplementsAspect(t *tes.T) {
-	var inspector = age.Inspector().Make()
-	var aspect Foolish
-	var value any
-	ass.False(t, inspector.ImplementsAspect(value, (*Foolish)(nil)))
-	value = "foolish"
-	ass.False(t, inspector.ImplementsAspect(value, (*Foolish)(nil)))
-	value = FooBar(5, "five", aspect)
-	ass.True(t, inspector.ImplementsAspect(value, (*Foolish)(nil)))
-}
-
-func TestIsDefined(t *tes.T) {
-	var inspector = age.Inspector().Make()
-
-	var integer int
-	ass.True(t, inspector.IsDefined(integer))
-	integer = 5
-	ass.True(t, inspector.IsDefined(integer))
-
-	var name string
-	ass.False(t, inspector.IsDefined(name))
-	name = ""
-	ass.False(t, inspector.IsDefined(name))
-	name = "foobar"
-	ass.True(t, inspector.IsDefined(name))
-
-	var slice []int
-	ass.False(t, inspector.IsDefined(slice))
-	slice = []int{}
-	ass.True(t, inspector.IsDefined(slice))
-	slice = []int{1, 2, 3}
-	ass.True(t, inspector.IsDefined(slice))
-
-	var list col.ListLike[string]
-	ass.False(t, inspector.IsDefined(list))
-	var notation = not.Notation().Make()
-	list = col.List[string](notation).Make()
-	ass.True(t, inspector.IsDefined(list))
-	list.AppendValue(name)
-	ass.True(t, inspector.IsDefined(list))
-
-	var sequence col.Sequential[string]
-	ass.False(t, inspector.IsDefined(sequence))
-	sequence = list
-	ass.True(t, inspector.IsDefined(sequence))
-}
-
-func TestCollatorConstants(t *tes.T) {
-	var Collator = age.Collator[any]()
-	ass.Equal(t, 16, Collator.DefaultMaximum())
-}
-
 func TestCompareMaximum(t *tes.T) {
-	var notation = not.Notation().Make()
-	var collator = age.Collator[any]().MakeWithMaximum(1)
-	var array = col.Array[any](notation).MakeFromArray([]any{"foo", []int{1, 2, 3}})
+	var collator = age.CollatorClass[any]().MakeWithMaximumDepth(1)
+	var array = col.ArrayClass[any]().MakeFromArray([]any{"foo", []int{1, 2, 3}})
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "The maximum traversal depth was exceeded: 1", e)
@@ -122,9 +68,8 @@ func TestCompareMaximum(t *tes.T) {
 }
 
 func TestRankMaximum(t *tes.T) {
-	var notation = not.Notation().Make()
-	var collator = age.Collator[any]().MakeWithMaximum(1)
-	var array = col.Array[any](notation).MakeFromArray([]any{"foo", []int{1, 2, 3}})
+	var collator = age.CollatorClass[any]().MakeWithMaximumDepth(1)
+	var array = col.ArrayClass[any]().MakeFromArray([]any{"foo", []int{1, 2, 3}})
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "The maximum traversal depth was exceeded: 1", e)
@@ -136,7 +81,7 @@ func TestRankMaximum(t *tes.T) {
 }
 
 func TestComparison(t *tes.T) {
-	var collator = age.Collator[any]().Make()
+	var collator = age.CollatorClass[any]().Make()
 
 	// Nil
 	var ShouldBeNil any
@@ -305,7 +250,7 @@ func TestComparison(t *tes.T) {
 }
 
 func TestTildeTypes(t *tes.T) {
-	var collator = age.Collator[any]().Make()
+	var collator = age.CollatorClass[any]().Make()
 
 	// Boolean
 	var False = Boolean(false)
@@ -366,9 +311,8 @@ func TestTildeTypes(t *tes.T) {
 }
 
 func TestCompareRecursiveArrays(t *tes.T) {
-	var notation = not.Notation().Make()
-	var collator = age.Collator[any]().Make()
-	var array = col.Array[any](notation).MakeFromArray([]any{0})
+	var collator = age.CollatorClass[any]().Make()
+	var array = col.ArrayClass[any]().MakeFromArray([]any{0})
 	array.SetValue(1, array) // Now it is recursive.
 	defer func() {
 		if e := recover(); e != nil {
@@ -381,9 +325,8 @@ func TestCompareRecursiveArrays(t *tes.T) {
 }
 
 func TestCompareRecursiveMaps(t *tes.T) {
-	var notation = not.Notation().Make()
-	var collator = age.Collator[any]().Make()
-	var m = col.Map[string, any](notation).MakeFromMap(map[string]any{"first": 1})
+	var collator = age.CollatorClass[any]().Make()
+	var m = col.MapClass[string, any]().MakeFromMap(map[string]any{"first": 1})
 	m.SetValue("first", m) // Now it is recursive.
 	defer func() {
 		if e := recover(); e != nil {
@@ -396,7 +339,7 @@ func TestCompareRecursiveMaps(t *tes.T) {
 }
 
 func TestRanking(t *tes.T) {
-	var collator = age.Collator[any]().Make()
+	var collator = age.CollatorClass[any]().Make()
 
 	// Nil
 	var ShouldBeNil any
@@ -600,9 +543,9 @@ func TestRanking(t *tes.T) {
 }
 
 func TestTildeArrays(t *tes.T) {
-	var collator = age.Collator[String]().Make()
+	var collator = age.CollatorClass[String]().Make()
 	var ranker = collator.RankValues
-	var sorter = age.Sorter[String]().MakeWithRanker(ranker)
+	var sorter = age.SorterClass[String]().MakeWithRanker(ranker)
 	var alpha = String("alpha")
 	var beta = String("beta")
 	var gamma = String("gamma")
@@ -616,9 +559,8 @@ func TestTildeArrays(t *tes.T) {
 }
 
 func TestRankRecursiveArrays(t *tes.T) {
-	var notation = not.Notation().Make()
-	var collator = age.Collator[any]().Make()
-	var array = col.Array[any](notation).MakeFromArray([]any{0})
+	var collator = age.CollatorClass[any]().Make()
+	var array = col.ArrayClass[any]().MakeFromArray([]any{0})
 	array.SetValue(1, array) // Now it is recursive.
 	defer func() {
 		if e := recover(); e != nil {
@@ -631,9 +573,8 @@ func TestRankRecursiveArrays(t *tes.T) {
 }
 
 func TestRankRecursiveMaps(t *tes.T) {
-	var notation = not.Notation().Make()
-	var collator = age.Collator[any]().Make()
-	var m = col.Map[string, any](notation).MakeFromMap(map[string]any{"first": 1})
+	var collator = age.CollatorClass[any]().Make()
+	var m = col.MapClass[string, any]().MakeFromMap(map[string]any{"first": 1})
 	m.SetValue("first", m) // Now it is recursive.
 	defer func() {
 		if e := recover(); e != nil {
@@ -646,13 +587,12 @@ func TestRankRecursiveMaps(t *tes.T) {
 }
 
 func TestIteratorsWithLists(t *tes.T) {
-	var notation = not.Notation().Make()
-	var array = col.Array[int](notation).MakeFromArray([]int{1, 2, 3, 4, 5})
-	var list = col.List[int](notation).MakeFromSequence(array)
+	var array = col.ArrayClass[int]().MakeFromArray([]int{1, 2, 3, 4, 5})
+	var list = col.ListClass[int]().MakeFromSequence(array)
 	var iterator = list.GetIterator()
 	ass.False(t, iterator.IsEmpty())
-	ass.Equal(t, 5, iterator.GetSize())
-	ass.Equal(t, 0, iterator.GetSlot())
+	ass.True(t, iterator.GetSize() == 5)
+	ass.True(t, iterator.GetSlot() == 0)
 	ass.False(t, iterator.HasPrevious())
 	ass.True(t, iterator.HasNext())
 	ass.Equal(t, 1, iterator.GetNext())
@@ -664,8 +604,8 @@ func TestIteratorsWithLists(t *tes.T) {
 	ass.True(t, iterator.HasNext())
 	ass.Equal(t, 3, iterator.GetNext())
 	ass.False(t, iterator.IsEmpty())
-	ass.Equal(t, 5, iterator.GetSize())
-	ass.Equal(t, 3, iterator.GetSlot())
+	ass.True(t, iterator.GetSize() == 5)
+	ass.True(t, iterator.GetSlot() == 3)
 	iterator.ToEnd()
 	ass.True(t, iterator.HasPrevious())
 	ass.False(t, iterator.HasNext())
@@ -677,17 +617,17 @@ func TestIteratorsWithLists(t *tes.T) {
 }
 
 func TestSortingEmpty(t *tes.T) {
-	var collator = age.Collator[any]().Make()
+	var collator = age.CollatorClass[any]().Make()
 	var ranker = collator.RankValues
-	var sorter = age.Sorter[any]().MakeWithRanker(ranker)
+	var sorter = age.SorterClass[any]().MakeWithRanker(ranker)
 	var empty = []any{}
 	sorter.SortValues(empty)
 }
 
 func TestSortingIntegers(t *tes.T) {
-	var collator = age.Collator[int]().Make()
+	var collator = age.CollatorClass[int]().Make()
 	var ranker = collator.RankValues
-	var sorter = age.Sorter[int]().MakeWithRanker(ranker)
+	var sorter = age.SorterClass[int]().MakeWithRanker(ranker)
 	var unsorted = []int{4, 3, 1, 5, 2}
 	var sorted = []int{1, 2, 3, 4, 5}
 	sorter.SortValues(unsorted)
@@ -695,9 +635,9 @@ func TestSortingIntegers(t *tes.T) {
 }
 
 func TestSortingStrings(t *tes.T) {
-	var collator = age.Collator[string]().Make()
+	var collator = age.CollatorClass[string]().Make()
 	var ranker = collator.RankValues
-	var sorter = age.Sorter[string]().MakeWithRanker(ranker)
+	var sorter = age.SorterClass[string]().MakeWithRanker(ranker)
 	var unsorted = []string{"alpha", "beta", "gamma", "delta"}
 	var sorted = []string{"alpha", "beta", "delta", "gamma"}
 	sorter.SortValues(unsorted)

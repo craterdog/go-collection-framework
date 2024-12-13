@@ -200,6 +200,10 @@ func TestListExampleCode(t *tes.T) {
 	list.InsertValue(0, "bax")
 	fmt.Println("The updated list:", list)
 
+	// Insert a new value at the end of the list (slot N).
+	list.InsertValue(6, "bux")
+	fmt.Println("The updated list:", list)
+
 	// Sort the values in the list.
 	list.SortValues()
 	fmt.Println("The sorted list:", list)

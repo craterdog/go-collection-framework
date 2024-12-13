@@ -30,7 +30,13 @@ func StackClass[V any]() StackClassLike[V] {
 // Constructor Methods
 
 func (c *stackClass_[V]) Make() StackLike[V] {
-	var instance = c.MakeWithCapacity(0) // Request the default capacity.
+	var listClass = ListClass[V]()
+	var values = listClass.Make()
+	var instance = &stack_[V]{
+		// Initialize the instance attributes.
+		capacity_: c.defaultCapacity_,
+		values_:   values,
+	}
 	return instance
 }
 
@@ -38,7 +44,7 @@ func (c *stackClass_[V]) MakeWithCapacity(
 	capacity age.Size,
 ) StackLike[V] {
 	if capacity < 1 {
-		capacity = 16 // This is the default capacity.
+		capacity = c.defaultCapacity_
 	}
 	var listClass = ListClass[V]()
 	var values = listClass.Make()
@@ -51,25 +57,29 @@ func (c *stackClass_[V]) MakeWithCapacity(
 }
 
 func (c *stackClass_[V]) MakeFromArray(
-	values []V,
+	array []V,
 ) StackLike[V] {
-	var stack = c.Make()
-	for _, value := range values {
-		stack.AddValue(value)
+	var listClass = ListClass[V]()
+	var values = listClass.MakeFromArray(array)
+	var instance = &stack_[V]{
+		// Initialize the instance attributes.
+		capacity_: c.defaultCapacity_,
+		values_:   values,
 	}
-	return stack
+	return instance
 }
 
 func (c *stackClass_[V]) MakeFromSequence(
-	values Sequential[V],
+	sequence Sequential[V],
 ) StackLike[V] {
-	var stack = c.Make()
-	var iterator = values.GetIterator()
-	for iterator.HasNext() {
-		var value = iterator.GetNext()
-		stack.AddValue(value)
+	var listClass = ListClass[V]()
+	var values = listClass.MakeFromSequence(sequence)
+	var instance = &stack_[V]{
+		// Initialize the instance attributes.
+		capacity_: c.defaultCapacity_,
+		values_:   values,
 	}
-	return stack
+	return instance
 }
 
 // Constant Methods
@@ -156,6 +166,7 @@ type stack_[V any] struct {
 
 type stackClass_[V any] struct {
 	// Declare the class constants.
+	defaultCapacity_ age.Size
 }
 
 // Class Reference
@@ -179,6 +190,7 @@ func stackClassReference[V any]() *stackClass_[V] {
 		// Add a new bound class type.
 		class = &stackClass_[V]{
 			// Initialize the class constants.
+			defaultCapacity_: 16,
 		}
 		stackMap_[name] = class
 	}

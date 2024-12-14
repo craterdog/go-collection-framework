@@ -29,9 +29,9 @@ func StackClass[V any]() StackClassLike[V] {
 
 // Constructor Methods
 
-func (c *stackClass_[V]) Make() StackLike[V] {
+func (c *stackClass_[V]) Stack() StackLike[V] {
 	var listClass = ListClass[V]()
-	var values = listClass.Make()
+	var values = listClass.List()
 	var instance = &stack_[V]{
 		// Initialize the instance attributes.
 		capacity_: c.defaultCapacity_,
@@ -40,14 +40,14 @@ func (c *stackClass_[V]) Make() StackLike[V] {
 	return instance
 }
 
-func (c *stackClass_[V]) MakeWithCapacity(
+func (c *stackClass_[V]) StackWithCapacity(
 	capacity age.Size,
 ) StackLike[V] {
 	if capacity < 1 {
 		capacity = c.defaultCapacity_
 	}
 	var listClass = ListClass[V]()
-	var values = listClass.Make()
+	var values = listClass.List()
 	var instance = &stack_[V]{
 		// Initialize the instance attributes.
 		capacity_: capacity,
@@ -56,11 +56,11 @@ func (c *stackClass_[V]) MakeWithCapacity(
 	return instance
 }
 
-func (c *stackClass_[V]) MakeFromArray(
+func (c *stackClass_[V]) StackFromArray(
 	array []V,
 ) StackLike[V] {
 	var listClass = ListClass[V]()
-	var values = listClass.MakeFromArray(array)
+	var values = listClass.ListFromArray(array)
 	var instance = &stack_[V]{
 		// Initialize the instance attributes.
 		capacity_: c.defaultCapacity_,
@@ -69,11 +69,11 @@ func (c *stackClass_[V]) MakeFromArray(
 	return instance
 }
 
-func (c *stackClass_[V]) MakeFromSequence(
+func (c *stackClass_[V]) StackFromSequence(
 	sequence Sequential[V],
 ) StackLike[V] {
 	var listClass = ListClass[V]()
-	var values = listClass.MakeFromSequence(sequence)
+	var values = listClass.ListFromSequence(sequence)
 	var instance = &stack_[V]{
 		// Initialize the instance attributes.
 		capacity_: c.defaultCapacity_,

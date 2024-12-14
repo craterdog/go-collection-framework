@@ -29,10 +29,10 @@ func CatalogClass[K comparable, V any]() CatalogClassLike[K, V] {
 
 // Constructor Methods
 
-func (c *catalogClass_[K, V]) Make() CatalogLike[K, V] {
+func (c *catalogClass_[K, V]) Catalog() CatalogLike[K, V] {
 	var listClass = ListClass[AssociationLike[K, V]]()
 	var keys = map[K]AssociationLike[K, V]{}
-	var associations = listClass.Make()
+	var associations = listClass.List()
 	var instance = &catalog_[K, V]{
 		// Initialize the instance attributes.
 		keys_:         keys,
@@ -41,10 +41,10 @@ func (c *catalogClass_[K, V]) Make() CatalogLike[K, V] {
 	return instance
 }
 
-func (c *catalogClass_[K, V]) MakeFromArray(
+func (c *catalogClass_[K, V]) CatalogFromArray(
 	associations []AssociationLike[K, V],
 ) CatalogLike[K, V] {
-	var catalog = c.Make()
+	var catalog = c.Catalog()
 	for _, association := range associations {
 		var key = association.GetKey()
 		var value = association.GetValue()
@@ -53,20 +53,20 @@ func (c *catalogClass_[K, V]) MakeFromArray(
 	return catalog
 }
 
-func (c *catalogClass_[K, V]) MakeFromMap(
+func (c *catalogClass_[K, V]) CatalogFromMap(
 	associations map[K]V,
 ) CatalogLike[K, V] {
-	var catalog = c.Make()
+	var catalog = c.Catalog()
 	for key, value := range associations {
 		catalog.SetValue(key, value)
 	}
 	return catalog
 }
 
-func (c *catalogClass_[K, V]) MakeFromSequence(
+func (c *catalogClass_[K, V]) CatalogFromSequence(
 	associations Sequential[AssociationLike[K, V]],
 ) CatalogLike[K, V] {
-	var catalog = c.Make()
+	var catalog = c.Catalog()
 	var iterator = associations.GetIterator()
 	for iterator.HasNext() {
 		var association = iterator.GetNext()
@@ -85,7 +85,7 @@ func (c *catalogClass_[K, V]) Extract(
 	catalog CatalogLike[K, V],
 	keys Sequential[K],
 ) CatalogLike[K, V] {
-	var result = c.Make()
+	var result = c.Catalog()
 	var iterator = keys.GetIterator()
 	for iterator.HasNext() {
 		var key = iterator.GetNext()
@@ -99,7 +99,7 @@ func (c *catalogClass_[K, V]) Merge(
 	first CatalogLike[K, V],
 	second CatalogLike[K, V],
 ) CatalogLike[K, V] {
-	var catalog = c.MakeFromSequence(first)
+	var catalog = c.CatalogFromSequence(first)
 	var iterator = second.GetIterator()
 	for iterator.HasNext() {
 		var association = iterator.GetNext()
@@ -157,7 +157,7 @@ func (v *catalog_[K, V]) SetValue(
 	} else {
 		// Add a new association.
 		var associationClass = AssociationClass[K, V]()
-		association = associationClass.Make(key, value)
+		association = associationClass.Association(key, value)
 		v.associations_.AppendValue(association)
 		v.keys_[key] = association
 	}
@@ -165,7 +165,7 @@ func (v *catalog_[K, V]) SetValue(
 
 func (v *catalog_[K, V]) GetKeys() Sequential[K] {
 	var listClass = ListClass[K]()
-	var keys = listClass.Make()
+	var keys = listClass.List()
 	var iterator = v.associations_.GetIterator()
 	for iterator.HasNext() {
 		var association = iterator.GetNext()
@@ -178,7 +178,7 @@ func (v *catalog_[K, V]) GetValues(
 	keys Sequential[K],
 ) Sequential[V] {
 	var listClass = ListClass[V]()
-	var values = listClass.Make()
+	var values = listClass.List()
 	var iterator = keys.GetIterator()
 	for iterator.HasNext() {
 		var key = iterator.GetNext()
@@ -205,7 +205,7 @@ func (v *catalog_[K, V]) RemoveValues(
 	keys Sequential[K],
 ) Sequential[V] {
 	var listClass = ListClass[V]()
-	var values = listClass.Make()
+	var values = listClass.List()
 	var iterator = keys.GetIterator()
 	for iterator.HasNext() {
 		var key = iterator.GetNext()

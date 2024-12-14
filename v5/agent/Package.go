@@ -80,8 +80,8 @@ The default maximum depth is 16.
 */
 type CollatorClassLike[V any] interface {
 	// Constructor Methods
-	Make() CollatorLike[V]
-	MakeWithMaximumDepth(
+	Collator() CollatorLike[V]
+	CollatorWithMaximumDepth(
 		maximumDepth Size,
 	) CollatorLike[V]
 }
@@ -111,7 +111,7 @@ during iteration.
 */
 type IteratorClassLike[V any] interface {
 	// Constructor Methods
-	Make(
+	Iterator(
 		array []V,
 	) IteratorLike[V]
 }
@@ -127,8 +127,8 @@ values are sorted into their "natural" ordering by type of value.
 */
 type SorterClassLike[V any] interface {
 	// Constructor Methods
-	Make() SorterLike[V]
-	MakeWithRanker(
+	Sorter() SorterLike[V]
+	SorterWithRanker(
 		ranker RankingFunction[V],
 	) SorterLike[V]
 }

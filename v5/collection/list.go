@@ -29,31 +29,31 @@ func ListClass[V any]() ListClassLike[V] {
 
 // Constructor Methods
 
-func (c *listClass_[V]) Make() ListLike[V] {
+func (c *listClass_[V]) List() ListLike[V] {
 	var arrayClass = ArrayClass[V]()
-	var array = arrayClass.Make(0)
+	var array = arrayClass.Array(0)
 	var instance = &list_[V]{
 		array_: array,
 	}
 	return instance
 }
 
-func (c *listClass_[V]) MakeFromArray(
+func (c *listClass_[V]) ListFromArray(
 	values []V,
 ) ListLike[V] {
 	var arrayClass = ArrayClass[V]()
-	var array = arrayClass.MakeFromArray(values)
+	var array = arrayClass.ArrayFromArray(values)
 	var instance = &list_[V]{
 		array_: array,
 	}
 	return instance
 }
 
-func (c *listClass_[V]) MakeFromSequence(
+func (c *listClass_[V]) ListFromSequence(
 	values Sequential[V],
 ) ListLike[V] {
 	var arrayClass = ArrayClass[V]()
-	var array = arrayClass.MakeFromSequence(values)
+	var array = arrayClass.ArrayFromSequence(values)
 	var instance = &list_[V]{
 		array_: array,
 	}
@@ -68,7 +68,7 @@ func (c *listClass_[V]) Concatenate(
 	first ListLike[V],
 	second ListLike[V],
 ) ListLike[V] {
-	var list = c.MakeFromSequence(first)
+	var list = c.ListFromSequence(first)
 	list.AppendValues(second)
 	return list
 }
@@ -109,7 +109,7 @@ func (v *list_[V]) InsertValue(
 	// Create a new larger array.
 	var size = v.GetSize() + 1
 	var arrayClass = ArrayClass[V]()
-	var array = arrayClass.Make(size)
+	var array = arrayClass.Array(size)
 
 	// Copy the values into the new array.
 	var existingValues = v.GetIterator()
@@ -139,7 +139,7 @@ func (v *list_[V]) InsertValues(
 	// Create a new larger array.
 	var size = v.GetSize() + values.GetSize()
 	var arrayClass = ArrayClass[V]()
-	var array = arrayClass.Make(size)
+	var array = arrayClass.Array(size)
 
 	// Copy the values into the new array.
 	var existingValues = v.GetIterator()
@@ -176,7 +176,7 @@ func (v *list_[V]) AppendValue(
 	// Create a new larger array.
 	var size = v.GetSize() + 1
 	var arrayClass = ArrayClass[V]()
-	var array = arrayClass.Make(size)
+	var array = arrayClass.Array(size)
 
 	// Copy the existing values into the new array.
 	var existingValues = v.GetIterator()
@@ -201,7 +201,7 @@ func (v *list_[V]) AppendValues(
 	// Create a new larger array.
 	var size = v.GetSize() + values.GetSize()
 	var arrayClass = ArrayClass[V]()
-	var array = arrayClass.Make(size)
+	var array = arrayClass.Array(size)
 
 	// Copy the existing values into the new array.
 	var existingValues = v.GetIterator()
@@ -231,7 +231,7 @@ func (v *list_[V]) RemoveValue(
 	var removed = v.GetValue(index)
 	var size = v.GetSize() - 1
 	var arrayClass = ArrayClass[V]()
-	var array = arrayClass.Make(size)
+	var array = arrayClass.Array(size)
 
 	// Copy the remaining values into the new array.
 	var counter = v.toNormalized(index)
@@ -262,8 +262,8 @@ func (v *list_[V]) RemoveValues(
 	var delta = age.Size(last - first + 1)
 	var size = v.GetSize() - delta
 	var arrayClass = ArrayClass[V]()
-	var removed = arrayClass.Make(delta)
-	var array = arrayClass.Make(size)
+	var removed = arrayClass.Array(delta)
+	var array = arrayClass.Array(size)
 
 	// Split the existing values into the two new arrays.
 	var counter Index
@@ -289,7 +289,7 @@ func (v *list_[V]) RemoveValues(
 
 func (v *list_[V]) RemoveAll() {
 	var arrayClass = ArrayClass[V]()
-	v.array_ = arrayClass.Make(0)
+	v.array_ = arrayClass.Array(0)
 }
 
 // Searchable[V] Methods
@@ -335,7 +335,7 @@ func (v *list_[V]) GetIndex(
 ) Index {
 	var index Index
 	var collatorClass = age.CollatorClass[V]()
-	var compare = collatorClass.Make().CompareValues
+	var compare = collatorClass.Collator().CompareValues
 	var iterator = v.GetIterator()
 	for iterator.HasNext() {
 		index++

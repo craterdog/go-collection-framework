@@ -30,15 +30,15 @@ func SorterClass[V any]() SorterClassLike[V] {
 
 // Constructor Methods
 
-func (c *sorterClass_[V]) Make() SorterLike[V] {
+func (c *sorterClass_[V]) Sorter() SorterLike[V] {
 	var instance = &sorter_[V]{
 		// Initialize the instance attributes.
-		ranker_: CollatorClass[V]().Make().RankValues,
+		ranker_: CollatorClass[V]().Collator().RankValues,
 	}
 	return instance
 }
 
-func (c *sorterClass_[V]) MakeWithRanker(
+func (c *sorterClass_[V]) SorterWithRanker(
 	ranker RankingFunction[V],
 ) SorterLike[V] {
 	if uti.IsUndefined(ranker) {

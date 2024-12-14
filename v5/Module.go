@@ -62,68 +62,254 @@ type (
 	Synchronized = col.Synchronized
 )
 
-// DEFAULT CONSTRUCTORS
+// CLASS CONSTRUCTORS
 
-// Agent
+// agent/Collator
 
 func Collator[V any]() age.CollatorLike[V] {
-	return age.CollatorClass[V]().Make()
+	return age.CollatorClass[V]().Collator()
 }
 
+func CollatorWithMaximumDepth[V any](
+	maximumDepth Size,
+) age.CollatorLike[V] {
+	return age.CollatorClass[V]().CollatorWithMaximumDepth(
+		maximumDepth,
+	)
+}
+
+// agent/Iterator
+
 func Iterator[V any](
-	values []V,
+	array []V,
 ) age.IteratorLike[V] {
-	return age.IteratorClass[V]().Make(
+	return age.IteratorClass[V]().Iterator(
+		array,
+	)
+}
+
+// agent/Sorter
+
+func Sorter[V any]() age.SorterLike[V] {
+	return age.SorterClass[V]().Sorter()
+}
+
+func SorterWithRanker[V any](
+	ranker age.RankingFunction[V],
+) age.SorterLike[V] {
+	return age.SorterClass[V]().SorterWithRanker(
+		ranker,
+	)
+}
+
+// collection/Array
+
+func Array[V any](
+	size age.Size,
+) col.ArrayLike[V] {
+	return col.ArrayClass[V]().Array(
+		size,
+	)
+}
+
+func ArrayFromArray[V any](
+	values []V,
+) col.ArrayLike[V] {
+	return col.ArrayClass[V]().ArrayFromArray(
 		values,
 	)
 }
 
-func Sorter[V any]() age.SorterLike[V] {
-	return age.SorterClass[V]().Make()
-}
-
-// Collection
-
-func Array[V any](
-	size Size,
+func ArrayFromSequence[V any](
+	values col.Sequential[V],
 ) col.ArrayLike[V] {
-	return col.ArrayClass[V]().Make(
-		size,
+	return col.ArrayClass[V]().ArrayFromSequence(
+		values,
 	)
 }
+
+// collection/Association
 
 func Association[K comparable, V any](
 	key K,
 	value V,
 ) col.AssociationLike[K, V] {
-	return col.AssociationClass[K, V]().Make(
+	return col.AssociationClass[K, V]().Association(
 		key,
 		value,
 	)
 }
 
+// collection/Catalog
+
 func Catalog[K comparable, V any]() col.CatalogLike[K, V] {
-	return col.CatalogClass[K, V]().Make()
+	return col.CatalogClass[K, V]().Catalog()
 }
+
+func CatalogFromArray[K comparable, V any](
+	associations []col.AssociationLike[K, V],
+) col.CatalogLike[K, V] {
+	return col.CatalogClass[K, V]().CatalogFromArray(
+		associations,
+	)
+}
+
+func CatalogFromMap[K comparable, V any](
+	associations map[K]V,
+) col.CatalogLike[K, V] {
+	return col.CatalogClass[K, V]().CatalogFromMap(
+		associations,
+	)
+}
+
+func CatalogFromSequence[K comparable, V any](
+	associations col.Sequential[col.AssociationLike[K, V]],
+) col.CatalogLike[K, V] {
+	return col.CatalogClass[K, V]().CatalogFromSequence(
+		associations,
+	)
+}
+
+// collection/List
 
 func List[V any]() col.ListLike[V] {
-	return col.ListClass[V]().Make()
+	return col.ListClass[V]().List()
 }
+
+func ListFromArray[V any](
+	values []V,
+) col.ListLike[V] {
+	return col.ListClass[V]().ListFromArray(
+		values,
+	)
+}
+
+func ListFromSequence[V any](
+	values col.Sequential[V],
+) col.ListLike[V] {
+	return col.ListClass[V]().ListFromSequence(
+		values,
+	)
+}
+
+// collection/Map
 
 func Map[K comparable, V any]() col.MapLike[K, V] {
-	return col.MapClass[K, V]().Make()
+	return col.MapClass[K, V]().Map()
 }
+
+func MapFromArray[K comparable, V any](
+	associations []col.AssociationLike[K, V],
+) col.MapLike[K, V] {
+	return col.MapClass[K, V]().MapFromArray(
+		associations,
+	)
+}
+
+func MapFromMap[K comparable, V any](
+	associations map[K]V,
+) col.MapLike[K, V] {
+	return col.MapClass[K, V]().MapFromMap(
+		associations,
+	)
+}
+
+func MapFromSequence[K comparable, V any](
+	associations col.Sequential[col.AssociationLike[K, V]],
+) col.MapLike[K, V] {
+	return col.MapClass[K, V]().MapFromSequence(
+		associations,
+	)
+}
+
+// collection/Queue
 
 func Queue[V any]() col.QueueLike[V] {
-	return col.QueueClass[V]().Make()
+	return col.QueueClass[V]().Queue()
 }
+
+func QueueWithCapacity[V any](
+	capacity age.Size,
+) col.QueueLike[V] {
+	return col.QueueClass[V]().QueueWithCapacity(
+		capacity,
+	)
+}
+
+func QueueFromArray[V any](
+	values []V,
+) col.QueueLike[V] {
+	return col.QueueClass[V]().QueueFromArray(
+		values,
+	)
+}
+
+func QueueFromSequence[V any](
+	values col.Sequential[V],
+) col.QueueLike[V] {
+	return col.QueueClass[V]().QueueFromSequence(
+		values,
+	)
+}
+
+// collection/Set
 
 func Set[V any]() col.SetLike[V] {
-	return col.SetClass[V]().Make()
+	return col.SetClass[V]().Set()
 }
 
+func SetWithCollator[V any](
+	collator age.CollatorLike[V],
+) col.SetLike[V] {
+	return col.SetClass[V]().SetWithCollator(
+		collator,
+	)
+}
+
+func SetFromArray[V any](
+	values []V,
+) col.SetLike[V] {
+	return col.SetClass[V]().SetFromArray(
+		values,
+	)
+}
+
+func SetFromSequence[V any](
+	values col.Sequential[V],
+) col.SetLike[V] {
+	return col.SetClass[V]().SetFromSequence(
+		values,
+	)
+}
+
+// collection/Stack
+
 func Stack[V any]() col.StackLike[V] {
-	return col.StackClass[V]().Make()
+	return col.StackClass[V]().Stack()
+}
+
+func StackWithCapacity[V any](
+	capacity age.Size,
+) col.StackLike[V] {
+	return col.StackClass[V]().StackWithCapacity(
+		capacity,
+	)
+}
+
+func StackFromArray[V any](
+	values []V,
+) col.StackLike[V] {
+	return col.StackClass[V]().StackFromArray(
+		values,
+	)
+}
+
+func StackFromSequence[V any](
+	values col.Sequential[V],
+) col.StackLike[V] {
+	return col.StackClass[V]().StackFromSequence(
+		values,
+	)
 }
 
 // GLOBAL FUNCTIONS
@@ -155,9 +341,9 @@ func AnyCollator[V any](
 	var collator age.CollatorLike[V]
 	switch {
 	case maximumDepth > 0:
-		collator = class.MakeWithMaximumDepth(maximumDepth)
+		collator = class.CollatorWithMaximumDepth(maximumDepth)
 	default:
-		collator = class.Make()
+		collator = class.Collator()
 	}
 	return collator
 }
@@ -187,7 +373,7 @@ func AnyIterator[V any](
 	var iterator age.IteratorLike[V]
 	switch {
 	case uti.IsDefined(values):
-		iterator = class.Make(values)
+		iterator = class.Iterator(values)
 	default:
 		var message = "At least one argument is required by the iterator constructor."
 		panic(message)
@@ -220,9 +406,9 @@ func AnySorter[V any](
 	var sorter age.SorterLike[V]
 	switch {
 	case uti.IsDefined(ranker):
-		sorter = class.MakeWithRanker(ranker)
+		sorter = class.SorterWithRanker(ranker)
 	default:
-		sorter = class.Make()
+		sorter = class.Sorter()
 	}
 	return sorter
 }
@@ -255,7 +441,7 @@ func AnyAssociation[K comparable, V any](arguments ...any) col.AssociationLike[K
 		panic("The constructor for an association requires a key and value.")
 	}
 	var class = col.AssociationClass[K, V]()
-	var association = class.Make(key, value)
+	var association = class.Association(key, value)
 	return association
 }
 
@@ -297,11 +483,11 @@ func AnyArray[V any](arguments ...any) col.ArrayLike[V] {
 	var array col.ArrayLike[V]
 	switch {
 	case size > 0:
-		array = class.Make(size)
+		array = class.Array(size)
 	case len(values) > 0:
-		array = class.MakeFromArray(values)
+		array = class.ArrayFromArray(values)
 	case sequence != nil:
-		array = class.MakeFromSequence(sequence)
+		array = class.ArrayFromSequence(sequence)
 	default:
 		panic("The constructor for an array requires an argument.")
 	}
@@ -342,13 +528,13 @@ func AnyCatalog[K comparable, V any](arguments ...any) col.CatalogLike[K, V] {
 	var catalog col.CatalogLike[K, V]
 	switch {
 	case len(associations) > 0:
-		catalog = class.MakeFromArray(associations)
+		catalog = class.CatalogFromArray(associations)
 	case len(mappings) > 0:
-		catalog = class.MakeFromMap(mappings)
+		catalog = class.CatalogFromMap(mappings)
 	case sequence != nil:
-		catalog = class.MakeFromSequence(sequence)
+		catalog = class.CatalogFromSequence(sequence)
 	default:
-		catalog = class.Make()
+		catalog = class.Catalog()
 	}
 	return catalog
 }
@@ -384,11 +570,11 @@ func AnyList[V any](arguments ...any) col.ListLike[V] {
 	var list col.ListLike[V]
 	switch {
 	case len(values) > 0:
-		list = class.MakeFromArray(values)
+		list = class.ListFromArray(values)
 	case sequence != nil:
-		list = class.MakeFromSequence(sequence)
+		list = class.ListFromSequence(sequence)
 	default:
-		list = class.Make()
+		list = class.List()
 	}
 	return list
 }
@@ -427,13 +613,13 @@ func AnyMap[K comparable, V any](arguments ...any) col.MapLike[K, V] {
 	var map_ col.MapLike[K, V]
 	switch {
 	case len(associations) > 0:
-		map_ = class.MakeFromArray(associations)
+		map_ = class.MapFromArray(associations)
 	case len(mappings) > 0:
-		map_ = class.MakeFromMap(mappings)
+		map_ = class.MapFromMap(mappings)
 	case sequence != nil:
-		map_ = class.MakeFromSequence(sequence)
+		map_ = class.MapFromSequence(sequence)
 	default:
-		map_ = class.Make()
+		map_ = class.Map()
 	}
 	return map_
 }
@@ -476,13 +662,13 @@ func AnyQueue[V any](arguments ...any) col.QueueLike[V] {
 	var queue col.QueueLike[V]
 	switch {
 	case capacity > 0:
-		queue = class.MakeWithCapacity(capacity)
+		queue = class.QueueWithCapacity(capacity)
 	case len(values) > 0:
-		queue = class.MakeFromArray(values)
+		queue = class.QueueFromArray(values)
 	case sequence != nil:
-		queue = class.MakeFromSequence(sequence)
+		queue = class.QueueFromSequence(sequence)
 	default:
-		queue = class.Make()
+		queue = class.Queue()
 	}
 	return queue
 }
@@ -521,7 +707,7 @@ func AnySet[V any](arguments ...any) col.SetLike[V] {
 	var set col.SetLike[V]
 	switch {
 	case collator != nil:
-		set = class.MakeWithCollator(collator)
+		set = class.SetWithCollator(collator)
 		switch {
 		case len(values) > 0:
 			for _, value := range values {
@@ -531,11 +717,11 @@ func AnySet[V any](arguments ...any) col.SetLike[V] {
 			set.AddValues(sequence)
 		}
 	case len(values) > 0:
-		set = class.MakeFromArray(values)
+		set = class.SetFromArray(values)
 	case sequence != nil:
-		set = class.MakeFromSequence(sequence)
+		set = class.SetFromSequence(sequence)
 	default:
-		set = class.Make()
+		set = class.Set()
 	}
 	return set
 }
@@ -578,13 +764,13 @@ func AnyStack[V any](arguments ...any) col.StackLike[V] {
 	var stack col.StackLike[V]
 	switch {
 	case capacity > 0:
-		stack = class.MakeWithCapacity(capacity)
+		stack = class.StackWithCapacity(capacity)
 	case len(values) > 0:
-		stack = class.MakeFromArray(values)
+		stack = class.StackFromArray(values)
 	case sequence != nil:
-		stack = class.MakeFromSequence(sequence)
+		stack = class.StackFromSequence(sequence)
 	default:
-		stack = class.Make()
+		stack = class.Stack()
 	}
 	return stack
 }

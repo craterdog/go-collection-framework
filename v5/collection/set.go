@@ -29,21 +29,21 @@ func SetClass[V any]() SetClassLike[V] {
 
 // Constructor Methods
 
-func (c *setClass_[V]) Make() SetLike[V] {
+func (c *setClass_[V]) Set() SetLike[V] {
 	var collatorClass = age.CollatorClass[V]()
-	var collator = collatorClass.Make()
-	var instance = c.MakeWithCollator(collator)
+	var collator = collatorClass.Collator()
+	var instance = c.SetWithCollator(collator)
 	return instance
 }
 
-func (c *setClass_[V]) MakeWithCollator(
+func (c *setClass_[V]) SetWithCollator(
 	collator age.CollatorLike[V],
 ) SetLike[V] {
 	if uti.IsUndefined(collator) {
 		panic("The \"collator\" attribute is required by this class.")
 	}
 	var listClass = ListClass[V]()
-	var values = listClass.Make()
+	var values = listClass.List()
 	var instance = &set_[V]{
 		// Initialize the instance attributes.
 		collator_: collator,
@@ -52,20 +52,20 @@ func (c *setClass_[V]) MakeWithCollator(
 	return instance
 }
 
-func (c *setClass_[V]) MakeFromArray(
+func (c *setClass_[V]) SetFromArray(
 	values []V,
 ) SetLike[V] {
-	var set = c.Make()
+	var set = c.Set()
 	for _, value := range values {
 		set.AddValue(value)
 	}
 	return set
 }
 
-func (c *setClass_[V]) MakeFromSequence(
+func (c *setClass_[V]) SetFromSequence(
 	values Sequential[V],
 ) SetLike[V] {
-	var set = c.Make()
+	var set = c.Set()
 	var iterator = values.GetIterator()
 	for iterator.HasNext() {
 		var value = iterator.GetNext()
@@ -83,7 +83,7 @@ func (c *setClass_[V]) And(
 	second SetLike[V],
 ) SetLike[V] {
 	var collator = first.GetCollator()
-	var result = c.MakeWithCollator(collator)
+	var result = c.SetWithCollator(collator)
 	var iterator = first.GetIterator()
 	for iterator.HasNext() {
 		var value = iterator.GetNext()
@@ -99,7 +99,7 @@ func (c *setClass_[V]) Or(
 	second SetLike[V],
 ) SetLike[V] {
 	var collator = first.GetCollator()
-	var result = c.MakeWithCollator(collator)
+	var result = c.SetWithCollator(collator)
 	result.AddValues(first)
 	result.AddValues(second)
 	return result
@@ -110,7 +110,7 @@ func (c *setClass_[V]) Sans(
 	second SetLike[V],
 ) SetLike[V] {
 	var collator = first.GetCollator()
-	var result = c.MakeWithCollator(collator)
+	var result = c.SetWithCollator(collator)
 	result.AddValues(first)
 	result.RemoveValues(second)
 	return result

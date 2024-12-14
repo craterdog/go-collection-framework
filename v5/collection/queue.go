@@ -29,12 +29,12 @@ func QueueClass[V any]() QueueClassLike[V] {
 
 // Constructor Methods
 
-func (c *queueClass_[V]) Make() QueueLike[V] {
-	var instance = c.MakeWithCapacity(0) // Request the default capacity.
+func (c *queueClass_[V]) Queue() QueueLike[V] {
+	var instance = c.QueueWithCapacity(0) // Request the default capacity.
 	return instance
 }
 
-func (c *queueClass_[V]) MakeWithCapacity(
+func (c *queueClass_[V]) QueueWithCapacity(
 	capacity age.Size,
 ) QueueLike[V] {
 	if capacity < 1 {
@@ -42,7 +42,7 @@ func (c *queueClass_[V]) MakeWithCapacity(
 	}
 	var available = make(chan bool, int(capacity))
 	var listClass = ListClass[V]()
-	var values = listClass.Make()
+	var values = listClass.List()
 	var instance = &queue_[V]{
 		// Initialize the instance attributes.
 		available_: available,
@@ -52,20 +52,20 @@ func (c *queueClass_[V]) MakeWithCapacity(
 	return instance
 }
 
-func (c *queueClass_[V]) MakeFromArray(
+func (c *queueClass_[V]) QueueFromArray(
 	values []V,
 ) QueueLike[V] {
-	var queue = c.Make()
+	var queue = c.Queue()
 	for _, value := range values {
 		queue.AddValue(value)
 	}
 	return queue
 }
 
-func (c *queueClass_[V]) MakeFromSequence(
+func (c *queueClass_[V]) QueueFromSequence(
 	values Sequential[V],
 ) QueueLike[V] {
-	var queue = c.Make()
+	var queue = c.Queue()
 	var iterator = values.GetIterator()
 	for iterator.HasNext() {
 		var value = iterator.GetNext()
@@ -93,10 +93,10 @@ func (c *queueClass_[V]) Fork(
 	// Create the new output queues.
 	var capacity = input.GetCapacity()
 	var listClass = ListClass[QueueLike[V]]()
-	var outputs = listClass.Make()
+	var outputs = listClass.List()
 	var i age.Size
 	for ; i < size; i++ {
-		outputs.AppendValue(c.MakeWithCapacity(capacity))
+		outputs.AppendValue(c.QueueWithCapacity(capacity))
 	}
 
 	// Connect up the input queue to the output queues in a separate go-routine.
@@ -146,10 +146,10 @@ func (c *queueClass_[V]) Split(
 	// Create the new output queues.
 	var capacity = input.GetCapacity()
 	var listClass = ListClass[QueueLike[V]]()
-	var outputs = listClass.Make()
+	var outputs = listClass.List()
 	var i age.Size
 	for ; i < size; i++ {
-		outputs.AppendValue(c.MakeWithCapacity(capacity))
+		outputs.AppendValue(c.QueueWithCapacity(capacity))
 	}
 
 	// Connect up the input queue to the output queues.
@@ -198,7 +198,7 @@ func (c *queueClass_[V]) Join(
 	// Create the new output queue.
 	var iterator = inputs.GetIterator()
 	var capacity = iterator.GetNext().GetCapacity()
-	var output = c.MakeWithCapacity(capacity)
+	var output = c.QueueWithCapacity(capacity)
 
 	// Connect up the input queues to the output queue.
 	group.Add(1)
@@ -270,7 +270,7 @@ func (v *queue_[V]) RemoveAll() {
 	v.mutex_.Lock()
 	v.available_ = make(chan bool, v.capacity_)
 	var listClass = ListClass[V]()
-	v.values_ = listClass.Make()
+	v.values_ = listClass.List()
 	v.mutex_.Unlock()
 }
 

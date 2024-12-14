@@ -28,7 +28,7 @@ func AssociationClass[K comparable, V any]() AssociationClassLike[K, V] {
 
 // Constructor Methods
 
-func (c *associationClass_[K, V]) Make(
+func (c *associationClass_[K, V]) Association(
 	key K,
 	value V,
 ) AssociationLike[K, V] {

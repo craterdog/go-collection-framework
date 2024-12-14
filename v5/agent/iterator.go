@@ -28,7 +28,7 @@ func IteratorClass[V any]() IteratorClassLike[V] {
 
 // Constructor Methods
 
-func (c *iteratorClass_[V]) Make(
+func (c *iteratorClass_[V]) Iterator(
 	array []V,
 ) IteratorLike[V] {
 	if uti.IsUndefined(array) {

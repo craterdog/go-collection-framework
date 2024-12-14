@@ -29,7 +29,7 @@ func ArrayClass[V any]() ArrayClassLike[V] {
 
 // Constructor Methods
 
-func (c *arrayClass_[V]) Make(
+func (c *arrayClass_[V]) Array(
 	size age.Size,
 ) ArrayLike[V] {
 	if uti.IsUndefined(size) {
@@ -39,14 +39,14 @@ func (c *arrayClass_[V]) Make(
 	return array_[V](array)
 }
 
-func (c *arrayClass_[V]) MakeFromArray(
+func (c *arrayClass_[V]) ArrayFromArray(
 	values []V,
 ) ArrayLike[V] {
 	var array = uti.CopyArray(values)
 	return array_[V](array)
 }
 
-func (c *arrayClass_[V]) MakeFromSequence(
+func (c *arrayClass_[V]) ArrayFromSequence(
 	values Sequential[V],
 ) ArrayLike[V] {
 	var array = values.AsArray() // This returns a copy of the array.
@@ -106,7 +106,7 @@ func (v array_[V]) AsArray() []V {
 func (v array_[V]) GetIterator() age.IteratorLike[V] {
 	var array = uti.CopyArray(v)
 	var iteratorClass = age.IteratorClass[V]()
-	var iterator = iteratorClass.Make(array)
+	var iterator = iteratorClass.Iterator(array)
 	return iterator
 }
 
@@ -114,8 +114,8 @@ func (v array_[V]) GetIterator() age.IteratorLike[V] {
 
 func (v array_[V]) SortValues() {
 	if v.GetSize() > 1 {
-		var iteratorClass = age.SorterClass[V]()
-		var sorter = iteratorClass.Make()
+		var sorterClass = age.SorterClass[V]()
+		var sorter = sorterClass.Sorter()
 		sorter.SortValues(v)
 	}
 }
@@ -125,7 +125,7 @@ func (v array_[V]) SortValuesWithRanker(
 ) {
 	if v.GetSize() > 1 {
 		var sorterClass = age.SorterClass[V]()
-		var sorter = sorterClass.MakeWithRanker(ranker)
+		var sorter = sorterClass.SorterWithRanker(ranker)
 		sorter.SortValues(v)
 	}
 }
@@ -133,7 +133,7 @@ func (v array_[V]) SortValuesWithRanker(
 func (v array_[V]) ReverseValues() {
 	if v.GetSize() > 1 {
 		var sorterClass = age.SorterClass[V]()
-		var sorter = sorterClass.Make()
+		var sorter = sorterClass.Sorter()
 		sorter.ReverseValues(v)
 	}
 }
@@ -141,7 +141,7 @@ func (v array_[V]) ReverseValues() {
 func (v array_[V]) ShuffleValues() {
 	if v.GetSize() > 1 {
 		var sorterClass = age.SorterClass[V]()
-		var sorter = sorterClass.Make()
+		var sorter = sorterClass.Sorter()
 		sorter.ShuffleValues(v)
 	}
 }

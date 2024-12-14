@@ -29,12 +29,12 @@ func MapClass[K comparable, V any]() MapClassLike[K, V] {
 
 // Constructor Methods
 
-func (c *mapClass_[K, V]) Make() MapLike[K, V] {
+func (c *mapClass_[K, V]) Map() MapLike[K, V] {
 	var instance = map_[K, V](map[K]V{})
 	return instance
 }
 
-func (c *mapClass_[K, V]) MakeFromArray(
+func (c *mapClass_[K, V]) MapFromArray(
 	associations []AssociationLike[K, V],
 ) MapLike[K, V] {
 	var instance = map_[K, V](map[K]V{})
@@ -46,7 +46,7 @@ func (c *mapClass_[K, V]) MakeFromArray(
 	return instance
 }
 
-func (c *mapClass_[K, V]) MakeFromMap(
+func (c *mapClass_[K, V]) MapFromMap(
 	associations map[K]V,
 ) MapLike[K, V] {
 	var instance = map_[K, V](map[K]V{})
@@ -56,7 +56,7 @@ func (c *mapClass_[K, V]) MakeFromMap(
 	return instance
 }
 
-func (c *mapClass_[K, V]) MakeFromSequence(
+func (c *mapClass_[K, V]) MapFromSequence(
 	associations Sequential[AssociationLike[K, V]],
 ) MapLike[K, V] {
 	var instance = map_[K, V](map[K]V{})
@@ -108,7 +108,7 @@ func (v map_[K, V]) SetValue(
 func (v map_[K, V]) GetKeys() Sequential[K] {
 	var size = v.GetSize()
 	var arrayClass = ArrayClass[K]()
-	var keys = arrayClass.Make(size)
+	var keys = arrayClass.Array(size)
 	var index Index
 	for key := range v {
 		index++
@@ -122,7 +122,7 @@ func (v map_[K, V]) GetValues(
 ) Sequential[V] {
 	var size = keys.GetSize()
 	var arrayClass = ArrayClass[V]()
-	var values = arrayClass.Make(size)
+	var values = arrayClass.Array(size)
 	var index Index
 	var iterator = keys.GetIterator()
 	for iterator.HasNext() {
@@ -149,7 +149,7 @@ func (v map_[K, V]) RemoveValues(
 ) Sequential[V] {
 	var size = keys.GetSize()
 	var arrayClass = ArrayClass[V]()
-	var values = arrayClass.Make(size)
+	var values = arrayClass.Array(size)
 	var index Index
 	var iterator = keys.GetIterator()
 	for iterator.HasNext() {
@@ -187,7 +187,7 @@ func (v map_[K, V]) AsArray() []AssociationLike[K, V] {
 	var index = 0
 	var associationClass = AssociationClass[K, V]()
 	for key, value := range v {
-		var association = associationClass.Make(key, value)
+		var association = associationClass.Association(key, value)
 		array[index] = association
 		index++
 	}
@@ -197,7 +197,7 @@ func (v map_[K, V]) AsArray() []AssociationLike[K, V] {
 func (v map_[K, V]) GetIterator() age.IteratorLike[AssociationLike[K, V]] {
 	var array = v.AsArray()
 	var iteratorClass = age.IteratorClass[AssociationLike[K, V]]()
-	var iterator = iteratorClass.Make(array)
+	var iterator = iteratorClass.Iterator(array)
 	return iterator
 }
 

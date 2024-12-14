@@ -78,13 +78,13 @@ This type provides a higher level abstraction for the intrinsic Go array type.
 */
 type ArrayClassLike[V any] interface {
 	// Constructor Methods
-	Make(
+	Array(
 		size age.Size,
 	) ArrayLike[V]
-	MakeFromArray(
+	ArrayFromArray(
 		values []V,
 	) ArrayLike[V]
-	MakeFromSequence(
+	ArrayFromSequence(
 		values Sequential[V],
 	) ArrayLike[V]
 }
@@ -99,7 +99,7 @@ key-value pair.
 */
 type AssociationClassLike[K comparable, V any] interface {
 	// Constructor Methods
-	Make(
+	Association(
 		key K,
 		value V,
 	) AssociationLike[K, V]
@@ -126,14 +126,14 @@ catalog takes precedence.
 */
 type CatalogClassLike[K comparable, V any] interface {
 	// Constructor Methods
-	Make() CatalogLike[K, V]
-	MakeFromArray(
+	Catalog() CatalogLike[K, V]
+	CatalogFromArray(
 		associations []AssociationLike[K, V],
 	) CatalogLike[K, V]
-	MakeFromMap(
+	CatalogFromMap(
 		associations map[K]V,
 	) CatalogLike[K, V]
-	MakeFromSequence(
+	CatalogFromSequence(
 		associations Sequential[AssociationLike[K, V]],
 	) CatalogLike[K, V]
 
@@ -166,11 +166,11 @@ lists.  The order of the values in each list is preserved in the new list.
 */
 type ListClassLike[V any] interface {
 	// Constructor Methods
-	Make() ListLike[V]
-	MakeFromArray(
+	List() ListLike[V]
+	ListFromArray(
 		values []V,
 	) ListLike[V]
-	MakeFromSequence(
+	ListFromSequence(
 		values Sequential[V],
 	) ListLike[V]
 
@@ -193,14 +193,14 @@ containing the same key-value associations.
 */
 type MapClassLike[K comparable, V any] interface {
 	// Constructor Methods
-	Make() MapLike[K, V]
-	MakeFromArray(
+	Map() MapLike[K, V]
+	MapFromArray(
 		associations []AssociationLike[K, V],
 	) MapLike[K, V]
-	MakeFromMap(
+	MapFromMap(
 		associations map[K]V,
 	) MapLike[K, V]
-	MakeFromSequence(
+	MapFromSequence(
 		associations Sequential[AssociationLike[K, V]],
 	) MapLike[K, V]
 }
@@ -242,14 +242,14 @@ consolidated into a single queue.
 */
 type QueueClassLike[V any] interface {
 	// Constructor Methods
-	Make() QueueLike[V]
-	MakeWithCapacity(
+	Queue() QueueLike[V]
+	QueueWithCapacity(
 		capacity age.Size,
 	) QueueLike[V]
-	MakeFromArray(
+	QueueFromArray(
 		values []V,
 	) QueueLike[V]
-	MakeFromSequence(
+	QueueFromSequence(
 		values Sequential[V],
 	) QueueLike[V]
 
@@ -295,14 +295,14 @@ set or the second specified set but not both.
 */
 type SetClassLike[V any] interface {
 	// Constructor Methods
-	Make() SetLike[V]
-	MakeWithCollator(
+	Set() SetLike[V]
+	SetWithCollator(
 		collator age.CollatorLike[V],
 	) SetLike[V]
-	MakeFromArray(
+	SetFromArray(
 		values []V,
 	) SetLike[V]
-	MakeFromSequence(
+	SetFromSequence(
 		values Sequential[V],
 	) SetLike[V]
 
@@ -336,14 +336,14 @@ capacity is 16 values.  Adding a value to a full stack will cause an error.
 */
 type StackClassLike[V any] interface {
 	// Constructor Methods
-	Make() StackLike[V]
-	MakeWithCapacity(
+	Stack() StackLike[V]
+	StackWithCapacity(
 		capacity age.Size,
 	) StackLike[V]
-	MakeFromArray(
+	StackFromArray(
 		values []V,
 	) StackLike[V]
-	MakeFromSequence(
+	StackFromSequence(
 		values Sequential[V],
 	) StackLike[V]
 }

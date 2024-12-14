@@ -31,7 +31,7 @@ func CollatorClass[V any]() CollatorClassLike[V] {
 
 // Constructor Methods
 
-func (c *collatorClass_[V]) Make() CollatorLike[V] {
+func (c *collatorClass_[V]) Collator() CollatorLike[V] {
 	var instance = &collator_[V]{
 		// Initialize the instance attributes.
 		maximumDepth_: 16,
@@ -39,7 +39,7 @@ func (c *collatorClass_[V]) Make() CollatorLike[V] {
 	return instance
 }
 
-func (c *collatorClass_[V]) MakeWithMaximumDepth(
+func (c *collatorClass_[V]) CollatorWithMaximumDepth(
 	maximumDepth Size,
 ) CollatorLike[V] {
 	if uti.IsUndefined(maximumDepth) {
@@ -491,7 +491,7 @@ func (v *collator_[V]) rankMaps(
 
 	// Extract and sort the keys for the two Go maps.
 	var sorterClass = SorterClass[ref.Value]()
-	var sorter = sorterClass.MakeWithRanker(v.rankValues)
+	var sorter = sorterClass.SorterWithRanker(v.rankValues)
 	var firstKeys = first.MapKeys() // The returned keys are in random order.
 	sorter.SortValues(firstKeys)
 	var secondKeys = second.MapKeys() // The returned keys are in random order.

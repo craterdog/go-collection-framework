@@ -64,7 +64,7 @@ type (
 
 // CLASS CONSTRUCTORS
 
-// agent/Collator
+// Agent/Collator
 
 func Collator[V any]() age.CollatorLike[V] {
 	return age.CollatorClass[V]().Collator()
@@ -78,7 +78,7 @@ func CollatorWithMaximumDepth[V any](
 	)
 }
 
-// agent/Iterator
+// Agent/Iterator
 
 func Iterator[V any](
 	array []V,
@@ -88,7 +88,7 @@ func Iterator[V any](
 	)
 }
 
-// agent/Sorter
+// Agent/Sorter
 
 func Sorter[V any]() age.SorterLike[V] {
 	return age.SorterClass[V]().Sorter()
@@ -102,7 +102,7 @@ func SorterWithRanker[V any](
 	)
 }
 
-// collection/Array
+// Collection/Array
 
 func Array[V any](
 	size age.Size,
@@ -128,7 +128,7 @@ func ArrayFromSequence[V any](
 	)
 }
 
-// collection/Association
+// Collection/Association
 
 func Association[K comparable, V any](
 	key K,
@@ -140,7 +140,7 @@ func Association[K comparable, V any](
 	)
 }
 
-// collection/Catalog
+// Collection/Catalog
 
 func Catalog[K comparable, V any]() col.CatalogLike[K, V] {
 	return col.CatalogClass[K, V]().Catalog()
@@ -170,7 +170,7 @@ func CatalogFromSequence[K comparable, V any](
 	)
 }
 
-// collection/List
+// Collection/List
 
 func List[V any]() col.ListLike[V] {
 	return col.ListClass[V]().List()
@@ -192,7 +192,7 @@ func ListFromSequence[V any](
 	)
 }
 
-// collection/Map
+// Collection/Map
 
 func Map[K comparable, V any]() col.MapLike[K, V] {
 	return col.MapClass[K, V]().Map()
@@ -222,7 +222,7 @@ func MapFromSequence[K comparable, V any](
 	)
 }
 
-// collection/Queue
+// Collection/Queue
 
 func Queue[V any]() col.QueueLike[V] {
 	return col.QueueClass[V]().Queue()
@@ -252,7 +252,7 @@ func QueueFromSequence[V any](
 	)
 }
 
-// collection/Set
+// Collection/Set
 
 func Set[V any]() col.SetLike[V] {
 	return col.SetClass[V]().Set()
@@ -282,7 +282,7 @@ func SetFromSequence[V any](
 	)
 }
 
-// collection/Stack
+// Collection/Stack
 
 func Stack[V any]() col.StackLike[V] {
 	return col.StackClass[V]().Stack()

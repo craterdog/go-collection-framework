@@ -71,7 +71,7 @@ func Collator[V any]() age.CollatorLike[V] {
 }
 
 func CollatorWithMaximumDepth[V any](
-	maximumDepth Size,
+	maximumDepth age.Size,
 ) age.CollatorLike[V] {
 	return age.CollatorClass[V]().CollatorWithMaximumDepth(
 		maximumDepth,

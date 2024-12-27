@@ -14,7 +14,7 @@ package module_test
 
 import (
 	fmt "fmt"
-	col "github.com/craterdog/go-collection-framework/v5"
+	fra "github.com/craterdog/go-collection-framework/v5"
 	syn "sync"
 	tes "testing"
 )
@@ -23,61 +23,61 @@ func TestModuleExampleCode(t *tes.T) {
 	fmt.Println("MODULE EXAMPLE:")
 
 	// Create a new association.
-	var association = col.Association[string, int]("A", 1)
+	var association = fra.Association[string, int]("A", 1)
 	fmt.Println(association)
 
 	// Create a new array collection of size 3.
-	var array = col.Array[int64](3)
+	var array = fra.Array[int64](3)
 	fmt.Println(array)
 
 	// Create a new array collection from an intrinsic Go array of values.
-	array = col.ArrayFromArray[int64]([]int64{1, 2, 3})
+	array = fra.ArrayFromArray[int64]([]int64{1, 2, 3})
 	fmt.Println(array)
 
 	// Create a new array collection from a sequence of values.
-	array = col.ArrayFromSequence[int64](array)
+	array = fra.ArrayFromSequence[int64](array)
 	fmt.Println(array)
 
 	// Create a new empty map collection.
-	var map_ = col.Map[string, int64]()
+	var map_ = fra.Map[string, int64]()
 	fmt.Println(map_)
 
 	// Create a new map collection from an intrinsic Go map of associations.
-	map_ = col.MapFromMap[string, int64](map[string]int64{
+	map_ = fra.MapFromMap[string, int64](map[string]int64{
 		"one": 1,
 		"two": 2,
 	})
 	fmt.Println(map_)
 
 	// Create a new map collection from an intrinsic Go array of associations.
-	map_ = col.MapFromArray[string, int64](map_.AsArray())
+	map_ = fra.MapFromArray[string, int64](map_.AsArray())
 	fmt.Println(map_)
 
 	// Create a new map collection from a sequence of associations.
-	map_ = col.MapFromSequence[string, int64](map_)
+	map_ = fra.MapFromSequence[string, int64](map_)
 	fmt.Println(map_)
 
 	// Create a new empty list collection.
-	var list = col.List[string]()
+	var list = fra.List[string]()
 	fmt.Println(list)
 
 	// Create a new list collection using an intrinsic Go array of values.
-	list = col.ListFromArray[string]([]string{
+	list = fra.ListFromArray[string]([]string{
 		"Hello",
 		"World",
 	})
 	fmt.Println(list)
 
 	// Create a new list collection using a sequence of values.
-	list = col.ListFromSequence[string](map_.GetKeys())
+	list = fra.ListFromSequence[string](map_.GetKeys())
 	fmt.Println(list)
 
 	// Create a new empty catalog collection.
-	var catalog = col.Catalog[string, int64]()
+	var catalog = fra.Catalog[string, int64]()
 	fmt.Println(catalog)
 
 	// Create a new catalog collection from a map collection.
-	catalog = col.CatalogFromSequence[string, int64](map_)
+	catalog = fra.CatalogFromSequence[string, int64](map_)
 	catalog.SetValue("delta", 4)
 	catalog.SortValues()
 	fmt.Println(catalog)
@@ -91,31 +91,31 @@ func TestModuleExampleCode(t *tes.T) {
 	fmt.Println()
 
 	// Create a new empty set collection.
-	var set = col.Set[string]()
+	var set = fra.Set[string]()
 	fmt.Println(set)
 
 	// Create a new set collection from an intrinsic Go array of values.
-	set = col.SetFromArray[string]([]string{"c", "a", "b"})
+	set = fra.SetFromArray[string]([]string{"c", "a", "b"})
 	fmt.Println(set)
 
 	// Create a new set collection from the keys in a catalog collection.
-	set = col.SetFromSequence[string](catalog.GetKeys())
+	set = fra.SetFromSequence[string](catalog.GetKeys())
 	fmt.Println(set)
 
 	// Create a new empty stack collection with a capacity of 4.
-	var stack = col.StackWithCapacity[string](4)
+	var stack = fra.StackWithCapacity[string](4)
 	fmt.Println(stack)
 
 	// Create a new stack collection from a list collection.
-	stack = col.StackFromSequence[string](list)
+	stack = fra.StackFromSequence[string](list)
 	fmt.Println(stack)
 
 	// Create a new empty queue collection with a capacity of 5.
-	var queue = col.QueueWithCapacity[string](5)
+	var queue = fra.QueueWithCapacity[string](5)
 	fmt.Println(queue)
 
 	// Create a new queue collection from a set collection.
-	queue = col.QueueFromSequence[string](set)
+	queue = fra.QueueFromSequence[string](set)
 	fmt.Println(queue)
 }
 
@@ -123,7 +123,7 @@ func TestArrayExampleCode(t *tes.T) {
 	fmt.Println("ARRAY EXAMPLE:")
 
 	// Create a new wrapped array using the universal constructor.
-	var array = col.ArrayFromArray[string]([]string{"foo", "bar", "baz"})
+	var array = fra.ArrayFromArray[string]([]string{"foo", "bar", "baz"})
 	fmt.Println("The array is:", array)
 
 	// Retrieve the first value in the array.
@@ -149,7 +149,7 @@ func TestMapExampleCode(t *tes.T) {
 	fmt.Println("MAP EXAMPLE:")
 
 	// Create a new wrapped map using the universal constructor.
-	var map_ = col.MapFromMap[string, int](map[string]int{
+	var map_ = fra.MapFromMap[string, int](map[string]int{
 		"foo": 1,
 		"bar": 2,
 	})
@@ -184,7 +184,7 @@ func TestListExampleCode(t *tes.T) {
 	fmt.Println("LIST EXAMPLE:")
 
 	// Create a new list using the universal constructor.
-	var list = col.ListFromArray[string]([]string{"bar", "foo", "bax"})
+	var list = fra.ListFromArray[string]([]string{"bar", "foo", "bax"})
 	fmt.Println("The initialized list:", list)
 
 	// Add some more values to the list.
@@ -225,9 +225,9 @@ func TestSetExampleCode(t *tes.T) {
 	fmt.Println("SET EXAMPLE:")
 
 	// Create two sets with overlapping values using the universal constructor.
-	var set1 = col.SetFromArray[string]([]string{"alpha", "beta", "gamma"})
+	var set1 = fra.SetFromArray[string]([]string{"alpha", "beta", "gamma"})
 	fmt.Println("The first set is:", set1)
-	var set2 = col.SetFromArray[string]([]string{"beta", "gamma", "delta"})
+	var set2 = fra.SetFromArray[string]([]string{"beta", "gamma", "delta"})
 	fmt.Println("The second set is:", set2)
 
 	// Find the logical union of the two sets.
@@ -252,7 +252,7 @@ func TestStackExampleCode(t *tes.T) {
 	fmt.Println("STACK EXAMPLE:")
 
 	// Create a new empty stack using the universal constructor.
-	var stack = col.Stack[string]()
+	var stack = fra.Stack[string]()
 	fmt.Println("The empty stack:", stack)
 
 	// Add some values to it.
@@ -284,7 +284,7 @@ func TestQueueExampleCode(t *tes.T) {
 	defer wg.Wait()
 
 	// Create a new queue with a specific capacity using the universal constructor.
-	var queue = col.QueueWithCapacity[int](12)
+	var queue = fra.QueueWithCapacity[int](12)
 	fmt.Println("The empty queue:", queue)
 
 	// Add some values to the queue.
@@ -322,7 +322,7 @@ func TestCatalogExampleCode(t *tes.T) {
 	fmt.Println("CATALOG EXAMPLE:")
 
 	// Create a new catalog using the universal constructor.
-	var catalog = col.CatalogFromMap[string, int64](map[string]int64{
+	var catalog = fra.CatalogFromMap[string, int64](map[string]int64{
 		"foo": 1,
 		"bar": 2,
 		"baz": 3,
@@ -361,7 +361,7 @@ func TestIteratorExampleCode(t *tes.T) {
 	fmt.Println("ITERATOR EXAMPLE:")
 
 	// Create a list using the universal constructor and an iterator for it.
-	var list = col.ListFromArray[string]([]string{"foo", "bar", "baz"})
+	var list = fra.ListFromArray[string]([]string{"foo", "bar", "baz"})
 	var iterator = list.GetIterator()
 
 	// Iterate over the values in order.

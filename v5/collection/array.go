@@ -30,19 +30,16 @@ func ArrayClass[V any]() ArrayClassLike[V] {
 // Constructor Methods
 
 func (c *arrayClass_[V]) Array(
-	size age.Size,
-) ArrayLike[V] {
-	if uti.IsUndefined(size) {
-		panic("The \"size\" attribute is required by this class.")
-	}
-	var array = make([]V, int(size)) // All values initialized to zero.
-	return array_[V](array)
-}
-
-func (c *arrayClass_[V]) ArrayFromArray(
 	values []V,
 ) ArrayLike[V] {
 	var array = uti.CopyArray(values)
+	return array_[V](array)
+}
+
+func (c *arrayClass_[V]) ArrayWithSize(
+	size age.Size,
+) ArrayLike[V] {
+	var array = make([]V, int(size)) // All values initialized to zero.
 	return array_[V](array)
 }
 

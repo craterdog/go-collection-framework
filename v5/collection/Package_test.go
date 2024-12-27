@@ -24,14 +24,15 @@ type Integer int
 
 func TestArrayConstructors(t *tes.T) {
 	var class = col.ArrayClass[int64]()
-	class.Array(5)
-	var sequence = class.ArrayFromArray([]int64{1, 2, 3})
+	class.Array(nil)
+	var sequence = class.Array([]int64{1, 2, 3})
+	class.ArrayWithSize(5)
 	var array = class.ArrayFromSequence(sequence)
 	ass.Equal(t, sequence.AsArray(), array.AsArray())
 }
 
 func TestEmptyArray(t *tes.T) {
-	var array = col.ArrayClass[string]().Array(0)
+	var array = col.ArrayClass[string]().ArrayWithSize(0)
 	ass.True(t, array.IsEmpty())
 	ass.True(t, array.GetSize() == 0)
 	ass.Equal(t, []string{}, array.AsArray())
@@ -52,7 +53,7 @@ func TestEmptyArray(t *tes.T) {
 }
 
 func TestArrayWithSize(t *tes.T) {
-	var array = col.ArrayClass[string]().Array(3)
+	var array = col.ArrayClass[string]().ArrayWithSize(3)
 	ass.False(t, array.IsEmpty())
 	ass.True(t, array.GetSize() == 3)
 	ass.Equal(t, []string{"", "", ""}, array.AsArray())
@@ -72,7 +73,7 @@ func TestArrayWithSize(t *tes.T) {
 }
 
 func TestArrayIndexOfZero(t *tes.T) {
-	var array = col.ArrayClass[int]().ArrayFromArray([]int{1, 2, 3})
+	var array = col.ArrayClass[int]().Array([]int{1, 2, 3})
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "Indices must be positive or negative ordinals, not zero.", e)
@@ -86,8 +87,8 @@ func TestArrayIndexOfZero(t *tes.T) {
 func TestArrayWithStrings(t *tes.T) {
 	var collator = age.CollatorClass[string]().Collator()
 	var class = col.ArrayClass[string]()
-	var array = class.ArrayFromArray([]string{"foo", "bar", "baz"})
-	var foobar = class.ArrayFromArray([]string{"foo", "bar"})
+	var array = class.Array([]string{"foo", "bar", "baz"})
+	var foobar = class.Array([]string{"foo", "bar"})
 	ass.False(t, array.IsEmpty())
 	ass.True(t, array.GetSize() == 3)
 	ass.Equal(t, "foo", array.GetValue(1))
@@ -111,7 +112,7 @@ func TestArrayWithStrings(t *tes.T) {
 }
 
 func TestArrayWithIntegers(t *tes.T) {
-	var array = col.ArrayClass[col.Index]().ArrayFromArray([]col.Index{1, 2, 3})
+	var array = col.ArrayClass[col.Index]().Array([]col.Index{1, 2, 3})
 	for index, value := range array.AsArray() {
 		ass.Equal(t, col.Index(index), array.GetValue(value)-1)
 		ass.Equal(t, col.Index(index), array.GetValue(value-4)-1)
@@ -151,7 +152,7 @@ func TestCatalogConstructors(t *tes.T) {
 func TestCatalogsWithStringsAndIntegers(t *tes.T) {
 	var catalogCollatorClass = age.CollatorClass[col.CatalogLike[string, int]]()
 	var catalogCollator = catalogCollatorClass.Collator()
-	var keys = col.ArrayClass[string]().ArrayFromArray([]string{"foo", "bar"})
+	var keys = col.ArrayClass[string]().Array([]string{"foo", "bar"})
 	var associationClass = col.AssociationClass[string, int]()
 	var association1 = associationClass.Association("foo", 1)
 	var association2 = associationClass.Association("bar", 2)
@@ -178,7 +179,7 @@ func TestCatalogsWithStringsAndIntegers(t *tes.T) {
 	ass.True(t, catalog.GetSize() == 3)
 	var catalog2 = catalogClass.CatalogFromSequence(catalog)
 	ass.True(t, catalogCollator.CompareValues(catalog, catalog2))
-	var m = col.MapClass[string, int]().MapFromMap(map[string]int{
+	var m = col.MapClass[string, int]().Map(map[string]int{
 		"foo": 1,
 		"bar": 2,
 		"baz": 3,
@@ -241,7 +242,7 @@ func TestCatalogsWithMerge(t *tes.T) {
 }
 
 func TestCatalogsWithExtract(t *tes.T) {
-	var keys = col.ArrayClass[string]().ArrayFromArray([]string{"foo", "baz"})
+	var keys = col.ArrayClass[string]().Array([]string{"foo", "baz"})
 	var associationClass = col.AssociationClass[string, int]()
 	var association1 = associationClass.Association("foo", 1)
 	var association2 = associationClass.Association("bar", 2)
@@ -267,7 +268,7 @@ func TestCatalogsWithExtract(t *tes.T) {
 }
 
 func TestCatalogsWithEmptyCatalogs(t *tes.T) {
-	var keys = col.ArrayClass[int]().Array(0)
+	var keys = col.ArrayClass[int]().ArrayWithSize(0)
 	var catalogClass = col.CatalogClass[int, string]()
 	var catalog1 = catalogClass.Catalog()
 	var catalog2 = catalogClass.Catalog()
@@ -292,19 +293,19 @@ func TestListsWithStrings(t *tes.T) {
 	var arrayClass = col.ArrayClass[string]()
 	var listClass = col.ListClass[string]()
 	var collator = age.CollatorClass[col.ListLike[string]]().Collator()
-	var foo = arrayClass.ArrayFromArray([]string{"foo"})
-	var bar = arrayClass.ArrayFromArray([]string{"bar"})
-	var baz = arrayClass.ArrayFromArray([]string{"baz"})
-	var foz = arrayClass.ArrayFromArray([]string{"foz"})
-	var barbaz = arrayClass.ArrayFromArray([]string{"bar", "baz"})
-	var bazbaz = arrayClass.ArrayFromArray([]string{"baz", "baz"})
-	var foobar = arrayClass.ArrayFromArray([]string{"foo", "bar"})
-	var baxbaz = arrayClass.ArrayFromArray([]string{"bax", "baz"})
-	var baxbez = arrayClass.ArrayFromArray([]string{"bax", "bez"})
-	var barfoobax = arrayClass.ArrayFromArray([]string{"bar", "foo", "bax"})
-	var foobazbar = arrayClass.ArrayFromArray([]string{"foo", "baz", "bar"})
-	var foobarbaz = arrayClass.ArrayFromArray([]string{"foo", "bar", "baz"})
-	var barbazfoo = arrayClass.ArrayFromArray([]string{"bar", "baz", "foo"})
+	var foo = arrayClass.Array([]string{"foo"})
+	var bar = arrayClass.Array([]string{"bar"})
+	var baz = arrayClass.Array([]string{"baz"})
+	var foz = arrayClass.Array([]string{"foz"})
+	var barbaz = arrayClass.Array([]string{"bar", "baz"})
+	var bazbaz = arrayClass.Array([]string{"baz", "baz"})
+	var foobar = arrayClass.Array([]string{"foo", "bar"})
+	var baxbaz = arrayClass.Array([]string{"bax", "baz"})
+	var baxbez = arrayClass.Array([]string{"bax", "bez"})
+	var barfoobax = arrayClass.Array([]string{"bar", "foo", "bax"})
+	var foobazbar = arrayClass.Array([]string{"foo", "baz", "bar"})
+	var foobarbaz = arrayClass.Array([]string{"foo", "bar", "baz"})
+	var barbazfoo = arrayClass.Array([]string{"bar", "baz", "foo"})
 	var list = listClass.List()
 	ass.True(t, list.IsEmpty())
 	ass.True(t, list.GetSize() == 0)
@@ -330,7 +331,7 @@ func TestListsWithStrings(t *tes.T) {
 	ass.Equal(t, foo.AsArray(), list.GetValues(1, 1).AsArray())
 	var list2 = listClass.ListFromSequence(list)
 	ass.True(t, collator.CompareValues(list, list2))
-	var array = arrayClass.ArrayFromArray([]string{"foo", "bar", "baz"})
+	var array = arrayClass.Array([]string{"foo", "bar", "baz"})
 	var list3 = listClass.ListFromSequence(array)
 	list2.SortValues()
 	list3.SortValues()
@@ -417,7 +418,7 @@ func TestListsWithStrings(t *tes.T) {
 }
 
 func TestListsWithTildes(t *tes.T) {
-	var array = col.ArrayClass[Integer]().ArrayFromArray([]Integer{3, 1, 4, 5, 9, 2})
+	var array = col.ArrayClass[Integer]().Array([]Integer{3, 1, 4, 5, 9, 2})
 	var list = col.ListClass[Integer]().ListFromSequence(array)
 	ass.False(t, list.IsEmpty())        // [3,1,4,5,9,2]
 	ass.True(t, list.GetSize() == 6)    // [3,1,4,5,9,2]
@@ -432,9 +433,9 @@ func TestListsWithConcatenate(t *tes.T) {
 	var listClass = col.ListClass[int]()
 	var collator = age.CollatorClass[col.ListLike[int]]().Collator()
 	var arrayClass = col.ArrayClass[int]()
-	var onetwothree = arrayClass.ArrayFromArray([]int{1, 2, 3})
-	var fourfivesix = arrayClass.ArrayFromArray([]int{4, 5, 6})
-	var onethrusix = arrayClass.ArrayFromArray([]int{1, 2, 3, 4, 5, 6})
+	var onetwothree = arrayClass.Array([]int{1, 2, 3})
+	var fourfivesix = arrayClass.Array([]int{4, 5, 6})
+	var onethrusix = arrayClass.Array([]int{1, 2, 3, 4, 5, 6})
 	var list1 = listClass.List()
 	list1.AppendValues(onetwothree)
 	var list2 = listClass.List()
@@ -458,15 +459,15 @@ func TestListsWithEmptyLists(t *tes.T) {
 
 func TestMapConstructors(t *tes.T) {
 	var mapClass = col.MapClass[rune, int64]()
-	mapClass.Map()
+	mapClass.Map(nil)
 	mapClass.MapFromArray([]col.AssociationLike[rune, int64]{})
-	mapClass.MapFromMap(map[rune]int64{})
-	var sequence = mapClass.MapFromMap(map[rune]int64{'a': 1, 'b': 2, 'c': 3})
+	mapClass.Map(map[rune]int64{})
+	var sequence = mapClass.Map(map[rune]int64{'a': 1, 'b': 2, 'c': 3})
 	mapClass.MapFromSequence(sequence)
 }
 
 func TestEmptyMaps(t *tes.T) {
-	var m = col.MapClass[string, int]().MapFromMap(map[string]int{})
+	var m = col.MapClass[string, int]().Map(map[string]int{})
 	ass.True(t, m.IsEmpty())
 	ass.True(t, m.GetSize() == 0)
 	ass.Equal(t, []string{}, m.GetKeys().AsArray())
@@ -493,7 +494,7 @@ func TestMapsWithStringsAndIntegers(t *tes.T) {
 	ass.True(t, m.GetValue("foo") == 1)
 	ass.True(t, m.GetValue("bar") == 2)
 	ass.True(t, m.GetValue("baz") == 3)
-	m = mapClass.MapFromMap(map[string]int{})
+	m = mapClass.Map(map[string]int{})
 	m.SetValue(association1.GetKey(), association1.GetValue())
 	ass.False(t, m.IsEmpty())
 	ass.True(t, m.GetSize() == 1)
@@ -502,7 +503,7 @@ func TestMapsWithStringsAndIntegers(t *tes.T) {
 	ass.True(t, m.GetSize() == 3)
 	ass.True(t, m.GetValue("baz") == 3)
 	m.SetValue("bar", 5)
-	var keys = col.ArrayClass[string]().ArrayFromArray([]string{"foo", "bar"})
+	var keys = col.ArrayClass[string]().Array([]string{"foo", "bar"})
 	ass.Equal(t, []int{1, 5}, m.GetValues(keys).AsArray())
 	ass.Equal(t, []int{1, 5}, m.RemoveValues(keys).AsArray())
 	ass.True(t, m.GetSize() == 1)
@@ -696,67 +697,67 @@ func TestSetsWithStrings(t *tes.T) {
 	var collator = age.CollatorClass[col.SetLike[string]]().Collator()
 	var arrayClass = col.ArrayClass[string]()
 	var empty = []string{}
-	var bazbar = arrayClass.ArrayFromArray([]string{"baz", "bar"})
-	var bazfoo = arrayClass.ArrayFromArray([]string{"baz", "foo"})
-	var baxbaz = arrayClass.ArrayFromArray([]string{"bax", "baz"})
-	var baxbez = arrayClass.ArrayFromArray([]string{"bax", "bez"})
-	var barbaz = arrayClass.ArrayFromArray([]string{"bar", "baz"})
-	var bar = arrayClass.ArrayFromArray([]string{"bar"})
+	var bazbar = arrayClass.Array([]string{"baz", "bar"})
+	var bazfoo = arrayClass.Array([]string{"baz", "foo"})
+	var baxbaz = arrayClass.Array([]string{"bax", "baz"})
+	var baxbez = arrayClass.Array([]string{"bax", "bez"})
+	var barbaz = arrayClass.Array([]string{"bar", "baz"})
+	var bar = arrayClass.Array([]string{"bar"})
 	var setClass = col.SetClass[string]()
-	var set = setClass.Set()                                             // [ ]
-	ass.True(t, set.IsEmpty())                                           // [ ]
-	ass.True(t, set.GetSize() == 0)                                      // [ ]
-	ass.False(t, set.ContainsValue("bax"))                               // [ ]
-	ass.Equal(t, empty, set.AsArray())                                   // [ ]
-	var iterator = set.GetIterator()                                     // [ ]
-	ass.False(t, iterator.HasNext())                                     // [ ]
-	ass.False(t, iterator.HasPrevious())                                 // [ ]
-	iterator.ToStart()                                                   // [ ]
-	iterator.ToEnd()                                                     // [ ]
-	set.RemoveAll()                                                      // [ ]
-	set.RemoveValue("foo")                                               // [ ]
-	set.AddValue("foo")                                                  // ["foo"]
-	ass.False(t, set.IsEmpty())                                          // ["foo"]
-	ass.True(t, set.GetSize() == 1)                                      // ["foo"]
-	ass.Equal(t, "foo", set.GetValue(1))                                 // ["foo"]
-	ass.True(t, set.GetIndex("baz") == 0)                                // ["foo"]
-	ass.True(t, set.ContainsValue("foo"))                                // ["foo"]
-	ass.False(t, set.ContainsValue("bax"))                               // ["foo"]
-	set.AddValues(bazbar)                                                // ["bar", "baz", "foo"]
-	ass.True(t, set.GetSize() == 3)                                      // ["bar", "baz", "foo"]
-	ass.True(t, set.GetIndex("baz") == 2)                                // ["bar", "baz", "foo"]
-	ass.Equal(t, "bar", set.GetValue(1))                                 // ["bar", "baz", "foo"]
-	ass.Equal(t, bazfoo.AsArray(), set.GetValues(2, 3).AsArray())        // ["bar", "baz", "foo"]
-	ass.Equal(t, bar.AsArray(), set.GetValues(1, 1).AsArray())           // ["bar", "baz", "foo"]
-	var set2 = setClass.SetFromSequence(set)                             // ["bar", "baz", "foo"]
-	ass.True(t, collator.CompareValues(set, set2))                       // ["bar", "baz", "foo"]
-	var array = arrayClass.ArrayFromArray([]string{"foo", "bar", "baz"}) // ["bar", "baz", "foo"]
-	var set3 = setClass.SetFromSequence(array)                           // ["bar", "baz", "foo"]
-	ass.True(t, collator.CompareValues(set2, set3))                      // ["bar", "baz", "foo"]
-	iterator = set.GetIterator()                                         // ["bar", "baz", "foo"]
-	ass.True(t, iterator.HasNext())                                      // ["bar", "baz", "foo"]
-	ass.False(t, iterator.HasPrevious())                                 // ["bar", "baz", "foo"]
-	ass.Equal(t, "bar", string(iterator.GetNext()))                      // ["bar", "baz", "foo"]
-	ass.True(t, iterator.HasPrevious())                                  // ["bar", "baz", "foo"]
-	iterator.ToEnd()                                                     // ["bar", "baz", "foo"]
-	ass.False(t, iterator.HasNext())                                     // ["bar", "baz", "foo"]
-	ass.True(t, iterator.HasPrevious())                                  // ["bar", "baz", "foo"]
-	ass.Equal(t, "foo", string(iterator.GetPrevious()))                  // ["bar", "baz", "foo"]
-	ass.True(t, iterator.HasNext())                                      // ["bar", "baz", "foo"]
-	ass.True(t, set.ContainsValue("baz"))                                // ["bar", "baz", "foo"]
-	ass.False(t, set.ContainsValue("bax"))                               // ["bar", "baz", "foo"]
-	ass.True(t, set.ContainsAny(baxbaz))                                 // ["bar", "baz", "foo"]
-	ass.False(t, set.ContainsAny(baxbez))                                // ["bar", "baz", "foo"]
-	ass.True(t, set.ContainsAll(barbaz))                                 // ["bar", "baz", "foo"]
-	ass.False(t, set.ContainsAll(baxbaz))                                // ["bar", "baz", "foo"]
-	set.RemoveAll()                                                      // [ ]
-	ass.True(t, set.IsEmpty())                                           // [ ]
-	ass.True(t, set.GetSize() == 0)                                      // [ ]
+	var set = setClass.Set()                                      // [ ]
+	ass.True(t, set.IsEmpty())                                    // [ ]
+	ass.True(t, set.GetSize() == 0)                               // [ ]
+	ass.False(t, set.ContainsValue("bax"))                        // [ ]
+	ass.Equal(t, empty, set.AsArray())                            // [ ]
+	var iterator = set.GetIterator()                              // [ ]
+	ass.False(t, iterator.HasNext())                              // [ ]
+	ass.False(t, iterator.HasPrevious())                          // [ ]
+	iterator.ToStart()                                            // [ ]
+	iterator.ToEnd()                                              // [ ]
+	set.RemoveAll()                                               // [ ]
+	set.RemoveValue("foo")                                        // [ ]
+	set.AddValue("foo")                                           // ["foo"]
+	ass.False(t, set.IsEmpty())                                   // ["foo"]
+	ass.True(t, set.GetSize() == 1)                               // ["foo"]
+	ass.Equal(t, "foo", set.GetValue(1))                          // ["foo"]
+	ass.True(t, set.GetIndex("baz") == 0)                         // ["foo"]
+	ass.True(t, set.ContainsValue("foo"))                         // ["foo"]
+	ass.False(t, set.ContainsValue("bax"))                        // ["foo"]
+	set.AddValues(bazbar)                                         // ["bar", "baz", "foo"]
+	ass.True(t, set.GetSize() == 3)                               // ["bar", "baz", "foo"]
+	ass.True(t, set.GetIndex("baz") == 2)                         // ["bar", "baz", "foo"]
+	ass.Equal(t, "bar", set.GetValue(1))                          // ["bar", "baz", "foo"]
+	ass.Equal(t, bazfoo.AsArray(), set.GetValues(2, 3).AsArray()) // ["bar", "baz", "foo"]
+	ass.Equal(t, bar.AsArray(), set.GetValues(1, 1).AsArray())    // ["bar", "baz", "foo"]
+	var set2 = setClass.SetFromSequence(set)                      // ["bar", "baz", "foo"]
+	ass.True(t, collator.CompareValues(set, set2))                // ["bar", "baz", "foo"]
+	var array = arrayClass.Array([]string{"foo", "bar", "baz"})   // ["bar", "baz", "foo"]
+	var set3 = setClass.SetFromSequence(array)                    // ["bar", "baz", "foo"]
+	ass.True(t, collator.CompareValues(set2, set3))               // ["bar", "baz", "foo"]
+	iterator = set.GetIterator()                                  // ["bar", "baz", "foo"]
+	ass.True(t, iterator.HasNext())                               // ["bar", "baz", "foo"]
+	ass.False(t, iterator.HasPrevious())                          // ["bar", "baz", "foo"]
+	ass.Equal(t, "bar", string(iterator.GetNext()))               // ["bar", "baz", "foo"]
+	ass.True(t, iterator.HasPrevious())                           // ["bar", "baz", "foo"]
+	iterator.ToEnd()                                              // ["bar", "baz", "foo"]
+	ass.False(t, iterator.HasNext())                              // ["bar", "baz", "foo"]
+	ass.True(t, iterator.HasPrevious())                           // ["bar", "baz", "foo"]
+	ass.Equal(t, "foo", string(iterator.GetPrevious()))           // ["bar", "baz", "foo"]
+	ass.True(t, iterator.HasNext())                               // ["bar", "baz", "foo"]
+	ass.True(t, set.ContainsValue("baz"))                         // ["bar", "baz", "foo"]
+	ass.False(t, set.ContainsValue("bax"))                        // ["bar", "baz", "foo"]
+	ass.True(t, set.ContainsAny(baxbaz))                          // ["bar", "baz", "foo"]
+	ass.False(t, set.ContainsAny(baxbez))                         // ["bar", "baz", "foo"]
+	ass.True(t, set.ContainsAll(barbaz))                          // ["bar", "baz", "foo"]
+	ass.False(t, set.ContainsAll(baxbaz))                         // ["bar", "baz", "foo"]
+	set.RemoveAll()                                               // [ ]
+	ass.True(t, set.IsEmpty())                                    // [ ]
+	ass.True(t, set.GetSize() == 0)                               // [ ]
 }
 
 func TestSetsWithIntegers(t *tes.T) {
 	var arrayClass = col.ArrayClass[int]()
-	var array = arrayClass.ArrayFromArray([]int{3, 1, 4, 5, 9, 2})
+	var array = arrayClass.Array([]int{3, 1, 4, 5, 9, 2})
 	var set = col.SetClass[int]().Set() // [ ]
 	set.AddValues(array)                // [1,2,3,4,5,9]
 	ass.False(t, set.IsEmpty())         // [1,2,3,4,5,9]
@@ -772,7 +773,7 @@ func TestSetsWithIntegers(t *tes.T) {
 
 func TestSetsWithTildes(t *tes.T) {
 	var arrayClass = col.ArrayClass[Integer]()
-	var array = arrayClass.ArrayFromArray([]Integer{3, 1, 4, 5, 9, 2})
+	var array = arrayClass.Array([]Integer{3, 1, 4, 5, 9, 2})
 	var set = col.SetClass[Integer]().Set() // [ ]
 	set.AddValues(array)                    // [1,2,3,4,5,9]
 	ass.False(t, set.IsEmpty())             // [1,2,3,4,5,9]
@@ -788,8 +789,8 @@ func TestSetsWithTildes(t *tes.T) {
 
 func TestSetsWithSets(t *tes.T) {
 	var arrayClass = col.ArrayClass[int]()
-	var array1 = arrayClass.ArrayFromArray([]int{3, 1, 4, 5, 9, 2})
-	var array2 = arrayClass.ArrayFromArray([]int{7, 1, 4, 5, 9, 2})
+	var array1 = arrayClass.Array([]int{3, 1, 4, 5, 9, 2})
+	var array2 = arrayClass.Array([]int{7, 1, 4, 5, 9, 2})
 	var setClass = col.SetClass[int]()
 	var set1 = setClass.Set()
 	set1.AddValues(array1)
@@ -811,9 +812,9 @@ func TestSetsWithSets(t *tes.T) {
 func TestSetsWithAnd(t *tes.T) {
 	var collator = age.CollatorClass[col.SetLike[int]]().Collator()
 	var arrayClass = col.ArrayClass[int]()
-	var array1 = arrayClass.ArrayFromArray([]int{3, 1, 2})
-	var array2 = arrayClass.ArrayFromArray([]int{3, 2, 4})
-	var array3 = arrayClass.ArrayFromArray([]int{3, 2})
+	var array1 = arrayClass.Array([]int{3, 1, 2})
+	var array2 = arrayClass.Array([]int{3, 2, 4})
+	var array3 = arrayClass.Array([]int{3, 2})
 	var setClass = col.SetClass[int]()
 	var set1 = setClass.Set()
 	set1.AddValues(array1)
@@ -828,9 +829,9 @@ func TestSetsWithAnd(t *tes.T) {
 func TestSetsWithSans(t *tes.T) {
 	var collator = age.CollatorClass[col.SetLike[int]]().Collator()
 	var arrayClass = col.ArrayClass[int]()
-	var array1 = arrayClass.ArrayFromArray([]int{3, 1, 2})
-	var array2 = arrayClass.ArrayFromArray([]int{3, 2, 4})
-	var array3 = arrayClass.ArrayFromArray([]int{1})
+	var array1 = arrayClass.Array([]int{3, 1, 2})
+	var array2 = arrayClass.Array([]int{3, 2, 4})
+	var array3 = arrayClass.Array([]int{1})
 	var setClass = col.SetClass[int]()
 	var set1 = setClass.Set()
 	set1.AddValues(array1)
@@ -845,9 +846,9 @@ func TestSetsWithSans(t *tes.T) {
 func TestSetsWithOr(t *tes.T) {
 	var collator = age.CollatorClass[col.SetLike[int]]().Collator()
 	var arrayClass = col.ArrayClass[int]()
-	var array1 = arrayClass.ArrayFromArray([]int{3, 1, 5})
-	var array2 = arrayClass.ArrayFromArray([]int{6, 2, 4})
-	var array3 = arrayClass.ArrayFromArray([]int{1, 3, 5, 6, 2, 4})
+	var array1 = arrayClass.Array([]int{3, 1, 5})
+	var array2 = arrayClass.Array([]int{6, 2, 4})
+	var array3 = arrayClass.Array([]int{1, 3, 5, 6, 2, 4})
 	var setClass = col.SetClass[int]()
 	var set1 = setClass.Set()
 	set1.AddValues(array1)
@@ -864,9 +865,9 @@ func TestSetsWithOr(t *tes.T) {
 func TestSetsWithXor(t *tes.T) {
 	var collator = age.CollatorClass[col.SetLike[int]]().Collator()
 	var arrayClass = col.ArrayClass[int]()
-	var array1 = arrayClass.ArrayFromArray([]int{2, 3, 1, 5})
-	var array2 = arrayClass.ArrayFromArray([]int{6, 2, 5, 4})
-	var array3 = arrayClass.ArrayFromArray([]int{1, 3, 4, 6})
+	var array1 = arrayClass.Array([]int{2, 3, 1, 5})
+	var array2 = arrayClass.Array([]int{6, 2, 5, 4})
+	var array3 = arrayClass.Array([]int{1, 3, 4, 6})
 	var setClass = col.SetClass[int]()
 	var set1 = setClass.Set()
 	set1.AddValues(array1)

@@ -102,18 +102,18 @@ func SorterWithRanker[V any](
 // Collection/Array
 
 func Array[V any](
-	size age.Size,
+	values []V,
 ) col.ArrayLike[V] {
 	return col.ArrayClass[V]().Array(
-		size,
+		values,
 	)
 }
 
-func ArrayFromArray[V any](
-	values []V,
+func ArrayWithSize[V any](
+	size age.Size,
 ) col.ArrayLike[V] {
-	return col.ArrayClass[V]().ArrayFromArray(
-		values,
+	return col.ArrayClass[V]().ArrayWithSize(
+		size,
 	)
 }
 
@@ -191,22 +191,18 @@ func ListFromSequence[V any](
 
 // Collection/Map
 
-func Map[K comparable, V any]() col.MapLike[K, V] {
-	return col.MapClass[K, V]().Map()
+func Map[K comparable, V any](
+	associations map[K]V,
+) col.MapLike[K, V] {
+	return col.MapClass[K, V]().Map(
+		associations,
+	)
 }
 
 func MapFromArray[K comparable, V any](
 	associations []col.AssociationLike[K, V],
 ) col.MapLike[K, V] {
 	return col.MapClass[K, V]().MapFromArray(
-		associations,
-	)
-}
-
-func MapFromMap[K comparable, V any](
-	associations map[K]V,
-) col.MapLike[K, V] {
-	return col.MapClass[K, V]().MapFromMap(
 		associations,
 	)
 }

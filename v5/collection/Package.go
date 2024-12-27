@@ -79,10 +79,10 @@ This type provides a higher level abstraction for the intrinsic Go array type.
 type ArrayClassLike[V any] interface {
 	// Constructor Methods
 	Array(
-		size age.Size,
-	) ArrayLike[V]
-	ArrayFromArray(
 		values []V,
+	) ArrayLike[V]
+	ArrayWithSize(
+		size age.Size,
 	) ArrayLike[V]
 	ArrayFromSequence(
 		values Sequential[V],
@@ -193,12 +193,11 @@ containing the same key-value associations.
 */
 type MapClassLike[K comparable, V any] interface {
 	// Constructor Methods
-	Map() MapLike[K, V]
+	Map(
+		associations map[K]V,
+	) MapLike[K, V]
 	MapFromArray(
 		associations []AssociationLike[K, V],
-	) MapLike[K, V]
-	MapFromMap(
-		associations map[K]V,
 	) MapLike[K, V]
 	MapFromSequence(
 		associations Sequential[AssociationLike[K, V]],

@@ -31,7 +31,7 @@ func ListClass[V any]() ListClassLike[V] {
 
 func (c *listClass_[V]) List() ListLike[V] {
 	var arrayClass = ArrayClass[V]()
-	var array = arrayClass.Array(0)
+	var array = arrayClass.ArrayWithSize(0)
 	var instance = &list_[V]{
 		array_: array,
 	}
@@ -42,7 +42,7 @@ func (c *listClass_[V]) ListFromArray(
 	values []V,
 ) ListLike[V] {
 	var arrayClass = ArrayClass[V]()
-	var array = arrayClass.ArrayFromArray(values)
+	var array = arrayClass.Array(values)
 	var instance = &list_[V]{
 		array_: array,
 	}
@@ -109,7 +109,7 @@ func (v *list_[V]) InsertValue(
 	// Create a new larger array.
 	var size = v.GetSize() + 1
 	var arrayClass = ArrayClass[V]()
-	var array = arrayClass.Array(size)
+	var array = arrayClass.ArrayWithSize(size)
 
 	// Copy the values into the new array.
 	var existingValues = v.GetIterator()
@@ -139,7 +139,7 @@ func (v *list_[V]) InsertValues(
 	// Create a new larger array.
 	var size = v.GetSize() + values.GetSize()
 	var arrayClass = ArrayClass[V]()
-	var array = arrayClass.Array(size)
+	var array = arrayClass.ArrayWithSize(size)
 
 	// Copy the values into the new array.
 	var existingValues = v.GetIterator()
@@ -176,7 +176,7 @@ func (v *list_[V]) AppendValue(
 	// Create a new larger array.
 	var size = v.GetSize() + 1
 	var arrayClass = ArrayClass[V]()
-	var array = arrayClass.Array(size)
+	var array = arrayClass.ArrayWithSize(size)
 
 	// Copy the existing values into the new array.
 	var existingValues = v.GetIterator()
@@ -201,7 +201,7 @@ func (v *list_[V]) AppendValues(
 	// Create a new larger array.
 	var size = v.GetSize() + values.GetSize()
 	var arrayClass = ArrayClass[V]()
-	var array = arrayClass.Array(size)
+	var array = arrayClass.ArrayWithSize(size)
 
 	// Copy the existing values into the new array.
 	var existingValues = v.GetIterator()
@@ -231,7 +231,7 @@ func (v *list_[V]) RemoveValue(
 	var removed = v.GetValue(index)
 	var size = v.GetSize() - 1
 	var arrayClass = ArrayClass[V]()
-	var array = arrayClass.Array(size)
+	var array = arrayClass.ArrayWithSize(size)
 
 	// Copy the remaining values into the new array.
 	var counter = v.toNormalized(index)
@@ -262,8 +262,8 @@ func (v *list_[V]) RemoveValues(
 	var delta = age.Size(last - first + 1)
 	var size = v.GetSize() - delta
 	var arrayClass = ArrayClass[V]()
-	var removed = arrayClass.Array(delta)
-	var array = arrayClass.Array(size)
+	var removed = arrayClass.ArrayWithSize(delta)
+	var array = arrayClass.ArrayWithSize(size)
 
 	// Split the existing values into the two new arrays.
 	var counter Index
@@ -289,7 +289,7 @@ func (v *list_[V]) RemoveValues(
 
 func (v *list_[V]) RemoveAll() {
 	var arrayClass = ArrayClass[V]()
-	v.array_ = arrayClass.Array(0)
+	v.array_ = arrayClass.ArrayWithSize(0)
 }
 
 // Searchable[V] Methods

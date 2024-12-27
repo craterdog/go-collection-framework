@@ -29,8 +29,13 @@ func MapClass[K comparable, V any]() MapClassLike[K, V] {
 
 // Constructor Methods
 
-func (c *mapClass_[K, V]) Map() MapLike[K, V] {
+func (c *mapClass_[K, V]) Map(
+	associations map[K]V,
+) MapLike[K, V] {
 	var instance = map_[K, V](map[K]V{})
+	for key, value := range associations {
+		instance[key] = value
+	}
 	return instance
 }
 
@@ -41,16 +46,6 @@ func (c *mapClass_[K, V]) MapFromArray(
 	for _, association := range associations {
 		var key = association.GetKey()
 		var value = association.GetValue()
-		instance[key] = value
-	}
-	return instance
-}
-
-func (c *mapClass_[K, V]) MapFromMap(
-	associations map[K]V,
-) MapLike[K, V] {
-	var instance = map_[K, V](map[K]V{})
-	for key, value := range associations {
 		instance[key] = value
 	}
 	return instance
@@ -108,7 +103,7 @@ func (v map_[K, V]) SetValue(
 func (v map_[K, V]) GetKeys() Sequential[K] {
 	var size = v.GetSize()
 	var arrayClass = ArrayClass[K]()
-	var keys = arrayClass.Array(size)
+	var keys = arrayClass.ArrayWithSize(size)
 	var index Index
 	for key := range v {
 		index++
@@ -122,7 +117,7 @@ func (v map_[K, V]) GetValues(
 ) Sequential[V] {
 	var size = keys.GetSize()
 	var arrayClass = ArrayClass[V]()
-	var values = arrayClass.Array(size)
+	var values = arrayClass.ArrayWithSize(size)
 	var index Index
 	var iterator = keys.GetIterator()
 	for iterator.HasNext() {
@@ -149,7 +144,7 @@ func (v map_[K, V]) RemoveValues(
 ) Sequential[V] {
 	var size = keys.GetSize()
 	var arrayClass = ArrayClass[V]()
-	var values = arrayClass.Array(size)
+	var values = arrayClass.ArrayWithSize(size)
 	var index Index
 	var iterator = keys.GetIterator()
 	for iterator.HasNext() {

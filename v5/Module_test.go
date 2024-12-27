@@ -27,11 +27,11 @@ func TestModuleExampleCode(t *tes.T) {
 	fmt.Println(association)
 
 	// Create a new array collection of size 3.
-	var array = fra.Array[int64](3)
+	var array = fra.ArrayWithSize[int64](3)
 	fmt.Println(array)
 
 	// Create a new array collection from an intrinsic Go array of values.
-	array = fra.ArrayFromArray[int64]([]int64{1, 2, 3})
+	array = fra.Array[int64]([]int64{1, 2, 3})
 	fmt.Println(array)
 
 	// Create a new array collection from a sequence of values.
@@ -39,11 +39,11 @@ func TestModuleExampleCode(t *tes.T) {
 	fmt.Println(array)
 
 	// Create a new empty map collection.
-	var map_ = fra.Map[string, int64]()
+	var map_ = fra.Map[string, int64](nil)
 	fmt.Println(map_)
 
 	// Create a new map collection from an intrinsic Go map of associations.
-	map_ = fra.MapFromMap[string, int64](map[string]int64{
+	map_ = fra.Map[string, int64](map[string]int64{
 		"one": 1,
 		"two": 2,
 	})
@@ -117,13 +117,14 @@ func TestModuleExampleCode(t *tes.T) {
 	// Create a new queue collection from a set collection.
 	queue = fra.QueueFromSequence[string](set)
 	fmt.Println(queue)
+	fmt.Println()
 }
 
 func TestArrayExampleCode(t *tes.T) {
 	fmt.Println("ARRAY EXAMPLE:")
 
 	// Create a new wrapped array using the universal constructor.
-	var array = fra.ArrayFromArray[string]([]string{"foo", "bar", "baz"})
+	var array = fra.Array[string]([]string{"foo", "bar", "baz"})
 	fmt.Println("The array is:", array)
 
 	// Retrieve the first value in the array.
@@ -143,13 +144,14 @@ func TestArrayExampleCode(t *tes.T) {
 	// Sort the values in the array.
 	array.SortValues()
 	fmt.Println("The sorted array is:", array)
+	fmt.Println()
 }
 
 func TestMapExampleCode(t *tes.T) {
 	fmt.Println("MAP EXAMPLE:")
 
 	// Create a new wrapped map using the universal constructor.
-	var map_ = fra.MapFromMap[string, int](map[string]int{
+	var map_ = fra.Map[string, int](map[string]int{
 		"foo": 1,
 		"bar": 2,
 	})
@@ -178,6 +180,7 @@ func TestMapExampleCode(t *tes.T) {
 	// Empty the map.
 	map_.RemoveAll()
 	fmt.Println("The empty map is:", map_)
+	fmt.Println()
 }
 
 func TestListExampleCode(t *tes.T) {
@@ -219,6 +222,7 @@ func TestListExampleCode(t *tes.T) {
 	// Remove all values from the list.
 	list.RemoveAll()
 	fmt.Println("The empty list:", list)
+	fmt.Println()
 }
 
 func TestSetExampleCode(t *tes.T) {
@@ -246,6 +250,7 @@ func TestSetExampleCode(t *tes.T) {
 	// Add an existing value to the first set.
 	set1.AddValue("beta")
 	fmt.Println("Adding an existing value to a set does not change it:", set1)
+	fmt.Println()
 }
 
 func TestStackExampleCode(t *tes.T) {
@@ -307,6 +312,7 @@ func TestQueueExampleCode(t *tes.T) {
 			}
 		}
 		fmt.Println("The closed queue:", queue)
+		fmt.Println()
 	}()
 
 	// Add some more values to the queue.
@@ -315,7 +321,6 @@ func TestQueueExampleCode(t *tes.T) {
 		fmt.Println("Added value:", i)
 	}
 	queue.CloseChannel()
-	fmt.Println()
 }
 
 func TestCatalogExampleCode(t *tes.T) {
@@ -355,6 +360,7 @@ func TestCatalogExampleCode(t *tes.T) {
 	// Change an existing value in the catalog.
 	catalog.SetValue("baz", 5)
 	fmt.Println("The updated catalog:", catalog)
+	fmt.Println()
 }
 
 func TestIteratorExampleCode(t *tes.T) {
@@ -368,9 +374,8 @@ func TestIteratorExampleCode(t *tes.T) {
 	fmt.Println("The list values in order:")
 	for iterator.HasNext() {
 		var value = iterator.GetNext()
-		fmt.Println("\tvalue:", value)
+		fmt.Println("    value:", value)
 	}
-	fmt.Println()
 
 	// Go to a specific value in the list.
 	iterator.ToSlot(2)
@@ -382,7 +387,7 @@ func TestIteratorExampleCode(t *tes.T) {
 	iterator.ToEnd()
 	for iterator.HasPrevious() {
 		var value = iterator.GetPrevious()
-		fmt.Println("\tvalue:", value)
+		fmt.Println("    value:", value)
 	}
 	fmt.Println()
 }

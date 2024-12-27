@@ -24,7 +24,7 @@ import (
 // Access Function
 
 func ListClass[V any]() ListClassLike[V] {
-	return listClassReference[V]()
+	return listClass[V]()
 }
 
 // Constructor Methods
@@ -78,7 +78,7 @@ func (c *listClass_[V]) Concatenate(
 // Principal Methods
 
 func (v *list_[V]) GetClass() ListClassLike[V] {
-	return listClassReference[V]()
+	return listClass[V]()
 }
 
 // Attribute Methods
@@ -468,7 +468,7 @@ type listClass_[V any] struct {
 var listMap_ = map[string]any{}
 var listMutex_ syn.Mutex
 
-func listClassReference[V any]() *listClass_[V] {
+func listClass[V any]() *listClass_[V] {
 	// Generate the name of the bound class type.
 	var class *listClass_[V]
 	var name = fmt.Sprintf("%T", class)

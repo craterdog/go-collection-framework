@@ -24,7 +24,7 @@ import (
 // Access Function
 
 func QueueClass[V any]() QueueClassLike[V] {
-	return queueClassReference[V]()
+	return queueClass[V]()
 }
 
 // Constructor Methods
@@ -232,7 +232,7 @@ func (c *queueClass_[V]) Join(
 // Principal Methods
 
 func (v *queue_[V]) GetClass() QueueClassLike[V] {
-	return queueClassReference[V]()
+	return queueClass[V]()
 }
 
 // Attribute Methods
@@ -347,7 +347,7 @@ type queueClass_[V any] struct {
 var queueMap_ = map[string]any{}
 var queueMutex_ syn.Mutex
 
-func queueClassReference[V any]() *queueClass_[V] {
+func queueClass[V any]() *queueClass_[V] {
 	// Generate the name of the bound class type.
 	var class *queueClass_[V]
 	var name = fmt.Sprintf("%T", class)

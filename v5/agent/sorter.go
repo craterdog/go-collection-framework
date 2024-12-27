@@ -25,7 +25,7 @@ import (
 // Access Function
 
 func SorterClass[V any]() SorterClassLike[V] {
-	return sorterClassReference[V]()
+	return sorterClass[V]()
 }
 
 // Constructor Methods
@@ -60,7 +60,7 @@ func (c *sorterClass_[V]) SorterWithRanker(
 // Principal Methods
 
 func (v *sorter_[V]) GetClass() SorterClassLike[V] {
-	return sorterClassReference[V]()
+	return sorterClass[V]()
 }
 
 func (v *sorter_[V]) SortValues(
@@ -225,7 +225,7 @@ type sorterClass_[V any] struct {
 var sorterMap_ = map[string]any{}
 var sorterMutex_ syn.Mutex
 
-func sorterClassReference[V any]() *sorterClass_[V] {
+func sorterClass[V any]() *sorterClass_[V] {
 	// Generate the name of the bound class type.
 	var class *sorterClass_[V]
 	var name = fmt.Sprintf("%T", class)

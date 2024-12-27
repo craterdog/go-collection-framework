@@ -23,7 +23,7 @@ import (
 // Access Function
 
 func IteratorClass[V any]() IteratorClassLike[V] {
-	return iteratorClassReference[V]()
+	return iteratorClass[V]()
 }
 
 // Constructor Methods
@@ -51,7 +51,7 @@ func (c *iteratorClass_[V]) Iterator(
 // Principal Methods
 
 func (v *iterator_[V]) GetClass() IteratorClassLike[V] {
-	return iteratorClassReference[V]()
+	return iteratorClass[V]()
 }
 
 func (v *iterator_[V]) IsEmpty() bool {
@@ -139,7 +139,7 @@ type iteratorClass_[V any] struct {
 var iteratorMap_ = map[string]any{}
 var iteratorMutex_ syn.Mutex
 
-func iteratorClassReference[V any]() *iteratorClass_[V] {
+func iteratorClass[V any]() *iteratorClass_[V] {
 	// Generate the name of the bound class type.
 	var class *iteratorClass_[V]
 	var name = fmt.Sprintf("%T", class)

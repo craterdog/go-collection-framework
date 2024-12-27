@@ -24,7 +24,7 @@ import (
 // Access Function
 
 func MapClass[K comparable, V any]() MapClassLike[K, V] {
-	return mapClassReference[K, V]()
+	return mapClass[K, V]()
 }
 
 // Constructor Methods
@@ -79,7 +79,7 @@ func (c *mapClass_[K, V]) MapFromSequence(
 // Principal Methods
 
 func (v map_[K, V]) GetClass() MapClassLike[K, V] {
-	return mapClassReference[K, V]()
+	return mapClass[K, V]()
 }
 
 // Attribute Methods
@@ -226,7 +226,7 @@ type mapClass_[K comparable, V any] struct {
 var mapMap_ = map[string]any{}
 var mapMutex_ syn.Mutex
 
-func mapClassReference[K comparable, V any]() *mapClass_[K, V] {
+func mapClass[K comparable, V any]() *mapClass_[K, V] {
 	// Generate the name of the bound class type.
 	var class *mapClass_[K, V]
 	var name = fmt.Sprintf("%T", class)

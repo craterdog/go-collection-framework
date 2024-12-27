@@ -24,7 +24,7 @@ import (
 // Access Function
 
 func CatalogClass[K comparable, V any]() CatalogClassLike[K, V] {
-	return catalogClassReference[K, V]()
+	return catalogClass[K, V]()
 }
 
 // Constructor Methods
@@ -115,7 +115,7 @@ func (c *catalogClass_[K, V]) Merge(
 // Principal Methods
 
 func (v *catalog_[K, V]) GetClass() CatalogClassLike[K, V] {
-	return catalogClassReference[K, V]()
+	return catalogClass[K, V]()
 }
 
 // Attribute Methods
@@ -289,7 +289,7 @@ type catalogClass_[K comparable, V any] struct {
 var catalogMap_ = map[string]any{}
 var catalogMutex_ syn.Mutex
 
-func catalogClassReference[K comparable, V any]() *catalogClass_[K, V] {
+func catalogClass[K comparable, V any]() *catalogClass_[K, V] {
 	// Generate the name of the bound class type.
 	var class *catalogClass_[K, V]
 	var name = fmt.Sprintf("%T", class)

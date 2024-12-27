@@ -24,7 +24,7 @@ import (
 // Access Function
 
 func SetClass[V any]() SetClassLike[V] {
-	return setClassReference[V]()
+	return setClass[V]()
 }
 
 // Constructor Methods
@@ -128,7 +128,7 @@ func (c *setClass_[V]) Xor(
 // Principal Methods
 
 func (v *set_[V]) GetClass() SetClassLike[V] {
-	return setClassReference[V]()
+	return setClass[V]()
 }
 
 // Attribute Methods
@@ -341,7 +341,7 @@ type setClass_[V any] struct {
 var setMap_ = map[string]any{}
 var setMutex_ syn.Mutex
 
-func setClassReference[V any]() *setClass_[V] {
+func setClass[V any]() *setClass_[V] {
 	// Generate the name of the bound class type.
 	var class *setClass_[V]
 	var name = fmt.Sprintf("%T", class)

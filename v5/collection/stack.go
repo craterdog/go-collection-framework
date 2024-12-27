@@ -24,7 +24,7 @@ import (
 // Access Function
 
 func StackClass[V any]() StackClassLike[V] {
-	return stackClassReference[V]()
+	return stackClass[V]()
 }
 
 // Constructor Methods
@@ -91,7 +91,7 @@ func (c *stackClass_[V]) StackFromSequence(
 // Principal Methods
 
 func (v *stack_[V]) GetClass() StackClassLike[V] {
-	return stackClassReference[V]()
+	return stackClass[V]()
 }
 
 // Attribute Methods
@@ -174,7 +174,7 @@ type stackClass_[V any] struct {
 var stackMap_ = map[string]any{}
 var stackMutex_ syn.Mutex
 
-func stackClassReference[V any]() *stackClass_[V] {
+func stackClass[V any]() *stackClass_[V] {
 	// Generate the name of the bound class type.
 	var class *stackClass_[V]
 	var name = fmt.Sprintf("%T", class)

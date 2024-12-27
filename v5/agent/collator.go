@@ -26,7 +26,7 @@ import (
 // Access Function
 
 func CollatorClass[V any]() CollatorClassLike[V] {
-	return collatorClassReference[V]()
+	return collatorClass[V]()
 }
 
 // Constructor Methods
@@ -61,7 +61,7 @@ func (c *collatorClass_[V]) CollatorWithMaximumDepth(
 // Principal Methods
 
 func (v *collator_[V]) GetClass() CollatorClassLike[V] {
-	return collatorClassReference[V]()
+	return collatorClass[V]()
 }
 
 func (v *collator_[V]) CompareValues(
@@ -808,7 +808,7 @@ type collatorClass_[V any] struct {
 var collatorMap_ = map[string]any{}
 var collatorMutex_ syn.Mutex
 
-func collatorClassReference[V any]() *collatorClass_[V] {
+func collatorClass[V any]() *collatorClass_[V] {
 	// Generate the name of the bound class type.
 	var class *collatorClass_[V]
 	var name = fmt.Sprintf("%T", class)

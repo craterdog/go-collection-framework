@@ -23,7 +23,7 @@ import (
 // Access Function
 
 func AssociationClass[K comparable, V any]() AssociationClassLike[K, V] {
-	return associationClassReference[K, V]()
+	return associationClass[K, V]()
 }
 
 // Constructor Methods
@@ -55,7 +55,7 @@ func (c *associationClass_[K, V]) Association(
 // Principal Methods
 
 func (v *association_[K, V]) GetClass() AssociationClassLike[K, V] {
-	return associationClassReference[K, V]()
+	return associationClass[K, V]()
 }
 
 // Attribute Methods
@@ -109,7 +109,7 @@ type associationClass_[K comparable, V any] struct {
 var associationMap_ = map[string]any{}
 var associationMutex_ syn.Mutex
 
-func associationClassReference[K comparable, V any]() *associationClass_[K, V] {
+func associationClass[K comparable, V any]() *associationClass_[K, V] {
 	// Generate the name of the bound class type.
 	var class *associationClass_[K, V]
 	var name = fmt.Sprintf("%T", class)

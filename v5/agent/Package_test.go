@@ -599,7 +599,7 @@ func TestIteratorsWithLists(t *tes.T) {
 	ass.True(t, iterator.HasPrevious())
 	ass.True(t, iterator.HasNext())
 	ass.Equal(t, 1, iterator.GetPrevious())
-	iterator.ToSlot(2)
+	iterator.SetSlot(2)
 	ass.True(t, iterator.HasPrevious())
 	ass.True(t, iterator.HasNext())
 	ass.Equal(t, 3, iterator.GetNext())

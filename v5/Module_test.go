@@ -378,7 +378,7 @@ func TestIteratorExampleCode(t *tes.T) {
 	}
 
 	// Go to a specific value in the list.
-	iterator.ToSlot(2)
+	iterator.SetSlot(2)
 	var value = iterator.GetPrevious()
 	fmt.Println("The second value in the list is:", value)
 

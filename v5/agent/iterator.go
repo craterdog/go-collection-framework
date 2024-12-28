@@ -62,16 +62,6 @@ func (v *iterator_[V]) ToStart() {
 	v.slot_ = 0
 }
 
-func (v *iterator_[V]) ToSlot(
-	slot Slot,
-) {
-	var size = Slot(v.size_)
-	if slot > size {
-		slot = size
-	}
-	v.slot_ = slot
-}
-
 func (v *iterator_[V]) ToEnd() {
 	var size = Slot(v.size_)
 	v.slot_ = size
@@ -113,6 +103,16 @@ func (v *iterator_[V]) GetSize() Size {
 
 func (v *iterator_[V]) GetSlot() Slot {
 	return v.slot_
+}
+
+func (v *iterator_[V]) SetSlot(
+	slot Slot,
+) {
+	var size = Slot(v.size_)
+	if slot > size {
+		slot = size
+	}
+	v.slot_ = slot
 }
 
 // PROTECTED INTERFACE

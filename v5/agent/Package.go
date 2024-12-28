@@ -166,9 +166,6 @@ type IteratorLike[V any] interface {
 	GetClass() IteratorClassLike[V]
 	IsEmpty() bool
 	ToStart()
-	ToSlot(
-		slot Slot,
-	)
 	ToEnd()
 	HasPrevious() bool
 	GetPrevious() V
@@ -178,6 +175,9 @@ type IteratorLike[V any] interface {
 	// Attribute Methods
 	GetSize() Size
 	GetSlot() Slot
+	SetSlot(
+		slot Slot,
+	)
 }
 
 /*

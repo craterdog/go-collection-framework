@@ -56,7 +56,7 @@ type Fuz struct {
 
 func TestCompareMaximum(t *tes.T) {
 	var collator = age.CollatorClass[any]().CollatorWithMaximumDepth(1)
-	var array = col.ArrayClass[any]().Array([]any{"foo", []int{1, 2, 3}})
+	var list = col.ListClass[any]().ListFromArray([]any{"foo", []int{1, 2, 3}})
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "The maximum traversal depth was exceeded: 1", e)
@@ -64,12 +64,12 @@ func TestCompareMaximum(t *tes.T) {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
-	collator.CompareValues(array, array)
+	collator.CompareValues(list, list)
 }
 
 func TestRankMaximum(t *tes.T) {
 	var collator = age.CollatorClass[any]().CollatorWithMaximumDepth(1)
-	var array = col.ArrayClass[any]().Array([]any{"foo", []int{1, 2, 3}})
+	var list = col.ListClass[any]().ListFromArray([]any{"foo", []int{1, 2, 3}})
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "The maximum traversal depth was exceeded: 1", e)
@@ -77,7 +77,7 @@ func TestRankMaximum(t *tes.T) {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
-	collator.RankValues(array, array)
+	collator.RankValues(list, list)
 }
 
 func TestComparison(t *tes.T) {
@@ -312,8 +312,10 @@ func TestTildeTypes(t *tes.T) {
 
 func TestCompareRecursiveArrays(t *tes.T) {
 	var collator = age.CollatorClass[any]().Collator()
-	var array = col.ArrayClass[any]().Array([]any{0})
-	array.SetValue(1, array) // Now it is recursive.
+	var list = col.ListClass[any]().ListFromArray(
+		[]any{0},
+	)
+	list.SetValue(1, list) // Now it is recursive.
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "The maximum traversal depth was exceeded: 16", e)
@@ -321,13 +323,17 @@ func TestCompareRecursiveArrays(t *tes.T) {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
-	collator.CompareValues(array, array) // This should panic.
+	collator.CompareValues(list, list) // This should panic.
 }
 
 func TestCompareRecursiveMaps(t *tes.T) {
 	var collator = age.CollatorClass[any]().Collator()
-	var m = col.MapClass[string, any]().Map(map[string]any{"first": 1})
-	m.SetValue("first", m) // Now it is recursive.
+	var catalog = col.CatalogClass[string, any]().CatalogFromMap(
+		map[string]any{
+			"first": 1,
+		},
+	)
+	catalog.SetValue("first", catalog) // Now it is recursive.
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "The maximum traversal depth was exceeded: 16", e)
@@ -335,7 +341,7 @@ func TestCompareRecursiveMaps(t *tes.T) {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
-	collator.CompareValues(m, m) // This should panic.
+	collator.CompareValues(catalog, catalog) // This should panic.
 }
 
 func TestRanking(t *tes.T) {
@@ -560,8 +566,10 @@ func TestTildeArrays(t *tes.T) {
 
 func TestRankRecursiveArrays(t *tes.T) {
 	var collator = age.CollatorClass[any]().Collator()
-	var array = col.ArrayClass[any]().Array([]any{0})
-	array.SetValue(1, array) // Now it is recursive.
+	var list = col.ListClass[any]().ListFromArray(
+		[]any{0},
+	)
+	list.SetValue(1, list) // Now it is recursive.
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "The maximum traversal depth was exceeded: 16", e)
@@ -569,13 +577,17 @@ func TestRankRecursiveArrays(t *tes.T) {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
-	collator.RankValues(array, array) // This should panic.
+	collator.RankValues(list, list) // This should panic.
 }
 
 func TestRankRecursiveMaps(t *tes.T) {
 	var collator = age.CollatorClass[any]().Collator()
-	var m = col.MapClass[string, any]().Map(map[string]any{"first": 1})
-	m.SetValue("first", m) // Now it is recursive.
+	var catalog = col.CatalogClass[string, any]().CatalogFromMap(
+		map[string]any{
+			"first": 1,
+		},
+	)
+	catalog.SetValue("first", catalog) // Now it is recursive.
 	defer func() {
 		if e := recover(); e != nil {
 			ass.Equal(t, "The maximum traversal depth was exceeded: 16", e)
@@ -583,12 +595,12 @@ func TestRankRecursiveMaps(t *tes.T) {
 			ass.Fail(t, "Test should result in recovered panic.")
 		}
 	}()
-	collator.RankValues(m, m) // This should panic.
+	collator.RankValues(catalog, catalog) // This should panic.
 }
 
 func TestIteratorsWithLists(t *tes.T) {
-	var array = col.ArrayClass[int]().Array([]int{1, 2, 3, 4, 5})
-	var list = col.ListClass[int]().ListFromSequence(array)
+	var list = col.ListClass[int]().ListFromArray([]int{1, 2, 3, 4, 5})
+	list = col.ListClass[int]().ListFromSequence(list)
 	var iterator = list.GetIterator()
 	ass.False(t, iterator.IsEmpty())
 	ass.True(t, iterator.GetSize() == 5)

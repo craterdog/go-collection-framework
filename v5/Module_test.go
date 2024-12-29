@@ -26,50 +26,14 @@ func TestModuleExampleCode(t *tes.T) {
 	var association = fra.Association[string, int]("A", 1)
 	fmt.Println(association)
 
-	// Create a new array collection of size 3.
-	var array = fra.ArrayWithSize[int64](3)
-	fmt.Println(array)
-
-	// Create a new array collection from an intrinsic Go array of values.
-	array = fra.Array[int64]([]int64{1, 2, 3})
-	fmt.Println(array)
-
-	// Create a new array collection from a sequence of values.
-	array = fra.ArrayFromSequence[int64](array)
-	fmt.Println(array)
-
-	// Create a new empty map collection.
-	var map_ = fra.Map[string, int64](nil)
-	fmt.Println(map_)
-
-	// Create a new map collection from an intrinsic Go map of associations.
-	map_ = fra.Map[string, int64](map[string]int64{
-		"one": 1,
-		"two": 2,
-	})
-	fmt.Println(map_)
-
-	// Create a new map collection from an intrinsic Go array of associations.
-	map_ = fra.MapFromArray[string, int64](map_.AsArray())
-	fmt.Println(map_)
-
-	// Create a new map collection from a sequence of associations.
-	map_ = fra.MapFromSequence[string, int64](map_)
-	fmt.Println(map_)
-
 	// Create a new empty list collection.
 	var list = fra.List[string]()
 	fmt.Println(list)
 
 	// Create a new list collection using an intrinsic Go array of values.
-	list = fra.ListFromArray[string]([]string{
-		"Hello",
-		"World",
-	})
-	fmt.Println(list)
-
-	// Create a new list collection using a sequence of values.
-	list = fra.ListFromSequence[string](map_.GetKeys())
+	list = fra.ListFromArray[string](
+		[]string{"Hello", "World"},
+	)
 	fmt.Println(list)
 
 	// Create a new empty catalog collection.
@@ -77,7 +41,20 @@ func TestModuleExampleCode(t *tes.T) {
 	fmt.Println(catalog)
 
 	// Create a new catalog collection from a map collection.
-	catalog = fra.CatalogFromSequence[string, int64](map_)
+	catalog = fra.CatalogFromMap[string, int64](
+		map[string]int64{
+			"alpha": 1,
+			"beta":  2,
+			"gamma": 3,
+		},
+	)
+
+	// Create a list of associations from the catalog.
+	var associations = fra.ListFromArray(catalog.AsArray())
+	fmt.Println(associations)
+
+	// Create a catalog from a sequence of associations.
+	catalog = fra.CatalogFromSequence[string, int64](associations)
 	catalog.SetValue("delta", 4)
 	catalog.SortValues()
 	fmt.Println(catalog)
@@ -90,12 +67,18 @@ func TestModuleExampleCode(t *tes.T) {
 	}
 	fmt.Println()
 
+	// Create a new list collection using a sequence of catalog keys.
+	list = fra.ListFromSequence[string](catalog.GetKeys())
+	fmt.Println(list)
+
 	// Create a new empty set collection.
 	var set = fra.Set[string]()
 	fmt.Println(set)
 
 	// Create a new set collection from an intrinsic Go array of values.
-	set = fra.SetFromArray[string]([]string{"c", "a", "b"})
+	set = fra.SetFromArray[string](
+		[]string{"c", "a", "b"},
+	)
 	fmt.Println(set)
 
 	// Create a new set collection from the keys in a catalog collection.
@@ -120,74 +103,13 @@ func TestModuleExampleCode(t *tes.T) {
 	fmt.Println()
 }
 
-func TestArrayExampleCode(t *tes.T) {
-	fmt.Println("ARRAY EXAMPLE:")
-
-	// Create a new wrapped array using the universal constructor.
-	var array = fra.Array[string]([]string{"foo", "bar", "baz"})
-	fmt.Println("The array is:", array)
-
-	// Retrieve the first value in the array.
-	var first = array.GetValue(1)
-	fmt.Println("The first value is:", first)
-
-	// Retrieve the last value in the array using negative indexing.
-	var last = array.GetValue(-1)
-	fmt.Println("The last value is:", last)
-
-	// Set the second value in the array to a new value.
-	array.SetValue(2, "fuz")
-	var second = array.GetValue(2)
-	fmt.Println("The second value is now:", second)
-	fmt.Println("The updated array is:", array)
-
-	// Sort the values in the array.
-	array.SortValues()
-	fmt.Println("The sorted array is:", array)
-	fmt.Println()
-}
-
-func TestMapExampleCode(t *tes.T) {
-	fmt.Println("MAP EXAMPLE:")
-
-	// Create a new wrapped map using the universal constructor.
-	var map_ = fra.Map[string, int](map[string]int{
-		"foo": 1,
-		"bar": 2,
-	})
-	fmt.Println("The initial map is:", map_)
-
-	// Add a new association.
-	map_.SetValue("baz", 3)
-	fmt.Println("The augmented map is now:", map_)
-
-	// Retrieve a couple values.
-	var one = map_.GetValue("foo")
-	fmt.Println("The \"foo\" value is:", one)
-	var three = map_.GetValue("baz")
-	fmt.Println("The \"baz\" value is:", three)
-
-	// Change the value of an association.
-	map_.SetValue("bar", 42)
-	var answer = map_.GetValue("bar")
-	fmt.Println("The \"bar\" value is now:", answer)
-	fmt.Println("The updated map is:", map_)
-
-	// Remove an association.
-	map_.RemoveValue("baz")
-	fmt.Println("The smaller map is:", map_)
-
-	// Empty the map.
-	map_.RemoveAll()
-	fmt.Println("The empty map is:", map_)
-	fmt.Println()
-}
-
 func TestListExampleCode(t *tes.T) {
 	fmt.Println("LIST EXAMPLE:")
 
 	// Create a new list using the universal constructor.
-	var list = fra.ListFromArray[string]([]string{"bar", "foo", "bax"})
+	var list = fra.ListFromArray[string](
+		[]string{"bar", "foo", "bax"},
+	)
 	fmt.Println("The initialized list:", list)
 
 	// Add some more values to the list.
@@ -229,9 +151,13 @@ func TestSetExampleCode(t *tes.T) {
 	fmt.Println("SET EXAMPLE:")
 
 	// Create two sets with overlapping values using the universal constructor.
-	var set1 = fra.SetFromArray[string]([]string{"alpha", "beta", "gamma"})
+	var set1 = fra.SetFromArray[string](
+		[]string{"alpha", "beta", "gamma"},
+	)
 	fmt.Println("The first set is:", set1)
-	var set2 = fra.SetFromArray[string]([]string{"beta", "gamma", "delta"})
+	var set2 = fra.SetFromArray[string](
+		[]string{"beta", "gamma", "delta"},
+	)
 	fmt.Println("The second set is:", set2)
 
 	// Find the logical union of the two sets.
@@ -327,11 +253,13 @@ func TestCatalogExampleCode(t *tes.T) {
 	fmt.Println("CATALOG EXAMPLE:")
 
 	// Create a new catalog using the universal constructor.
-	var catalog = fra.CatalogFromMap[string, int64](map[string]int64{
-		"foo": 1,
-		"bar": 2,
-		"baz": 3,
-	})
+	var catalog = fra.CatalogFromMap[string, int64](
+		map[string]int64{
+			"foo": 1,
+			"bar": 2,
+			"baz": 3,
+		},
+	)
 	fmt.Println("The initialized catalog:", catalog)
 
 	// Add a new association to the catalog.
@@ -367,7 +295,9 @@ func TestIteratorExampleCode(t *tes.T) {
 	fmt.Println("ITERATOR EXAMPLE:")
 
 	// Create a list using the universal constructor and an iterator for it.
-	var list = fra.ListFromArray[string]([]string{"foo", "bar", "baz"})
+	var list = fra.ListFromArray[string](
+		[]string{"foo", "bar", "baz"},
+	)
 	var iterator = list.GetIterator()
 
 	// Iterate over the values in order.

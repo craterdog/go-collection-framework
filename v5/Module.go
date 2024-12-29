@@ -99,32 +99,6 @@ func SorterWithRanker[V any](
 	)
 }
 
-// Collection/Array
-
-func Array[V any](
-	values []V,
-) col.ArrayLike[V] {
-	return col.ArrayClass[V]().Array(
-		values,
-	)
-}
-
-func ArrayWithSize[V any](
-	size age.Size,
-) col.ArrayLike[V] {
-	return col.ArrayClass[V]().ArrayWithSize(
-		size,
-	)
-}
-
-func ArrayFromSequence[V any](
-	values col.Sequential[V],
-) col.ArrayLike[V] {
-	return col.ArrayClass[V]().ArrayFromSequence(
-		values,
-	)
-}
-
 // Collection/Association
 
 func Association[K comparable, V any](
@@ -186,32 +160,6 @@ func ListFromSequence[V any](
 ) col.ListLike[V] {
 	return col.ListClass[V]().ListFromSequence(
 		values,
-	)
-}
-
-// Collection/Map
-
-func Map[K comparable, V any](
-	associations map[K]V,
-) col.MapLike[K, V] {
-	return col.MapClass[K, V]().Map(
-		associations,
-	)
-}
-
-func MapFromArray[K comparable, V any](
-	associations []col.AssociationLike[K, V],
-) col.MapLike[K, V] {
-	return col.MapClass[K, V]().MapFromArray(
-		associations,
-	)
-}
-
-func MapFromSequence[K comparable, V any](
-	associations col.Sequential[col.AssociationLike[K, V]],
-) col.MapLike[K, V] {
-	return col.MapClass[K, V]().MapFromSequence(
-		associations,
 	)
 }
 
@@ -306,3 +254,93 @@ func StackFromSequence[V any](
 }
 
 // GLOBAL FUNCTIONS
+
+// Collection/Catalog
+
+func CatalogExtract[K comparable, V any](
+	catalog col.CatalogLike[K, V],
+	keys col.Sequential[K],
+) col.CatalogLike[K, V] {
+	var catalogClass = col.CatalogClass[K, V]()
+	return catalogClass.Extract(catalog, keys)
+}
+
+func CatalogMerge[K comparable, V any](
+	first col.CatalogLike[K, V],
+	second col.CatalogLike[K, V],
+) col.CatalogLike[K, V] {
+	var catalogClass = col.CatalogClass[K, V]()
+	return catalogClass.Merge(first, second)
+}
+
+// Collection/List
+
+func ListConcatenate[V any](
+	first col.ListLike[V],
+	second col.ListLike[V],
+) col.ListLike[V] {
+	var listClass = col.ListClass[V]()
+	return listClass.Concatenate(first, second)
+}
+
+// Collection/Queue
+
+func QueueFork[V any](
+	group col.Synchronized,
+	input col.QueueLike[V],
+	size age.Size,
+) col.Sequential[col.QueueLike[V]] {
+	var queueClass = col.QueueClass[V]()
+	return queueClass.Fork(group, input, size)
+}
+
+func QueueSplit[V any](
+	group col.Synchronized,
+	input col.QueueLike[V],
+	size age.Size,
+) col.Sequential[col.QueueLike[V]] {
+	var queueClass = col.QueueClass[V]()
+	return queueClass.Split(group, input, size)
+}
+
+func QueueJoin[V any](
+	group col.Synchronized,
+	inputs col.Sequential[col.QueueLike[V]],
+) col.QueueLike[V] {
+	var queueClass = col.QueueClass[V]()
+	return queueClass.Join(group, inputs)
+}
+
+// Collection/Set
+
+func SetAnd[V any](
+	first col.SetLike[V],
+	second col.SetLike[V],
+) col.SetLike[V] {
+	var setClass = col.SetClass[V]()
+	return setClass.And(first, second)
+}
+
+func SetOr[V any](
+	first col.SetLike[V],
+	second col.SetLike[V],
+) col.SetLike[V] {
+	var setClass = col.SetClass[V]()
+	return setClass.Or(first, second)
+}
+
+func SetSans[V any](
+	first col.SetLike[V],
+	second col.SetLike[V],
+) col.SetLike[V] {
+	var setClass = col.SetClass[V]()
+	return setClass.Sans(first, second)
+}
+
+func SetXor[V any](
+	first col.SetLike[V],
+	second col.SetLike[V],
+) col.SetLike[V] {
+	var setClass = col.SetClass[V]()
+	return setClass.Xor(first, second)
+}

@@ -25,20 +25,24 @@ func TestModuleExampleCode(t *tes.T) {
 	// Create a new association.
 	var association = fra.Association[string, int]("A", 1)
 	fmt.Println(association)
+	fmt.Println()
 
 	// Create a new empty list collection.
 	var list = fra.List[string]()
 	fmt.Println(list)
+	fmt.Println()
 
 	// Create a new list collection using an intrinsic Go array of values.
 	list = fra.ListFromArray[string](
 		[]string{"Hello", "World"},
 	)
 	fmt.Println(list)
+	fmt.Println()
 
 	// Create a new empty catalog collection.
 	var catalog = fra.Catalog[string, int64]()
 	fmt.Println(catalog)
+	fmt.Println()
 
 	// Create a new catalog collection from a map collection.
 	catalog = fra.CatalogFromMap[string, int64](
@@ -48,16 +52,20 @@ func TestModuleExampleCode(t *tes.T) {
 			"gamma": 3,
 		},
 	)
+	fmt.Println(catalog)
+	fmt.Println()
 
 	// Create a list of associations from the catalog.
 	var associations = fra.ListFromArray(catalog.AsArray())
 	fmt.Println(associations)
+	fmt.Println()
 
 	// Create a catalog from a sequence of associations.
 	catalog = fra.CatalogFromSequence[string, int64](associations)
 	catalog.SetValue("delta", 4)
 	catalog.SortValues()
 	fmt.Println(catalog)
+	fmt.Println()
 
 	// Iterate through the catalog associations.
 	var iterator = catalog.GetIterator()
@@ -70,32 +78,39 @@ func TestModuleExampleCode(t *tes.T) {
 	// Create a new list collection using a sequence of catalog keys.
 	list = fra.ListFromSequence[string](catalog.GetKeys())
 	fmt.Println(list)
+	fmt.Println()
 
 	// Create a new empty set collection.
 	var set = fra.Set[string]()
 	fmt.Println(set)
+	fmt.Println()
 
 	// Create a new set collection from an intrinsic Go array of values.
 	set = fra.SetFromArray[string](
 		[]string{"c", "a", "b"},
 	)
 	fmt.Println(set)
+	fmt.Println()
 
 	// Create a new set collection from the keys in a catalog collection.
 	set = fra.SetFromSequence[string](catalog.GetKeys())
 	fmt.Println(set)
+	fmt.Println()
 
 	// Create a new empty stack collection with a capacity of 4.
 	var stack = fra.StackWithCapacity[string](4)
 	fmt.Println(stack)
+	fmt.Println()
 
 	// Create a new stack collection from a list collection.
 	stack = fra.StackFromSequence[string](list)
 	fmt.Println(stack)
+	fmt.Println()
 
 	// Create a new empty queue collection with a capacity of 5.
 	var queue = fra.QueueWithCapacity[string](5)
 	fmt.Println(queue)
+	fmt.Println()
 
 	// Create a new queue collection from a set collection.
 	queue = fra.QueueFromSequence[string](set)

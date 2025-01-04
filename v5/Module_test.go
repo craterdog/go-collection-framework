@@ -15,36 +15,73 @@ package module_test
 import (
 	fmt "fmt"
 	fra "github.com/craterdog/go-collection-framework/v5"
+	col "github.com/craterdog/go-collection-framework/v5/collection"
 	syn "sync"
 	tes "testing"
 )
 
+func TestModuleFunctions(t *tes.T) {
+	fra.Collator[any]()
+	fra.CollatorWithMaximumDepth[any](8)
+	fra.Iterator[any]([]any{"foo", 5})
+	var sorter = fra.Sorter[any]()
+	fra.SorterWithRanker[any](sorter.GetRanker())
+	fra.List[string]()
+	var list = fra.ListFromArray[string]([]string{"A"})
+	fra.ListFromSequence[string](list)
+	fra.ListConcatenate[string](list, list)
+	var association = fra.Association[string, int]("A", 1)
+	var catalog = fra.Catalog[string, int]()
+	fra.CatalogFromArray[string, int]([]col.AssociationLike[string, int]{association})
+	fra.CatalogFromMap[string, int](catalog.AsMap())
+	fra.CatalogFromSequence[string, int](catalog)
+	fra.CatalogExtract[string, int](catalog, list)
+	fra.CatalogMerge[string, int](catalog, catalog)
+	fra.Queue[string]()
+	fra.QueueWithCapacity[string](8)
+	var queue = fra.QueueFromArray[string](list.AsArray())
+	fra.QueueFromSequence[string](queue)
+	var group = new(syn.WaitGroup)
+	defer group.Wait()
+	var queues = fra.QueueFork[string](group, queue, 2)
+	fra.QueueSplit[string](group, queue, 2)
+	fra.QueueJoin[string](group, queues)
+	queue.CloseChannel()
+	var set = fra.Set[string]()
+	fra.SetWithCollator[string](set.GetCollator())
+	fra.SetFromArray[string](set.AsArray())
+	fra.SetFromSequence[string](set)
+	fra.SetAnd[string](set, set)
+	fra.SetOr[string](set, set)
+	fra.SetSans[string](set, set)
+	fra.SetXor[string](set, set)
+	fra.Stack[string]()
+	fra.StackWithCapacity[string](8)
+	fra.StackFromArray[string](list.AsArray())
+	fra.StackFromSequence[string](list)
+}
+
 func TestModuleExampleCode(t *tes.T) {
 	fmt.Println("MODULE EXAMPLE:")
 
-	// Create a new association.
-	var association = fra.Association[string, int]("A", 1)
-	fmt.Println(association)
-	fmt.Println()
-
-	// Create a new empty list collection.
+	// Create an empty list.
 	var list = fra.List[string]()
-	fmt.Println(list)
+	fmt.Printf("An empty list: %v\n", list)
 	fmt.Println()
 
-	// Create a new list collection using an intrinsic Go array of values.
+	// Create a list using an intrinsic Go array of values.
 	list = fra.ListFromArray[string](
 		[]string{"Hello", "World"},
 	)
-	fmt.Println(list)
+	fmt.Printf("A list: %v\n", list)
 	fmt.Println()
 
-	// Create a new empty catalog collection.
+	// Create an empty catalog.
 	var catalog = fra.Catalog[string, int64]()
-	fmt.Println(catalog)
+	fmt.Printf("An empty catalog: %v\n", catalog)
 	fmt.Println()
 
-	// Create a new catalog collection from a map collection.
+	// Create a catalog from an intrinsic Go map.
 	catalog = fra.CatalogFromMap[string, int64](
 		map[string]int64{
 			"alpha": 1,
@@ -52,69 +89,39 @@ func TestModuleExampleCode(t *tes.T) {
 			"gamma": 3,
 		},
 	)
-	fmt.Println(catalog)
+	fmt.Printf("A catalog: %v\n", catalog)
 	fmt.Println()
 
-	// Create a list of associations from the catalog.
-	var associations = fra.ListFromArray(catalog.AsArray())
-	fmt.Println(associations)
-	fmt.Println()
-
-	// Create a catalog from a sequence of associations.
-	catalog = fra.CatalogFromSequence[string, int64](associations)
-	catalog.SetValue("delta", 4)
-	catalog.SortValues()
-	fmt.Println(catalog)
-	fmt.Println()
-
-	// Iterate through the catalog associations.
-	var iterator = catalog.GetIterator()
-	for iterator.HasNext() {
-		var association = iterator.GetNext()
-		fmt.Println(association)
-	}
-	fmt.Println()
-
-	// Create a new list collection using a sequence of catalog keys.
+	// Create a list of the catalog keys.
 	list = fra.ListFromSequence[string](catalog.GetKeys())
-	fmt.Println(list)
+	fmt.Printf("A list of keys: %v\n", list)
 	fmt.Println()
 
-	// Create a new empty set collection.
-	var set = fra.Set[string]()
-	fmt.Println(set)
-	fmt.Println()
-
-	// Create a new set collection from an intrinsic Go array of values.
-	set = fra.SetFromArray[string](
-		[]string{"c", "a", "b"},
+	// Create a set from an intrinsic Go array of values.
+	var set = fra.SetFromArray[string](
+		[]string{"a", "b", "r", "a", "c", "a", "d", "a", "b", "r", "a"},
 	)
-	fmt.Println(set)
+	fmt.Printf("A set: %v\n", set)
 	fmt.Println()
 
-	// Create a new set collection from the keys in a catalog collection.
-	set = fra.SetFromSequence[string](catalog.GetKeys())
-	fmt.Println(set)
-	fmt.Println()
-
-	// Create a new empty stack collection with a capacity of 4.
+	// Create an empty stack with a capacity of 4.
 	var stack = fra.StackWithCapacity[string](4)
-	fmt.Println(stack)
+	fmt.Printf("An empty stack: %v\n", stack)
 	fmt.Println()
 
-	// Create a new stack collection from a list collection.
+	// Create a stack containing the values from a list.
 	stack = fra.StackFromSequence[string](list)
-	fmt.Println(stack)
+	fmt.Printf("A stack: %v\n", stack)
 	fmt.Println()
 
-	// Create a new empty queue collection with a capacity of 5.
+	// Create an empty queue with a capacity of 5.
 	var queue = fra.QueueWithCapacity[string](5)
-	fmt.Println(queue)
+	fmt.Printf("An empty queue: %v\n", queue)
 	fmt.Println()
 
-	// Create a new queue collection from a set collection.
+	// Create a queue containing the values from a set.
 	queue = fra.QueueFromSequence[string](set)
-	fmt.Println(queue)
+	fmt.Printf("A queue: %v\n", queue)
 	fmt.Println()
 }
 

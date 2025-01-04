@@ -56,10 +56,16 @@ func (c *catalogClass_[K, V]) CatalogFromArray(
 func (c *catalogClass_[K, V]) CatalogFromMap(
 	associations map[K]V,
 ) CatalogLike[K, V] {
+	// NOTE:
+	// The ordering of the key-value associations in the specified intrinsic Go
+	// map data type is non-deterministic, even using the same associations
+	// across multiple runs.  To make this constructor deterministic we sort the
+	// specified map associations using their "natural" ordering.
 	var catalog = c.Catalog()
 	for key, value := range associations {
 		catalog.SetValue(key, value)
 	}
+	catalog.SortValues()
 	return catalog
 }
 

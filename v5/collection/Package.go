@@ -82,10 +82,13 @@ CatalogClassLike[K comparable, V any] is a class interface that declares the
 complete set of class constructors, constants and functions that must be
 supported by each concrete catalog-like class.
 
-A catalog-like class maintains an ordered set of generic typed key-value
-associations.
+A catalog-like class maintains a sortable set of generic typed key-value
+associations.  Unlike the intrinsic Go map data type, the order of the
+associations in a catalog is the order in which they were added to the catalog.
+A catalog can also be sorted using either the default "natural" ordering of the
+keys or using a custom association ranking function.
 
-The following class functions are supported:
+The following class functions are also supported:
 
 Extract() returns a new catalog containing only the associations that are in
 the specified catalog that have the specified keys.  The associations in the

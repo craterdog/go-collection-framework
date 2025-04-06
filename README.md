@@ -1,6 +1,6 @@
 <img src="https://craterdog.com/images/CraterDog.png" width="50%">
 
-## Go Generic Collection Framework
+## Go Collection Framework
 
 ### Overview
 This project provides a Go based framework containing generic interfaces and

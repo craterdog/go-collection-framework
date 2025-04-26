@@ -24,7 +24,7 @@ For detailed documentation on this package refer to the wiki:
 
 This package follows the Crater Dog Technologies™ Go Coding Conventions located
 here:
-  - https://github.com/craterdog/go-class-model/wiki
+  - https://github.com/craterdog/go-development-tools/wiki/Coding-Conventions
 
 Additional concrete implementations of the classes declared by this package can
 be developed and used seamlessly since the interface declarations only depend on

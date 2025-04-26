@@ -29,9 +29,8 @@ following:
  1. Add unit tests that will verify the correctness of the code changes and any
     new code.
  1. Make the changes to the existing code and add any new code that is required.
- 1. Make sure that all code changes and new code meet the coding conventions for
-    the [class model framework](https://github.com/craterdog/go-class-model/wiki)
-    and that all unit tests pass.
+ 1. Make sure that all code changes and new code meet the
+    [coding conventions](https://github.com/craterdog/go-development-tools/wiki/Coding-Conventions) for the class model and that all unit tests pass.
  1. Create a [pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request) for your proposed changes.
  1. We will review the pull request and then merge the changes into the main branch.
 

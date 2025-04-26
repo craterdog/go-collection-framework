@@ -16,7 +16,7 @@ For more information on this project click on the following links:
 To include the Go packages for this module use the following import statement:
 ```go
 import (
-	fra "github.com/craterdog/go-collection-framework/v4"
+	fra "github.com/craterdog/go-collection-framework/v5"
 )
 ```
 

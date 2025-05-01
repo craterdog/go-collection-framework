@@ -12,14 +12,6 @@ For more information on this project click on the following links:
  * [project documentation](https://github.com/craterdog/go-collection-framework/wiki)
  * [coding conventions](https://github.com/craterdog/go-development-tools/wiki/Coding-Conventions)
 
-### Getting Started
-To include the Go packages for this module use the following import statement:
-```go
-import (
-	fra "github.com/craterdog/go-collection-framework/v5"
-)
-```
-
 ### Contributing
 Project contributors are always welcome. Check out the contributing guidelines
 [here](https://github.com/craterdog/go-collection-framework/blob/main/.github/CONTRIBUTING.md).

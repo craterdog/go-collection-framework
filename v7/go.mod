@@ -1,9 +1,9 @@
-module github.com/craterdog/go-collection-framework/v5
+module github.com/craterdog/go-collection-framework/v7
 
 go 1.23
 
 require (
-	github.com/craterdog/go-missing-utilities/v2 v2.15.0
+	github.com/craterdog/go-missing-utilities/v7 v7.0.0
 	github.com/stretchr/testify v1.10.0
 )
 

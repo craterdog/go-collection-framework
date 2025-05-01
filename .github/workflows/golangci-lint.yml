@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/setup-go@v3
         with:
-          go-version: 1.22
+          go-version: 1.23
       - uses: actions/checkout@v3
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
@@ -27,7 +27,7 @@ jobs:
           version: latest
 
           # Optional: working directory, useful for monorepos
-          working-directory: ./v5
+          working-directory: ./v7
 
           # Optional: golangci-lint command line arguments.
           # args: --config ./.github/workflows/golangci-lint.yml ./... ./v1 ./v2

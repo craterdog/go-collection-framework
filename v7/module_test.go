@@ -14,8 +14,8 @@ package module_test
 
 import (
 	fmt "fmt"
-	fra "github.com/craterdog/go-collection-framework/v5"
-	col "github.com/craterdog/go-collection-framework/v5/collection"
+	fra "github.com/craterdog/go-collection-framework/v7"
+	col "github.com/craterdog/go-collection-framework/v7/collection"
 	syn "sync"
 	tes "testing"
 )

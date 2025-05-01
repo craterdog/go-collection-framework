@@ -29,8 +29,8 @@ For detailed documentation on this entire module refer to the wiki:
 package module
 
 import (
-	age "github.com/craterdog/go-collection-framework/v5/agent"
-	col "github.com/craterdog/go-collection-framework/v5/collection"
+	age "github.com/craterdog/go-collection-framework/v7/agent"
+	col "github.com/craterdog/go-collection-framework/v7/collection"
 )
 
 // TYPE ALIASES

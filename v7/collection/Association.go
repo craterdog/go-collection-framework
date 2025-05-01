@@ -14,7 +14,7 @@ package collection
 
 import (
 	fmt "fmt"
-	uti "github.com/craterdog/go-missing-utilities/v2"
+	uti "github.com/craterdog/go-missing-utilities/v7"
 	syn "sync"
 )
 

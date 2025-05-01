@@ -14,8 +14,8 @@ package collection
 
 import (
 	fmt "fmt"
-	age "github.com/craterdog/go-collection-framework/v5/agent"
-	uti "github.com/craterdog/go-missing-utilities/v2"
+	age "github.com/craterdog/go-collection-framework/v7/agent"
+	uti "github.com/craterdog/go-missing-utilities/v7"
 	syn "sync"
 )
 

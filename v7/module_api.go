@@ -18,13 +18,13 @@
 └──────────────────────────────────────────────────────────────────────────────┘
 
 Package "module" declares type aliases for the commonly used types declared in
-the packages contained in this module.  It also provides a default constructor
-for each commonly used class that is exported by the module.  Each constructor
-delegates the actual construction process to its corresponding concrete class
-declared in the corresponding package contained within this module.
+the packages contained in this module.  It also provides constructors for each
+commonly used class that is exported by the module.  Each constructor delegates
+the actual construction process to its corresponding concrete class declared in
+the corresponding package contained within this module.
 
 For detailed documentation on this entire module refer to the wiki:
-  - https://github.com/craterdog/go-collection-framework//wiki
+  - https://github.com/craterdog/go-collection-framework/wiki
 */
 package module
 
@@ -49,6 +49,22 @@ const (
 	GreaterRank = age.GreaterRank
 )
 
+type (
+	RankingFunction[V any] = age.RankingFunction[V]
+)
+
+type (
+	CollatorClassLike[V any] = age.CollatorClassLike[V]
+	IteratorClassLike[V any] = age.IteratorClassLike[V]
+	SorterClassLike[V any]   = age.SorterClassLike[V]
+)
+
+type (
+	CollatorLike[V any] = age.CollatorLike[V]
+	IteratorLike[V any] = age.IteratorLike[V]
+	SorterLike[V any]   = age.SorterLike[V]
+)
+
 // Collection
 
 type (
@@ -56,7 +72,35 @@ type (
 )
 
 type (
-	Synchronized = col.Synchronized
+	AssociationClassLike[K comparable, V any] = col.AssociationClassLike[K, V]
+	CatalogClassLike[K comparable, V any]     = col.CatalogClassLike[K, V]
+	ListClassLike[V any]                      = col.ListClassLike[V]
+	QueueClassLike[V any]                     = col.QueueClassLike[V]
+	SetClassLike[V any]                       = col.SetClassLike[V]
+	StackClassLike[V any]                     = col.StackClassLike[V]
+)
+
+type (
+	AssociationLike[K comparable, V any] = col.AssociationLike[K, V]
+	CatalogLike[K comparable, V any]     = col.CatalogLike[K, V]
+	ListLike[V any]                      = col.ListLike[V]
+	QueueLike[V any]                     = col.QueueLike[V]
+	SetLike[V any]                       = col.SetLike[V]
+	StackLike[V any]                     = col.StackLike[V]
+)
+
+type (
+	Accessible[V any]                = col.Accessible[V]
+	Associative[K comparable, V any] = col.Associative[K, V]
+	Elastic[V any]                   = col.Elastic[V]
+	Fifo[V any]                      = col.Fifo[V]
+	Lifo[V any]                      = col.Lifo[V]
+	Malleable[V any]                 = col.Malleable[V]
+	Searchable[V any]                = col.Searchable[V]
+	Sequential[V any]                = col.Sequential[V]
+	Sortable[V any]                  = col.Sortable[V]
+	Synchronized                     = col.Synchronized
+	Updatable[V any]                 = col.Updatable[V]
 )
 
 // CLASS CONSTRUCTORS

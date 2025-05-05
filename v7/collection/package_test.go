@@ -404,7 +404,7 @@ func TestQueueWithFork(t *tes.T) {
 	var readOutput = func(output col.QueueLike[int], name string) {
 		defer group.Done()
 		var value int
-		var ok bool = true
+		var ok = true
 		for i := 1; ok; i++ {
 			value, ok = output.RemoveFirst()
 			if ok {
@@ -460,7 +460,7 @@ func TestQueueWithSplitAndJoin(t *tes.T) {
 	go func() {
 		defer group.Done()
 		var value int
-		var ok bool = true
+		var ok = true
 		for i := 1; ok; i++ {
 			value, ok = output.RemoveFirst()
 			if ok {

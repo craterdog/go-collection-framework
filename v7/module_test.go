@@ -14,75 +14,74 @@ package module_test
 
 import (
 	fmt "fmt"
-	fra "github.com/craterdog/go-collection-framework/v7"
-	col "github.com/craterdog/go-collection-framework/v7/collection"
+	col "github.com/craterdog/go-collection-framework/v7"
 	syn "sync"
 	tes "testing"
 )
 
 func TestModuleFunctions(t *tes.T) {
-	fra.Collator[any]()
-	fra.CollatorWithMaximumDepth[any](8)
-	fra.Iterator[any]([]any{"foo", 5})
-	var sorter = fra.Sorter[any]()
-	fra.SorterWithRanker[any](sorter.GetRanker())
-	fra.List[string]()
-	var list = fra.ListFromArray[string]([]string{"A"})
-	fra.ListFromSequence[string](list)
-	fra.ListConcatenate[string](list, list)
-	var association = fra.Association[string, int]("A", 1)
-	var catalog = fra.Catalog[string, int]()
-	fra.CatalogFromArray[string, int]([]col.AssociationLike[string, int]{association})
-	fra.CatalogFromMap[string, int](catalog.AsMap())
-	fra.CatalogFromSequence[string, int](catalog)
-	fra.CatalogExtract[string, int](catalog, list)
-	fra.CatalogMerge[string, int](catalog, catalog)
-	fra.Queue[string]()
-	fra.QueueWithCapacity[string](8)
-	var queue = fra.QueueFromArray[string](list.AsArray())
-	fra.QueueFromSequence[string](queue)
+	col.Collator[any]()
+	col.CollatorWithMaximumDepth[any](8)
+	col.Iterator[any]([]any{"foo", 5})
+	var sorter = col.Sorter[any]()
+	col.SorterWithRanker[any](sorter.GetRanker())
+	col.List[string]()
+	var list = col.ListFromArray[string]([]string{"A"})
+	col.ListFromSequence[string](list)
+	col.ListConcatenate[string](list, list)
+	var association = col.Association[string, int]("A", 1)
+	var catalog = col.Catalog[string, int]()
+	col.CatalogFromArray[string, int]([]col.AssociationLike[string, int]{association})
+	col.CatalogFromMap[string, int](catalog.AsMap())
+	col.CatalogFromSequence[string, int](catalog)
+	col.CatalogExtract[string, int](catalog, list)
+	col.CatalogMerge[string, int](catalog, catalog)
+	col.Queue[string]()
+	col.QueueWithCapacity[string](8)
+	var queue = col.QueueFromArray[string](list.AsArray())
+	col.QueueFromSequence[string](queue)
 	var group = new(syn.WaitGroup)
 	defer group.Wait()
-	var queues = fra.QueueFork[string](group, queue, 2)
-	fra.QueueSplit[string](group, queue, 2)
-	fra.QueueJoin[string](group, queues)
+	var queues = col.QueueFork[string](group, queue, 2)
+	col.QueueSplit[string](group, queue, 2)
+	col.QueueJoin[string](group, queues)
 	queue.CloseChannel()
-	var set = fra.Set[string]()
-	fra.SetWithCollator[string](set.GetCollator())
-	fra.SetFromArray[string](set.AsArray())
-	fra.SetFromSequence[string](set)
-	fra.SetAnd[string](set, set)
-	fra.SetOr[string](set, set)
-	fra.SetSans[string](set, set)
-	fra.SetXor[string](set, set)
-	fra.Stack[string]()
-	fra.StackWithCapacity[string](8)
-	fra.StackFromArray[string](list.AsArray())
-	fra.StackFromSequence[string](list)
+	var set = col.Set[string]()
+	col.SetWithCollator[string](set.GetCollator())
+	col.SetFromArray[string](set.AsArray())
+	col.SetFromSequence[string](set)
+	col.SetAnd[string](set, set)
+	col.SetOr[string](set, set)
+	col.SetSans[string](set, set)
+	col.SetXor[string](set, set)
+	col.Stack[string]()
+	col.StackWithCapacity[string](8)
+	col.StackFromArray[string](list.AsArray())
+	col.StackFromSequence[string](list)
 }
 
 func TestModuleExampleCode(t *tes.T) {
 	fmt.Println("MODULE EXAMPLE:")
 
 	// Create an empty list.
-	var list = fra.List[string]()
+	var list = col.List[string]()
 	fmt.Printf("An empty list: %v\n", list)
 	fmt.Println()
 
 	// Create a list using an intrinsic Go array of values.
-	list = fra.ListFromArray[string](
+	list = col.ListFromArray[string](
 		[]string{"Hello", "World"},
 	)
 	fmt.Printf("A list: %v\n", list)
 	fmt.Println()
 
 	// Create an empty catalog.
-	var catalog = fra.Catalog[string, int64]()
+	var catalog = col.Catalog[string, int64]()
 	fmt.Printf("An empty catalog: %v\n", catalog)
 	fmt.Println()
 
 	// Create a catalog from an intrinsic Go map.
-	catalog = fra.CatalogFromMap[string, int64](
+	catalog = col.CatalogFromMap[string, int64](
 		map[string]int64{
 			"alpha": 1,
 			"beta":  2,
@@ -93,34 +92,34 @@ func TestModuleExampleCode(t *tes.T) {
 	fmt.Println()
 
 	// Create a list of the catalog keys.
-	list = fra.ListFromSequence[string](catalog.GetKeys())
+	list = col.ListFromSequence[string](catalog.GetKeys())
 	fmt.Printf("A list of keys: %v\n", list)
 	fmt.Println()
 
 	// Create a set from an intrinsic Go array of values.
-	var set = fra.SetFromArray[string](
+	var set = col.SetFromArray[string](
 		[]string{"a", "b", "r", "a", "c", "a", "d", "a", "b", "r", "a"},
 	)
 	fmt.Printf("A set: %v\n", set)
 	fmt.Println()
 
 	// Create an empty stack with a capacity of 4.
-	var stack = fra.StackWithCapacity[string](4)
+	var stack = col.StackWithCapacity[string](4)
 	fmt.Printf("An empty stack: %v\n", stack)
 	fmt.Println()
 
 	// Create a stack containing the values from a list.
-	stack = fra.StackFromSequence[string](list)
+	stack = col.StackFromSequence[string](list)
 	fmt.Printf("A stack: %v\n", stack)
 	fmt.Println()
 
 	// Create an empty queue with a capacity of 5.
-	var queue = fra.QueueWithCapacity[string](5)
+	var queue = col.QueueWithCapacity[string](5)
 	fmt.Printf("An empty queue: %v\n", queue)
 	fmt.Println()
 
 	// Create a queue containing the values from a set.
-	queue = fra.QueueFromSequence[string](set)
+	queue = col.QueueFromSequence[string](set)
 	fmt.Printf("A queue: %v\n", queue)
 	fmt.Println()
 }
@@ -129,7 +128,7 @@ func TestListExampleCode(t *tes.T) {
 	fmt.Println("LIST EXAMPLE:")
 
 	// Create a new list from an array.
-	var list = fra.ListFromArray[string](
+	var list = col.ListFromArray[string](
 		[]string{"bar", "foo", "bax"},
 	)
 	fmt.Println("The initialized list:", list)
@@ -181,12 +180,12 @@ func TestSetExampleCode(t *tes.T) {
 	fmt.Println("SET EXAMPLE:")
 
 	// Create two sets with overlapping values.
-	var set1 = fra.SetFromArray[string](
+	var set1 = col.SetFromArray[string](
 		[]string{"alpha", "beta", "gamma"},
 	)
 	fmt.Println("The first set is:", set1)
 	fmt.Println()
-	var set2 = fra.SetFromArray[string](
+	var set2 = col.SetFromArray[string](
 		[]string{"beta", "gamma", "delta"},
 	)
 	fmt.Println("The second set is:", set2)
@@ -219,7 +218,7 @@ func TestStackExampleCode(t *tes.T) {
 	fmt.Println("STACK EXAMPLE:")
 
 	// Create a new empty stack.
-	var stack = fra.Stack[string]()
+	var stack = col.Stack[string]()
 	fmt.Println("The empty stack:", stack)
 	fmt.Println()
 
@@ -258,7 +257,7 @@ func TestQueueExampleCode(t *tes.T) {
 	defer wg.Wait()
 
 	// Create a new queue with a specific capacity.
-	var queue = fra.QueueWithCapacity[int](12)
+	var queue = col.QueueWithCapacity[int](12)
 	fmt.Println("The empty queue:", queue)
 	fmt.Println()
 
@@ -299,7 +298,7 @@ func TestCatalogExampleCode(t *tes.T) {
 	fmt.Println("CATALOG EXAMPLE:")
 
 	// Create a new catalog from a map.
-	var catalog = fra.CatalogFromMap[string, int64](
+	var catalog = col.CatalogFromMap[string, int64](
 		map[string]int64{
 			"foo": 1,
 			"bar": 2,
@@ -348,7 +347,7 @@ func TestCollatorExampleCode(t *tes.T) {
 	fmt.Println("COLLATOR EXAMPLE:")
 
 	// Create a collator with the default maximum depth.
-	var collator = fra.Collator[any]()
+	var collator = col.Collator[any]()
 
 	// Collate two strings.
 	var s1 = "first"
@@ -359,7 +358,7 @@ func TestCollatorExampleCode(t *tes.T) {
 	)
 	fmt.Println(
 		"The first string is ranked before the second strings:",
-		collator.RankValues(s1, s2) == fra.LesserRank,
+		collator.RankValues(s1, s2) == col.LesserRank,
 	)
 	fmt.Println()
 
@@ -372,7 +371,7 @@ func TestCollatorExampleCode(t *tes.T) {
 	)
 	fmt.Println(
 		"The first array is ranked before the second array:",
-		collator.RankValues(a1, a2) == fra.LesserRank,
+		collator.RankValues(a1, a2) == col.LesserRank,
 	)
 	fmt.Println()
 }
@@ -381,7 +380,7 @@ func TestSorterExampleCode(t *tes.T) {
 	fmt.Println("SORTER EXAMPLE:")
 
 	// Create a sorter with the default (natural) ranker.
-	var sorter = fra.Sorter[string]()
+	var sorter = col.Sorter[string]()
 
 	// Create an array.
 	var array = []string{
@@ -409,15 +408,15 @@ func TestSorterExampleCode(t *tes.T) {
 	fmt.Println()
 
 	// Sort the values with a custom ranking function.
-	sorter = fra.SorterWithRanker[string](
-		func(first, second string) fra.Rank {
+	sorter = col.SorterWithRanker[string](
+		func(first, second string) col.Rank {
 			switch {
 			case first < second:
-				return fra.GreaterRank
+				return col.GreaterRank
 			case first > second:
-				return fra.LesserRank
+				return col.LesserRank
 			default:
-				return fra.EqualRank
+				return col.EqualRank
 			}
 		},
 	)
@@ -430,7 +429,7 @@ func TestIteratorExampleCode(t *tes.T) {
 	fmt.Println("ITERATOR EXAMPLE:")
 
 	// Create a list from an array.
-	var list = fra.ListFromArray[string](
+	var list = col.ListFromArray[string](
 		[]string{"foo", "bar", "baz"},
 	)
 	var iterator = list.GetIterator()

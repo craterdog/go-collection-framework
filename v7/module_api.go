@@ -321,7 +321,7 @@ func StackFromSequence[V any](
 
 // GLOBAL FUNCTIONS
 
-// Collection/Catalog
+// Catalog
 
 func CatalogExtract[K comparable, V any](
 	catalog col.CatalogLike[K, V],
@@ -339,7 +339,7 @@ func CatalogMerge[K comparable, V any](
 	return catalogClass.Merge(first, second)
 }
 
-// Collection/List
+// List
 
 func ListConcatenate[V any](
 	first col.ListLike[V],
@@ -349,7 +349,7 @@ func ListConcatenate[V any](
 	return listClass.Concatenate(first, second)
 }
 
-// Collection/Queue
+// Queue
 
 func QueueFork[V any](
 	group col.Synchronized,
@@ -377,7 +377,7 @@ func QueueJoin[V any](
 	return queueClass.Join(group, inputs)
 }
 
-// Collection/Set
+// Set
 
 func SetAnd[V any](
 	first col.SetLike[V],

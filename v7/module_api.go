@@ -103,196 +103,218 @@ type (
 	Updatable[V any]                 = col.Updatable[V]
 )
 
-// CLASS CONSTRUCTORS
+// CLASS ACCESSORS
 
-// Agent/Collator
+// Agent
 
-func Collator[V any]() age.CollatorLike[V] {
-	return age.CollatorClass[V]().Collator()
+func CollatorClass[V any]() CollatorClassLike[V] {
+	return age.CollatorClass[V]()
+}
+
+func Collator[V any]() CollatorLike[V] {
+	return CollatorClass[V]().Collator()
 }
 
 func CollatorWithMaximumDepth[V any](
 	maximumDepth age.Size,
-) age.CollatorLike[V] {
-	return age.CollatorClass[V]().CollatorWithMaximumDepth(
+) CollatorLike[V] {
+	return CollatorClass[V]().CollatorWithMaximumDepth(
 		maximumDepth,
 	)
 }
 
-// Agent/Iterator
+func IteratorClass[V any]() IteratorClassLike[V] {
+	return age.IteratorClass[V]()
+}
 
 func Iterator[V any](
 	array []V,
-) age.IteratorLike[V] {
-	return age.IteratorClass[V]().Iterator(
+) IteratorLike[V] {
+	return IteratorClass[V]().Iterator(
 		array,
 	)
 }
 
-// Agent/Sorter
+func SorterClass[V any]() SorterClassLike[V] {
+	return age.SorterClass[V]()
+}
 
-func Sorter[V any]() age.SorterLike[V] {
-	return age.SorterClass[V]().Sorter()
+func Sorter[V any]() SorterLike[V] {
+	return SorterClass[V]().Sorter()
 }
 
 func SorterWithRanker[V any](
 	ranker age.RankingFunction[V],
-) age.SorterLike[V] {
-	return age.SorterClass[V]().SorterWithRanker(
+) SorterLike[V] {
+	return SorterClass[V]().SorterWithRanker(
 		ranker,
 	)
 }
 
-// Collection/Association
+// Collection
+
+func AssociationClass[K comparable, V any]() AssociationClassLike[K, V] {
+	return col.AssociationClass[K, V]()
+}
 
 func Association[K comparable, V any](
 	key K,
 	value V,
-) col.AssociationLike[K, V] {
-	return col.AssociationClass[K, V]().Association(
+) AssociationLike[K, V] {
+	return AssociationClass[K, V]().Association(
 		key,
 		value,
 	)
 }
 
-// Collection/Catalog
+func CatalogClass[K comparable, V any]() CatalogClassLike[K, V] {
+	return col.CatalogClass[K, V]()
+}
 
-func Catalog[K comparable, V any]() col.CatalogLike[K, V] {
-	return col.CatalogClass[K, V]().Catalog()
+func Catalog[K comparable, V any]() CatalogLike[K, V] {
+	return CatalogClass[K, V]().Catalog()
 }
 
 func CatalogFromArray[K comparable, V any](
 	associations []col.AssociationLike[K, V],
-) col.CatalogLike[K, V] {
-	return col.CatalogClass[K, V]().CatalogFromArray(
+) CatalogLike[K, V] {
+	return CatalogClass[K, V]().CatalogFromArray(
 		associations,
 	)
 }
 
 func CatalogFromMap[K comparable, V any](
 	associations map[K]V,
-) col.CatalogLike[K, V] {
-	return col.CatalogClass[K, V]().CatalogFromMap(
+) CatalogLike[K, V] {
+	return CatalogClass[K, V]().CatalogFromMap(
 		associations,
 	)
 }
 
 func CatalogFromSequence[K comparable, V any](
 	associations col.Sequential[col.AssociationLike[K, V]],
-) col.CatalogLike[K, V] {
-	return col.CatalogClass[K, V]().CatalogFromSequence(
+) CatalogLike[K, V] {
+	return CatalogClass[K, V]().CatalogFromSequence(
 		associations,
 	)
 }
 
-// Collection/List
+func ListClass[V any]() ListClassLike[V] {
+	return col.ListClass[V]()
+}
 
-func List[V any]() col.ListLike[V] {
-	return col.ListClass[V]().List()
+func List[V any]() ListLike[V] {
+	return ListClass[V]().List()
 }
 
 func ListFromArray[V any](
 	values []V,
-) col.ListLike[V] {
-	return col.ListClass[V]().ListFromArray(
+) ListLike[V] {
+	return ListClass[V]().ListFromArray(
 		values,
 	)
 }
 
 func ListFromSequence[V any](
 	values col.Sequential[V],
-) col.ListLike[V] {
-	return col.ListClass[V]().ListFromSequence(
+) ListLike[V] {
+	return ListClass[V]().ListFromSequence(
 		values,
 	)
 }
 
-// Collection/Queue
+func QueueClass[V any]() QueueClassLike[V] {
+	return col.QueueClass[V]()
+}
 
-func Queue[V any]() col.QueueLike[V] {
-	return col.QueueClass[V]().Queue()
+func Queue[V any]() QueueLike[V] {
+	return QueueClass[V]().Queue()
 }
 
 func QueueWithCapacity[V any](
 	capacity age.Size,
-) col.QueueLike[V] {
-	return col.QueueClass[V]().QueueWithCapacity(
+) QueueLike[V] {
+	return QueueClass[V]().QueueWithCapacity(
 		capacity,
 	)
 }
 
 func QueueFromArray[V any](
 	values []V,
-) col.QueueLike[V] {
-	return col.QueueClass[V]().QueueFromArray(
+) QueueLike[V] {
+	return QueueClass[V]().QueueFromArray(
 		values,
 	)
 }
 
 func QueueFromSequence[V any](
 	values col.Sequential[V],
-) col.QueueLike[V] {
-	return col.QueueClass[V]().QueueFromSequence(
+) QueueLike[V] {
+	return QueueClass[V]().QueueFromSequence(
 		values,
 	)
 }
 
-// Collection/Set
+func SetClass[V any]() SetClassLike[V] {
+	return col.SetClass[V]()
+}
 
-func Set[V any]() col.SetLike[V] {
-	return col.SetClass[V]().Set()
+func Set[V any]() SetLike[V] {
+	return SetClass[V]().Set()
 }
 
 func SetWithCollator[V any](
 	collator age.CollatorLike[V],
-) col.SetLike[V] {
-	return col.SetClass[V]().SetWithCollator(
+) SetLike[V] {
+	return SetClass[V]().SetWithCollator(
 		collator,
 	)
 }
 
 func SetFromArray[V any](
 	values []V,
-) col.SetLike[V] {
-	return col.SetClass[V]().SetFromArray(
+) SetLike[V] {
+	return SetClass[V]().SetFromArray(
 		values,
 	)
 }
 
 func SetFromSequence[V any](
 	values col.Sequential[V],
-) col.SetLike[V] {
-	return col.SetClass[V]().SetFromSequence(
+) SetLike[V] {
+	return SetClass[V]().SetFromSequence(
 		values,
 	)
 }
 
-// Collection/Stack
+func StackClass[V any]() StackClassLike[V] {
+	return col.StackClass[V]()
+}
 
-func Stack[V any]() col.StackLike[V] {
-	return col.StackClass[V]().Stack()
+func Stack[V any]() StackLike[V] {
+	return StackClass[V]().Stack()
 }
 
 func StackWithCapacity[V any](
 	capacity age.Size,
-) col.StackLike[V] {
-	return col.StackClass[V]().StackWithCapacity(
+) StackLike[V] {
+	return StackClass[V]().StackWithCapacity(
 		capacity,
 	)
 }
 
 func StackFromArray[V any](
 	values []V,
-) col.StackLike[V] {
-	return col.StackClass[V]().StackFromArray(
+) StackLike[V] {
+	return StackClass[V]().StackFromArray(
 		values,
 	)
 }
 
 func StackFromSequence[V any](
 	values col.Sequential[V],
-) col.StackLike[V] {
-	return col.StackClass[V]().StackFromSequence(
+) StackLike[V] {
+	return StackClass[V]().StackFromSequence(
 		values,
 	)
 }

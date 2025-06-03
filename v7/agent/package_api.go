@@ -29,7 +29,9 @@ on interfaces, not on each other.
 */
 package agent
 
-import ()
+import (
+	uti "github.com/craterdog/go-missing-utilities/v7"
+)
 
 // TYPE DECLARATIONS
 
@@ -43,11 +45,6 @@ const (
 	EqualRank
 	GreaterRank
 )
-
-/*
-Size is a constrained type representing the size or capacity of something.
-*/
-type Size uint
 
 /*
 Slot is a constrained type representing a slot between values in a sequence.
@@ -82,7 +79,7 @@ type CollatorClassLike[V any] interface {
 	// Constructor Methods
 	Collator() CollatorLike[V]
 	CollatorWithMaximumDepth(
-		maximumDepth Size,
+		maximumDepth uti.Cardinal,
 	) CollatorLike[V]
 }
 
@@ -153,7 +150,7 @@ type CollatorLike[V any] interface {
 	) Rank
 
 	// Attribute Methods
-	GetMaximumDepth() Size
+	GetMaximumDepth() uti.Cardinal
 }
 
 /*
@@ -173,7 +170,7 @@ type IteratorLike[V any] interface {
 	GetNext() V
 
 	// Attribute Methods
-	GetSize() Size
+	GetSize() uti.Cardinal
 	GetSlot() Slot
 	SetSlot(
 		slot Slot,

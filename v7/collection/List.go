@@ -277,8 +277,8 @@ func (v *list_[V]) IsEmpty() bool {
 	return len(v.array_) == 0
 }
 
-func (v *list_[V]) GetSize() age.Size {
-	return age.Size(len(v.array_))
+func (v *list_[V]) GetSize() uti.Cardinal {
+	return uti.Cardinal(len(v.array_))
 }
 
 func (v *list_[V]) AsArray() []V {

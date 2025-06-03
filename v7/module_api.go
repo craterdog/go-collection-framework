@@ -31,6 +31,7 @@ package module
 import (
 	age "github.com/craterdog/go-collection-framework/v7/agent"
 	col "github.com/craterdog/go-collection-framework/v7/collection"
+	uti "github.com/craterdog/go-missing-utilities/v7"
 )
 
 // TYPE ALIASES
@@ -38,9 +39,9 @@ import (
 // Agent
 
 type (
-	Rank = age.Rank
-	Size = age.Size
-	Slot = age.Slot
+	Cardinal = uti.Cardinal
+	Rank     = age.Rank
+	Slot     = age.Slot
 )
 
 const (
@@ -116,7 +117,7 @@ func Collator[V any]() CollatorLike[V] {
 }
 
 func CollatorWithMaximumDepth[V any](
-	maximumDepth age.Size,
+	maximumDepth Cardinal,
 ) CollatorLike[V] {
 	return CollatorClass[V]().CollatorWithMaximumDepth(
 		maximumDepth,
@@ -144,7 +145,7 @@ func Sorter[V any]() SorterLike[V] {
 }
 
 func SorterWithRanker[V any](
-	ranker age.RankingFunction[V],
+	ranker RankingFunction[V],
 ) SorterLike[V] {
 	return SorterClass[V]().SorterWithRanker(
 		ranker,
@@ -176,7 +177,7 @@ func Catalog[K comparable, V any]() CatalogLike[K, V] {
 }
 
 func CatalogFromArray[K comparable, V any](
-	associations []col.AssociationLike[K, V],
+	associations []AssociationLike[K, V],
 ) CatalogLike[K, V] {
 	return CatalogClass[K, V]().CatalogFromArray(
 		associations,
@@ -192,7 +193,7 @@ func CatalogFromMap[K comparable, V any](
 }
 
 func CatalogFromSequence[K comparable, V any](
-	associations col.Sequential[col.AssociationLike[K, V]],
+	associations Sequential[AssociationLike[K, V]],
 ) CatalogLike[K, V] {
 	return CatalogClass[K, V]().CatalogFromSequence(
 		associations,
@@ -216,7 +217,7 @@ func ListFromArray[V any](
 }
 
 func ListFromSequence[V any](
-	values col.Sequential[V],
+	values Sequential[V],
 ) ListLike[V] {
 	return ListClass[V]().ListFromSequence(
 		values,
@@ -232,7 +233,7 @@ func Queue[V any]() QueueLike[V] {
 }
 
 func QueueWithCapacity[V any](
-	capacity age.Size,
+	capacity Cardinal,
 ) QueueLike[V] {
 	return QueueClass[V]().QueueWithCapacity(
 		capacity,
@@ -248,7 +249,7 @@ func QueueFromArray[V any](
 }
 
 func QueueFromSequence[V any](
-	values col.Sequential[V],
+	values Sequential[V],
 ) QueueLike[V] {
 	return QueueClass[V]().QueueFromSequence(
 		values,
@@ -264,7 +265,7 @@ func Set[V any]() SetLike[V] {
 }
 
 func SetWithCollator[V any](
-	collator age.CollatorLike[V],
+	collator CollatorLike[V],
 ) SetLike[V] {
 	return SetClass[V]().SetWithCollator(
 		collator,
@@ -280,7 +281,7 @@ func SetFromArray[V any](
 }
 
 func SetFromSequence[V any](
-	values col.Sequential[V],
+	values Sequential[V],
 ) SetLike[V] {
 	return SetClass[V]().SetFromSequence(
 		values,
@@ -296,7 +297,7 @@ func Stack[V any]() StackLike[V] {
 }
 
 func StackWithCapacity[V any](
-	capacity age.Size,
+	capacity Cardinal,
 ) StackLike[V] {
 	return StackClass[V]().StackWithCapacity(
 		capacity,
@@ -312,7 +313,7 @@ func StackFromArray[V any](
 }
 
 func StackFromSequence[V any](
-	values col.Sequential[V],
+	values Sequential[V],
 ) StackLike[V] {
 	return StackClass[V]().StackFromSequence(
 		values,

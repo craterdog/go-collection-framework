@@ -11,7 +11,7 @@
 */
 
 /*
-Package "agent" declares a set of agents that operate on values that have a
+Package "agents" declares a set of agents that operate on values that have a
 generic type.  They are used by the collection classes declared in this Go
 module.
 
@@ -27,13 +27,18 @@ be developed and used seamlessly since the interface declarations only depend on
 other interfaces and intrinsic types—and the class implementations only depend
 on interfaces, not on each other.
 */
-package agent
+package agents
 
-import (
-	uti "github.com/craterdog/go-missing-utilities/v7"
-)
+import ()
 
 // TYPE DECLARATIONS
+
+/*
+Event is a constrained type representing an event type in a state machine.
+Using a string type for an event makes it easier to print out in a human
+readable way.
+*/
+type Event string
 
 /*
 Rank is a constrained type representing the possible rankings for two values.
@@ -47,9 +52,15 @@ const (
 )
 
 /*
-Slot is a constrained type representing a slot between values in a sequence.
+State is a constrained type representing a state in a state machine.  Using a
+string type for a state makes it easier to print out in a human readable way.
 */
-type Slot uint
+type State string
+
+/*
+Transitions is a constrained type representing a row of states in a state machine.
+*/
+type Transitions []State
 
 // FUNCTIONAL DECLARATIONS
 
@@ -79,8 +90,48 @@ type CollatorClassLike[V any] interface {
 	// Constructor Methods
 	Collator() CollatorLike[V]
 	CollatorWithMaximumDepth(
-		maximumDepth uti.Cardinal,
+		maximumDepth uint,
 	) CollatorLike[V]
+}
+
+/*
+ControllerClassLike is a class interface that declares the complete set of class
+constructors, constants and functions that must be supported by each concrete
+controller-like class.
+
+A controller-like class implements a state machine based on a finite state
+machine and possible event types. It enforces the possible states of the state
+machine and allowed transitions between states given a finite set of possible
+event types. It implements a finite state machine with the following table
+structure:
+
+	                    events:
+	        -------------------------------
+	        [event1,  event2,  ... eventM ]
+
+	                 transitions:
+	        -------------------------------
+	state1: [invalid, state2,  ... invalid]
+	state2: [state3,  stateN,  ... invalid]
+	                    ...
+	stateN: [state1,  invalid, ... state3 ]
+
+The first row of the state machine defines the possible events that can occur.
+Each subsequent row defines a state and the possible transitions from that
+state to the next state for each possible event. Transitions marked as "invalid"
+cannot occur. The state machine always starts in the first state of the finite
+state machine (e.g. state1).
+*/
+type ControllerClassLike interface {
+	// Constructor Methods
+	Controller(
+		events []Event,
+		transitions map[State]Transitions,
+		initialState State,
+	) ControllerLike
+
+	// Constant Methods
+	Invalid() State
 }
 
 /*
@@ -150,7 +201,28 @@ type CollatorLike[V any] interface {
 	) Rank
 
 	// Attribute Methods
-	GetMaximumDepth() uti.Cardinal
+	GetMaximumDepth() uint
+}
+
+/*
+ControllerLike is an instance interface that declares the complete set of
+principal, attribute and aspect methods that must be supported by each
+instance of a concrete controller-like class.
+*/
+type ControllerLike interface {
+	// Principal Methods
+	GetClass() ControllerClassLike
+	ProcessEvent(
+		event Event,
+	) State
+
+	// Attribute Methods
+	GetState() State
+	SetState(
+		state State,
+	)
+	GetEvents() []Event
+	GetTransitions() map[State]Transitions
 }
 
 /*
@@ -170,10 +242,10 @@ type IteratorLike[V any] interface {
 	GetNext() V
 
 	// Attribute Methods
-	GetSize() uti.Cardinal
-	GetSlot() Slot
+	GetSize() uint
+	GetSlot() uint
 	SetSlot(
-		slot Slot,
+		slot uint,
 	)
 }
 

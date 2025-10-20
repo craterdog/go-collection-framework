@@ -10,12 +10,12 @@
 ................................................................................
 */
 
-package collection
+package collections
 
 import (
 	fmt "fmt"
-	age "github.com/craterdog/go-collection-framework/v7/agent"
-	uti "github.com/craterdog/go-missing-utilities/v7"
+	age "github.com/craterdog/go-collection-framework/v8/agents"
+	uti "github.com/craterdog/go-missing-utilities/v8"
 	syn "sync"
 )
 
@@ -94,7 +94,7 @@ func (c *setClass_[V]) And(
 	return result
 }
 
-func (c *setClass_[V]) Or(
+func (c *setClass_[V]) Ior(
 	first SetLike[V],
 	second SetLike[V],
 ) SetLike[V] {
@@ -105,7 +105,7 @@ func (c *setClass_[V]) Or(
 	return result
 }
 
-func (c *setClass_[V]) Sans(
+func (c *setClass_[V]) San(
 	first SetLike[V],
 	second SetLike[V],
 ) SetLike[V] {
@@ -120,7 +120,7 @@ func (c *setClass_[V]) Xor(
 	first SetLike[V],
 	second SetLike[V],
 ) SetLike[V] {
-	return c.Or(c.Sans(first, second), c.Sans(second, first))
+	return c.Ior(c.San(first, second), c.San(second, first))
 }
 
 // INSTANCE INTERFACE
@@ -140,18 +140,28 @@ func (v *set_[V]) GetCollator() age.CollatorLike[V] {
 // Accessible[V] Methods
 
 func (v *set_[V]) GetValue(
-	index Index,
+	index int,
 ) V {
 	var value = v.values_.GetValue(index)
 	return value
 }
 
 func (v *set_[V]) GetValues(
-	first Index,
-	last Index,
+	first int,
+	last int,
 ) Sequential[V] {
 	var values = v.values_.GetValues(first, last)
 	return values
+}
+
+func (v *set_[V]) GetIndex(
+	value V,
+) int {
+	var index, found = v.findIndex(value)
+	if !found {
+		return 0
+	}
+	return index
 }
 
 // Elastic[V] Methods
@@ -159,11 +169,10 @@ func (v *set_[V]) GetValues(
 func (v *set_[V]) AddValue(
 	value V,
 ) {
-	var index, found = v.findIndex(value)
+	var slot, found = v.findIndex(value)
 	if !found {
 		// The value is not already a member, so add it.
-		var slot = age.Slot(index)
-		v.values_.InsertValue(slot, value)
+		v.values_.InsertValue(uint(slot), value)
 	}
 }
 
@@ -240,23 +249,13 @@ func (v *set_[V]) ContainsAll(
 	return true
 }
 
-func (v *set_[V]) GetIndex(
-	value V,
-) Index {
-	var index, found = v.findIndex(value)
-	if !found {
-		return 0
-	}
-	return index
-}
-
 // Sequential[V] Methods
 
 func (v *set_[V]) IsEmpty() bool {
 	return v.values_.IsEmpty()
 }
 
-func (v *set_[V]) GetSize() uti.Cardinal {
+func (v *set_[V]) GetSize() uint {
 	var size = v.values_.GetSize()
 	return size
 }
@@ -271,13 +270,11 @@ func (v *set_[V]) GetIterator() age.IteratorLike[V] {
 	return iterator
 }
 
-// Stringer Methods
+// PROTECTED INTERFACE
 
 func (v *set_[V]) String() string {
 	return uti.Format(v)
 }
-
-// PROTECTED INTERFACE
 
 // Private Methods
 
@@ -288,18 +285,18 @@ func (v *set_[V]) String() string {
 //   - found: A boolean stating whether or not the value was found.
 //
 // The algorithm performs a true O[log(n)] worst case search.
-func (v *set_[V]) findIndex(value V) (index Index, found bool) {
+func (v *set_[V]) findIndex(value V) (index int, found bool) {
 	// We use iteration instead of recursion for better performance.
 	//    start        first      middle       last          end
 	//    |-------------||----------||----------||-------------|
 	//                  |<-- size -------------->|
 	//
-	var first Index = 1           // Start at the beginning.
-	var last = Index(v.GetSize()) // End at the end.
-	var size = last               // Initially all values are candidates.
+	var first = 1               // Start at the beginning.
+	var last = int(v.GetSize()) // End at the end.
+	var size = last             // Initially all values are candidates.
 	for size > 0 {
 		var middle = first + size/2 // Rounds down to the nearest integer.
-		var candidate = v.GetValue(middle)
+		var candidate = v.GetValue(int(middle))
 		switch v.collator_.RankValues(value, candidate) {
 		case age.LesserRank:
 			// The index of the value is less than the middle

@@ -10,12 +10,12 @@
 ................................................................................
 */
 
-package collection
+package collections
 
 import (
 	fmt "fmt"
-	age "github.com/craterdog/go-collection-framework/v7/agent"
-	uti "github.com/craterdog/go-missing-utilities/v7"
+	age "github.com/craterdog/go-collection-framework/v8/agents"
+	uti "github.com/craterdog/go-missing-utilities/v8"
 	syn "sync"
 )
 
@@ -41,7 +41,7 @@ func (c *stackClass_[V]) Stack() StackLike[V] {
 }
 
 func (c *stackClass_[V]) StackWithCapacity(
-	capacity uti.Cardinal,
+	capacity uint,
 ) StackLike[V] {
 	if capacity < 1 {
 		capacity = c.defaultCapacity_
@@ -96,7 +96,7 @@ func (v *stack_[V]) GetClass() StackClassLike[V] {
 
 // Attribute Methods
 
-func (v *stack_[V]) GetCapacity() uti.Cardinal {
+func (v *stack_[V]) GetCapacity() uint {
 	return v.capacity_
 }
 
@@ -109,6 +109,14 @@ func (v *stack_[V]) AddValue(
 		panic("Attempted to add a value onto a stack that has reached its capacity.")
 	}
 	v.values_.InsertValue(0, value)
+}
+
+func (v *stack_[V]) GetLast() V {
+	if v.values_.IsEmpty() {
+		panic("Attempted to get a value from an empty stack!")
+	}
+	var last = v.values_.GetValue(1)
+	return last
 }
 
 func (v *stack_[V]) RemoveLast() V {
@@ -129,7 +137,7 @@ func (v *stack_[V]) IsEmpty() bool {
 	return v.values_.IsEmpty()
 }
 
-func (v *stack_[V]) GetSize() uti.Cardinal {
+func (v *stack_[V]) GetSize() uint {
 	var size = v.values_.GetSize()
 	return size
 }
@@ -144,13 +152,11 @@ func (v *stack_[V]) GetIterator() age.IteratorLike[V] {
 	return iterator
 }
 
-// Stringer Methods
+// PROTECTED INTERFACE
 
 func (v *stack_[V]) String() string {
 	return uti.Format(v)
 }
-
-// PROTECTED INTERFACE
 
 // Private Methods
 
@@ -158,7 +164,7 @@ func (v *stack_[V]) String() string {
 
 type stack_[V any] struct {
 	// Declare the instance attributes.
-	capacity_ uti.Cardinal
+	capacity_ uint
 	values_   ListLike[V]
 }
 
@@ -166,7 +172,7 @@ type stack_[V any] struct {
 
 type stackClass_[V any] struct {
 	// Declare the class constants.
-	defaultCapacity_ uti.Cardinal
+	defaultCapacity_ uint
 }
 
 // Class Reference

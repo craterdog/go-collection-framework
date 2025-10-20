@@ -10,11 +10,11 @@
 ................................................................................
 */
 
-package collection
+package collections
 
 import (
 	fmt "fmt"
-	uti "github.com/craterdog/go-missing-utilities/v7"
+	uti "github.com/craterdog/go-missing-utilities/v8"
 	syn "sync"
 )
 
@@ -77,7 +77,7 @@ func (v *association_[K, V]) SetValue(
 	v.value_ = value
 }
 
-// Stringer Methods
+// PROTECTED INTERFACE
 
 func (v *association_[K, V]) String() string {
 	var result = uti.Format(v.GetKey())
@@ -85,8 +85,6 @@ func (v *association_[K, V]) String() string {
 	result += uti.Format(v.GetValue())
 	return result
 }
-
-// PROTECTED INTERFACE
 
 // Private Methods
 

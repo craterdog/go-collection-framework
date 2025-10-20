@@ -11,13 +11,13 @@
 */
 
 /*
-Package "collection" declares a set of collection classes that maintain values
+Package "collections" declares a set of collection classes that maintain values
 of a generic type:
-  - List (a sortable list)
   - Catalog (a sortable map of key-value associations)
+  - List (a sortable list)
+  - Queue (a blocking FIFO)
   - Set (an ordered set)
   - Stack (a LIFO)
-  - Queue (a blocking FIFO)
 
 For detailed documentation on this package refer to the wiki:
   - https://github.com/craterdog/go-collection-framework/wiki
@@ -31,32 +31,13 @@ be developed and used seamlessly since the interface declarations only depend on
 other interfaces and intrinsic types—and the class implementations only depend
 on interfaces, not on each other.
 */
-package collection
+package collections
 
 import (
-	age "github.com/craterdog/go-collection-framework/v7/agent"
-	uti "github.com/craterdog/go-missing-utilities/v7"
+	age "github.com/craterdog/go-collection-framework/v8/agents"
 )
 
 // TYPE DECLARATIONS
-
-/*
-Index is a constrained type representing the positive (or negative) ORDINAL
-index of a value in a sequence.  The indices are ordinal rather than zero-based
-which never really made sense except for pointer offsets.  What is the "zeroth
-value" anyway?  It's the "first value", right?  So we start a fresh...
-
-This approach allows for positive indices starting at the beginning of a
-sequence—and negative indices starting at the end of the sequence, as follows:
-
-	    1           2           3             N
-	[value 1] . [value 2] . [value 3] ... [value N]
-	   -N        -(N-1)      -(N-2)          -1
-
-Notice that because the indices are ordinal based, the positive and negative
-indices are symmetrical.  An index can NEVER be zero.
-*/
-type Index int
 
 // FUNCTIONAL DECLARATIONS
 
@@ -196,7 +177,7 @@ type QueueClassLike[V any] interface {
 	// Constructor Methods
 	Queue() QueueLike[V]
 	QueueWithCapacity(
-		capacity uti.Cardinal,
+		capacity uint,
 	) QueueLike[V]
 	QueueFromArray(
 		values []V,
@@ -209,12 +190,12 @@ type QueueClassLike[V any] interface {
 	Fork(
 		group Synchronized,
 		input QueueLike[V],
-		size uti.Cardinal,
+		size uint,
 	) Sequential[QueueLike[V]]
 	Split(
 		group Synchronized,
 		input QueueLike[V],
-		size uti.Cardinal,
+		size uint,
 	) Sequential[QueueLike[V]]
 	Join(
 		group Synchronized,
@@ -236,10 +217,10 @@ The following class functions are supported:
 And() returns a new set containing the values that are both of the specified
 sets.
 
-Or() returns a new set containing the values that are in either of the specified
+Ior() returns a new set containing the values that are in either of the specified
 sets.
 
-Sans() returns a new set containing the values that are in the first specified
+San() returns a new set containing the values that are in the first specified
 set but not in the second specified set.
 
 Xor() returns a new set containing the values that are in the first specified
@@ -263,11 +244,11 @@ type SetClassLike[V any] interface {
 		first SetLike[V],
 		second SetLike[V],
 	) SetLike[V]
-	Or(
+	Ior(
 		first SetLike[V],
 		second SetLike[V],
 	) SetLike[V]
-	Sans(
+	San(
 		first SetLike[V],
 		second SetLike[V],
 	) SetLike[V]
@@ -290,7 +271,7 @@ type StackClassLike[V any] interface {
 	// Constructor Methods
 	Stack() StackLike[V]
 	StackWithCapacity(
-		capacity uti.Cardinal,
+		capacity uint,
 	) StackLike[V]
 	StackFromArray(
 		values []V,
@@ -362,7 +343,7 @@ type QueueLike[V any] interface {
 	GetClass() QueueClassLike[V]
 
 	// Attribute Methods
-	GetCapacity() uti.Cardinal
+	GetCapacity() uint
 
 	// Aspect Interfaces
 	Fifo[V]
@@ -398,7 +379,7 @@ type StackLike[V any] interface {
 	GetClass() StackClassLike[V]
 
 	// Attribute Methods
-	GetCapacity() uti.Cardinal
+	GetCapacity() uint
 
 	// Aspect Interfaces
 	Lifo[V]
@@ -429,12 +410,15 @@ indices are symmetrical.
 */
 type Accessible[V any] interface {
 	GetValue(
-		index Index,
+		index int,
 	) V
 	GetValues(
-		first Index,
-		last Index,
+		first int,
+		last int,
 	) Sequential[V]
+	GetIndex(
+		value V,
+	) int
 }
 
 /*
@@ -512,6 +496,7 @@ type Lifo[V any] interface {
 	AddValue(
 		value V,
 	)
+	GetLast() V
 	RemoveLast() V
 	RemoveAll()
 }
@@ -523,11 +508,11 @@ class.
 */
 type Malleable[V any] interface {
 	InsertValue(
-		slot age.Slot,
+		slot uint,
 		value V,
 	)
 	InsertValues(
-		slot age.Slot,
+		slot uint,
 		values Sequential[V],
 	)
 	AppendValue(
@@ -537,11 +522,11 @@ type Malleable[V any] interface {
 		values Sequential[V],
 	)
 	RemoveValue(
-		index Index,
+		index int,
 	) V
 	RemoveValues(
-		first Index,
-		last Index,
+		first int,
+		last int,
 	) Sequential[V]
 	RemoveAll()
 }
@@ -561,9 +546,6 @@ type Searchable[V any] interface {
 	ContainsAll(
 		values Sequential[V],
 	) bool
-	GetIndex(
-		value V,
-	) Index
 }
 
 /*
@@ -573,7 +555,7 @@ class.
 */
 type Sequential[V any] interface {
 	IsEmpty() bool
-	GetSize() uti.Cardinal
+	GetSize() uint
 	AsArray() []V
 	GetIterator() age.IteratorLike[V]
 }
@@ -600,11 +582,10 @@ Synchronized is an aspect interface that declares a set of method signatures
 that must be supported by each instance of a synchronized concrete class.
 */
 type Synchronized interface {
-	Add(
-		delta int,
+	Go(
+		function func(),
 	)
 	Wait()
-	Done()
 }
 
 /*
@@ -614,11 +595,11 @@ class.
 */
 type Updatable[V any] interface {
 	SetValue(
-		index Index,
+		index int,
 		value V,
 	)
 	SetValues(
-		index Index,
+		index int,
 		values Sequential[V],
 	)
 }

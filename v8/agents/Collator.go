@@ -10,11 +10,11 @@
 ................................................................................
 */
 
-package agent
+package agents
 
 import (
 	fmt "fmt"
-	uti "github.com/craterdog/go-missing-utilities/v7"
+	uti "github.com/craterdog/go-missing-utilities/v8"
 	cmp "math/cmplx"
 	ref "reflect"
 	sts "strings"
@@ -40,7 +40,7 @@ func (c *collatorClass_[V]) Collator() CollatorLike[V] {
 }
 
 func (c *collatorClass_[V]) CollatorWithMaximumDepth(
-	maximumDepth uti.Cardinal,
+	maximumDepth uint,
 ) CollatorLike[V] {
 	if uti.IsUndefined(maximumDepth) {
 		panic("The \"maximumDepth\" attribute is required by this class.")
@@ -80,11 +80,24 @@ func (v *collator_[V]) RankValues(
 
 // Attribute Methods
 
-func (v *collator_[V]) GetMaximumDepth() uti.Cardinal {
+func (v *collator_[V]) GetMaximumDepth() uint {
 	return v.maximumDepth_
 }
 
 // PROTECTED INTERFACE
+
+func (v Rank) String() string {
+	var source string
+	switch v {
+	case LesserRank:
+		source = "LesserRank"
+	case EqualRank:
+		source = "EqualRank"
+	case GreaterRank:
+		source = "GreaterRank"
+	}
+	return source
+}
 
 // Private Methods
 
@@ -403,6 +416,14 @@ func (v *collator_[V]) rankBytes(
 	return EqualRank
 }
 
+// NOTE:
+// There is no canonical ordering of complex numbers that preserves their
+// mathematical field structure.  However, we can provide the following
+// useful ordering using the Riemann Sphere:
+//
+//	0 < z < ∞  ordered by magnitude(z) followed by -angle(z)
+//
+// This ordering preserves the standard order of the real number line.
 func (v *collator_[V]) rankComplex(
 	first complex128,
 	second complex128,
@@ -411,23 +432,34 @@ func (v *collator_[V]) rankComplex(
 		return EqualRank
 	}
 	switch {
-	case cmp.Abs(first) < cmp.Abs(second):
-		// The magnitude of the first vector is less than the second.
-		return LesserRank
-	case cmp.Abs(first) > cmp.Abs(second):
-		// The magnitude of the first vector is greater than the second.
+	case cmp.IsInf(first):
 		return GreaterRank
-	default:
-		// The magnitudes of the vectors are equal.
+	case cmp.IsInf(second):
+		return LesserRank
+	case cmp.Abs(first) < cmp.Abs(second):
 		switch {
 		case cmp.Phase(first) < cmp.Phase(second):
-			// The phase of the first vector is less than the second.
-			return LesserRank
-		case cmp.Phase(first) > cmp.Phase(second):
-			// The phase of the first vector is greater than the second.
+			// Reverse the direction since larger angles head negative.
 			return GreaterRank
 		default:
-			// The phases of the vectors are also equal.
+			return LesserRank
+		}
+	case cmp.Abs(first) > cmp.Abs(second):
+		switch {
+		case cmp.Phase(first) < cmp.Phase(second):
+			// Reverse the direction since larger angles head negative.
+			return LesserRank
+		default:
+			return GreaterRank
+		}
+	default:
+		switch {
+		case cmp.Phase(first) < cmp.Phase(second):
+			// Reverse the direction since larger angles head negative.
+			return GreaterRank
+		case cmp.Phase(first) > cmp.Phase(second):
+			return LesserRank
+		default:
 			return EqualRank
 		}
 	}
@@ -793,8 +825,8 @@ func (v *collator_[V]) rankValues(
 
 type collator_[V any] struct {
 	// Declare the instance attributes.
-	currentDepth_ uti.Cardinal
-	maximumDepth_ uti.Cardinal
+	currentDepth_ uint
+	maximumDepth_ uint
 }
 
 // Class Structure

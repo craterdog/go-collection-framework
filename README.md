@@ -4,8 +4,8 @@
 
 ### Overview
 This project provides a Go based framework containing generic interfaces and
-collection types for common high-level collections. It is meant to augment or
-replace the use of the native Go array, slice and map types.
+class types for common high-level collections. It provides a higher-level of
+abstraction than the low-level native array, slice and map types.
 
 ### Quick Links
 For more information on this project click on the following links:

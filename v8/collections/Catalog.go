@@ -10,12 +10,12 @@
 ................................................................................
 */
 
-package collection
+package collections
 
 import (
 	fmt "fmt"
-	age "github.com/craterdog/go-collection-framework/v7/agent"
-	uti "github.com/craterdog/go-missing-utilities/v7"
+	age "github.com/craterdog/go-collection-framework/v8/agents"
+	uti "github.com/craterdog/go-missing-utilities/v8"
 	syn "sync"
 )
 
@@ -231,7 +231,7 @@ func (v *catalog_[K, V]) IsEmpty() bool {
 	return v.associations_.IsEmpty()
 }
 
-func (v *catalog_[K, V]) GetSize() uti.Cardinal {
+func (v *catalog_[K, V]) GetSize() uint {
 	var size = v.associations_.GetSize()
 	return size
 }
@@ -266,13 +266,11 @@ func (v *catalog_[K, V]) ShuffleValues() {
 	v.associations_.ShuffleValues()
 }
 
-// Stringer Methods
+// PROTECTED INTERFACE
 
 func (v *catalog_[K, V]) String() string {
 	return uti.Format(v)
 }
-
-// PROTECTED INTERFACE
 
 // Private Methods
 

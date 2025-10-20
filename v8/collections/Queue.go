@@ -10,12 +10,12 @@
 ................................................................................
 */
 
-package collection
+package collections
 
 import (
 	fmt "fmt"
-	age "github.com/craterdog/go-collection-framework/v7/agent"
-	uti "github.com/craterdog/go-missing-utilities/v7"
+	age "github.com/craterdog/go-collection-framework/v8/agents"
+	uti "github.com/craterdog/go-missing-utilities/v8"
 	syn "sync"
 )
 
@@ -35,12 +35,12 @@ func (c *queueClass_[V]) Queue() QueueLike[V] {
 }
 
 func (c *queueClass_[V]) QueueWithCapacity(
-	capacity uti.Cardinal,
+	capacity uint,
 ) QueueLike[V] {
 	if capacity < 1 {
 		capacity = 16 // This is the default capacity.
 	}
-	var available = make(chan bool, int(capacity))
+	var available = make(chan bool, capacity)
 	var listClass = ListClass[V]()
 	var values = listClass.List()
 	var instance = &queue_[V]{
@@ -83,7 +83,7 @@ func (c *queueClass_[V]) QueueFromSequence(
 func (c *queueClass_[V]) Fork(
 	group Synchronized,
 	input QueueLike[V],
-	size uti.Cardinal,
+	size uint,
 ) Sequential[QueueLike[V]] {
 	// Validate the arguments.
 	if size < 2 {
@@ -94,17 +94,13 @@ func (c *queueClass_[V]) Fork(
 	var capacity = input.GetCapacity()
 	var listClass = ListClass[QueueLike[V]]()
 	var outputs = listClass.List()
-	var i uti.Cardinal
-	for ; i < size; i++ {
+	var counter uint
+	for ; counter < size; counter++ {
 		outputs.AppendValue(c.QueueWithCapacity(capacity))
 	}
 
 	// Connect up the input queue to the output queues in a separate go-routine.
-	group.Add(1)
-	go func() {
-		// Make sure the wait group is decremented on termination.
-		defer group.Done()
-
+	group.Go(func() {
 		// Write each value read from the input queue to each output queue.
 		var iterator = outputs.GetIterator()
 		for {
@@ -128,7 +124,7 @@ func (c *queueClass_[V]) Fork(
 			var output = iterator.GetNext()
 			output.CloseChannel()
 		}
-	}()
+	})
 
 	return outputs
 }
@@ -136,7 +132,7 @@ func (c *queueClass_[V]) Fork(
 func (c *queueClass_[V]) Split(
 	group Synchronized,
 	input QueueLike[V],
-	size uti.Cardinal,
+	size uint,
 ) Sequential[QueueLike[V]] {
 	// Validate the arguments.
 	if size < 2 {
@@ -147,17 +143,13 @@ func (c *queueClass_[V]) Split(
 	var capacity = input.GetCapacity()
 	var listClass = ListClass[QueueLike[V]]()
 	var outputs = listClass.List()
-	var i uti.Cardinal
-	for ; i < size; i++ {
+	var counter uint
+	for ; counter < size; counter++ {
 		outputs.AppendValue(c.QueueWithCapacity(capacity))
 	}
 
 	// Connect up the input queue to the output queues.
-	group.Add(1)
-	go func() {
-		// Make sure the wait group is decremented on termination.
-		defer group.Done()
-
+	group.Go(func() {
 		// Take turns reading from the input queue and writing to each output queue.
 		var iterator = outputs.GetIterator()
 		for {
@@ -181,7 +173,7 @@ func (c *queueClass_[V]) Split(
 			var output = iterator.GetNext()
 			output.CloseChannel()
 		}
-	}()
+	})
 
 	return outputs
 }
@@ -201,11 +193,7 @@ func (c *queueClass_[V]) Join(
 	var output = c.QueueWithCapacity(capacity)
 
 	// Connect up the input queues to the output queue.
-	group.Add(1)
-	go func() {
-		// Make sure the wait group is decremented on termination.
-		defer group.Done()
-
+	group.Go(func() {
 		// Take turns reading from each input queue and writing to the output queue.
 		iterator.ToStart()
 		for {
@@ -222,7 +210,7 @@ func (c *queueClass_[V]) Join(
 
 		// Close the output queue.
 		output.CloseChannel()
-	}()
+	})
 
 	return output
 }
@@ -237,7 +225,7 @@ func (v *queue_[V]) GetClass() QueueClassLike[V] {
 
 // Attribute Methods
 
-func (v *queue_[V]) GetCapacity() uti.Cardinal {
+func (v *queue_[V]) GetCapacity() uint {
 	return v.capacity_
 }
 
@@ -290,9 +278,9 @@ func (v *queue_[V]) IsEmpty() bool {
 	return result
 }
 
-func (v *queue_[V]) GetSize() uti.Cardinal {
+func (v *queue_[V]) GetSize() uint {
 	v.mutex_.Lock()
-	var size = uti.Cardinal(len(v.available_))
+	var size = uint(len(v.available_))
 	v.mutex_.Unlock()
 	return size
 }
@@ -311,13 +299,11 @@ func (v *queue_[V]) GetIterator() age.IteratorLike[V] {
 	return iterator
 }
 
-// Stringer Methods
+// PROTECTED INTERFACE
 
 func (v *queue_[V]) String() string {
 	return uti.Format(v)
 }
-
-// PROTECTED INTERFACE
 
 // Private Methods
 
@@ -331,7 +317,7 @@ func (v *queue_[V]) String() string {
 type queue_[V any] struct {
 	// Declare the instance attributes.
 	available_ chan bool
-	capacity_  uti.Cardinal
+	capacity_  uint
 	mutex_     syn.Mutex
 	values_    ListLike[V]
 }

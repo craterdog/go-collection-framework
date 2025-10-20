@@ -10,11 +10,11 @@
 ................................................................................
 */
 
-package agent
+package agents
 
 import (
 	fmt "fmt"
-	uti "github.com/craterdog/go-missing-utilities/v7"
+	uti "github.com/craterdog/go-missing-utilities/v8"
 	syn "sync"
 )
 
@@ -36,7 +36,7 @@ func (c *iteratorClass_[V]) Iterator(
 	}
 	var instance = &iterator_[V]{
 		// Initialize the instance attributes.
-		size_:   uti.Cardinal(len(array)),
+		size_:   uti.ArraySize(array),
 		values_: array,
 	}
 	return instance
@@ -63,8 +63,7 @@ func (v *iterator_[V]) ToStart() {
 }
 
 func (v *iterator_[V]) ToEnd() {
-	var size = Slot(v.size_)
-	v.slot_ = size
+	v.slot_ = v.size_
 }
 
 func (v *iterator_[V]) HasPrevious() bool {
@@ -81,14 +80,12 @@ func (v *iterator_[V]) GetPrevious() V {
 }
 
 func (v *iterator_[V]) HasNext() bool {
-	var size = Slot(v.size_)
-	return v.slot_ < size
+	return v.slot_ < v.size_
 }
 
 func (v *iterator_[V]) GetNext() V {
 	var result_ V
-	var size = Slot(v.size_)
-	if v.slot_ < size {
+	if v.slot_ < v.size_ {
 		v.slot_ = v.slot_ + 1
 		result_ = v.values_[v.slot_-1] // convert to ZERO based indexing
 	}
@@ -97,20 +94,19 @@ func (v *iterator_[V]) GetNext() V {
 
 // Attribute Methods
 
-func (v *iterator_[V]) GetSize() uti.Cardinal {
+func (v *iterator_[V]) GetSize() uint {
 	return v.size_
 }
 
-func (v *iterator_[V]) GetSlot() Slot {
+func (v *iterator_[V]) GetSlot() uint {
 	return v.slot_
 }
 
 func (v *iterator_[V]) SetSlot(
-	slot Slot,
+	slot uint,
 ) {
-	var size = Slot(v.size_)
-	if slot > size {
-		slot = size
+	if slot > v.size_ {
+		slot = v.size_
 	}
 	v.slot_ = slot
 }
@@ -123,8 +119,8 @@ func (v *iterator_[V]) SetSlot(
 
 type iterator_[V any] struct {
 	// Declare the instance attributes.
-	slot_   Slot
-	size_   uti.Cardinal
+	slot_   uint
+	size_   uint
 	values_ []V
 }
 

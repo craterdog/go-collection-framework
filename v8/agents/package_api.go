@@ -34,13 +34,6 @@ import ()
 // TYPE DECLARATIONS
 
 /*
-Event is a constrained type representing an event type in a state machine.
-Using a string type for an event makes it easier to print out in a human
-readable way.
-*/
-type Event string
-
-/*
 Rank is a constrained type representing the possible rankings for two values.
 */
 type Rank uint8

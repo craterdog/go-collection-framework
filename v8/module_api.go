@@ -40,8 +40,7 @@ import (
 // Agents
 
 type (
-	Event = age.Event
-	Rank  = age.Rank
+	Rank = age.Rank
 )
 
 const (

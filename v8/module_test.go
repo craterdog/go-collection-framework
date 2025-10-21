@@ -1141,36 +1141,6 @@ func TestSortingStrings(t *tes.T) {
 	ass.Equal(t, sorted, unsorted)
 }
 
-var (
-	invalid fra.State = fra.ControllerClass().Invalid()
-	state1  fra.State = "$State1"
-	state2  fra.State = "$State2"
-	state3  fra.State = "$State3"
-)
-
-var (
-	initialized fra.Event = "$Initialized"
-	processed   fra.Event = "$Processed"
-	finalized   fra.Event = "$Finalized"
-)
-
-func TestController(t *tes.T) {
-	var events = []fra.Event{initialized, processed, finalized}
-	var transitions = map[fra.State]fra.Transitions{
-		state1: fra.Transitions{state2, invalid, invalid},
-		state2: fra.Transitions{invalid, state2, state3},
-		state3: fra.Transitions{invalid, invalid, invalid},
-	}
-
-	var controller = fra.Controller(events, transitions, state1)
-	ass.Equal(t, state1, controller.GetState())
-	ass.Equal(t, state2, controller.ProcessEvent(initialized))
-	ass.Equal(t, state2, controller.ProcessEvent(processed))
-	ass.Equal(t, state3, controller.ProcessEvent(finalized))
-	controller.SetState(state1)
-	ass.Equal(t, state1, controller.GetState())
-}
-
 // COLLECTIONS
 
 func TestCatalogConstructors(t *tes.T) {

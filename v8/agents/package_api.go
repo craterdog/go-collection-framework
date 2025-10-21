@@ -51,17 +51,6 @@ const (
 	GreaterRank
 )
 
-/*
-State is a constrained type representing a state in a state machine.  Using a
-string type for a state makes it easier to print out in a human readable way.
-*/
-type State string
-
-/*
-Transitions is a constrained type representing a row of states in a state machine.
-*/
-type Transitions []State
-
 // FUNCTIONAL DECLARATIONS
 
 /*
@@ -92,46 +81,6 @@ type CollatorClassLike[V any] interface {
 	CollatorWithMaximumDepth(
 		maximumDepth uint,
 	) CollatorLike[V]
-}
-
-/*
-ControllerClassLike is a class interface that declares the complete set of class
-constructors, constants and functions that must be supported by each concrete
-controller-like class.
-
-A controller-like class implements a state machine based on a finite state
-machine and possible event types. It enforces the possible states of the state
-machine and allowed transitions between states given a finite set of possible
-event types. It implements a finite state machine with the following table
-structure:
-
-	                    events:
-	        -------------------------------
-	        [event1,  event2,  ... eventM ]
-
-	                 transitions:
-	        -------------------------------
-	state1: [invalid, state2,  ... invalid]
-	state2: [state3,  stateN,  ... invalid]
-	                    ...
-	stateN: [state1,  invalid, ... state3 ]
-
-The first row of the state machine defines the possible events that can occur.
-Each subsequent row defines a state and the possible transitions from that
-state to the next state for each possible event. Transitions marked as "invalid"
-cannot occur. The state machine always starts in the first state of the finite
-state machine (e.g. state1).
-*/
-type ControllerClassLike interface {
-	// Constructor Methods
-	Controller(
-		events []Event,
-		transitions map[State]Transitions,
-		initialState State,
-	) ControllerLike
-
-	// Constant Methods
-	Invalid() State
 }
 
 /*
@@ -202,27 +151,6 @@ type CollatorLike[V any] interface {
 
 	// Attribute Methods
 	GetMaximumDepth() uint
-}
-
-/*
-ControllerLike is an instance interface that declares the complete set of
-principal, attribute and aspect methods that must be supported by each
-instance of a concrete controller-like class.
-*/
-type ControllerLike interface {
-	// Principal Methods
-	GetClass() ControllerClassLike
-	ProcessEvent(
-		event Event,
-	) State
-
-	// Attribute Methods
-	GetState() State
-	SetState(
-		state State,
-	)
-	GetEvents() []Event
-	GetTransitions() map[State]Transitions
 }
 
 /*

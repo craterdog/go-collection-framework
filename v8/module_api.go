@@ -40,10 +40,8 @@ import (
 // Agents
 
 type (
-	Event       = age.Event
-	Rank        = age.Rank
-	State       = age.State
-	Transitions = age.Transitions
+	Event = age.Event
+	Rank  = age.Rank
 )
 
 const (
@@ -58,14 +56,12 @@ type (
 
 type (
 	CollatorClassLike[V any] = age.CollatorClassLike[V]
-	ControllerClassLike      = age.ControllerClassLike
 	IteratorClassLike[V any] = age.IteratorClassLike[V]
 	SorterClassLike[V any]   = age.SorterClassLike[V]
 )
 
 type (
 	CollatorLike[V any] = age.CollatorLike[V]
-	ControllerLike      = age.ControllerLike
 	IteratorLike[V any] = age.IteratorLike[V]
 	SorterLike[V any]   = age.SorterLike[V]
 )
@@ -121,22 +117,6 @@ func CollatorWithMaximumDepth[V any](
 ) CollatorLike[V] {
 	return CollatorClass[V]().CollatorWithMaximumDepth(
 		maximumDepth,
-	)
-}
-
-func ControllerClass() ControllerClassLike {
-	return age.ControllerClass()
-}
-
-func Controller(
-	events []age.Event,
-	transitions map[State]age.Transitions,
-	initialState age.State,
-) ControllerLike {
-	return ControllerClass().Controller(
-		events,
-		transitions,
-		initialState,
 	)
 }
 

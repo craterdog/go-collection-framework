@@ -3,9 +3,16 @@
 ## Go Collection Framework
 
 ### Overview
-This project provides a Go based framework containing generic interfaces and
-class types for common high-level collections. It provides a higher-level of
-abstraction than the low-level native array, slice and map types.
+This project defines a Go based framework containing generic interfaces and
+class types for the following common high-level collections:
+ * `Catalog[K comparable, V any]`
+ * `List[V any]`
+ * `Set[V any]`
+ * `Stack[V any]`
+ * `Queue[V any]`
+
+These classes provides a higher-level of abstraction than the low-level native
+Go array, slice and map types.
 
 ### Quick Links
 For more information on this project click on the following links:

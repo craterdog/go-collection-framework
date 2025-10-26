@@ -23,7 +23,6 @@ import (
 func TestModuleFunctions(t *tes.T) {
 	fra.Collator[any]()
 	fra.CollatorWithMaximumDepth[any](8)
-	fra.Iterator[any]([]any{"foo", 5})
 	var sorter = fra.Sorter[any]()
 	fra.SorterWithRanker[any](sorter.GetRanker())
 	fra.List[string]()

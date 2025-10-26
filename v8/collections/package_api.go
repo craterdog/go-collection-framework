@@ -35,6 +35,7 @@ package collections
 
 import (
 	age "github.com/craterdog/go-collection-framework/v8/agents"
+	uti "github.com/craterdog/go-missing-utilities/v8"
 )
 
 // TYPE DECLARATIONS
@@ -557,7 +558,7 @@ type Sequential[V any] interface {
 	IsEmpty() bool
 	GetSize() uint
 	AsArray() []V
-	GetIterator() age.IteratorLike[V]
+	GetIterator() uti.IteratorLike[V]
 }
 
 /*

@@ -33,6 +33,7 @@ package module
 import (
 	age "github.com/craterdog/go-collection-framework/v8/agents"
 	col "github.com/craterdog/go-collection-framework/v8/collections"
+	uti "github.com/craterdog/go-missing-utilities/v8"
 )
 
 // TYPE ALIASES
@@ -55,13 +56,12 @@ type (
 
 type (
 	CollatorClassLike[V any] = age.CollatorClassLike[V]
-	IteratorClassLike[V any] = age.IteratorClassLike[V]
 	SorterClassLike[V any]   = age.SorterClassLike[V]
 )
 
 type (
+	IteratorLike[V any] = uti.IteratorLike[V]
 	CollatorLike[V any] = age.CollatorLike[V]
-	IteratorLike[V any] = age.IteratorLike[V]
 	SorterLike[V any]   = age.SorterLike[V]
 )
 
@@ -119,14 +119,10 @@ func CollatorWithMaximumDepth[V any](
 	)
 }
 
-func IteratorClass[V any]() IteratorClassLike[V] {
-	return age.IteratorClass[V]()
-}
-
 func Iterator[V any](
 	array []V,
 ) IteratorLike[V] {
-	return IteratorClass[V]().Iterator(
+	return uti.Iterator(
 		array,
 	)
 }

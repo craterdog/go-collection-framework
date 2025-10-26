@@ -241,7 +241,7 @@ func (v *catalog_[K, V]) AsArray() []AssociationLike[K, V] {
 	return array
 }
 
-func (v *catalog_[K, V]) GetIterator() age.IteratorLike[AssociationLike[K, V]] {
+func (v *catalog_[K, V]) GetIterator() uti.IteratorLike[AssociationLike[K, V]] {
 	var iterator = v.associations_.GetIterator()
 	return iterator
 }

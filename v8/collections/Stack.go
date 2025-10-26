@@ -14,7 +14,6 @@ package collections
 
 import (
 	fmt "fmt"
-	age "github.com/craterdog/go-collection-framework/v8/agents"
 	uti "github.com/craterdog/go-missing-utilities/v8"
 	syn "sync"
 )
@@ -147,7 +146,7 @@ func (v *stack_[V]) AsArray() []V {
 	return array
 }
 
-func (v *stack_[V]) GetIterator() age.IteratorLike[V] {
+func (v *stack_[V]) GetIterator() uti.IteratorLike[V] {
 	var iterator = v.values_.GetIterator()
 	return iterator
 }

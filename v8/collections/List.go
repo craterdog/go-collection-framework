@@ -291,10 +291,9 @@ func (v *list_[V]) AsArray() []V {
 	return array
 }
 
-func (v *list_[V]) GetIterator() age.IteratorLike[V] {
+func (v *list_[V]) GetIterator() uti.IteratorLike[V] {
 	var array = uti.CopyArray(v.array_)
-	var iteratorClass = age.IteratorClass[V]()
-	var iterator = iteratorClass.Iterator(array)
+	var iterator = uti.Iterator(array)
 	return iterator
 }
 

@@ -265,7 +265,7 @@ func (v *set_[V]) AsArray() []V {
 	return array
 }
 
-func (v *set_[V]) GetIterator() age.IteratorLike[V] {
+func (v *set_[V]) GetIterator() uti.IteratorLike[V] {
 	var iterator = v.values_.GetIterator()
 	return iterator
 }

@@ -16,6 +16,8 @@ import (
 	fmt "fmt"
 	fra "github.com/craterdog/go-collection-framework/v8"
 	ass "github.com/stretchr/testify/assert"
+	mat "math"
+	sli "slices"
 	syn "sync"
 	tes "testing"
 )
@@ -1848,4 +1850,190 @@ func TestStacksWithStrings(t *tes.T) {
 	ass.Equal(t, "bar", stack.RemoveLast())
 	ass.True(t, stack.GetSize() == 1)
 	stack.RemoveAll()
+}
+
+func TestIntervalConstructors(t *tes.T) {
+	var glyphs = fra.Interval[Glyph](
+		fra.Inclusive,
+		Glyph(65),
+		Glyph(70),
+		fra.Inclusive,
+	)
+	ass.Equal(t, 6, int(glyphs.GetSize()))
+	ass.Equal(t, "['A'..'F']", fmt.Sprintf("%v", glyphs))
+
+	glyphs = fra.Interval[Glyph](
+		fra.Exclusive,
+		Glyph(123),
+		Glyph(456),
+		fra.Inclusive,
+	)
+	ass.Equal(t, 333, int(glyphs.GetSize()))
+	ass.Equal(t, "('{'..'ǈ']", fmt.Sprintf("%v", glyphs))
+
+	glyphs = fra.Interval[Glyph](
+		fra.Inclusive,
+		Glyph(1302),
+		Glyph(1303),
+		fra.Exclusive,
+	)
+	ass.Equal(t, 1, int(glyphs.GetSize()))
+	ass.Equal(t, "['Ԗ'..'ԗ')", fmt.Sprintf("%v", glyphs))
+
+	glyphs = fra.Interval[Glyph](
+		fra.Exclusive,
+		Glyph(0),
+		Glyph(30),
+		fra.Exclusive,
+	)
+	ass.Equal(t, 29, int(glyphs.GetSize()))
+	ass.Equal(
+		t,
+		"('\x00'..'\x1e')",
+		fmt.Sprintf("%v", glyphs),
+	)
+}
+
+func TestSpectrumConstructors(t *tes.T) {
+	var words = fra.Spectrum[Word](
+		fra.Inclusive,
+		Word("/nebula/classes/abstract"),
+		Word("/nebula/types"),
+		fra.Inclusive,
+	)
+	ass.Equal(
+		t,
+		"[/nebula/classes/abstract../nebula/types]",
+		fmt.Sprintf("%v", words),
+	)
+
+	words = fra.Spectrum[Word](
+		fra.Inclusive,
+		Word(`"A"`),
+		Word(`"Fe"`),
+		fra.Exclusive,
+	)
+	ass.Equal(
+		t,
+		`["A".."Fe")`,
+		fmt.Sprintf("%v", words),
+	)
+
+	words = fra.Spectrum[Word](
+		fra.Exclusive,
+		Word("v1.2.3"),
+		Word("v2"),
+		fra.Exclusive,
+	)
+	ass.Equal(
+		t,
+		`(v1.2.3..v2)`,
+		fmt.Sprintf("%v", words),
+	)
+}
+
+func TestContinuumConstructors(t *tes.T) {
+	var numbers = fra.Continuum[Number](
+		fra.Exclusive,
+		Number(-1.23),
+		Number(4.56),
+		fra.Exclusive,
+	)
+	ass.Equal(t, "(-1.23..4.56)", fmt.Sprintf("%v", numbers))
+
+	numbers = fra.Continuum[Number](
+		fra.Exclusive,
+		Number(mat.NaN()),
+		Number(0),
+		fra.Inclusive,
+	)
+	ass.Equal(t, "(..0]", fmt.Sprintf("%v", numbers))
+
+	numbers = fra.Continuum[Number](
+		fra.Inclusive,
+		Number(1),
+		Number(mat.NaN()),
+		fra.Exclusive,
+	)
+	ass.Equal(t, "[1..)", fmt.Sprintf("%v", numbers))
+
+	numbers = fra.Continuum[Number](
+		fra.Inclusive,
+		Number(0),
+		Number(1),
+		fra.Inclusive,
+	)
+	ass.Equal(t, "[0..1]", fmt.Sprintf("%v", numbers))
+}
+
+type Glyph rune
+
+func (v Glyph) AsSource() string {
+	return "'" + string([]rune{rune(v)}) + "'"
+}
+
+func (v Glyph) AsInteger() int {
+	return int(v)
+}
+
+func (v Glyph) IsDefined() bool {
+	return v >= 0
+}
+
+func (v Glyph) IsMinimum() bool {
+	return v == 0
+}
+
+func (v Glyph) IsZero() bool {
+	return v == 0
+}
+
+func (v Glyph) IsMaximum() bool {
+	return v == mat.MaxInt32
+}
+
+type Word string
+
+func (v Word) AsSource() string {
+	return string(v)
+}
+
+func (v Word) IsBefore(
+	value Word,
+) bool {
+	return sli.Compare([]byte(v), []byte(value)) < 0
+}
+
+type Number float64
+
+func (v Number) AsSource() string {
+	return fmt.Sprintf("%v", float64(v))
+}
+
+func (v Number) AsFloat() float64 {
+	return float64(v)
+}
+
+func (v Number) HasMagnitude() bool {
+	return v > 0
+}
+
+func (v Number) IsInfinite() bool {
+	return v == Number(mat.Inf(0))
+}
+
+func (v Number) IsDefined() bool {
+	return !(mat.IsNaN(float64(v)))
+}
+
+func (v Number) IsMinimum() bool {
+	return v == Number(mat.Inf(-1))
+}
+
+func (v Number) IsZero() bool {
+	return v == Number(0)
+}
+
+func (v Number) IsMaximum() bool {
+	return v == Number(mat.Inf(1))
 }

@@ -30,8 +30,7 @@ func SetClass[V any]() SetClassLike[V] {
 // Constructor Methods
 
 func (c *setClass_[V]) Set() SetLike[V] {
-	var collatorClass = age.CollatorClass[V]()
-	var collator = collatorClass.Collator()
+	var collator = age.CollatorClass[V]().Collator()
 	var instance = c.SetWithCollator(collator)
 	return instance
 }

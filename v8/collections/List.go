@@ -103,13 +103,12 @@ func (v *list_[V]) GetIndex(
 	value V,
 ) int {
 	var index int
-	var collatorClass = age.CollatorClass[V]()
-	var compare = collatorClass.Collator().CompareValues
+	var collator = age.CollatorClass[V]().Collator()
 	var iterator = v.GetIterator()
 	for iterator.HasNext() {
 		index++
 		var candidate = iterator.GetNext()
-		if compare(candidate, value) {
+		if collator.CompareValues(candidate, value) {
 			// Found the value.
 			return index
 		}
@@ -300,28 +299,24 @@ func (v *list_[V]) GetIterator() uti.IteratorLike[V] {
 // Sortable[V] Methods
 
 func (v *list_[V]) SortValues() {
-	var sorterClass = age.SorterClass[V]()
-	var sorter = sorterClass.Sorter()
+	var sorter = age.SorterClass[V]().Sorter()
 	sorter.SortValues(v.array_)
 }
 
 func (v *list_[V]) SortValuesWithRanker(
 	ranker age.RankingFunction[V],
 ) {
-	var sorterClass = age.SorterClass[V]()
-	var sorter = sorterClass.SorterWithRanker(ranker)
+	var sorter = age.SorterClass[V]().SorterWithRanker(ranker)
 	sorter.SortValues(v.array_)
 }
 
 func (v *list_[V]) ReverseValues() {
-	var sorterClass = age.SorterClass[V]()
-	var sorter = sorterClass.Sorter()
+	var sorter = age.SorterClass[V]().Sorter()
 	sorter.ReverseValues(v.array_)
 }
 
 func (v *list_[V]) ShuffleValues() {
-	var sorterClass = age.SorterClass[V]()
-	var sorter = sorterClass.Sorter()
+	var sorter = age.SorterClass[V]().Sorter()
 	sorter.ShuffleValues(v.array_)
 }
 

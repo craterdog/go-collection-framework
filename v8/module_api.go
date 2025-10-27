@@ -33,6 +33,7 @@ package module
 import (
 	age "github.com/craterdog/go-collection-framework/v8/agents"
 	col "github.com/craterdog/go-collection-framework/v8/collections"
+	ran "github.com/craterdog/go-collection-framework/v8/ranges"
 )
 
 // TYPE ALIASES
@@ -95,6 +96,36 @@ type (
 	Sortable[V any]                  = col.Sortable[V]
 	Synchronized                     = col.Synchronized
 	Updatable[V any]                 = col.Updatable[V]
+)
+
+// Ranges
+
+type (
+	Bracket = ran.Bracket
+)
+
+const (
+	Inclusive = ran.Inclusive
+	Exclusive = ran.Exclusive
+)
+
+type (
+	ContinuumClassLike[V ran.Continuous] = ran.ContinuumClassLike[V]
+	IntervalClassLike[V ran.Discrete]    = ran.IntervalClassLike[V]
+	SpectrumClassLike[V ran.Ordered[V]]  = ran.SpectrumClassLike[V]
+)
+
+type (
+	ContinuumLike[V ran.Continuous] = ran.ContinuumLike[V]
+	IntervalLike[V ran.Discrete]    = ran.IntervalLike[V]
+	SpectrumLike[V ran.Ordered[V]]  = ran.SpectrumLike[V]
+)
+
+type (
+	Bounded[V any] = ran.Bounded[V]
+	Continuous     = ran.Continuous
+	Discrete       = ran.Discrete
+	Ordered[V any] = ran.Ordered[V]
 )
 
 // CLASS ACCESSORS
@@ -298,6 +329,62 @@ func StackFromSequence[V any](
 ) StackLike[V] {
 	return StackClass[V]().StackFromSequence(
 		values,
+	)
+}
+
+// Ranges
+
+func ContinuumClass[V Continuous]() ContinuumClassLike[V] {
+	return ran.ContinuumClass[V]()
+}
+
+func Continuum[V Continuous](
+	left ran.Bracket,
+	minimum V,
+	maximum V,
+	right ran.Bracket,
+) ContinuumLike[V] {
+	return ContinuumClass[V]().Continuum(
+		left,
+		minimum,
+		maximum,
+		right,
+	)
+}
+
+func IntervalClass[V Discrete]() IntervalClassLike[V] {
+	return ran.IntervalClass[V]()
+}
+
+func Interval[V Discrete](
+	left ran.Bracket,
+	minimum V,
+	maximum V,
+	right ran.Bracket,
+) IntervalLike[V] {
+	return IntervalClass[V]().Interval(
+		left,
+		minimum,
+		maximum,
+		right,
+	)
+}
+
+func SpectrumClass[V Ordered[V]]() SpectrumClassLike[V] {
+	return ran.SpectrumClass[V]()
+}
+
+func Spectrum[V Ordered[V]](
+	left ran.Bracket,
+	minimum V,
+	maximum V,
+	right ran.Bracket,
+) SpectrumLike[V] {
+	return SpectrumClass[V]().Spectrum(
+		left,
+		minimum,
+		maximum,
+		right,
 	)
 }
 
